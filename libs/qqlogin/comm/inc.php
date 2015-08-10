@@ -1,0 +1,2 @@
+<?php die('forbidden'); ?>
+{"appid":"xx","appkey":"xxx","callback":"http://sso.qingguo.com/callback","scope":"get_user_info,add_share,get_info,add_t","errorReport":true,"storageType":"file","host":"localhost","user":"root","password":"root","database":"test"}
