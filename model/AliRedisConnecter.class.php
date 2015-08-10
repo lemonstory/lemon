@@ -4,10 +4,10 @@ class AliRedisConnecter
 	private static $CONN_TIMEOUT = 3;
 	public static function connRedis($instance)
 	{
-		$host = 'adee4334c6ed11e4.m.cnhza.kvstore.aliyuncs.com';
+		$host = 'xx.m.cnhza.kvstore.aliyuncs.com';
 		$port = '6379';
-		$user = 'adee4334c6ed11e4';
-		$pwd = 'TutuDev317';
+		$user = 'xxx';
+		$pwd = 'xxx';
 	
 		$redisObj = new Redis();
 		$tmp_count = 0;

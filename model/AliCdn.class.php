@@ -11,8 +11,8 @@ class AliCdn extends ModelBase
     public function getClient()
     {
         $c = new AliyunClient;
-        $c->accessKeyId = "84KTqRKsyBIYnVJt";
-        $c->accessKeySecret = "u72cpnMTt2mykMMluafimbhv5QD3uC";
+        $c->accessKeyId = "xxx";
+        $c->accessKeySecret = "xxx";
         $c->serverUrl="http://cdn.aliyuncs.com/";
         return $c;
     }
