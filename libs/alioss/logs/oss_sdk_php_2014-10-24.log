@@ -1,0 +1,225 @@
+2014-10-24 15:48:29 : ---LOG START---------------------------------------------------------------------------
+--REQUEST URL:----------------------------------------------
+http://oss.aliyuncs.com/gexingnew/2014/10/24/c1b161f9db3dbc5e2b4cdd8984daf83e.jpg
+STRING TO SIGN:----------------------------------------------
+PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 07:48:29 GMT
+/gexingnew/2014/10/24/c1b161f9db3dbc5e2b4cdd8984daf83e.jpg
+REQUEST HEADERS:----------------------------------------------
+a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 07:48:29 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:VNRGv4jhm0RIWuQGApAeuxscMI0=";}
+RESPONSE HEADERS:----------------------------------------------
+a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 07:48:34 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""941555C294BB2F45341E4FC5491B034D"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A04528B3742897C822FF8";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/c1b161f9db3dbc5e2b4cdd8984daf83e.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:454;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.2179999999999999993338661852249060757458209991455078125;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.061999999999999999555910790149937383830547332763671875;s:16:"pretransfer_time";d:0.061999999999999999555910790149937383830547332763671875;s:11:"size_upload";d:7634;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:35018;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:7634;s:18:"starttransfer_time";d:0.0940000000000000002220446049250313080847263336181640625;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/c1b161f9db3dbc5e2b4cdd8984daf83e.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 07:48:29 GMT
+/gexingnew/2014/10/24/c1b161f9db3dbc5e2b4cdd8984daf83e.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 07:48:29 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:VNRGv4jhm0RIWuQGApAeuxscMI0=";}}
+RESPONSE DATA:----------------------------------------------
+O:12:"ResponseCore":3:{s:6:"header";a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 07:48:34 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""941555C294BB2F45341E4FC5491B034D"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A04528B3742897C822FF8";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/c1b161f9db3dbc5e2b4cdd8984daf83e.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:454;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.2179999999999999993338661852249060757458209991455078125;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.061999999999999999555910790149937383830547332763671875;s:16:"pretransfer_time";d:0.061999999999999999555910790149937383830547332763671875;s:11:"size_upload";d:7634;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:35018;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:7634;s:18:"starttransfer_time";d:0.0940000000000000002220446049250313080847263336181640625;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/c1b161f9db3dbc5e2b4cdd8984daf83e.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 07:48:29 GMT
+/gexingnew/2014/10/24/c1b161f9db3dbc5e2b4cdd8984daf83e.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 07:48:29 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:VNRGv4jhm0RIWuQGApAeuxscMI0=";}}s:4:"body";b:0;s:6:"status";i:200;}
+2014-10-24 15:48:29:---LOG END---------------------------------------------------------------------------
+
+2014-10-24 15:50:08 : ---LOG START---------------------------------------------------------------------------
+--REQUEST URL:----------------------------------------------
+http://oss.aliyuncs.com/gexingnew/2014/10/24/7654c497f4f1dc5309531f9efa27f485.jpg
+STRING TO SIGN:----------------------------------------------
+PUT
+
+image/jpeg
+Fri, 24 Oct 2014 07:50:07 GMT
+/gexingnew/2014/10/24/7654c497f4f1dc5309531f9efa27f485.jpg
+REQUEST HEADERS:----------------------------------------------
+a:4:{s:12:"Content-Type";s:10:"image/jpeg";s:4:"Date";s:29:"Fri, 24 Oct 2014 07:50:07 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:mQXVm/7m/9vh7awGHU4+UgYFmGQ=";}
+RESPONSE HEADERS:----------------------------------------------
+a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 07:50:13 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""D0EB1A21456DD8B628028A6EF5F5BEEC"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A04B50CCB584449817CDD";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/7654c497f4f1dc5309531f9efa27f485.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:441;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.34399999999999997246646898929611779749393463134765625;s:15:"namelookup_time";d:0.01600000000000000033306690738754696212708950042724609375;s:12:"connect_time";d:0.07799999999999999988897769753748434595763683319091796875;s:16:"pretransfer_time";d:0.07799999999999999988897769753748434595763683319091796875;s:11:"size_upload";d:17112;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:49744;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:17112;s:18:"starttransfer_time";d:0.125;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/7654c497f4f1dc5309531f9efa27f485.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:104:"PUT
+
+image/jpeg
+Fri, 24 Oct 2014 07:50:07 GMT
+/gexingnew/2014/10/24/7654c497f4f1dc5309531f9efa27f485.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:10:"image/jpeg";s:4:"Date";s:29:"Fri, 24 Oct 2014 07:50:07 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:mQXVm/7m/9vh7awGHU4+UgYFmGQ=";}}
+RESPONSE DATA:----------------------------------------------
+O:12:"ResponseCore":3:{s:6:"header";a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 07:50:13 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""D0EB1A21456DD8B628028A6EF5F5BEEC"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A04B50CCB584449817CDD";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/7654c497f4f1dc5309531f9efa27f485.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:441;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.34399999999999997246646898929611779749393463134765625;s:15:"namelookup_time";d:0.01600000000000000033306690738754696212708950042724609375;s:12:"connect_time";d:0.07799999999999999988897769753748434595763683319091796875;s:16:"pretransfer_time";d:0.07799999999999999988897769753748434595763683319091796875;s:11:"size_upload";d:17112;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:49744;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:17112;s:18:"starttransfer_time";d:0.125;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/7654c497f4f1dc5309531f9efa27f485.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:104:"PUT
+
+image/jpeg
+Fri, 24 Oct 2014 07:50:07 GMT
+/gexingnew/2014/10/24/7654c497f4f1dc5309531f9efa27f485.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:10:"image/jpeg";s:4:"Date";s:29:"Fri, 24 Oct 2014 07:50:07 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:mQXVm/7m/9vh7awGHU4+UgYFmGQ=";}}s:4:"body";b:0;s:6:"status";i:200;}
+2014-10-24 15:50:08:---LOG END---------------------------------------------------------------------------
+
+2014-10-24 15:57:27 : ---LOG START---------------------------------------------------------------------------
+--REQUEST URL:----------------------------------------------
+http://oss.aliyuncs.com/gexingnew/2014/10/24/e630cf0d2cbcf785f5ff53d4d2d81745.jpg
+STRING TO SIGN:----------------------------------------------
+PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 07:57:27 GMT
+/gexingnew/2014/10/24/e630cf0d2cbcf785f5ff53d4d2d81745.jpg
+REQUEST HEADERS:----------------------------------------------
+a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 07:57:27 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:KyYgJbY8Mu8tWcHjCiLRCiYA8h8=";}
+RESPONSE HEADERS:----------------------------------------------
+a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 07:57:32 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""941555C294BB2F45341E4FC5491B034D"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A066CB99A88664280E19E";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/e630cf0d2cbcf785f5ff53d4d2d81745.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:454;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.203000000000000013766765505351941101253032684326171875;s:15:"namelookup_time";d:0.01600000000000000033306690738754696212708950042724609375;s:12:"connect_time";d:0.063000000000000000444089209850062616169452667236328125;s:16:"pretransfer_time";d:0.063000000000000000444089209850062616169452667236328125;s:11:"size_upload";d:7634;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:37605;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:7634;s:18:"starttransfer_time";d:0.10899999999999999966693309261245303787291049957275390625;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/e630cf0d2cbcf785f5ff53d4d2d81745.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 07:57:27 GMT
+/gexingnew/2014/10/24/e630cf0d2cbcf785f5ff53d4d2d81745.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 07:57:27 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:KyYgJbY8Mu8tWcHjCiLRCiYA8h8=";}}
+RESPONSE DATA:----------------------------------------------
+O:12:"ResponseCore":3:{s:6:"header";a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 07:57:32 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""941555C294BB2F45341E4FC5491B034D"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A066CB99A88664280E19E";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/e630cf0d2cbcf785f5ff53d4d2d81745.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:454;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.203000000000000013766765505351941101253032684326171875;s:15:"namelookup_time";d:0.01600000000000000033306690738754696212708950042724609375;s:12:"connect_time";d:0.063000000000000000444089209850062616169452667236328125;s:16:"pretransfer_time";d:0.063000000000000000444089209850062616169452667236328125;s:11:"size_upload";d:7634;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:37605;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:7634;s:18:"starttransfer_time";d:0.10899999999999999966693309261245303787291049957275390625;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/e630cf0d2cbcf785f5ff53d4d2d81745.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 07:57:27 GMT
+/gexingnew/2014/10/24/e630cf0d2cbcf785f5ff53d4d2d81745.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 07:57:27 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:KyYgJbY8Mu8tWcHjCiLRCiYA8h8=";}}s:4:"body";b:0;s:6:"status";i:200;}
+2014-10-24 15:57:27:---LOG END---------------------------------------------------------------------------
+
+2014-10-24 16:29:45 : ---LOG START---------------------------------------------------------------------------
+--REQUEST URL:----------------------------------------------
+http://oss.aliyuncs.com/gexingnew/2014/10/24/2244b0a8b73a98002beff6578154742f.jpg
+STRING TO SIGN:----------------------------------------------
+PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:29:45 GMT
+/gexingnew/2014/10/24/2244b0a8b73a98002beff6578154742f.jpg
+REQUEST HEADERS:----------------------------------------------
+a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:29:45 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:n2QspihL2Wh80pmL2ZtYZmU6Uu4=";}
+RESPONSE HEADERS:----------------------------------------------
+a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 08:29:51 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""D0EB1A21456DD8B628028A6EF5F5BEEC"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A0DFE06255DA4428649A8";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/2244b0a8b73a98002beff6578154742f.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:455;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.24899999999999999911182158029987476766109466552734375;s:15:"namelookup_time";d:0.01499999999999999944488848768742172978818416595458984375;s:12:"connect_time";d:0.061999999999999999555910790149937383830547332763671875;s:16:"pretransfer_time";d:0.061999999999999999555910790149937383830547332763671875;s:11:"size_upload";d:17112;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:68722;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:17112;s:18:"starttransfer_time";d:0.10899999999999999966693309261245303787291049957275390625;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/2244b0a8b73a98002beff6578154742f.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:29:45 GMT
+/gexingnew/2014/10/24/2244b0a8b73a98002beff6578154742f.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:29:45 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:n2QspihL2Wh80pmL2ZtYZmU6Uu4=";}}
+RESPONSE DATA:----------------------------------------------
+O:12:"ResponseCore":3:{s:6:"header";a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 08:29:51 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""D0EB1A21456DD8B628028A6EF5F5BEEC"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A0DFE06255DA4428649A8";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/2244b0a8b73a98002beff6578154742f.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:455;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.24899999999999999911182158029987476766109466552734375;s:15:"namelookup_time";d:0.01499999999999999944488848768742172978818416595458984375;s:12:"connect_time";d:0.061999999999999999555910790149937383830547332763671875;s:16:"pretransfer_time";d:0.061999999999999999555910790149937383830547332763671875;s:11:"size_upload";d:17112;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:68722;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:17112;s:18:"starttransfer_time";d:0.10899999999999999966693309261245303787291049957275390625;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/2244b0a8b73a98002beff6578154742f.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:29:45 GMT
+/gexingnew/2014/10/24/2244b0a8b73a98002beff6578154742f.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:29:45 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:n2QspihL2Wh80pmL2ZtYZmU6Uu4=";}}s:4:"body";b:0;s:6:"status";i:200;}
+2014-10-24 16:29:45:---LOG END---------------------------------------------------------------------------
+
+2014-10-24 16:30:22 : ---LOG START---------------------------------------------------------------------------
+--REQUEST URL:----------------------------------------------
+http://oss.aliyuncs.com/gexingnew/2014/10/24/139b5a93795fcae6094266f878f57157.jpg
+STRING TO SIGN:----------------------------------------------
+PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:22 GMT
+/gexingnew/2014/10/24/139b5a93795fcae6094266f878f57157.jpg
+REQUEST HEADERS:----------------------------------------------
+a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:22 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:iJrrWCwx81DE0WVGc0yNg4gIUbM=";}
+RESPONSE HEADERS:----------------------------------------------
+a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 08:30:28 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""A5212842237EAB3381DD0A5565CD6204"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A0E235CECE2E21185788A";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/139b5a93795fcae6094266f878f57157.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:455;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.4519999999999999573674358543939888477325439453125;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.1089999999999999857891452847979962825775146484375;s:16:"pretransfer_time";d:0.1089999999999999857891452847979962825775146484375;s:11:"size_upload";d:35089;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:77630;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:35089;s:18:"starttransfer_time";d:0.15600000000000002753353101070388220250606536865234375;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/139b5a93795fcae6094266f878f57157.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:22 GMT
+/gexingnew/2014/10/24/139b5a93795fcae6094266f878f57157.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:22 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:iJrrWCwx81DE0WVGc0yNg4gIUbM=";}}
+RESPONSE DATA:----------------------------------------------
+O:12:"ResponseCore":3:{s:6:"header";a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 08:30:28 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""A5212842237EAB3381DD0A5565CD6204"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A0E235CECE2E21185788A";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/139b5a93795fcae6094266f878f57157.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:455;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.4519999999999999573674358543939888477325439453125;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.1089999999999999857891452847979962825775146484375;s:16:"pretransfer_time";d:0.1089999999999999857891452847979962825775146484375;s:11:"size_upload";d:35089;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:77630;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:35089;s:18:"starttransfer_time";d:0.15600000000000002753353101070388220250606536865234375;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/139b5a93795fcae6094266f878f57157.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:22 GMT
+/gexingnew/2014/10/24/139b5a93795fcae6094266f878f57157.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:22 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:iJrrWCwx81DE0WVGc0yNg4gIUbM=";}}s:4:"body";b:0;s:6:"status";i:200;}
+2014-10-24 16:30:22:---LOG END---------------------------------------------------------------------------
+
+2014-10-24 16:30:31 : ---LOG START---------------------------------------------------------------------------
+--REQUEST URL:----------------------------------------------
+http://oss.aliyuncs.com/gexingnew/2014/10/24/23894249c083d8d7b042b924c25a0912.jpg
+STRING TO SIGN:----------------------------------------------
+PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:30 GMT
+/gexingnew/2014/10/24/23894249c083d8d7b042b924c25a0912.jpg
+REQUEST HEADERS:----------------------------------------------
+a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:30 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:LZVLH3gPQFhpHE37fVaoRnu4eK8=";}
+RESPONSE HEADERS:----------------------------------------------
+a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 08:30:36 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""56029C79065CBD6A0CCB8FF49635841A"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A0E2C175FD5A32A873142";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/23894249c083d8d7b042b924c25a0912.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:455;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.2800000000000000266453525910037569701671600341796875;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.04599999999999999922284388276239042170345783233642578125;s:16:"pretransfer_time";d:0.04599999999999999922284388276239042170345783233642578125;s:11:"size_upload";d:27803;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:99296;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:27803;s:18:"starttransfer_time";d:0.0929999999999999993338661852249060757458209991455078125;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/23894249c083d8d7b042b924c25a0912.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:30 GMT
+/gexingnew/2014/10/24/23894249c083d8d7b042b924c25a0912.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:30 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:LZVLH3gPQFhpHE37fVaoRnu4eK8=";}}
+RESPONSE DATA:----------------------------------------------
+O:12:"ResponseCore":3:{s:6:"header";a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 08:30:36 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""56029C79065CBD6A0CCB8FF49635841A"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A0E2C175FD5A32A873142";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/23894249c083d8d7b042b924c25a0912.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:455;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.2800000000000000266453525910037569701671600341796875;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.04599999999999999922284388276239042170345783233642578125;s:16:"pretransfer_time";d:0.04599999999999999922284388276239042170345783233642578125;s:11:"size_upload";d:27803;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:99296;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:27803;s:18:"starttransfer_time";d:0.0929999999999999993338661852249060757458209991455078125;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/23894249c083d8d7b042b924c25a0912.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:30 GMT
+/gexingnew/2014/10/24/23894249c083d8d7b042b924c25a0912.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:30 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:LZVLH3gPQFhpHE37fVaoRnu4eK8=";}}s:4:"body";b:0;s:6:"status";i:200;}
+2014-10-24 16:30:31:---LOG END---------------------------------------------------------------------------
+
+2014-10-24 16:30:44 : ---LOG START---------------------------------------------------------------------------
+--REQUEST URL:----------------------------------------------
+http://oss.aliyuncs.com/gexingnew/2014/10/24/0eee87af0643208a2bd0de43a42b1d4f.jpg
+STRING TO SIGN:----------------------------------------------
+PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:43 GMT
+/gexingnew/2014/10/24/0eee87af0643208a2bd0de43a42b1d4f.jpg
+REQUEST HEADERS:----------------------------------------------
+a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:43 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:RhpdzPWTuammivqGgWo47LBEvlE=";}
+RESPONSE HEADERS:----------------------------------------------
+a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 08:30:49 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""769C077A4DB88325409B8286B0A6EE07"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A0E38C2C214C81C84F379";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/0eee87af0643208a2bd0de43a42b1d4f.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:455;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.64000000000000001332267629550187848508358001708984375;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.07799999999999999988897769753748434595763683319091796875;s:16:"pretransfer_time";d:0.07799999999999999988897769753748434595763683319091796875;s:11:"size_upload";d:60007;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:93760;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:60007;s:18:"starttransfer_time";d:0.14000000000000001332267629550187848508358001708984375;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/0eee87af0643208a2bd0de43a42b1d4f.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:43 GMT
+/gexingnew/2014/10/24/0eee87af0643208a2bd0de43a42b1d4f.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:43 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:RhpdzPWTuammivqGgWo47LBEvlE=";}}
+RESPONSE DATA:----------------------------------------------
+O:12:"ResponseCore":3:{s:6:"header";a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 08:30:49 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""769C077A4DB88325409B8286B0A6EE07"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A0E38C2C214C81C84F379";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/0eee87af0643208a2bd0de43a42b1d4f.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:455;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.64000000000000001332267629550187848508358001708984375;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.07799999999999999988897769753748434595763683319091796875;s:16:"pretransfer_time";d:0.07799999999999999988897769753748434595763683319091796875;s:11:"size_upload";d:60007;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:93760;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:60007;s:18:"starttransfer_time";d:0.14000000000000001332267629550187848508358001708984375;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/0eee87af0643208a2bd0de43a42b1d4f.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:43 GMT
+/gexingnew/2014/10/24/0eee87af0643208a2bd0de43a42b1d4f.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:43 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:RhpdzPWTuammivqGgWo47LBEvlE=";}}s:4:"body";b:0;s:6:"status";i:200;}
+2014-10-24 16:30:44:---LOG END---------------------------------------------------------------------------
+
+2014-10-24 16:30:49 : ---LOG START---------------------------------------------------------------------------
+--REQUEST URL:----------------------------------------------
+http://oss.aliyuncs.com/gexingnew/2014/10/24/7a3e04a62f67aefe2934b4ae05d1a313.jpg
+STRING TO SIGN:----------------------------------------------
+PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:49 GMT
+/gexingnew/2014/10/24/7a3e04a62f67aefe2934b4ae05d1a313.jpg
+REQUEST HEADERS:----------------------------------------------
+a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:49 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:xFPCroW92utvMY8F149QzAHAdaY=";}
+RESPONSE HEADERS:----------------------------------------------
+a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 08:30:54 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""9A1BDD5E8CD1BA5CEE53F2A334D87517"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A0E3E56A1859F3C85B3E4";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/7a3e04a62f67aefe2934b4ae05d1a313.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:455;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.25;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.0309999999999999997779553950749686919152736663818359375;s:16:"pretransfer_time";d:0.0309999999999999997779553950749686919152736663818359375;s:11:"size_upload";d:39872;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:159488;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:39872;s:18:"starttransfer_time";d:0.07799999999999999988897769753748434595763683319091796875;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/7a3e04a62f67aefe2934b4ae05d1a313.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:49 GMT
+/gexingnew/2014/10/24/7a3e04a62f67aefe2934b4ae05d1a313.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:49 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:xFPCroW92utvMY8F149QzAHAdaY=";}}
+RESPONSE DATA:----------------------------------------------
+O:12:"ResponseCore":3:{s:6:"header";a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 08:30:54 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""9A1BDD5E8CD1BA5CEE53F2A334D87517"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A0E3E56A1859F3C85B3E4";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/7a3e04a62f67aefe2934b4ae05d1a313.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:455;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.25;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.0309999999999999997779553950749686919152736663818359375;s:16:"pretransfer_time";d:0.0309999999999999997779553950749686919152736663818359375;s:11:"size_upload";d:39872;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:159488;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:39872;s:18:"starttransfer_time";d:0.07799999999999999988897769753748434595763683319091796875;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/7a3e04a62f67aefe2934b4ae05d1a313.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:49 GMT
+/gexingnew/2014/10/24/7a3e04a62f67aefe2934b4ae05d1a313.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:49 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:xFPCroW92utvMY8F149QzAHAdaY=";}}s:4:"body";b:0;s:6:"status";i:200;}
+2014-10-24 16:30:49:---LOG END---------------------------------------------------------------------------
+
+2014-10-24 16:30:56 : ---LOG START---------------------------------------------------------------------------
+--REQUEST URL:----------------------------------------------
+http://oss.aliyuncs.com/gexingnew/2014/10/24/0085f9874ff289403907cb87546dd74b.jpg
+STRING TO SIGN:----------------------------------------------
+PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:55 GMT
+/gexingnew/2014/10/24/0085f9874ff289403907cb87546dd74b.jpg
+REQUEST HEADERS:----------------------------------------------
+a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:55 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:u9/N4U3YpEuPhFE1cZkRb7uRNYI=";}
+RESPONSE HEADERS:----------------------------------------------
+a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 08:31:01 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""953FD6D8DCB99E9C1F286575A5AA3374"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A0E45E46892530E85A286";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/0085f9874ff289403907cb87546dd74b.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:456;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.85799999999999998490096686509787105023860931396484375;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.04700000000000000011102230246251565404236316680908203125;s:16:"pretransfer_time";d:0.04700000000000000011102230246251565404236316680908203125;s:11:"size_upload";d:417178;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:486221;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:417178;s:18:"starttransfer_time";d:0.07799999999999999988897769753748434595763683319091796875;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/0085f9874ff289403907cb87546dd74b.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:55 GMT
+/gexingnew/2014/10/24/0085f9874ff289403907cb87546dd74b.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:55 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:u9/N4U3YpEuPhFE1cZkRb7uRNYI=";}}
+RESPONSE DATA:----------------------------------------------
+O:12:"ResponseCore":3:{s:6:"header";a:11:{s:4:"date";s:29:"Fri, 24 Oct 2014 08:31:01 GMT";s:14:"content-length";s:1:"0";s:10:"connection";s:5:"close";s:4:"etag";s:34:""953FD6D8DCB99E9C1F286575A5AA3374"";s:6:"server";s:9:"AliyunOSS";s:16:"x-oss-request-id";s:24:"544A0E45E46892530E85A286";s:5:"_info";a:23:{s:3:"url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/0085f9874ff289403907cb87546dd74b.jpg";s:12:"content_type";N;s:9:"http_code";i:200;s:11:"header_size";i:224;s:12:"request_size";i:456;s:8:"filetime";i:-1;s:17:"ssl_verify_result";i:0;s:14:"redirect_count";i:0;s:10:"total_time";d:0.85799999999999998490096686509787105023860931396484375;s:15:"namelookup_time";d:0;s:12:"connect_time";d:0.04700000000000000011102230246251565404236316680908203125;s:16:"pretransfer_time";d:0.04700000000000000011102230246251565404236316680908203125;s:11:"size_upload";d:417178;s:13:"size_download";d:0;s:14:"speed_download";d:0;s:12:"speed_upload";d:486221;s:23:"download_content_length";d:0;s:21:"upload_content_length";d:417178;s:18:"starttransfer_time";d:0.07799999999999999988897769753748434595763683319091796875;s:13:"redirect_time";d:0;s:8:"certinfo";a:0:{}s:12:"redirect_url";s:0:"";s:6:"method";s:3:"PUT";}s:17:"x-oss-request-url";s:81:"http://oss.aliyuncs.com/gexingnew/2014/10/24/0085f9874ff289403907cb87546dd74b.jpg";s:15:"x-oss-redirects";i:0;s:18:"x-oss-stringtosign";s:118:"PUT
+
+application/octet-stream
+Fri, 24 Oct 2014 08:30:55 GMT
+/gexingnew/2014/10/24/0085f9874ff289403907cb87546dd74b.jpg";s:20:"x-oss-requestheaders";a:4:{s:12:"Content-Type";s:24:"application/octet-stream";s:4:"Date";s:29:"Fri, 24 Oct 2014 08:30:55 GMT";s:4:"Host";s:16:"oss.aliyuncs.com";s:13:"Authorization";s:49:"OSS uPpCpsxMW6n95HpI:u9/N4U3YpEuPhFE1cZkRb7uRNYI=";}}s:4:"body";b:0;s:6:"status";i:200;}
+2014-10-24 16:30:56:---LOG END---------------------------------------------------------------------------
+
