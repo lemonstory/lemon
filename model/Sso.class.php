@@ -6,65 +6,6 @@ class Sso extends ModelBase
 	{
 		$this->cookies = $_COOKIE;
 	}
-	public function regUser($phonenumber,$rawpassword,$nickname)
-	{
-		if($phonenumber=='' )
-		{
-			$this->setError(ErrorConf::phoneNumberEmpty());
-			return false;
-		}
-		if($rawpassword=='')
-		{
-			$this->setError(ErrorConf::passwordEmpty());
-			return false;
-		}
-		
-		$NicknameMd5Obj =  new NicknameMd5();
-		if($NicknameMd5Obj->checkNameIsExist($nickname))
-		{
-			$this->setError(ErrorConf::nickNameIsExist());
-			return false;
-		}
-		
-		$passportinfo = $this->getInfoWithPhoneNumber($phonenumber);
-		if(!empty($passportinfo))
-		{
-			$this->setError(ErrorConf::phoneIsReged());
-			return false;
-		}
-		$username = $this->createPhoneUserName($phonenumber);
-		$time = time();
-		$addtime=date('Y-m-d H:i:s',$time);
-		$password = md5($rawpassword.strrev($time));
-		$db = DbConnecter::connectMysql('share_passport');
-		
-		$sql = "insert into passport (username,password,addtime) values (?,?,?)";
-		$st = $db->prepare ( $sql );
-		$st->execute (array($username,$password,$addtime));
-		$uid = $db->lastInsertId()+0;
-		if($uid==0)
-		{
-			return false;
-		}
-		$UserObj = new User();
-		$UserObj->initUser($uid, $addtime,$nickname);
-		
-		$userinfo = current($UserObj->getUserInfo($uid));
-		$this->setSsoCookie($this->getInfoWithUid($uid),$userinfo);
-		
-		
-		
-		if($uid>0)
-		{
-			$NicknameMd5Obj->addOne($nickname, $uid);
-		}
-		
-		
-		
-		QueueManager::pushAfterRegQueue($uid);
-		QueueManager::pushUserInfoToSearch($uid);
-		return $uid;
-	}	
 	
 	public function resetPassword($uid,$oldrawpassword,$newrawpassword)
 	{
@@ -196,7 +137,6 @@ class Sso extends ModelBase
 	    
 	    $NicknameMd5Obj = new NicknameMd5();
 	    if($NicknameMd5Obj->checkNameIsExist($nickName)) {
-	        //$this->showErrorJson(ErrorConf::nickNameIsExist());
 	        $this->setError(ErrorConf::nickNameIsExist());
 	        return false;
 	    }
@@ -206,7 +146,6 @@ class Sso extends ModelBase
 	        return false;
 	    }
 		
-		//$nickname  = $qqUserInfo['nickName'];
 		$gender    = $qqUserInfo['gender'];
 		$province  = $qqUserInfo['province'];
 		$city      = $qqUserInfo['city'];
@@ -298,109 +237,11 @@ class Sso extends ModelBase
 		$UserObj =  new User();
 		$this->setLoginType($uid, 'qq');
 		$userinfo = $UserObj->getSelfInfo($uid);
-		// 判断是否封号账户
-		/* if (!empty($userinfo['status']) && $userinfo['status'] == '-2') {
-	        $this->setError(ErrorConf::userForbidenPost());
-	        return false;
-		} */
 		
 		$this->setSsoCookie($passportdata,$userinfo);
-		
-		if (empty($userinfo['birthday'])) {
-		    // 修复qq用户年龄为空的数据
-		    QueueManager::pushQqBirthday($uid);
-		}
-		
 		return $userinfo;
 	}
 	
-	
-	public function setPhonenumberIsVerify($uid)
-	{
-	    if (empty($uid)) {
-	        return false;
-	    }
-	    $passportdata = $this->getInfoWithUid($uid);
-	    if (empty($passportdata)) {
-	        return false;
-	    }
-	    
-		$db = DbConnecter::connectMysql('share_passport');
-		$sql = "update passport set verifyphone=1 where uid=?";
-		$st = $db->prepare ( $sql );
-		$re = $st->execute (array($uid));
-		if($re)
-		{
-		    $userName = $passportdata['username'];
-		    $this->clearPassportCacheByUserName($userName);
-		    $this->clearPassportCacheByUid($uid);
-			return true;
-		}
-		return false;
-	}
-	
-	
-	public function resetPasswordWithVcode($phonenumber,$newrawpassword)
-	{
-		$SsoObj = new PhoneVerifyCode();
-
-		$passportdata	= $this->getInfoWithPhoneNumber($phonenumber);
-		$addtime 		= strtotime($passportdata['addtime']);
-		$uid     		= $passportdata['uid'];
-
-		$newpassword = md5($newrawpassword.strrev($addtime));
-		$db = DbConnecter::connectMysql('share_passport');
-		$sql = "update passport set password=? where uid=?";
-		$st = $db->prepare ( $sql );
-		$re = $st->execute (array($newpassword,$uid));
-		if(!$re)
-		{
-			return false;
-		}
-		$UserObj =  new User();
-		//$userinfo = current($UserObj->getUserInfo($uid));
-		$userinfo = $UserObj->getSelfInfo($uid);
-		$this->setSsoCookie($passportdata,$userinfo);
-		//$avatartime = $userinfo['avatartime'];
-		//$return = array('uid'=>$userinfo['uid']+0,'nickname'=>$userinfo['nickname'],'avatartime'=>"$avatartime");
-		
-		$userName = $passportdata['username'];
-		$this->clearPassportCacheByUserName($userName);
-		$this->clearPassportCacheByUid($uid);
-		
-		return $userinfo;
-		
-	}
-	
-	
-	public function userBindPhone($uid,$phonenumber,$password)
-	{
-		
-		$passportdata = $this->getInfoWithUid($uid);
-		$addtime 		= strtotime($passportdata['addtime']);
-		$newpassword = md5($password.strrev($addtime));
-		
-		$db = DbConnecter::connectMysql('share_passport');
-		$username = $this->createPhoneUserName($phonenumber);
-		$sql = "update passport set username=?, password=? where uid=?";
-		$st = $db->prepare ( $sql );
-		$re = $st->execute (array($username,$newpassword,$uid));
-		if(!$re)
-		{
-			return false;
-		}
-		
-		$db = DbConnecter::connectMysql('share_user');
-		$sql = "insert into userbindphone (uid,phonenumber ,addtime) values (?,?,?)";
-		$st = $db->prepare ( $sql );
-		$re = $st->execute (array($uid,$phonenumber,date('Y-m-d H:i:s')));
-		
-		
-		$this->clearPassportCacheByUid($uid);
-		$this->clearPassportCacheByUserName($this->createPhoneUserName($phonenumber));
-		
-		return true;
-	}
 	
 	public function logout()
 	{
@@ -435,74 +276,6 @@ class Sso extends ModelBase
 		return  $_SESSION['uid']+0;
 	}
 	
-	
-	public function phoneLogin($phonenumber,$rawpassword)
-	{
-		if($phonenumber=='' || $rawpassword=='')
-		{
-			$this->setError(ErrorConf::phoneNumberEmpty());
-			return false;
-		}
-		if($rawpassword=='')
-		{
-			$this->setError(ErrorConf::passwordEmpty());
-			return false;
-		}
-		$passportdata = $this->getInfoWithPhoneNumber($phonenumber);
-		if(empty($passportdata))
-		{
-			$this->setError(ErrorConf::userNoExist());
-			return false;	
-		}
-		$uid = $passportdata['uid'];
-		if($passportdata['password'] != md5($rawpassword.strrev(strtotime($passportdata['addtime']))))
-		{
-			$this->setError(ErrorConf::passwordError());
-			return false;
-		}
-		$this->setLoginType($uid, 'phone');
-		$UserObj =  new User();
-		$userinfo = $UserObj->getSelfInfo($uid);
-	    if (!empty($userinfo['status']) && $userinfo['status'] == '-2') {
-	        $this->setError(ErrorConf::userForbidenPost());
-	        return false;
-		}
-		
-		$this->setSsoCookie($passportdata,$userinfo);
-		return $userinfo;
-	}
-	
-	
-	
-	
-	
-	
-	public function getInfoWithPhoneNumber($phonenumber)
-	{
-		if($phonenumber=='')
-		{
-			return array();
-		}
-		
-		$data = array();
-		$username = $this->createPhoneUserName($phonenumber);
-		$cacheData = CacheConnecter::get('passport', $username);
-		if (empty($cacheData)) {
-    		$db = DbConnecter::connectMysql('share_passport');
-    		$sql = "select * from passport where username=?";
-    		$st = $db->prepare ( $sql );
-    		$st->execute (array($username));
-    		$data = $st->fetch(PDO::FETCH_ASSOC);
-    		$db=null;
-    		if (!empty($data)) {
-    		    CacheConnecter::set('passport',	$username, $data, 2592000);
-    		}
-    		
-    		return $data;
-		} else {
-		    return $cacheData;
-		}
-	}
 	
 	public function getInfoWithUid($uid)
 	{
@@ -626,12 +399,6 @@ class Sso extends ModelBase
 	}
 	
 	
-	protected function createPhoneUserName($phonenumber)
-	{
-		$username = 'CM'.$phonenumber;
-		return $username;
-	}
-	
 	protected function setSsoCookie($passportdata,$userinfo)
 	{
 		$R['uid'] = $passportdata['uid'];
@@ -656,13 +423,6 @@ class Sso extends ModelBase
 	    $this->cookies['us'] = str_replace("\"", "", $this->cookies['us']);
 	    parse_str($this->abacaEncrypt($this->cookies['us']), $info);
 	    if (! isset($info['uid']) || ! isset($info['cert']) || $this->md5Together($info['uid'], $_SERVER['CONFIG']['defaultEncryptKey']) != $info['cert']) {
-	        /* $encrypt = $this->abacaEncrypt($this->cookies['us']);
-	        $isEmptyUs = 0;
-	        if (empty($encrypt)) {
-	            $isEmptyUs = 1;
-	        }
-	        QueueManager::pushCookieLog("error", $this->cookies['us'], $isEmptyUs); */
-	        
 	        $this->logout();
 	        return array();
 	    }
