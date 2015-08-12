@@ -58,6 +58,9 @@ class Http
 
 	/**
      * 截字符串 
+     * @param $content 截取的内容
+     * @param $start   开始位置
+     * @param $end     结速位置
      * @return string          [description]
      */
     public static function sub_data($content = '', $start = '', $end = '')
@@ -88,6 +91,15 @@ class Http
         }
         return $content;
 
+    }
+
+    // 删除换行
+    public static function remove_n($str)
+    {
+        $patten = array("\r\n", "\n", "\r", "\t"); 
+        //先替换掉\r\n,然后是否存在\n,最后替换\r 
+        $str=str_replace($patten, "", $str); 
+        return $str;
     }
 
 }
