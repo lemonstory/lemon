@@ -1,10 +1,10 @@
 <?php
 //个人测试
 //ACCESS_ID
-define('OSS_ACCESS_ID', 'xxx');
+define('OSS_ACCESS_ID', 'QHzux6QVXjQgfBNM');
 
 //ACCESS_KEY
-define('OSS_ACCESS_KEY', 'xxx');
+define('OSS_ACCESS_KEY', 'diWfijmBbiGlwle1s9KyAL8BQhB3Qc');
 
 //是否记录日志
 define('ALI_LOG', false);
