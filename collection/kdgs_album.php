@@ -3,7 +3,6 @@
 include_once '../controller.php';
 class kdgs_album extends controller 
 {
-    
     function action() {
         $category = new Category();
         $kdgs = new Kdgs();
