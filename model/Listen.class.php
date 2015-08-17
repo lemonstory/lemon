@@ -13,6 +13,7 @@ class Listen extends ModelBase
 	public function getUserListenList($uid)
 	{
 		if (empty($uid)) {
+		    $this->setError(ErrorConf::paramError());
 			return array();
 		}
 		
@@ -27,6 +28,33 @@ class Listen extends ModelBase
 			return $res;
 		}
 	}
+	
+	
+	/**
+	 * 获取用户收听的故事记录
+	 * @param I $uid
+	 * @param I $storyid
+	 * @return array
+	 */
+	public function getUserListenInfoByStoryId($uid, $storyid)
+	{
+	    if (empty($uid) || empty($storyid)) {
+	        $this->setError(ErrorConf::paramError());
+	        return array();
+	    }
+	     
+	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+	    $sql = "SELECT * FROM {$this->LISTEN_TABLE_NAME} WHERE `uid` = ? and `storyid` = ?";
+	    $st = $db->prepare($sql);
+	    $st->execute(array($uid, $storyid));
+	    $res = $st->fetch(PDO::FETCH_ASSOC);
+	    if (empty($res)) {
+	        return array();
+	    } else {
+	        return $res;
+	    }
+	}
+	
 	
 	/**
 	 * 用户添加收听故事

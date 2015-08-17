@@ -10,16 +10,17 @@ class   ErrorConf
     {
         return array('code'=>'100002','desc'=>'参数错误');
     }
-    
     public static function paramErrorWithParam($param)
     {
         return array('code'=>'100002','desc'=>self::concatError('参数：[param]错误', $param));
     }
+    
+    
+    // 用户
 	public static function userNoExist()
 	{
 		return array('code'=>'100101','desc'=>'用户不存在');
 	}
-	
 	public static function userFreezePost($uid)
 	{
 	    $frozenObj = new FrozenUserNew();
@@ -38,7 +39,6 @@ class   ErrorConf
 	{
 	    return array('code'=>'100120','desc'=>'你已经被封号.');
 	}
-	
 	public static function modifyUserInfoEmpty()
 	{
 	    return array('code'=>'100009','desc'=>'要修改的用户信息未空');
@@ -51,16 +51,6 @@ class   ErrorConf
 	{
 	    return array('code'=>'100109','desc'=>'昵称已经存在了');
 	}
-	
-	
-	public static function qqUserInfoEmpty()
-	{
-		return array('code'=>'100807','desc'=>'qq用户信息获取失败');
-	}
-    public static function qqAuthInfoEmpty()
-	{
-		return array('code'=>'100817','desc'=>'此qq未注册');
-	}
 	public static function userBabyInfoEmpty()
 	{
 	    return array('code'=>'100108','desc'=>'用户宝宝资料为空');
@@ -71,6 +61,7 @@ class   ErrorConf
 	}
 	
 	
+	// 上传
 	public static function noUploadAvatarfile()
 	{
 	    return array('code'=>'100201','desc'=>'上传头像文件不存在');
@@ -81,6 +72,29 @@ class   ErrorConf
 	}
 	
 	
+	// qq联合登录
+	public static function qqUserInfoEmpty()
+	{
+		return array('code'=>'100301','desc'=>'qq用户信息获取失败');
+	}
+    public static function qqAuthInfoEmpty()
+	{
+		return array('code'=>'100302','desc'=>'此qq未注册');
+	}
+	
+	
+	// 收藏
+	public static function userFavAlbumIsExist()
+	{
+	    return array('code'=>'100401','desc'=>'你已经收藏过了');
+	}
+	
+	
+	// 收听
+	public static function userListenStoryIsExist()
+	{
+	    return array('code'=>'100501','desc'=>'你已经收听过了');
+	}
 	/**
 	 * 拼接错误信息
 	 * @param string $msg

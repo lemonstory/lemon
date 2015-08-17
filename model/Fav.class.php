@@ -13,6 +13,7 @@ class Fav extends ModelBase
 	public function getUserFavList($uid)
 	{
 		if (empty($uid)) {
+		    $this->setError(ErrorConf::paramError());
 			return array();
 		}
 		
@@ -27,6 +28,33 @@ class Fav extends ModelBase
 			return $res;
 		}
 	}
+	
+	
+	/**
+	 * 获取用户收藏的专辑记录
+	 * @param I $uid
+	 * @param I $albumid
+	 * @return array
+	 */
+	public function getUserFavInfoByAlbumId($uid, $albumid)
+	{
+	    if (empty($uid) || empty($albumid)) {
+	        $this->setError(ErrorConf::paramError());
+	        return array();
+	    }
+	    
+	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+	    $sql = "SELECT * FROM {$this->FAV_TABLE_NAME} WHERE `uid` = ? and `albumid` = ?";
+	    $st = $db->prepare($sql);
+	    $st->execute(array($uid, $albumid));
+	    $res = $st->fetch(PDO::FETCH_ASSOC);
+	    if (empty($res)) {
+	        return array();
+	    } else {
+	        return $res;
+	    }
+	}
+	
 	
 	/**
 	 * 用户添加收藏
