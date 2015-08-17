@@ -5,7 +5,7 @@
  * 		CacheConnecter::get('topic', 11111, 'xxxxxxxx')
  * 		CacheConnecter::get('topic', array(11111,22222), 'xxxxxxxx')
  * 
- * cache 使用长连接（即：可多次调用get/set/delete方法，不考虑连接耗时） 2014.11.03 @wangzhitao
+ * cache 使用长连接（即：可多次调用get/set/delete方法，不考虑连接耗时） 
  * 
  */
 class CacheConnecter

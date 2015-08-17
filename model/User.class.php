@@ -1,6 +1,13 @@
 <?php
 class User extends ModelBase
 {
+	public $PASSPORT_DB_INSTANCE = 'share_main';
+	public $USER_INFO_TABLE_NAME = 'user_info';
+	public $BABY_INFO_TABLE_NAME = 'user_baby_info';
+	public $ADDRESS_INFO_TABLE_NAME = 'user_address_info';
+	
+	public $CACHE_INSTANCE = 'main';
+	
 	public function initUser($uid,$addtime,$nickname)
 	{
 		if($uid==0)
@@ -8,10 +15,10 @@ class User extends ModelBase
 			$this->setError(ErrorConf::noUid());
 			return false;
 		}
-		$db = DbConnecter::connectMysql('share_user');
-		$sql = "insert into userinfo (uid,addtime,nickname) values (?,?,?)";
+		$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+		$sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid,nickname,addtime) values (?,?,?)";
 		$st = $db->prepare ( $sql );
-		$re = $st->execute (array($uid,$addtime,$nickname));
+		$re = $st->execute (array($uid,$nickname,$addtime));
 		if($re)
 		{
 			$this->clearUserCache($uid);
@@ -21,17 +28,17 @@ class User extends ModelBase
 	}	
 	
 	
-	public function initQQLoginUser($uid,$nickname,$avatartime,$gender,$birthday,$province,$city,$addtime)
+	public function initQQLoginUser($uid,$nickname,$avatartime,$addtime)
 	{
 		if($uid==0)
 		{
 			$this->setError(ErrorConf::noUid());
 			return false;
 		}
-		$db = DbConnecter::connectMysql('share_user');
-		$sql = "insert into userinfo (uid,nickname,avatartime,gender,birthday,province,city,addtime) values (?,?,?,?,?,?,?,?)";
+		$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+		$sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid,nickname,avatartime,addtime) values (?,?,?,?)";
 		$st = $db->prepare ( $sql );
-		$re = $st->execute (array($uid,$nickname,$avatartime,$gender,$birthday,$province,$city,$addtime));
+		$re = $st->execute (array($uid,$nickname,$avatartime,$addtime));
 		if($re)
 		{
 			return true;
@@ -47,10 +54,9 @@ class User extends ModelBase
 		{
 			$uids = array($uids);
 		}
-		$UserHonor = new UserHonor();
 		$data = array();
-		$cacheData = CacheConnecter::get('userinfo', $uids);
-		#$honorcacheData = $UserHonor->getUserHonorLevel($uids);
+		$cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uids);
+		$cacheData = array();
 		$cacheIds = array();
 		if (is_array($cacheData)){
 			foreach ($cacheData as $onecachedata){
@@ -67,8 +73,8 @@ class User extends ModelBase
 		{
 			$result = array();
 			$idlist = implode(',', $dbIds);
-			$db = DbConnecter::connectMysql('share_user');
-			$sql = "select * from userinfo where uid in($idlist)";
+			$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+			$sql = "select * from {$this->USER_INFO_TABLE_NAME} where uid in($idlist)";
 			
 			$st = $db->prepare ( $sql );
 			$st->execute ();
@@ -76,7 +82,7 @@ class User extends ModelBase
 			$db=null;
 			foreach ($tmpDbData as $onedbdata){
 				$dbData[$onedbdata['uid']] = $onedbdata;
-				CacheConnecter::set('userinfo',	$onedbdata['uid'], $onedbdata,2592000);
+				CacheConnecter::set($this->CACHE_INSTANCE, $onedbdata['uid'], $onedbdata, 2592000);
 			}
 		}
 
@@ -103,29 +109,7 @@ class User extends ModelBase
 			}
 			$one = $this->formatUserBaseInfo($one);
 			
-			if(isset($_SERVER['visitorappversion']) && $_SERVER['visitorappversion']>=168000000)
-			{
-				if(empty($remarks[$one['uid']]))
-				{
-					$remarks[$one['uid']] = "";
-				}
-				$one['remarkname'] = $remarks[$one['uid']];
-			}else{
-				if (!empty($remarks[$one['uid']])){
-					$one['nickname'] = $remarks[$one['uid']];
-				}
-			}
-			#$one['userhonorlevel'] = $honorcacheData[$one['uid']];
-			$one['constellation'] = $this->getConstellationByBirthday($one['birthday']);
-			if($currentuid!=$one['uid'])
-			{
-				$tmpsign = $one['sign'];
-				$tmpsign = str_replace(" ", '', $tmpsign);
-				if(preg_match("/\d{7}/", $tmpsign)){
-					$one['sign'] = $_SERVER['disposeqqcontent'][$one['uid']%3];
-				}
-			}
-			$one['age']=getAgeFromBirthDay($one['birthday']);
+			//$one['age']=getAgeFromBirthDay($one['birthday']);
 			$result[$one['uid']] = $one;
 		}
 		return $result;
@@ -174,11 +158,6 @@ class User extends ModelBase
 			$one['gender']=1;
 		}
 		
-		if (isset($_SERVER['visitorappversion']) && $one['userhonorlevel']>5 && $_SERVER['visitorappversion']<180000000)
-		{
-			$one['userhonorlevel'] = 5;
-		}
-		
 		return $one;
 	}
 	
@@ -200,10 +179,8 @@ class User extends ModelBase
 		$avatartime = time();
 		$this->setUserinfo($uid, array('avatartime'=>$avatartime));
 		$this->clearUserCache($uid);
-// 		用户头像审核队列
- 		QueueManager::pushUserAvatarAudit($uid);
  		
- 		QueueManager::pushUserToUpdateUserSysFriendLog($uid);
+ 		//QueueManager::pushUserToUpdateUserSysFriendLog($uid);
 		return $avatartime;
 	}
 	
@@ -215,7 +192,6 @@ class User extends ModelBase
 			$this->setError(ErrorConf::noUid());
 			return false;
 		}
-		unset($data['sign']);
 		if(empty($data))
 		{
 			$this->setError(ErrorConf::modifyUserInfoEmpty());
@@ -249,13 +225,11 @@ class User extends ModelBase
 			$this->setError(ErrorConf::modifyUserInfoEmpty());
 			return false;
 		}
-		$sql = "update `userinfo` set $setstr where uid=$uid ";
-		$db = DbConnecter::connectMysql('share_user');
+		$sql = "update `{$this->USER_INFO_TABLE_NAME}` set $setstr where uid=$uid ";
+		$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
 		$st = $db->prepare ( $sql );
 		$st->execute ();
 		$this->clearUserCache($uid);
-// 		用户信息（文字）审核队列
-// 		QueueManager::pushUserInfoAudit($uid);
 		return true;
 	}
 		
@@ -271,38 +245,34 @@ class User extends ModelBase
 		}else{
 			$NicknameMd5Obj->addOne($nickname, $uid);
 		}
-			
 		
-		
-		$db = DbConnecter::connectMysql('share_user');
-		$sql = "update `userinfo` set nickname=? where uid=$uid ";
+		$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+		$sql = "update `{$this->USER_INFO_TABLE_NAME}` set nickname=? where uid=$uid ";
 		$st = $db->prepare ( $sql );
 		$st->execute (array($nickname));
 		$this->clearUserCache($uid);
 		
-		QueueManager::pushUserInfoToSearch($uid);
+		//QueueManager::pushUserInfoToSearch($uid);
 		// 添加到审核队列
-		QueueManager::pushAuditTextAction($uid, 1);
+		//QueueManager::pushAuditTextAction($uid, 1);
 		
-		QueueManager::pushUserToUpdateUserSysFriendLog($uid);
+		//QueueManager::pushUserToUpdateUserSysFriendLog($uid);
 		return true;
 	}
 	
-	public function moveAvatarImage($uid)
+	/*public function moveAvatarImage($uid)
 	{
 	    $nowDate = date("YmdHis");
 	    $imageBak = "{$uid}_{$nowDate}";
 	    $aliOssObj = new AliOss();
 	    return $aliOssObj->moveAvatarOss($uid, $imageBak);
-	}
+	}*/
 	
 	public function clearUserCache($uid)
 	{
-		CacheConnecter::delete('userinfo', $uid);
-		$DataSyncManagerObj = new DataSyncManager();
-		$DataSyncManagerObj->setRenewTime($DataSyncManagerObj->DATATYPEUSERINFO, $uid,time());
-		
-		
+		CacheConnecter::delete($this->CACHE_INSTANCE, $uid);
+		//$DataSyncManagerObj = new DataSyncManager();
+		//$DataSyncManagerObj->setRenewTime($DataSyncManagerObj->DATATYPEUSERINFO, $uid,time());
 	}
 	
 }

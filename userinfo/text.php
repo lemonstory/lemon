@@ -3,6 +3,7 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
+		echo "22";
         // 获取当前登录用户uid
         $uid = $this->getUid();
         if ($uid == 0) {

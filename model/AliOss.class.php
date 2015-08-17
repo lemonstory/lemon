@@ -8,9 +8,9 @@ include SERVER_ROOT.'libs/getid3/getid3.php';
 
 class AliOss extends ModelBase
 {
-    public $OSS_BUCKET_IMAGE = 'tutupic';
-    public $OSS_BUCKET_AVATAR = 'tutuavatar';
-    public $OSS_BUCKET_VIDEO = 'tutuvideo';
+    public $OSS_BUCKET_IMAGE = 'lemonpic';
+    public $OSS_BUCKET_AVATAR = 'lemonavatar';
+    public $OSS_BUCKET_MEDIA = 'lemonvideo';
     public $OSS_BUCKET_IMAGE_DOMAIN = array(
     	'http://p.xinqing.com/',
     	'http://p.xinqing.com/',
@@ -19,18 +19,18 @@ class AliOss extends ModelBase
     	'http://a.tutuim.com/avatar/',
     	'http://a.tutuim.com/avatar/',
     );
-    public $OSS_BUCKET_VIDEO_DOMAIN = array(
+    public $OSS_BUCKET_MEDIA_DOMAIN = array(
         'http://vf.tutuim.com/',
         'http://vf.tutuim.com/',
     );
     
     public $OSS_IMAGE_ENABLE = array('jpg','jpeg','png');
-    public $OSS_VIDEO_ENABLE = array('mp4');
+    public $OSS_MEDIA_ENABLE = array('mp4');
     
 //     public $LOCAL_TMP_PATH = '/alidata/tmpavatarfile/';
     public $LOCAL_TMP_PATH = '/alidata1/www/tmpavatarfile/';
     
-    public function uploadImage($file, $id)
+    public function uploadAlbumImage($file, $albumid)
     {
         if (empty($file)){
             $this->setError(ErrorConf::topicContentImageEmpty());
@@ -44,10 +44,10 @@ class AliOss extends ModelBase
 	    if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
 	    	$ext = "jpg";
 	    }
-	    $from = $this->LOCAL_TMP_PATH . $id . rand(1, 100) . '.' . $ext;
+	    $from = $this->LOCAL_TMP_PATH . $albumid . rand(1, 100) . '.' . $ext;
 	    move_uploaded_file($tmpFile, $from);
 	    
-	    $to = $this->formatImageFile($id, $ext);
+	    $to = $this->formatImageFile($albumid, $ext);
     	$responseObj = $obj->upload_file_by_file($bucket,$to,$from);
     	if ($responseObj->status==200){
     	    list($width, $height, $type, $attr) = getimagesize($from);
@@ -61,7 +61,7 @@ class AliOss extends ModelBase
     	}
     }
     
-    public function uploadYunyingMedia($file)
+    /*public function uploadYunyingMedia($file)
     {
         if (empty($file)){
             $this->setError(ErrorConf::yunyingMediaEmpty());
@@ -91,9 +91,9 @@ class AliOss extends ModelBase
             $this->setError(ErrorConf::yunyingMediaError());
             return false;
         }
-    }
+    }*/
     
-    public function uploadVideo($file, $id)
+    public function uploadMedia($file, $id)
     {
         if (empty($file)){
             $this->setError(ErrorConf::topicContentImageEmpty());
@@ -101,7 +101,7 @@ class AliOss extends ModelBase
         }
         $obj = new alioss_sdk();
         $obj->set_debug_mode(FALSE);
-        $bucket = $this->OSS_BUCKET_VIDEO;
+        $bucket = $this->OSS_BUCKET_MEDIA;
         $tmpFile = $file['tmp_name'];
         
         
@@ -109,7 +109,7 @@ class AliOss extends ModelBase
         $id3Info = $getID3->analyze($tmpFile);
         
         $ext = $id3Info['fileformat'];
-        if (!in_array($ext, $this->OSS_VIDEO_ENABLE)){
+        if (!in_array($ext, $this->OSS_MEDIA_ENABLE)){
             $this->setError(ErrorConf::topicContentVideoInvalidateType());
         }
         $times = ceil(@$id3Info['playtime_seconds']+0);
@@ -123,7 +123,7 @@ class AliOss extends ModelBase
         $to = $this->formatVideoFile($id, $ext);
         $responseObj = $obj->upload_file_by_file($bucket,$to,$from);
         if ($responseObj->status==200){
-            $return['videopath'] = $to;
+            $return['mediapath'] = $to;
             $return['width'] = $width;
             $return['height'] = $height;
             $return['size'] = $size;
@@ -133,19 +133,6 @@ class AliOss extends ModelBase
             $this->setError(ErrorConf::topicContentImageEmpty());
             return false;
         }
-    }
-
-    public function getImageUrl($file,$width=0,$height=0)
-    {
-        $domains = $this->OSS_BUCKET_IMAGE_DOMAIN;
-        $domainsCount = count($domains);
-        $domainIndex = abs(crc32($file)%$domainsCount);
-        $domain = $domains[$domainIndex];
-        $size = '';
-        if (!empty($width)){
-            $size = "_{$width}";
-        }
-        return $domain.trim($file, '/').$size;
     }
     
     public function getImageUrlNg($file, $style='')
@@ -167,24 +154,24 @@ class AliOss extends ModelBase
         return "{$domain}{$uid}/{$avatartime}{$size}";
     }
     
-    public function getVideoUrl($file)
+    public function getMediaUrl($file)
     {
-        $domains = $this->OSS_BUCKET_VIDEO_DOMAIN;
+        $domains = $this->OSS_BUCKET_MEDIA_DOMAIN;
         $domainsCount = count($domains);
         $domainIndex = abs(crc32($file)%$domainsCount);
         $domain = $domains[$domainIndex];
         return $domain.trim($file, '/');
     }
     
-    public function getWebVideoUrl($file)
+    /*public function getWebMediaUrl($file)
     {
         $file = str_replace('.mp4', '_web.mp4', $file);
-        $domains = $this->OSS_BUCKET_VIDEO_DOMAIN;
+        $domains = $this->OSS_BUCKET_MEDIA_DOMAIN;
         $domainsCount = count($domains);
         $domainIndex = abs(crc32($file)%$domainsCount);
         $domain = $domains[$domainIndex];
         return $domain.trim($file, '/');
-    }
+    }*/
     
     /**
      * delete_object
@@ -255,19 +242,13 @@ class AliOss extends ModelBase
     	return false;
     }
     
-    public function formatImageFile($topicId, $ext)
+    public function formatImageFile($albumid, $ext)
     {
-        return date("Y/m/d/").md5($topicId).".".$ext;
+        return date("Y/m/d/").md5($albumid).".".$ext;
     }
     
-    public function formatVideoFile($topicId, $ext)
+    public function formatVideoFile($albumid, $ext)
     {
-        return date("Y/m/d/").md5($topicId).".".$ext;
+        return date("Y/m/d/").md5($albumid).".".$ext;
     }
-    
-    public function formatAvatarFile()
-    {
-        
-    }
-    
 }

@@ -1,8 +1,6 @@
 <?php
 /**
  * cdn api 调用封装累
- * @author wangzhitao
- * 
  */
 include_once SERVER_ROOT.'libs/alicdn/TopSdk.php';
 
