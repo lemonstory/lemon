@@ -20,10 +20,8 @@ abstract class controller
         $this->getActionData();
         $this->checkFilters();
         $this->getAppVertion();
-        $this->getLanguage();
-        //$this->startXhprof();
+        //$this->getLanguage();
         $this->action();
-        //$this->endXhprof();
     }
     
     protected function getAppVertion()
@@ -47,43 +45,6 @@ abstract class controller
     		$version = str_pad(str_replace('.', '', @$_GET['visitorappversion']),9,0)+0;
     		$_SERVER['visitorappversion'] = $version;
     	}
-    }
-    
-    
-    protected function getLanguage()
-    {
-//     	$filename = "/tmp/zhen.log";
-//     	$handle = @fopen($filename, 'a+');
-//     	var_dump($handle);exit;
-// 		fwrite($handle, ($userAgent).PHP_EOL);
-    	
-// 	    fwrite($handle, $tmp[0].PHP_EOL);
-    	
-// 		fwrite($handle, $_SERVER['language'].PHP_EOL);
-// 		fclose($handle);
-    	$userAgent = @$_SERVER['HTTP_USER_AGENT'];
-    	$language = 'zh';
-
-    	if($userAgent!="")
-    	{
-	    	$agentArr = explode('/', $userAgent);
-	    	 
-	    	if (!empty($agentArr[2]))
-	    	{
-	    		preg_match("/,\w{2,5}\)/", $agentArr[2], $tmp);
-	    		if (!empty($tmp[0]) && (strpos($tmp[0], 'en') || strpos($tmp[0], 'EN')))
-	    		{
-	    			$language = 'en';
-	    		}
-	    	}
-    	}
-    	$_SERVER['language'] = $language;
-    	
-    	if(isset($_GET['language']))
-    	{
-    		$_SERVER['language'] = $_GET['language'];
-    	}
-		include dirname(__FILE__)."/config/".$_SERVER['language']."_language.php";
     }
     
     
@@ -159,7 +120,6 @@ abstract class controller
             $data = ErrorConf::systemError();
         }
         echo json_encode($data);
-        //$this->endXhprof();
         exit;
     }
     protected function showSuccJson($data=array())
@@ -170,7 +130,6 @@ abstract class controller
         }else{
             echo json_encode(array('code'=>10000,'data'=>$data));
         }
-        //$this->endXhprof();
         exit;
     }
     

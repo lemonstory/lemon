@@ -8,7 +8,6 @@ if (DIRECTORY_SEPARATOR == '/'){
 } else {
     define("MANAGE_ROOT", dirname(dirname(dirname(SERVER_ROOT)))."/manage.git/trunk/");
 }
-define("XHPROF_DEBUG", 2); // xhprof是否开启：0关闭，1开启手工模式，2开启取样模式
 
 include dirname(__FILE__)."/config/dbconf.php";
 include dirname(__FILE__)."/config/cacheconf.php";
