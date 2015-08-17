@@ -3,15 +3,16 @@ class User extends ModelBase
 {
 	public $PASSPORT_DB_INSTANCE = 'share_main';
 	public $USER_INFO_TABLE_NAME = 'user_info';
+	public $CACHE_INSTANCE = 'user_info';
 	
-	public $CACHE_INSTANCE = 'main';
 	public $TYPE_QQ = 1;
 	public $TYPE_WX = 2;
 	public $TYPE_PH = 3;
+	
 	public $STATUS_NORMAL = 1;
-	public $STATUS_FORZEN = 2; // 冻结
-	public $STATUS_FORBITEN = 3; // 封号
-	public $STATUS_DELETE = 4; // 删除
+	public $STATUS_FORZEN = -1; // 冻结
+	public $STATUS_FORBITEN = -2; // 封号
+	public $STATUS_DELETE = -3; // 删除
 	
 	public function initUser($uid,$addtime,$nickname)
 	{

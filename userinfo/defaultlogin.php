@@ -3,29 +3,34 @@ include_once '../controller.php';
 class defaultlogin extends controller 
 {
     function action() {
-        $addtime = date('Y-m-d H:i:s');
-        $db = DbConnecter::connectMysql("share_main");
-        
-        $qquserpasword = md5("11223344");
-        $sql = "insert into passport (username,password,addtime) values (?,?,?)";
-        $st = $db->prepare($sql);
-        $st->execute(array('18701515649', $qquserpasword, $addtime));
-        $uid = $db->lastInsertId() + 0;
-        if ($uid == 0) {
-            echo "@@@";
-            return false;
+        $username = $this->getRequest("username");
+        $password = $this->getRequest("password");
+        if (empty($username) || empty($password)) {
+            $this->showErrorJson(ErrorConf::paramError());
         }
-        $nickName = "Lemon";
+        
+        $db = DbConnecter::connectMysql('share_main');
+        $sql = "select * from passport where username=?";
+        $st = $db->prepare ( $sql );
+        $st->execute (array($username));
+        $passportdata = $st->fetch(PDO::FETCH_ASSOC);
+        if(empty($passportdata)) {
+            $this->showErrorJson(ErrorConf::userNoExist());
+        }
+        
+        $uid = $passportdata['uid'];
+        if($passportdata['password'] != md5($password . strrev(strtotime($passportdata['addtime'])))){
+            $this->showErrorJson(array('code'=>'100002','desc'=>'用户名或者密码错误'));
+        }
+        
         $UserObj = new User();
-        $UserObj->initQQLoginUser($uid, $nickName, 0, $UserObj->TYPE_PH, $addtime);
+        $userinfo = current($UserObj->getUserInfo($uid));
+        if (!empty($userinfo['status']) && $userinfo['status'] == '-2') {
+            $this->showErrorJson(ErrorConf::userForbidenPost());
+        }
         
         $ssoobj = new Sso();
-        $ssoobj->setSsoCookie(array('uid' => $uid, 'pasword' => $qquserpasword), array('nickname' => $nickName));
-        
-        die();
-        
-        $userobj = new User();
-        $userinfo = $userobj->getUserInfo($uid);
+        $ssoobj->setSsoCookie($passportdata, $userinfo);
         
         // 返回成功json
         $this->showSuccJson($userinfo);

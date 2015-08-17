@@ -3,6 +3,7 @@ class Listen extends ModelBase
 {
 	public $MAIN_DB_INSTANCE = 'share_main';
 	public $LISTEN_TABLE_NAME = 'user_listen';
+	public $CACHE_INSTANCE = 'user_listen';
 	
 	/**
 	 * 获取用户收听列表
