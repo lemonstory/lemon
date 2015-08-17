@@ -40,7 +40,7 @@ class User extends ModelBase
 		$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
 		$sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid,nickname,avatartime,type,addtime) values (?,?,?,?,?)";
 		$st = $db->prepare ( $sql );
-		$re = $st->execute (array($uid,$nickname,$avatartime,$client,$addtime));
+		$re = $st->execute (array($uid,$nickname,$avatartime,$type,$addtime));
 		if($re) {
 			return true;
 		}
