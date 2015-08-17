@@ -1,15 +1,15 @@
 <?php
 
 /**
- * 获取专辑分类 Xmly::get_category();
- * 获取专辑列表 Xmly::get_album_list();
- * 获取故事列表 Xmly::get_story_list();
+ * 获取专辑分类 Xmly->get_category();
+ * 获取专辑列表 Xmly->get_album_list();
+ * 获取故事列表 Xmly->get_story_list();
  */
 class Xmly extends Http
 {
 
     // 获取专辑分类
-    public static function get_category($url = '')
+    public function get_category($url = '')
     {
         $content = parent::get($url);
 
@@ -18,40 +18,41 @@ class Xmly extends Http
         $r = array();
 
         foreach($result[0] as $k => $v) {
+            $url   = 'http://m.ximalaya.com'.Http::sub_data($v, 'href="', '"');
+            if (strstr($url, 'kid/rank')) {
+                continue;
+            }
             $title = Http::sub_data($v, 'mgt-5">', '<');
             $cover = Http::sub_data($v, 'src="', '"');
-            $url   = Http::sub_data($v, 'href="', '"');
             if ($title && $cover && $url) {
-                $r[$k]['title']         = $title;
-                $r[$k]['cover']         = $cover;
-                $r[$k]['url']           = $url;
-                $r[$k]['category_id']   = self::get_category_id($ul);
+                $r[$k]['title']    = $title;
+                $r[$k]['cover']    = $cover;
+                $r[$k]['link_url'] = 'http://m.ximalaya.com/explore/more_album?page=1&per_page=10&category_id=6&condition=rank&tag='.$title;
             }
         }
         return $r;
     }
 
-    // 获取专辑的分类ID 构建分页用
-    public static function get_category_id($album_url = '')
-    {
-        $content = parent::get($album_url);
-        return Http::sub_data($content, "data-category-id='", "'");
-    }
-
     // 获取专辑列表
-    // http://m.ximalaya.com/explore/more_album?page={{page}}&per_page=10&category_id={{category_id}}&condition=rank&tag=%E5%84%BF%E6%AD%8C%E5%A4%A7%E5%85%A8
-    public static function get_album_list($page_url = '', $page = 1, $category_id = 0)
+    public function get_album_list($page = 1, $tag = '')
     {
+        $page_url = "http://m.ximalaya.com/explore/more_album?page={{page}}&per_page=10&category_id=6&condition=recent&tag={{tag}}";
         $page_url = str_replace("{{page}}", $page, $page_url);
-        $page_url = str_replace("{{category_id}}", $category_id, $page_url);
+        $page_url = str_replace("{{tag}}", urlencode($tag), $page_url);
+        // 设置referer
+        Http::$referer = $page_url;
         if ($page == 1) {
-            $content = parent::get($page_url);
+            $content = Http::get($page_url);
         } else {
-            $content = parent::ajax_get($page_url);
+            $content = Http::ajax_get($page_url);
         }
+
         $content = json_decode($content, true);
 
         if (!isset($content['html'])) {
+            return array();
+        }
+        if (!$content['next_page']) {
             return array();
         }
 
@@ -70,24 +71,26 @@ class Xmly extends Http
             }
 
         }
+        return $arr;
     }
 
     // 获取故事列表
     // http://m.ximalaya.com/album/more_tracks?url=%2Falbum%2Fmore_tracks&aid=159&page=1
-    public static function get_story_list($album_id = 0, $page = 1)
+    public function get_story_list($album_id = 0, $page = 1)
     {
         if (!$album_id) {
             return array();
         }
 
-        $album_url = "http://m.ximalaya.com/album/more_tracks?url=%2Falbum%2Fmore_tracks&aid={{$album_id}}&page={$page}";
+        $album_url = "http://m.ximalaya.com/album/more_tracks?url=%2Falbum%2Fmore_tracks&aid={$album_id}&page={$page}";
+
+        Http::$referer = $album_url;
 
         if ($page == 1) {
-            $content = parent::get($album_url);
+            $content = Http::get($album_url);
         } else {
-            $content = parent::ajax_get($album_url);
+            $content = Http::ajax_get($album_url);
         }
-        
 
         $content = json_decode($content, true);
 
@@ -106,21 +109,37 @@ class Xmly extends Http
         foreach ($r as $k => $v) {
             $content = Http::get($v);
             $title = Http::sub_data($content, '<h1 class="name">', '</h1>');
-            $sound_url = Http::sub_data($content, 'sound_url="', '"');
-            $length = Http::sub_data($content, '<span class="time fr">', '</span>');
-            $length = get_seconds($length);
-            $intro = Http::sub_data($content, 'intro-desc', '</div>');
-            $intro = Http::sub_data($intro, '>');
+            $source_audio_url = Http::sub_data($content, 'sound_url="', '"');
+            $times = Http::sub_data($content, '<span class="time fr">', '</span>');
+            $times = $this->get_seconds($times);
+            $intro = htmlspecialchars_decode(Http::sub_data($content, 'data-text="', '"'));
+            $intro = preg_replace('/<a[\s|\S].*?a>/', '', $intro);
             $cover = Http::sub_data($content, "background-image: url('", "')");
             if ($title && $intro) {
                 $n[$k]['title'] = $title;
-                $n[$k]['sound_url'] = $sound_url;
-                $n[$k]['length'] = $length;
+                $n[$k]['source_audio_url'] = $source_audio_url;
+                $n[$k]['times'] = $times;
                 $n[$k]['intro'] = $intro;
-                $n[$k]['cover'] = $cover;
+                $n[$k]['s_cover'] = $cover;
             }
             return $n;
         }
         return $n;
+    }
+
+    // 返回秒数
+    public function get_seconds($times = '')
+    {
+        if (!$times) {
+            return 0;
+        }
+        $times = explode(":", $times);
+        if (isset($times[2])) {
+            return $times[2] * 60 * 60 + $times[1] * 60 + $times[0];
+        } else if (isset($times[1])) {
+            return $times[1] * 60 + $times[0];
+        } else {
+            return $times[0];
+        }
     }
 }

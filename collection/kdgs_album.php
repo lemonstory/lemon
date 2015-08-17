@@ -8,7 +8,7 @@ class kdgs_album extends controller
         $kdgs = new Kdgs();
         $album = new Album();
         $story_url = new StoryUrl();
-        $category_list = $category->get_list("`res_name`='kdgs' and `s_id`='0'");
+        $category_list = $category->get_list("`res_name`='kdgs' and `parent_id`>0");
         foreach($category_list as $k => $v) {
             $page = 1;
             while(true) {
@@ -22,13 +22,15 @@ class kdgs_album extends controller
                         continue;
                     }
                     $album_id = $album->insert(array(
-                        'title'      => $v2['title'],
-                        'min_age'    => $v2['min_age'],
-                        'max_age'    => $v2['max_age'],
-                        'intro'      => '',
-                        's_cover'    => $v2['cover'],
-                        'link_url'   => $v2['url'],
-                        'add_time'   => date('Y-m-d H:i:s'),
+                        'title'       => $v2['title'],
+                        'category_id' => $v['id'],
+                        'min_age'     => $v2['min_age'],
+                        'max_age'     => $v2['max_age'],
+                        'cat'         => 'kdgs',
+                        'intro'       => '',
+                        's_cover'     => $v2['cover'],
+                        'link_url'    => $v2['url'],
+                        'add_time'    => date('Y-m-d H:i:s'),
                     ));
                     $story_url->insert(array(
                         'res_name' => 'album',
@@ -38,10 +40,13 @@ class kdgs_album extends controller
                         'source_file_name' => ltrim(strrchr($v2['cover'], '/'), '/'),
                         'add_time' => date('Y-m-d H:i:s'),
                     ));
+                    echo $album_id;
+                    echo "<br />";
                 }
                 $page ++;
             }
         }
     }
 }
+
 new kdgs_album();

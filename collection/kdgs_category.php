@@ -46,7 +46,7 @@ class kdgs_category extends controller
         foreach($category_list as $k => $v) {
             $children_category_list = $kdgs->get_children_category_list($v['link_url']);
             foreach($children_category_list as $k2 => $v2) {
-                $exists = $category->check_exists("`res_name`='kdgs' and `s_id`='0' and `s_p_id`='{$v2['s_p_id']}'");
+                $exists = $category->check_exists("`res_name`='kdgs' and `s_id`='{$v['s_id']}' and `s_p_id`='{$v2['s_p_id']}'");
                 if ($exists) {
                     continue;
                 } else {
@@ -54,7 +54,7 @@ class kdgs_category extends controller
                         'res_name' => 'kdgs',
                         'parent_id' => $v['id'],
                         'title' => $v2['title'],
-                        's_id' => 0,
+                        's_id' => $v['s_id'],
                         's_p_id' => $v2['s_p_id'],
                         'from_url' => $v['link_url'],
                         'link_url' => $v2['link_url'],
