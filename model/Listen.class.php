@@ -25,7 +25,11 @@ class Listen extends ModelBase
 		if (empty($res)) {
 			return array();
 		} else {
-			return $res;
+		    $list = array();
+		    foreach ($res as $value) {
+		        $list[$value['id']] = $value;
+		    }
+			return $list;
 		}
 	}
 	
@@ -42,7 +46,7 @@ class Listen extends ModelBase
 	        $this->setError(ErrorConf::paramError());
 	        return array();
 	    }
-	     
+	    
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 	    $sql = "SELECT * FROM {$this->LISTEN_TABLE_NAME} WHERE `uid` = ? and `storyid` = ?";
 	    $st = $db->prepare($sql);
@@ -59,23 +63,44 @@ class Listen extends ModelBase
 	/**
 	 * 用户添加收听故事
 	 * @param I $uid
+	 * @param I $albumid    专辑Id
 	 * @param I $storyid	故事id
 	 * @return boolean
 	 */
-	public function addUserLisenStory($uid, $storyid)
+	public function addUserLisenStory($uid, $albumid, $storyid)
 	{
-		if (empty($uid) || empty($storyid)) {
+		if (empty($uid) || empty($albumid) || empty($storyid)) {
 			$this->setError(ErrorConf::paramError());
 			return false;
 		}
 		$addtime = date("Y-m-d H:i:s");
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 		$sql = "INSERT INTO {$this->LISTEN_TABLE_NAME} 
-			(`uid`, `storyid`, `addtime`) 
-			VALUES (?, ?, ?)";
+			(`uid`, `albumid`, `storyid`, `addtime`) 
+			VALUES (?, ?, ?, ?)";
 		$st = $db->prepare($sql);
 		$res = $st->execute(array($uid, $storyid, $addtime));
 		return $res;
 	}
 	
+	
+	/**
+	 * 用户取消收听
+	 * @param I $uid
+	 * @param I $storyid    故事Id
+	 * @return boolean
+	 */
+	public function delUserListenStory($uid, $storyid)
+	{
+	    if (empty($uid) || empty($storyid)) {
+	        $this->setError(ErrorConf::paramError());
+	        return false;
+	    }
+	    $addtime = date("Y-m-d H:i:s");
+	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+	    $sql = "DELETE FROM {$this->LISTEN_TABLE_NAME} WHERE `uid` = ? AND `storyid` = ?";
+	    $st = $db->prepare($sql);
+	    $res = $st->execute(array($uid, $storyid));
+	    return $res;
+	}
 }

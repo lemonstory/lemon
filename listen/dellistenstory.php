@@ -1,11 +1,12 @@
 <?php
 /*
- * 用户收听故事
+ * 用户取消收听故事
  */
 include_once '../controller.php';
-class addlistenstory extends controller 
+class dellistenstory extends controller 
 {
-    function action() {
+    public function action() 
+    {
         $albumid = $this->getRequest("albumid");
         $storyid = $this->getRequest("storyid");
         if (empty($albumid) || empty($storyid)) {
@@ -16,7 +17,7 @@ class addlistenstory extends controller
             $this->showErrorJson(ErrorConf::noLogin());
         }
         
-        // 获取故事信息
+        // 获取专辑信息
         
         
         /* $userobj = new User();
@@ -27,12 +28,12 @@ class addlistenstory extends controller
         
         $listenobj = new Listen();
         $listeninfo = $listenobj->getUserListenInfoByStoryId($uid, $storyid);
-        if (!empty($listeninfo)) {
-            $this->showErrorJson(ErrorConf::userListenStoryIsExist());
+        if (empty($listeninfo)) {
+            $this->showErrorJson(ErrorConf::userListenIsEmpty());
         }
-        $listenobj->addUserLisenStory($uid, $albumid, $storyid);
+        $listenobj->delUserListenStory($uid, $storyid);
         
         $this->showSuccJson();
     }
 }
-new addlistenstory();
+new dellistenstory();

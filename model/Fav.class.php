@@ -25,7 +25,11 @@ class Fav extends ModelBase
 		if (empty($res)) {
 			return array();
 		} else {
-			return $res;
+			$list = array();
+		    foreach ($res as $value) {
+		        $list[$value['id']] = $value;
+		    }
+			return $list;
 		}
 	}
 	
@@ -76,6 +80,27 @@ class Fav extends ModelBase
 		$st = $db->prepare($sql);
 		$res = $st->execute(array($uid, $albumid, $addtime));
 		return $res;
+	}
+	
+	
+	/**
+	 * 用户取消收藏
+	 * @param I $uid
+	 * @param I $albumid	专辑id
+	 * @return boolean
+	 */
+	public function delUserFavAlbum($uid, $albumid)
+	{
+	    if (empty($uid) || empty($albumid)) {
+	        $this->setError(ErrorConf::paramError());
+	        return false;
+	    }
+	    $addtime = date("Y-m-d H:i:s");
+	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+	    $sql = "DELETE FROM {$this->FAV_TABLE_NAME} WHERE `uid` = ? AND `albumid` = ?";
+	    $st = $db->prepare($sql);
+	    $res = $st->execute(array($uid, $albumid));
+	    return $res;
 	}
 	
 }

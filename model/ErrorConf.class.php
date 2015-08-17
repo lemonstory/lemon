@@ -88,6 +88,14 @@ class   ErrorConf
 	{
 	    return array('code'=>'100401','desc'=>'你已经收藏过了');
 	}
+	public static function userFavIsEmpty()
+	{
+	    return array('code'=>'100402','desc'=>'你还没有收藏专辑');
+	}
+	public static function userFavDataError()
+	{
+	    return array('code'=>'100403','desc'=>'收藏数据错误');
+	}
 	
 	
 	// 收听
@@ -95,6 +103,15 @@ class   ErrorConf
 	{
 	    return array('code'=>'100501','desc'=>'你已经收听过了');
 	}
+	public static function userListenIsEmpty()
+	{
+	    return array('code'=>'100502','desc'=>'你还没有收听故事');
+	}
+	public static function userListenDataError()
+	{
+	    return array('code'=>'100503','desc'=>'收听数据错误');
+	}
+	
 	/**
 	 * 拼接错误信息
 	 * @param string $msg
