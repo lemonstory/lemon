@@ -33,7 +33,7 @@ class Fav extends ModelBase
 	 * @param I $albumid	专辑id
 	 * @return boolean
 	 */
-	public function addUserFav($uid, $albumid)
+	public function addUserFavAlbum($uid, $albumid)
 	{
 		if (empty($uid) || empty($albumid)) {
 			$this->setError(ErrorConf::paramError());

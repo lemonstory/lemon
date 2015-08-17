@@ -3,24 +3,27 @@ class User extends ModelBase
 {
 	public $PASSPORT_DB_INSTANCE = 'share_main';
 	public $USER_INFO_TABLE_NAME = 'user_info';
-	public $BABY_INFO_TABLE_NAME = 'user_baby_info';
-	public $ADDRESS_INFO_TABLE_NAME = 'user_address_info';
 	
 	public $CACHE_INSTANCE = 'main';
+	public $TYPE_QQ = 1;
+	public $TYPE_WX = 2;
+	public $TYPE_PH = 3;
+	public $STATUS_NORMAL = 1;
+	public $STATUS_FORZEN = 2; // 冻结
+	public $STATUS_FORBITEN = 3; // 封号
+	public $STATUS_DELETE = 4; // 删除
 	
 	public function initUser($uid,$addtime,$nickname)
 	{
-		if($uid==0)
-		{
-			$this->setError(ErrorConf::noUid());
+		if(empty($uid)) {
+			$this->setError(ErrorConf::paramError());
 			return false;
 		}
 		$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
 		$sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid,nickname,addtime) values (?,?,?)";
 		$st = $db->prepare ( $sql );
 		$re = $st->execute (array($uid,$nickname,$addtime));
-		if($re)
-		{
+		if($re) {
 			$this->clearUserCache($uid);
 			return true;
 		}
@@ -28,19 +31,17 @@ class User extends ModelBase
 	}	
 	
 	
-	public function initQQLoginUser($uid,$nickname,$avatartime,$addtime)
+	public function initQQLoginUser($uid,$nickname,$avatartime,$type,$addtime)
 	{
-		if($uid==0)
-		{
-			$this->setError(ErrorConf::noUid());
+		if(empty($uid) || empty($nickname) || empty($type)) {
+			$this->setError(ErrorConf::paramError());
 			return false;
 		}
 		$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-		$sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid,nickname,avatartime,addtime) values (?,?,?,?)";
+		$sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid,nickname,avatartime,type,addtime) values (?,?,?,?,?)";
 		$st = $db->prepare ( $sql );
-		$re = $st->execute (array($uid,$nickname,$avatartime,$addtime));
-		if($re)
-		{
+		$re = $st->execute (array($uid,$nickname,$avatartime,$client,$addtime));
+		if($re) {
 			return true;
 		}
 		$this->clearUserCache($uid);
@@ -50,13 +51,11 @@ class User extends ModelBase
 	
 	public function getUserInfo($uids)
 	{
-		if(!is_array($uids))
-		{
+		if(!is_array($uids)) {
 			$uids = array($uids);
 		}
 		$data = array();
 		$cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uids);
-		$cacheData = array();
 		$cacheIds = array();
 		if (is_array($cacheData)){
 			foreach ($cacheData as $onecachedata){
@@ -69,13 +68,11 @@ class User extends ModelBase
 		$dbIds = array_diff($uids, $cacheIds);
 		$dbData = array();
 		
-		if(!empty($dbIds))
-		{
+		if(!empty($dbIds)) {
 			$result = array();
 			$idlist = implode(',', $dbIds);
 			$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-			$sql = "select * from {$this->USER_INFO_TABLE_NAME} where uid in($idlist)";
-			
+			$sql = "select * from {$this->USER_INFO_TABLE_NAME} where uid in ($idlist)";
 			$st = $db->prepare ( $sql );
 			$st->execute ();
 			$tmpDbData = $st->fetchAll ( PDO::FETCH_ASSOC );
@@ -86,20 +83,15 @@ class User extends ModelBase
 			}
 		}
 
-		foreach($uids as $uid)
-		{
-			if(in_array($uid, $dbIds))
-			{
+		foreach($uids as $uid) {
+			if(in_array($uid, $dbIds)) {
 				$data[$uid] = @$dbData[$uid];
-			}else{
+			} else {
 				$data[$uid] = $cacheData[$uid];
 			}
-			
-			
 		}
 		
 		$currentuid = @$_SESSION['uid'];
-		
 		$result = array();
 		foreach ($data as $one)
 		{
@@ -113,52 +105,6 @@ class User extends ModelBase
 			$result[$one['uid']] = $one;
 		}
 		return $result;
-	}
-	
-	
-	private function formatUserBaseInfo($one)
-	{
-		if($one['avatartime']+0==0)
-		{
-			$one['avatartime'] = strtotime($one['addtime']);
-		}
-		
-		if($one['birthday']=="0000-00-00")
-		{
-			$one['birthday']="";
-		}	
-		
-		if($one['birthday']==null)
-		{
-			$one['birthday']="";
-		}
-		if($one['province']==null)
-		{
-			$one['province']="";
-		}
-		if($one['city']==null)
-		{
-			$one['city']="";
-		}
-		if($one['area']==null)
-		{
-			$one['area']="";
-		}
-		if($one['province']=="" && $one['city']=="")
-		{
-			$one['area']=$_SERVER['morelanguage']['wherefrom'];
-		}	
-		if($one['sign']==null)
-		{
-			$one['sign']="";
-		}
-			
-		if($one['gender']==0)
-		{
-			$one['gender']=1;
-		}
-		
-		return $one;
 	}
 	
 	
@@ -187,62 +133,54 @@ class User extends ModelBase
 	
 	public function setUserinfo($uid,$data)
 	{
-		if($uid==0)
-		{
-			$this->setError(ErrorConf::noUid());
+		if($uid==0) {
+			$this->setError(ErrorConf::paramError());
 			return false;
 		}
-		if(empty($data))
-		{
+		if(empty($data)) {
 			$this->setError(ErrorConf::modifyUserInfoEmpty());
 			return false;
 		}
 		
-		
-		if(@$data['nickname']!="")
-		{
+		if(@$data['nickname'] != "") {
 			$NicknameMd5Obj = new NicknameMd5();
 			$existnicknameuid = $NicknameMd5Obj->checkNameIsExist($data['nickname']);
-			if ($existnicknameuid>0 && $existnicknameuid!=$uid)
-			{
+			if ($existnicknameuid > 0 && $existnicknameuid != $uid) {
 				$this->setError(ErrorConf::nickNameIsExist());
 				return false;
-			}else{
+			} else {
 				$NicknameMd5Obj->addOne($data['nickname'], $uid);
 			}
 			
-			QueueManager::pushUserInfoToSearch($uid);
+			//QueueManager::pushUserInfoToSearch($uid);
 		}
 		
 		$setstr = "";
-		foreach ($data as $attr=>$value)
-		{
+		foreach ($data as $attr => $value) {
 			$setstr = $setstr." $attr='{$value}' ,";
 		}
 		$setstr = rtrim($setstr,',');
-		if($setstr == "")
-		{
+		if($setstr == "") {
 			$this->setError(ErrorConf::modifyUserInfoEmpty());
 			return false;
 		}
-		$sql = "update `{$this->USER_INFO_TABLE_NAME}` set $setstr where uid=$uid ";
+		$sql = "update `{$this->USER_INFO_TABLE_NAME}` set $setstr where uid = $uid ";
 		$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
 		$st = $db->prepare ( $sql );
 		$st->execute ();
 		$this->clearUserCache($uid);
 		return true;
 	}
-		
 	
-	public function setUserNickname($uid,$nickname)
+	
+	public function setUserNickname($uid, $nickname)
 	{
 		$NicknameMd5Obj = new NicknameMd5();
 		$existnicknameuid = $NicknameMd5Obj->checkNameIsExist($nickname);
-		if ($existnicknameuid>0 && $existnicknameuid!=$uid)
-		{
+		if ($existnicknameuid > 0 && $existnicknameuid != $uid) {
 			$this->setError(ErrorConf::nickNameIsExist());
 			return false;
-		}else{
+		} else {
 			$NicknameMd5Obj->addOne($nickname, $uid);
 		}
 		
@@ -275,4 +213,21 @@ class User extends ModelBase
 		//$DataSyncManagerObj->setRenewTime($DataSyncManagerObj->DATATYPEUSERINFO, $uid,time());
 	}
 	
+
+	private function formatUserBaseInfo($one)
+	{
+	    if($one['avatartime']+0 == 0) {
+	        $one['avatartime'] = strtotime($one['addtime']);
+	    }
+	    if($one['birthday'] == "0000-00-00") {
+	        $one['birthday'] = "";
+	    }
+	    if($one['birthday'] == null) {
+	        $one['birthday'] = "";
+	    }
+	    if($one['gender'] == 0) {
+	        $one['gender'] = 1;
+	    }
+	    return $one;
+	}
 }

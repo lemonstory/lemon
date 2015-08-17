@@ -33,7 +33,7 @@ class Listen extends ModelBase
 	 * @param I $storyid	故事id
 	 * @return boolean
 	 */
-	public function addUserStory($uid, $storyid)
+	public function addUserLisenStory($uid, $storyid)
 	{
 		if (empty($uid) || empty($storyid)) {
 			$this->setError(ErrorConf::paramError());

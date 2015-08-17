@@ -139,11 +139,7 @@ class Sso extends ModelBase
         $qquserpasword = md5('QL' . time());
         $sql = "insert into {$this->PASSPORT_TABLE_NAME} (username,password,addtime) values (?,?,?)";
         $st = $db->prepare($sql);
-        $st->execute(array(
-                'QL',
-                $qquserpasword,
-                $addtime 
-        ));
+        $st->execute(array('QL', $qquserpasword, $addtime));
         $uid = $db->lastInsertId() + 0;
         if ($uid == 0) {
             return false;
@@ -151,29 +147,24 @@ class Sso extends ModelBase
         
         $sql = "insert into {$this->QQ_RELATION_TABLE_NAME} (openid,uid,accesstoken,addtime) values (?,?,?,?)";
         $st = $db->prepare($sql);
-        $st->execute(array(
-                $openId,
-                $uid,
-                $accessToken,
-                $addtime 
-        ));
+        $st->execute(array($openId, $uid, $accessToken, $addtime ));
         
         $NicknameMd5Obj->addOne($nickName, $uid);
         
         $avatartime = 0;
         if ($qqavatar != "") {
-            QueueManager::pushLoadUserQqavatar($uid, $qqavatar);
+            //QueueManager::pushLoadUserQqavatar($uid, $qqavatar);
         }
         
         $UserObj = new User();
-        $UserObj->initQQLoginUser($uid, $nickName, $avatartime, $gender, $birthday, $addtime);
-        
+        $type = $UserObj->TYPE_QQ;
+        $UserObj->initQQLoginUser($uid, $nickName, $avatartime, $type, $addtime);
         $this->setSsoCookie(array('uid' => $uid, 'pasword' => $qquserpasword), array('nickname' => $nickName));
         
         $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         
-        QueueManager::pushAfterRegQueue($uid);
-        QueueManager::pushUserInfoToSearch($uid);
+        //QueueManager::pushAfterRegQueue($uid);
+        //QueueManager::pushUserInfoToSearch($uid);
         return $return;
     }
     
@@ -182,23 +173,19 @@ class Sso extends ModelBase
         $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
         $sql = "update {$this->QQ_RELATION_TABLE_NAME} set accesstoken=? where openid=?";
         $st = $db->prepare($sql);
-        $st->execute(array(
-                $accessToken,
-                $openId 
-        ));
+        $st->execute(array($accessToken, $openId));
         
         $sql = "select * from {$this->QQ_RELATION_TABLE_NAME} where openid=?";
         $st = $db->prepare($sql);
-        $st->execute(array(
-                $openId 
-        ));
+        $st->execute(array($openId));
         $ar = $st->fetch(PDO::FETCH_ASSOC);
         $uid = $ar['uid'];
         
         $passportdata = $this->getInfoWithUid($uid);
         $UserObj = new User();
         //$this->setLoginType($uid, 'qq');
-        $userinfo = $UserObj->getSelfInfo($uid);
+        //$userinfo = $UserObj->getSelfInfo($uid);
+        $UserObj = current($UserObj->getUserInfo($uid));
         
         $this->setSsoCookie($passportdata, $userinfo);
         return $userinfo;
@@ -242,7 +229,6 @@ class Sso extends ModelBase
         
         $data = array();
         $cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uid);
-        $cacheData = array();
         if (empty($cacheData)) {
             $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
             $sql = "select * from {$this->PASSPORT_TABLE_NAME} where uid=?";
@@ -266,18 +252,16 @@ class Sso extends ModelBase
         }
     }
     
-    public function getInfoWithUids($uids) {
+    public function getInfoWithUids($uids) 
+    {
         if (empty($uids)) {
             return array();
         }
         if (! is_array($uids)) {
-            $uids = array(
-                    $uids 
-            );
+            $uids = array($uids);
         }
         $data = array();
         $cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uids);
-        $cacheData = array();
         $cacheIds = array();
         if (is_array($cacheData)) {
             foreach ($cacheData as $onecachedata) {
@@ -317,6 +301,35 @@ class Sso extends ModelBase
         return $data;
     }
     
+    
+    public function autoLogin()
+    {
+        if (isset($this->cookies['us']) || ! isset($this->cookies['al'])) {
+            return false;
+        }
+    
+        $domain = $this->domain;
+        $alCookieValue = $this->cookies['al'];
+        parse_str($this->abacaEncrypt($alCookieValue), $info);
+        if (! isset($info['uid']) || ! isset($info['cert']) || intval($info['uid']) <= 0) {
+            setcookie('al', '', time() - 86400, '/', $domain);
+            return false;
+        }
+        $uid = intval($info['uid']);
+        $passportdata = $this->getInfoWithUid($uid);
+        $UserObj = new User();
+        $userinfo = current($UserObj->getUserInfo($uid));
+    
+        if (! empty($passportdata['password'])) {
+            if ($this->md5Together($uid, $passportdata['password']) != $info['cert']) {
+                setcookie('al', '', time() - 86400, '/', $domain);
+                return false;
+            }
+            $this->setSsoCookie($passportdata, $userinfo);
+        }
+        return true;
+    }
+    
     /*public function setLoginType($uid,$logintype)
 	{
 		if($logintype=="")
@@ -348,14 +361,17 @@ class Sso extends ModelBase
 		return $logintype;
 	}*/
     
-    public function clearPassportCacheByUid($uid) {
+    public function clearPassportCacheByUid($uid) 
+    {
         return CacheConnecter::deleteMulti($this->CACHE_INSTANCE, $uid);
     }
-    public function clearPassportCacheByUserName($userName) {
+    public function clearPassportCacheByUserName($userName) 
+    {
         return CacheConnecter::deleteMulti($this->CACHE_INSTANCE, $userName);
     }
     
-    protected function setSsoCookie($passportdata, $userinfo) {
+    public function setSsoCookie($passportdata, $userinfo) 
+    {
         $R['uid'] = $passportdata['uid'];
         $R['nickname'] = $userinfo['nickname'];
         $R['password'] = @$passportdata['password'];
@@ -366,7 +382,8 @@ class Sso extends ModelBase
         setcookie('al', $this->makeCookie($R, 'al'), time() + 60 * 86400, '/', $domain, false, true);
     }
     
-    private function parseSession() {
+    private function parseSession() 
+    {
         if (! isset($this->cookies['us'])) {
             return array();
         }
@@ -380,7 +397,8 @@ class Sso extends ModelBase
         return $info;
     }
     
-    private function makeCookie($R, $type = 'us') {
+    private function makeCookie($R, $type = 'us') 
+    {
         switch ($type) {
             case 'us' :
                 $cookieInfo = array(
@@ -414,32 +432,6 @@ class Sso extends ModelBase
         return $cookie;
     }
     
-    public function autoLogin() {
-        if (isset($this->cookies['us']) || ! isset($this->cookies['al'])) {
-            return false;
-        }
-        
-        $domain = $this->domain;
-        $alCookieValue = $this->cookies['al'];
-        parse_str($this->abacaEncrypt($alCookieValue), $info);
-        if (! isset($info['uid']) || ! isset($info['cert']) || intval($info['uid']) <= 0) {
-            setcookie('al', '', time() - 86400, '/', $domain);
-            return false;
-        }
-        $uid = intval($info['uid']);
-        $passportdata = $this->getInfoWithUid($uid);
-        $UserObj = new User();
-        $userinfo = current($UserObj->getUserInfo($uid));
-        
-        if (! empty($passportdata['password'])) {
-            if ($this->md5Together($uid, $passportdata['password']) != $info['cert']) {
-                setcookie('al', '', time() - 86400, '/', $domain);
-                return false;
-            }
-            $this->setSsoCookie($passportdata, $userinfo);
-        }
-        return true;
-    }
     
     /*public function getMaxUid()
 	{
@@ -468,10 +460,12 @@ class Sso extends ModelBase
 		return $maxuid;	
 	}*/
     
-    private function md5Together($a = '', $b = '') {
+    private function md5Together($a = '', $b = '') 
+    {
         return md5(substr(md5($a), 13, 6) . substr(md5($b), 17, 6));
     }
-    private function abacaEncrypt($string, $operation = 'DECODE', $key = '', $expiry = 0) {
+    private function abacaEncrypt($string, $operation = 'DECODE', $key = '', $expiry = 0) 
+    {
         $ckey_length = 4;
         
         $key = md5($key ? $key : $_SERVER['CONFIG']['defaultEncryptKey']);

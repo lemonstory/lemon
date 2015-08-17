@@ -4,20 +4,20 @@ class   ErrorConf
     // COMMON 101xxx
     public static function systemError()
     {
-        return array('code'=>'101001','desc'=>'系统错误');
+        return array('code'=>'100001','desc'=>'系统错误');
     }
     public static function paramError($param=array())
     {
-        return array('code'=>'101002','desc'=>'参数错误');
+        return array('code'=>'100002','desc'=>'参数错误');
     }
     
     public static function paramErrorWithParam($param)
     {
-        return array('code'=>'101002','desc'=>self::concatError('参数：[param]错误', $param));
+        return array('code'=>'100002','desc'=>self::concatError('参数：[param]错误', $param));
     }
 	public static function userNoExist()
 	{
-		return array('code'=>'100001','desc'=>'用户不存在');
+		return array('code'=>'100101','desc'=>'用户不存在');
 	}
 	
 	public static function userFreezePost($uid)
@@ -36,26 +36,49 @@ class   ErrorConf
 	}
 	public static function userForbidenPost()
 	{
-	    return array('code'=>'100020','desc'=>'你已经被封号.');
+	    return array('code'=>'100120','desc'=>'你已经被封号.');
 	}
 	
-	
+	public static function modifyUserInfoEmpty()
+	{
+	    return array('code'=>'100009','desc'=>'要修改的用户信息未空');
+	}
 	public static function noLogin()
 	{
-		return array('code'=>'100007','desc'=>'身份已过期，请退出后重新登录');
+		return array('code'=>'100107','desc'=>'身份已过期，请退出后重新登录');
 	}
+	public static function nickNameIsExist()
+	{
+	    return array('code'=>'100109','desc'=>'昵称已经存在了');
+	}
+	
 	
 	public static function qqUserInfoEmpty()
 	{
 		return array('code'=>'100807','desc'=>'qq用户信息获取失败');
 	}
-	
     public static function qqAuthInfoEmpty()
 	{
 		return array('code'=>'100817','desc'=>'此qq未注册');
-	} 
+	}
+	public static function userBabyInfoEmpty()
+	{
+	    return array('code'=>'100108','desc'=>'用户宝宝资料为空');
+	}
+	public static function userAddressInfoEmpty()
+	{
+	    return array('code'=>'100109','desc'=>'用户地址信息为空');
+	}
 	
-
+	
+	public static function noUploadAvatarfile()
+	{
+	    return array('code'=>'100201','desc'=>'上传头像文件不存在');
+	}
+	public static function uploadAvatarfileFail()
+	{
+	    return array('code'=>'100202','desc'=>'头像上传失败');
+	}
 	
 	
 	/**
