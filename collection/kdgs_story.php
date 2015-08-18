@@ -34,7 +34,6 @@ class kdgs_story extends controller
                 ));
                 echo $story_id;
                 echo "<br />";
-                exit;
             }
         }
     }

@@ -1,19 +1,23 @@
 <?php
 
 include_once '../controller.php';
-class kdgs_album extends controller 
+class xmly_album extends controller 
 {
+	private $home_url = 'http://m.ximalaya.com/album-tag/kid';
     function action() {
-        $category = new Category();
-        $kdgs = new Kdgs();
-        $album = new Album();
-        $story_url = new StoryUrl();
-        $category_list = $category->get_list("`res_name`='kdgs' and `parent_id`>0");
 
-        foreach($category_list as $k => $v) {
+        $category = new Category();
+        $xmly = new Xmly();
+        $story_url = new StoryUrl();
+        $album = new Album();
+        $current_time = date('Y-m-d H:i:s');
+        // 分类
+        $category_list = $category->get_list("`res_name`='xmly'");
+
+        foreach ($category_list as $k => $v) {
             $page = 1;
             while(true) {
-                $album_list = $kdgs->get_children_category_album_list($v['s_p_id'], $page);
+                $album_list = $xmly->get_album_list($page, $v['title']);
                 if (!$album_list) {
                     break;
                 }
@@ -24,11 +28,9 @@ class kdgs_album extends controller
                     }
                     $album_id = $album->insert(array(
                         'title'       => $v2['title'],
-                        'category_id' => $v['id'],
-                        'min_age'     => $v2['min_age'],
-                        'max_age'     => $v2['max_age'],
-                        'from'        => 'kdgs',
+                        'from'        => 'xmly',
                         'intro'       => '',
+                        'category_id' => $v['id'],
                         's_cover'     => $v2['cover'],
                         'link_url'    => $v2['url'],
                         'add_time'    => date('Y-m-d H:i:s'),
@@ -46,8 +48,9 @@ class kdgs_album extends controller
                 }
                 $page ++;
             }
+
         }
+
     }
 }
-
-new kdgs_album();
+new xmly_album();
