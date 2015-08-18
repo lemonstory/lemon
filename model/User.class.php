@@ -132,7 +132,7 @@ class User extends ModelBase
 	}
 	
 	
-	public function setUserinfo($uid,$data)
+	public function setUserinfo($uid, $data)
 	{
 		if($uid==0) {
 			$this->setError(ErrorConf::paramError());
@@ -143,7 +143,7 @@ class User extends ModelBase
 			return false;
 		}
 		
-		if(@$data['nickname'] != "") {
+		if(!empty($data['nickname'])) {
 			$NicknameMd5Obj = new NicknameMd5();
 			$existnicknameuid = $NicknameMd5Obj->checkNameIsExist($data['nickname']);
 			if ($existnicknameuid > 0 && $existnicknameuid != $uid) {

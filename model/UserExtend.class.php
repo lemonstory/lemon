@@ -83,7 +83,18 @@ class UserExtend extends ModelBase
 			VALUES (?, ?, ?, ?, ?)";
 		$st = $db->prepare($sql);
 		$res = $st->execute(array($uid, $birthday, $gender, $age, $addtime));
-		return $res;
+		if (empty($res)) {
+		    return false;
+		}
+		$defaultbabyid = $db->lastInsertId() + 0;
+		
+		$data = array("defaultbabyid" => $defaultbabyid);
+		$userobj = new User();
+		$upres = $userobj->setUserinfo($uid, $data);
+		if (empty($upres)) {
+		    return false;
+		}
+		return true;
 	}
 	
 	public function updateUserBabyInfo($babyid, $updatedata)
@@ -128,7 +139,18 @@ class UserExtend extends ModelBase
 	    VALUES (?, ?, ?, ?, ?, ?)";
 	    $st = $db->prepare($sql);
 	    $res = $st->execute(array($uid, $name, $phonenumber, $address, $ecode, $addtime));
-	    return $res;
+	    if (empty($res)) {
+	        return false;
+	    }
+	    $defaultaddressid = $db->lastInsertId() + 0;
+	    
+	    $data = array("defaultaddressid" => $defaultaddressid);
+	    $userobj = new User();
+	    $upres = $userobj->setUserinfo($uid, $data);
+	    if (empty($upres)) {
+	        return false;
+	    }
+	    return true;
 	}
 	
 	public function updateUserAddressInfo($addressid, $updatedata)

@@ -96,7 +96,6 @@ class Listen extends ModelBase
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
-	    $addtime = date("Y-m-d H:i:s");
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 	    $sql = "DELETE FROM {$this->LISTEN_TABLE_NAME} WHERE `uid` = ? AND `storyid` = ?";
 	    $st = $db->prepare($sql);

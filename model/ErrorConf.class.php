@@ -41,7 +41,7 @@ class   ErrorConf
 	}
 	public static function modifyUserInfoEmpty()
 	{
-	    return array('code'=>'100009','desc'=>'要修改的用户信息未空');
+	    return array('code'=>'100009','desc'=>'要修改的用户信息为空');
 	}
 	public static function noLogin()
 	{
