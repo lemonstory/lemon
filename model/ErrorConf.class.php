@@ -70,6 +70,17 @@ class   ErrorConf
 	{
 	    return array('code'=>'100202','desc'=>'头像上传失败');
 	}
+	public static function uploadImgfileFail()
+	{
+	    return array('code'=>'100203','desc'=>'上传图片失败');
+	}
+	public static function uploadMediaInvalidateType(){
+	    return array('code'=>'100204','desc'=>'上传的媒体文件格式不正确');
+	}
+	public static function uploadMediafileFail()
+	{
+	    return array('code'=>'100205','desc'=>'上传媒体文件失败');
+	}
 	
 	
 	// qq联合登录

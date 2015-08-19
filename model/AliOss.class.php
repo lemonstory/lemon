@@ -10,7 +10,7 @@ class AliOss extends ModelBase
 {
     public $OSS_BUCKET_IMAGE = 'lemonpic';
     public $OSS_BUCKET_AVATAR = 'lemonavatar';
-    public $OSS_BUCKET_MEDIA = 'lemonvideo';
+    public $OSS_BUCKET_MEDIA = 'lemonmedia';
     public $OSS_BUCKET_IMAGE_DOMAIN = array(
     	'http://p.xinqing.com/',
     	'http://p.xinqing.com/',
@@ -27,13 +27,13 @@ class AliOss extends ModelBase
     public $OSS_IMAGE_ENABLE = array('jpg','jpeg','png');
     public $OSS_MEDIA_ENABLE = array('mp4');
     
-//     public $LOCAL_TMP_PATH = '/alidata/tmpavatarfile/';
-    public $LOCAL_TMP_PATH = '/alidata1/www/tmpavatarfile/';
+    public $LOCAL_IMG_TMP_PATH = '/alidata1/tmppicfile/';
+    public $LOCAL_MEDIA_TMP_PATH = '/alidata1/tmpmediafile/';
     
-    public function uploadAlbumImage($file, $albumid)
+    public function uploadImage($file, $relationid)
     {
         if (empty($file)){
-            $this->setError(ErrorConf::topicContentImageEmpty());
+            $this->setError(ErrorConf::paramError());
             return false;
         }
         $obj = new alioss_sdk();
@@ -44,10 +44,10 @@ class AliOss extends ModelBase
 	    if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
 	    	$ext = "jpg";
 	    }
-	    $from = $this->LOCAL_TMP_PATH . $albumid . rand(1, 100) . '.' . $ext;
+	    $from = $this->LOCAL_IMG_TMP_PATH . $relationid . rand(1, 100) . '.' . $ext;
 	    move_uploaded_file($tmpFile, $from);
 	    
-	    $to = $this->formatImageFile($albumid, $ext);
+	    $to = $this->formatImageFile($relationid, $ext);
     	$responseObj = $obj->upload_file_by_file($bucket,$to,$from);
     	if ($responseObj->status==200){
     	    list($width, $height, $type, $attr) = getimagesize($from);
@@ -56,7 +56,7 @@ class AliOss extends ModelBase
     	    $return['height'] = $height;
     	    return $return;
     	} else {
-    	    $this->setError(ErrorConf::topicContentImageEmpty());
+    	    $this->setError(ErrorConf::uploadImgfileFail());
     	    return false;
     	}
     }
@@ -93,34 +93,33 @@ class AliOss extends ModelBase
         }
     }*/
     
-    public function uploadMedia($file, $id)
+    public function uploadMedia($file, $relationid)
     {
         if (empty($file)){
-            $this->setError(ErrorConf::topicContentImageEmpty());
+            $this->setError(ErrorConf::paramError());
             return false;
         }
         $obj = new alioss_sdk();
-        $obj->set_debug_mode(FALSE);
+        $obj->set_debug_mode(false);
         $bucket = $this->OSS_BUCKET_MEDIA;
         $tmpFile = $file['tmp_name'];
-        
         
         $getID3 = new getID3;
         $id3Info = $getID3->analyze($tmpFile);
         
         $ext = $id3Info['fileformat'];
         if (!in_array($ext, $this->OSS_MEDIA_ENABLE)){
-            $this->setError(ErrorConf::topicContentVideoInvalidateType());
+            $this->setError(ErrorConf::uploadMediaInvalidateType());
         }
         $times = ceil(@$id3Info['playtime_seconds']+0);
         $width = @$id3Info['video']['resolution_x']+0;
         $height = @$id3Info['video']['resolution_y']+0;
         $size = @$id3Info['filesize'];
                 
-        $from = $this->LOCAL_TMP_PATH . $id . rand(1, 100) . '.' . $ext;
+        $from = $this->LOCAL_MEDIA_TMP_PATH . $relationid . rand(1, 100) . '.' . $ext;
         move_uploaded_file($tmpFile, $from);
         
-        $to = $this->formatVideoFile($id, $ext);
+        $to = $this->formatVideoFile($relationid, $ext);
         $responseObj = $obj->upload_file_by_file($bucket,$to,$from);
         if ($responseObj->status==200){
             $return['mediapath'] = $to;
@@ -130,7 +129,7 @@ class AliOss extends ModelBase
             $return['times'] = $times;
             return $return;
         } else {
-            $this->setError(ErrorConf::topicContentImageEmpty());
+            $this->setError(ErrorConf::uploadMediafileFail());
             return false;
         }
     }
@@ -242,13 +241,13 @@ class AliOss extends ModelBase
     	return false;
     }
     
-    public function formatImageFile($albumid, $ext)
+    public function formatImageFile($relationid, $ext)
     {
-        return date("Y/m/d/").md5($albumid).".".$ext;
+        return date("Y/m/d/").md5($relationid).".".$ext;
     }
     
-    public function formatVideoFile($albumid, $ext)
+    public function formatVideoFile($relationid, $ext)
     {
-        return date("Y/m/d/").md5($albumid).".".$ext;
+        return date("Y/m/d/").md5($relationid).".".$ext;
     }
 }
