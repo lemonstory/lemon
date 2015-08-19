@@ -15,6 +15,15 @@ class text extends controller
             $res = $uploadobj->uploadAlbumImage($albumid, "content");
         }
         
+        $file = "2015/08/19/c4ca4238a0b923820dcc509a6f75849b.png";
+        $aliossobj = new AliOss();
+        
+        $imgurl = $aliossobj->getImageUrlNg($file);
+        //$smallimgurl = $aliossobj->getImageUrlNg($file, "@!200x200");
+        
+        $mediafile = "/2015/08/19/c4ca4238a0b923820dcc509a6f75849b.mp4";
+        $mediaurl = $aliossobj->getMediaUrl($mediafile);
+        
         $smartyObj = $this->getSmartyObj();
         $smartyObj->display("userinfo/text.html");
     }

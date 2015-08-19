@@ -12,16 +12,16 @@ class AliOss extends ModelBase
     public $OSS_BUCKET_AVATAR = 'lemonavatar';
     public $OSS_BUCKET_MEDIA = 'lemonmedia';
     public $OSS_BUCKET_IMAGE_DOMAIN = array(
-    	'http://p.xinqing.com/',
-    	'http://p.xinqing.com/',
+    	'http://p.lemon.com/',
+    	'http://p.lemon.com/',
     );
     public $OSS_BUCKET_AVATAR_DOMAIN = array(
-    	'http://a.tutuim.com/avatar/',
-    	'http://a.tutuim.com/avatar/',
+    	'http://a.lemon.com/avatar/',
+    	'http://a.lemon.com/avatar/',
     );
     public $OSS_BUCKET_MEDIA_DOMAIN = array(
-        'http://vf.tutuim.com/',
-        'http://vf.tutuim.com/',
+        'http://mf.lemon.com/',
+        'http://mf.lemon.com/',
     );
     
     public $OSS_IMAGE_ENABLE = array('jpg','jpeg','png');
@@ -162,15 +162,6 @@ class AliOss extends ModelBase
         return $domain.trim($file, '/');
     }
     
-    /*public function getWebMediaUrl($file)
-    {
-        $file = str_replace('.mp4', '_web.mp4', $file);
-        $domains = $this->OSS_BUCKET_MEDIA_DOMAIN;
-        $domainsCount = count($domains);
-        $domainIndex = abs(crc32($file)%$domainsCount);
-        $domain = $domains[$domainIndex];
-        return $domain.trim($file, '/');
-    }*/
     
     /**
      * delete_object
