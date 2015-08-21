@@ -17,25 +17,11 @@ class downalbum extends controller
         // 获取专辑信息
         
         // 获取专辑所有故事列表、以及音频文件地址、总下载大小
-        $file = "http://lemonpic.oss-cn-hangzhou.aliyuncs.com/2015/08/19/c4ca4238a0b923820dcc509a6f75849b.png";
-        $filelen = 516424;
         
-        // 开始下载
-        $startBytes = 0;
-        $bytesLen = 102400;
-        $downobj = new DownLoad();
-        //$res = $downobj->getFileContent($file, $startBytes, $bytesLen);
-        $fp = fopen($file, 'r');
-        var_dump($fp);
-        die();
         
-        //$downResult = $downobj->startDownload($file, $filelen);
-        if ($downResult == false) {
-            $this->emptyHttpHeader();
-        }
     }
     
-    public function emptyHttpHeader()
+    /* public function emptyHttpHeader()
     {
         header("Accept-Length: 0");
         header("Content-Length: 0");
@@ -45,6 +31,6 @@ class downalbum extends controller
         header("Cache-Control: must-ridate, post-check=0, pre-check=0");
         header("Pragma: no-cache");
         die();
-    }
+    } */
 }
 new downalbum();
