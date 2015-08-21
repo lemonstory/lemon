@@ -92,13 +92,11 @@ class AliOss extends ModelBase
 	    if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
 	    	$ext = "jpg";
 	    }
-	    $from = $this->LOCAL_IMG_TMP_PATH . $relationid . rand(1, 100) . '.' . $ext;
-	    move_uploaded_file($tmpFile, $from);
 	    
 	    $to = $this->formatImageFile($relationid, $ext);
-    	$responseObj = $obj->upload_file_by_file($bucket,$to,$from);
+    	$responseObj = $obj->upload_file_by_file($bucket, $to, $tmpFile);
     	if ($responseObj->status==200){
-    	    list($width, $height, $type, $attr) = getimagesize($from);
+    	    list($width, $height, $type, $attr) = getimagesize($tmpFile);
     	    $return['path'] = $to;
     	    $return['width'] = $width;
     	    $return['height'] = $height;
@@ -144,12 +142,9 @@ class AliOss extends ModelBase
         $width = @$id3Info['video']['resolution_x']+0;
         $height = @$id3Info['video']['resolution_y']+0;
         $size = @$id3Info['filesize'];
-                
-        $from = $this->LOCAL_MEDIA_TMP_PATH . $relationid . rand(1, 100) . '.' . $ext;
-        move_uploaded_file($tmpFile, $from);
         
         $to = $this->formatVideoFile($relationid, $ext);
-        $responseObj = $obj->upload_file_by_file($bucket,$to,$from);
+        $responseObj = $obj->upload_file_by_file($bucket, $to, $tmpFile);
         if ($responseObj->status==200){
             $return['mediapath'] = $to;
             $return['width'] = $width;
