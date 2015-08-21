@@ -20,10 +20,8 @@ class upload_oss extends controller
     private function middle_upload($url, $storyid){  
         if(trim($url)==''){  
             return false;
-        }  
-        if(trim($save_dir)==''){  
-            $save_dir= sys_get_temp_dir(tempnam('pic-', 'prefix'));  
-        }  
+        }
+        $save_dir = tempnam(sys_get_temp_dir(), 'attachment_'.$storyid);
         if(trim($filename)==''){//保存文件名  
             $ext = strtolower(strrchr($url,'.'));  
             if(in_array($ext, array('.gif', '.jpg', '.jpeg', '.mp3', '.audio'))){  
