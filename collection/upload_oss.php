@@ -3,15 +3,20 @@
 include_once '../controller.php';
 class upload_oss extends controller 
 {
-    function action() {
-        // 
+    public function action() {
+        $album = new Album();
+        $album_list = $album->get_list("cover=''", 1);
+        foreach ($album_list as $k => $v) {
+            $r = $this->middle_upload($v['s_cover'], $v['id']);
+        }
+        var_dump($r);
     }
 
     /**
      * 功能：php完美实现下载远程图片保存到本地 
      * 将本地文件上传到oss,删除本地文件
-    */  
-    function middle_upload($url, $storyid){  
+     */
+    private function middle_upload($url, $storyid){  
         if(trim($url)==''){  
             return false;
         }  
@@ -51,7 +56,7 @@ class upload_oss extends controller
         if (in_array($ext, array('.mp3', '.audio'))) {
             $mediafile   = $save_dir.$filename;;
             $uploadobj = new Upload();
-            $uploadobj->uploadStoryMedia($mediafile)
+            $uploadobj->uploadStoryMedia($mediafile);
             return $mediaurl;  
         } else {
             $file      = $save_dir.$filename;;
