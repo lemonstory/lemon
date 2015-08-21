@@ -2,30 +2,30 @@
 class Upload extends ModelBase
 {
     /**
-     * 上传专辑封面
+     * 上传临时目录下的封面图片，临时目录：/alidata1/tmppicfile/
+     * @param S $tmpfilename    临时目录存储的图片文件名，如111
+     * @param S $tmpfiletype    文件格式，如png
      * @param I $albumid
-     * @param S $fileobjname    图片文件名
      * @return array            图片文件的信息
      */
-    public function uploadAlbumImage($albumid, $fileobjname='content')
+    public function uploadAlbumImage($tmpfilename, $tmpfiletype, $albumid)
     {
         $ossObj = new AliOss();
-        $file = @$_FILES[$fileobjname];
-        return $ossObj->uploadImage($file, $albumid);
+        return $ossObj->uploadPicImage($tmpfilename, $tmpfiletype, $albumid);
     }
     
     
     /**
-     * 上传故事音频内容
+     * 上传临时目录下的音频文件， 临时目录：/alidata1/tmpmediafile/
+     * @param string $tmpfilepath    临时目录,存储的音频文件名，如222
+     * @param S $tmpfiletype         文件格式，如mp3
      * @param string $storyid
-     * @param string $medianame    音频文件名
      * @return array 音频文件的信息
      */
-    public function uploadStoryMedia($storyid, $medianame = "media")
+    public function uploadStoryMedia($tmpfilename, $tmpfiletype, $storyid)
     {
         $ossObj = new AliOss();
-        $mediafile = @$_FILES[$medianame];
-        $mediainfo = $ossObj->uploadMedia($mediafile, $storyid);
+        $mediainfo = $ossObj->uploadMedia($tmpfilename, $tmpfiletype, $storyid);
         return $mediainfo;
     }
 }

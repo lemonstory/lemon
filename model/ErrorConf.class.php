@@ -81,6 +81,10 @@ class   ErrorConf
 	{
 	    return array('code'=>'100205','desc'=>'上传媒体文件失败');
 	}
+	public static function noUploadTmpfile()
+	{
+	    return array('code'=>'100206','desc'=>'上传临时文件不存在');
+	}
 	
 	
 	// qq联合登录

@@ -1,9 +1,4 @@
 <?php
-/**
- * 上传到alioss
- * @author wangzhitao
- *
- */
 include SERVER_ROOT.'libs/getid3/getid3.php';
 
 class AliOss extends ModelBase
@@ -25,22 +20,75 @@ class AliOss extends ModelBase
     );
     
     public $OSS_IMAGE_ENABLE = array('jpg','jpeg','png');
-    public $OSS_MEDIA_ENABLE = array('mp4');
+    public $OSS_MEDIA_ENABLE = array('mp4', 'mp3', 'audio');
     
     public $LOCAL_IMG_TMP_PATH = '/alidata1/tmppicfile/';
     public $LOCAL_MEDIA_TMP_PATH = '/alidata1/tmpmediafile/';
     
-    public function uploadImage($file, $relationid)
+    
+    /**
+     * 上传头像图片
+     * @param S $file        $_FILES['xxx']的值
+     * @param I $relationid
+     * @return array
+     */
+    public function uploadAvatarImage($file, $uid)
     {
         if (empty($file)){
             $this->setError(ErrorConf::paramError());
-            return false;
+            return array();
         }
         $obj = new alioss_sdk();
         $obj->set_debug_mode(FALSE);
         $bucket = $this->OSS_BUCKET_IMAGE;
         $tmpFile = $file['tmp_name'];
-	    $ext = array_search($file['type'], MimeTypes::$mime_types);
+    
+        $ext = array_search($file['type'], MimeTypes::$mime_types);
+        if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
+            $ext = "jpg";
+        }
+        $from = $this->LOCAL_IMG_TMP_PATH . $uid . rand(1, 100) . '.' . $ext;
+        move_uploaded_file($tmpFile, $from);
+         
+        $to = $this->formatImageFile($uid, $ext);
+        $responseObj = $obj->upload_file_by_file($bucket,$to,$from);
+        if ($responseObj->status==200){
+            list($width, $height, $type, $attr) = getimagesize($from);
+            $return['path'] = $to;
+            $return['width'] = $width;
+            $return['height'] = $height;
+            return $return;
+        } else {
+            $this->setError(ErrorConf::uploadImgfileFail());
+            return array();
+        }
+    }
+    
+    
+    /**
+     * 上传抓取图片
+     * @param S $tmpfilename    临时目录文件名，如111
+     * @param S $tmpfiletype    临时目录文件后缀，如png
+     * @param S $relationid
+     * @return array()
+     */
+    public function uploadPicImage($tmpfilename, $tmpfiletype, $relationid)
+    {
+        if (empty($tmpfilename) || empty($tmpfiletype) || empty($relationid)){
+            $this->setError(ErrorConf::paramError());
+            return array();
+        }
+        $tmpFile = $this->LOCAL_IMG_TMP_PATH . "/" . $tmpfilename . "." . $tmpfiletype;
+        if (!file_exists($tmpFile)) {
+            $this->setError(ErrorConf::noUploadTmpfile());
+            return array();
+        }
+        
+        $obj = new alioss_sdk();
+        $obj->set_debug_mode(FALSE);
+        $bucket = $this->OSS_BUCKET_IMAGE;
+        
+	    $ext = array_search($tmpfiletype, MimeTypes::$mime_types);
 	    if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
 	    	$ext = "jpg";
 	    }
@@ -57,52 +105,33 @@ class AliOss extends ModelBase
     	    return $return;
     	} else {
     	    $this->setError(ErrorConf::uploadImgfileFail());
-    	    return false;
+    	    return array();
     	}
     }
     
-    /*public function uploadYunyingMedia($file)
-    {
-        if (empty($file)){
-            $this->setError(ErrorConf::yunyingMediaEmpty());
-            return false;
-        }
-        $obj = new alioss_sdk();
-        $obj->set_debug_mode(FALSE);
-        $bucket = $this->OSS_BUCKET_IMAGE;
-        $tmpFile = $file['tmp_name'];
-        $ext = array_search($file['type'], MimeTypes::$mime_types);
-        if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
-            $ext = "jpg";
-        }
-        $filemd5 = md5_file($tmpFile);
-        $from = "{$this->LOCAL_TMP_PATH}{$filemd5}.{$ext}";
-        move_uploaded_file($tmpFile, $from);
-        
-        $to = "yunying/{$filemd5}.$ext";
-        $responseObj = $obj->upload_file_by_file($bucket,$to,$from);
-        if ($responseObj->status==200){
-            list($width, $height, $type, $attr) = getimagesize($from);
-            $return['path'] = $to;
-            $return['width'] = $width;
-            $return['height'] = $height;
-            return $return;
-        } else {
-            $this->setError(ErrorConf::yunyingMediaError());
-            return false;
-        }
-    }*/
     
-    public function uploadMedia($file, $relationid)
+    /**
+     * 上传抓取音频
+     * @param S $tmpfilename    临时目录文件名，如111
+     * @param S $tmpfiletype    临时目录文件后缀，如mp3
+     * @param S $relationid
+     * @return array()
+     */
+    public function uploadMedia($tmpfilename, $tmpfiletype, $relationid)
     {
-        if (empty($file)){
+        if (empty($tmpfilename) || empty($tmpfiletype) || empty($relationid)){
             $this->setError(ErrorConf::paramError());
-            return false;
+            return array();
         }
+        $tmpFile = $this->LOCAL_MEDIA_TMP_PATH . "/" . $tmpfilename. "." . $tmpfiletype;
+        if (!file_exists($tmpFile)) {
+            $this->setError(ErrorConf::noUploadTmpfile());
+            return array();
+        }
+        
         $obj = new alioss_sdk();
         $obj->set_debug_mode(false);
         $bucket = $this->OSS_BUCKET_MEDIA;
-        $tmpFile = $file['tmp_name'];
         
         $getID3 = new getID3;
         $id3Info = $getID3->analyze($tmpFile);
@@ -130,7 +159,7 @@ class AliOss extends ModelBase
             return $return;
         } else {
             $this->setError(ErrorConf::uploadMediafileFail());
-            return false;
+            return array();
         }
     }
     
