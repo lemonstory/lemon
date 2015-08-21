@@ -30,7 +30,7 @@ class addlistenstory extends controller
         if (!empty($listeninfo)) {
             $this->showErrorJson(ErrorConf::userListenStoryIsExist());
         }
-        $listenobj->addUserLisenStory($uid, $albumid, $storyid);
+        $listenobj->addUserListenStory($uid, $albumid, $storyid);
         
         $this->showSuccJson();
     }

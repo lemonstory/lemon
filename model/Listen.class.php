@@ -4,6 +4,7 @@ class Listen extends ModelBase
 	public $MAIN_DB_INSTANCE = 'share_main';
 	public $LISTEN_TABLE_NAME = 'user_listen';
 	public $CACHE_INSTANCE = 'user_listen';
+	public $KVSTORE_INSTANCE = 'main';
 	
 	/**
 	 * 获取用户收听列表
@@ -67,12 +68,13 @@ class Listen extends ModelBase
 	 * @param I $storyid	故事id
 	 * @return boolean
 	 */
-	public function addUserLisenStory($uid, $albumid, $storyid)
+	public function addUserListenStory($uid, $albumid, $storyid)
 	{
 		if (empty($uid) || empty($albumid) || empty($storyid)) {
 			$this->setError(ErrorConf::paramError());
 			return false;
 		}
+		
 		$addtime = date("Y-m-d H:i:s");
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 		$sql = "INSERT INTO {$this->LISTEN_TABLE_NAME} 
@@ -80,7 +82,15 @@ class Listen extends ModelBase
 			VALUES (?, ?, ?, ?)";
 		$st = $db->prepare($sql);
 		$res = $st->execute(array($uid, $storyid, $addtime));
-		return $res;
+		if (empty($res)) {
+		    return false;
+		}
+		
+		// 更新用户的收听排行
+		$key = "userlistenrank";
+		$redisObj = RedisConnecter::connRedis($this->KVSTORE_INSTANCE);
+		$redisObj->zIncrBy($key, 1, $uid);
+		return true;
 	}
 	
 	
@@ -96,10 +106,19 @@ class Listen extends ModelBase
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
+	    
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 	    $sql = "DELETE FROM {$this->LISTEN_TABLE_NAME} WHERE `uid` = ? AND `storyid` = ?";
 	    $st = $db->prepare($sql);
 	    $res = $st->execute(array($uid, $storyid));
-	    return $res;
+	    if (empty($res)) {
+	        return false;
+	    }
+	    
+	    // 更新用户的收听排行
+	    $key = "userlistenrank";
+	    $redisObj = RedisConnecter::connRedis($this->KVSTORE_INSTANCE);
+	    $redisObj->zIncrBy($key, -1, $uid);
+	    return true;
 	}
 }
