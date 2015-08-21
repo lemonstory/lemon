@@ -22,13 +22,13 @@ class upload_oss extends controller
             return false;
         }
         $save_dir = tempnam(sys_get_temp_dir(), 'attachment_'.$storyid);
-        if(trim($filename)==''){//保存文件名  
-            $ext = strtolower(strrchr($url,'.'));  
-            if(in_array($ext, array('.gif', '.jpg', '.jpeg', '.mp3', '.audio'))){  
-                return false;
-            }  
-            $filename = time().'_'.mt_rand(1, 1000).$ext;  
-        }  
+        $ext = strtolower(strrchr($url,'.'));
+        if(in_array($ext, array('.gif', '.jpg', '.jpeg', '.mp3', '.audio'))){  
+            return false;
+        } 
+
+        $filename = time().'_'.mt_rand(1, 1000).$ext;  
+
         if(0!==strrpos($save_dir,'/')){  
             $save_dir.='/';  
         }  
