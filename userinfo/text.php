@@ -3,6 +3,10 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
+        $obj = new AliOss();
+        $res = $obj->uploadPicImage("112", "png", "1");
+        die();
+        
         $type = $this->getRequest("type");
         
         if ($type == 1) {
