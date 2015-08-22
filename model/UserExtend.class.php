@@ -60,6 +60,25 @@ class UserExtend extends ModelBase
 	    }
 	}
 	
+	/**
+	 * 通过年龄获取年龄段
+	 * @param I $age
+	 * @return I
+	 */
+	public function getBabyAgeType($age)
+	{
+		if ($age <= 2) {
+			$agetype = 1;
+		} elseif ($age > 2 && $age <= 6) {
+			$agetype = 2;
+		} elseif ($age > 6 && $age <= 10) {
+			$agetype = 3;
+		} else {
+			$agetype = 3;
+		}
+		return $agetype;
+	}
+	
 	
 	/**
 	 * 用户添加宝宝资料

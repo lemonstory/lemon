@@ -1,6 +1,17 @@
 <?php
 class Upload extends ModelBase
 {
+	public function getMediaTmpDir()
+	{
+		$aliossobj = new AliOss();
+		return $aliossobj->LOCAL_IMG_TMP_PATH;
+	}
+	public function getAlbumImageTmpDir()
+	{
+		$aliossobj = new AliOss();
+		return $aliossobj->LOCAL_IMG_TMP_PATH;
+	}
+	
     /**
      * 上传临时目录下的封面图片，临时目录：/alidata1/tmppicfile/
      * @param S $tmpfilename    临时目录存储的图片文件名，如111

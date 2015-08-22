@@ -31,7 +31,7 @@ class dellistenstory extends controller
         if (empty($listeninfo)) {
             $this->showErrorJson(ErrorConf::userListenIsEmpty());
         }
-        $listenobj->delUserListenStory($uid, $storyid);
+        $listenobj->delUserListenStory($uid, $albumid, $storyid);
         
         $this->showSuccJson();
     }

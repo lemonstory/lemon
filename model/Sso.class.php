@@ -6,8 +6,9 @@ class Sso extends ModelBase
     public $PASSPORT_DB_INSTANCE = 'share_main';
     public $PASSPORT_TABLE_NAME = 'passport';
     public $QQ_RELATION_TABLE_NAME = 'user_qq_relation';
+    public $WECHAT_RELATION_TABLE_NAME = 'user_wechat_relation';
     
-    public $CACHE_INSTANCE = '';
+    public $CACHE_INSTANCE = 'user_info';
     
     public function __construct() 
     {
@@ -18,7 +19,6 @@ class Sso extends ModelBase
     {
         $key = 'qqrecount_' . $openId;
         $cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $key);
-        $cacheData = array();
         if (empty($cacheData)) {
             $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
             $sql = "select count(1) from  {$this->QQ_RELATION_TABLE_NAME} where openid=?";
@@ -49,7 +49,6 @@ class Sso extends ModelBase
         }
         $key = 'qqrelation_' . $uid;
         $cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $key);
-        $cacheData = array();
         if (empty($cacheData)) {
             $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
             $sql = "select * from {$this->QQ_RELATION_TABLE_NAME} where uid = ?";
@@ -159,7 +158,7 @@ class Sso extends ModelBase
         $UserObj = new User();
         $type = $UserObj->TYPE_QQ;
         $UserObj->initQQLoginUser($uid, $nickName, $avatartime, $type, $addtime);
-        $this->setSsoCookie(array('uid' => $uid, 'pasword' => $qquserpasword), array('nickname' => $nickName));
+        $this->setSsoCookie(array('uid' => $uid, 'password' => $qquserpasword), array('nickname' => $nickName));
         
         $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         
@@ -185,7 +184,7 @@ class Sso extends ModelBase
         $UserObj = new User();
         //$this->setLoginType($uid, 'qq');
         //$userinfo = $UserObj->getSelfInfo($uid);
-        $UserObj = current($UserObj->getUserInfo($uid));
+        $userinfo = current($UserObj->getUserInfo($uid));
         
         $this->setSsoCookie($passportdata, $userinfo);
         return $userinfo;

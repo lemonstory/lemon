@@ -96,6 +96,15 @@ class   ErrorConf
 	{
 		return array('code'=>'100302','desc'=>'此qq未注册');
 	}
+	// 微信登录
+	public static function wechatUserInfoEmpty()
+	{
+		return array('code'=>'100311','desc'=>'微信用户信息获取失败');
+	}
+    public static function wechatAuthInfoEmpty()
+	{
+		return array('code'=>'100312','desc'=>'此微信账户未注册');
+	}
 	
 	
 	// 收藏
