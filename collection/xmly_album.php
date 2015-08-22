@@ -26,6 +26,7 @@ class xmly_album extends controller
                     if ($exists) {
                         continue;
                     }
+
                     $album_id = $album->insert(array(
                         'title'       => $v2['title'],
                         'from'        => 'xmly',

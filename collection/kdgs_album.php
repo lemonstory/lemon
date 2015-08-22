@@ -9,6 +9,7 @@ class kdgs_album extends controller
         $album = new Album();
         $story_url = new StoryUrl();
         $category_list = $category->get_list("`res_name`='kdgs' and `parent_id`>0");
+        $count = 1;
 
         foreach($category_list as $k => $v) {
             $page = 1;
@@ -22,15 +23,18 @@ class kdgs_album extends controller
                     if ($exists) {
                         continue;
                     }
+                    $count++;
+                    if ($count > 25) {
+                        exit;
+                    }
                     $album_id = $album->insert(array(
                         'title'       => $v2['title'],
                         'category_id' => $v['id'],
-                        'min_age'     => $v2['min_age'],
-                        'max_age'     => $v2['max_age'],
                         'from'        => 'kdgs',
                         'intro'       => '',
                         's_cover'     => $v2['cover'],
                         'link_url'    => $v2['url'],
+                        'age_str'     => $v2['age_str'],
                         'add_time'    => date('Y-m-d H:i:s'),
                     ));
                     $story_url->insert(array(

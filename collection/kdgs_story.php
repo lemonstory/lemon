@@ -10,6 +10,10 @@ class kdgs_story extends controller
         $story_url = new StoryUrl();
         $album_list = $album->get_list("id>0", 10);
         foreach ($album_list as $k => $v) {
+            if (!$v['age_type']) {
+                $v['age_type'] = $album->get_age_type($v['age_str']);
+                $album->update(array('age_type' => $v['age_type']), "`id`={$v['id']}");
+            }
             $story_list = $kdgs->get_album_story_list($v['link_url']);
             foreach($story_list as $k2 => $v2) {
                 $exists = $story->check_exists("`source_audio_url`='{$v2['source_audio_url']}'");

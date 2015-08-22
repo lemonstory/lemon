@@ -140,23 +140,7 @@ class Kdgs extends Http
 				$r[$k]['url']     = $url;
 				$r[$k]['title']   = $title;
 				$r[$k]['cover']   = $cover;
-				$r[$k]['min_age'] = 0;
-				$r[$k]['max_age'] = 0;
-				if (strstr($v, 'P')) {
-					$r[$k]['min_age'] = (int)http::sub_data($v, 'P-', '<');
-				} else {
-					$age = http::sub_data($v, '<td style=" padding:0 0 0 10px;">', '<');
-					if (strstr($age, '-')) {
-						$tmp = explode("-", $age);
-						if (isset($tmp[1])) {
-							$r[$k]['max_age'] = (int)$tmp[1];
-						}
-						if (isset($tmp[0])) {
-							$r[$k]['min_age'] = (int)$tmp[0];
-						}
-					}
-					$r[$k]['age'] = (int)http::sub_data($v, '<td style=" padding:0 0 0 10px;">', '<');
-				}
+				$r[$k]['age_str'] = http::sub_data($v, '<td style=" padding:0 0 0 10px;">', '<');
 			}
 		}
 		return $r;
