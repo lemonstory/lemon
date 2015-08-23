@@ -25,6 +25,7 @@ class upload_oss extends controller
         }
 
         $uploadobj = new Upload();
+        $aliossobj = new AliOss();
 
         if ($type == 3) {
             $savedir = $uploadobj->getMediaTmpDir();
@@ -48,7 +49,6 @@ class upload_oss extends controller
 
         if ($type == 3) {
             $res = $uploadobj->uploadStoryMedia($file, "media");
-            $aliossobj = new AliOss();
             $dest_url  = $aliossobj->getImageUrlNg($file);
         } else {
             $res = $uploadobj->uploadAlbumImage($file, "content", $id);
