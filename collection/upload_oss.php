@@ -32,7 +32,7 @@ class upload_oss extends controller
             $savedir = $uploadobj->getAlbumImageTmpDir();
         }
 
-        $savedir = tempnam($savedir, "attachment_{$type}_{$id}_");
+        $savedir = $savedir.date('Y_m_d_{$type}_{$id}');
 
         $ext = strtolower(strrchr($url,'.'));
 
