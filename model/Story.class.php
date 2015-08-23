@@ -99,4 +99,41 @@ class Story extends ModelBase
         	return $r;
         }
 	}
+
+	/**
+	 * 获取专辑的故事列表
+	 */
+	public function get_album_story_list($album_id = 0)
+	{
+		if (!$album_id) {
+			return array();
+		}
+		$new_list   = array();
+		$story_list = $this->get_list("`id`={$album_id}");
+		foreach ($story_list as $k => $v) {
+			if (!$v['cover']) {
+				$v['cover'] = $v['s_cover'];
+			}
+			if (!$v['audio_url']) {
+				$v['audio_url'] = $v['source_audio_url'];
+			}
+			unset($v['s_cover'], $v['source_audio_url']);
+			$new_list[] = $v;
+		}
+		return $new_list;
+	}
+
+	/**
+	 * 格式化成接口数据
+	 */
+	public function format_to_api($story_info = array())
+	{
+		$info = array();
+		$info['albumid'] = '';
+		$info['title'] = '';
+		$info['intro'] = '';
+		$info['cover'] = '';
+		$info['times'] = '';
+		$info['file_size'] = '';
+	}
 }

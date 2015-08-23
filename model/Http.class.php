@@ -33,7 +33,7 @@ class Http
         	$header[] = 'Cookie:'.self::$cookie;
         }
 
-        
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER , $header);
@@ -44,20 +44,20 @@ class Http
         if (self::$user_agent) {
         	curl_setopt($ch, CURLOPT_USERAGENT, self::$user_agent);
         }
-        
+
         if (self::$referer) {
         	curl_setopt($ch, CURLOPT_REFERER, self::$referer);
         }
- 
+
         $output = curl_exec($ch);
- 
+
         curl_close($ch);
 
         return $output;
 	}
 
 	/**
-     * 截字符串 
+     * 截字符串
      * @param $content 截取的内容
      * @param $start   开始位置
      * @param $end     结速位置
@@ -96,10 +96,36 @@ class Http
     // 删除换行
     public static function remove_n($str)
     {
-        $patten = array("\r\n", "\n", "\r", "\t"); 
-        //先替换掉\r\n,然后是否存在\n,最后替换\r 
-        $str=str_replace($patten, "", $str); 
+        $patten = array("\r\n", "\n", "\r", "\t");
+        //先替换掉\r\n,然后是否存在\n,最后替换\r
+        $str=str_replace($patten, "", $str);
         return $str;
+    }
+
+    /**
+     * 下载远程文件
+     */
+    public static function download($url = '', $dest = '', $filename = '', $file_ext = '')
+    {
+        if (!$url) {
+            return false;
+        }
+        $dest ＝ rtrim($dest, '/').'/'.$filename.'.'.ltrim($file_ext, '.');
+        //获取远程文件
+        $ch=curl_init();
+        $timeout = 30;
+        curl_setopt($ch,CURLOPT_URL, $url);
+        curl_setopt($ch,CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, $timeout);
+        $content = curl_exec($ch);
+        curl_close($ch);
+        //文件大小
+        $fp2=@fopen($dest, 'w');
+        fwrite($fp2, $content);
+        fclose($fp2);
+        unset($fp2, $content, $timeout, $ch);
+        return $dest;
     }
 
 }

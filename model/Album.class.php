@@ -159,4 +159,44 @@ class Album extends ModelBase
         }
         return $age_type;
     }
+
+    /**
+     * 获取封面信息
+     */
+    public function get_album_info($album_id = 0, $filed = '')
+    {
+        if (!$album_id) {
+            return array();
+        }
+        $where = "`id`={$album_id}";
+        $sql = "select * from {$this->table}  where {$where} limit 1";
+
+        $db = DbConnecter::connectMysql('share_story');
+        $st = $db->query( $sql );
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r  = $st->fetchAll();
+        $r  = array_pop($r);;
+        if ($filed) {
+            if (isset($r[$filed])) {
+                return $r[$filed];
+            } else {
+                return '';
+            }
+        }
+        return $r;
+    }
+
+    public function album_format($alubm_info = array())
+    {
+        $api_param_list = array('audio_src', 'title');
+
+        $new_album_info['title'] = '';
+        $new_album_info['intro'] = '';
+        $new_album_info['tag'] = array('1' => '标签1');
+        $new_album_info['start_level'] = 3;
+        $new_album_info['comment'] = '';
+        $new_album_info[''] = '';
+        $new_album_info[''] = '';
+        $new_album_info[''] = '';
+    }
 }
