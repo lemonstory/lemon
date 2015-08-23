@@ -110,7 +110,7 @@ class Http
         if (!$url) {
             return false;
         }
-        $dest = rtrim($dest, '/').'/'.$filename.'.'.ltrim($file_ext, '.');
+
         //获取远程文件
         $ch=curl_init();
         $timeout = 5;
