@@ -42,6 +42,7 @@ class upload_oss extends controller
 
         $filename = $save_dir.$ext;
 
+        var_dump($savedir);
         $file = Http::download($url, $savedir);
 
         if ($type == 3) {
