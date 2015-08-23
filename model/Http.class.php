@@ -113,7 +113,7 @@ class Http
         $dest = rtrim($dest, '/').'/'.$filename.'.'.ltrim($file_ext, '.');
         //获取远程文件
         $ch=curl_init();
-        $timeout = 30;
+        $timeout = 5;
         curl_setopt($ch,CURLOPT_URL, $url);
         curl_setopt($ch,CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1);

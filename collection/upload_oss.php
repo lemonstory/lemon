@@ -41,8 +41,10 @@ class upload_oss extends controller
         }
 
         $filename = $savedir.$ext;
+        var_dump($filename);
 
         $file = Http::download($url, $filename);
+        var_dump($file);
 
         if ($type == 3) {
             $res = $uploadobj->uploadStoryMedia($file, "media");
