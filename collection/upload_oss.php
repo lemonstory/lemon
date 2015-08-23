@@ -32,7 +32,7 @@ class upload_oss extends controller
             $savedir = $uploadobj->getAlbumImageTmpDir();
         }
 
-        $savedir = $savedir.date('Y_m_d_{$type}_{$id}');
+        $savedir = $savedir.date("Y_m_d_{$type}_{$id}");
 
         $ext = strtolower(strrchr($url,'.'));
 
@@ -49,7 +49,7 @@ class upload_oss extends controller
         if ($type == 3) {
             $res = $uploadobj->uploadStoryMedia($file, "media");
         } else {
-            $res = $uploadobj->uploadAlbumImage($file, "content");
+            $res = $uploadobj->uploadAlbumImage($file, "content", $id);
         }
 
         return $res;
