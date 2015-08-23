@@ -48,11 +48,14 @@ class upload_oss extends controller
 
         if ($type == 3) {
             $res = $uploadobj->uploadStoryMedia($file, "media");
+            $aliossobj = new AliOss();
+            $dest_url  = $aliossobj->getImageUrlNg($file);
         } else {
             $res = $uploadobj->uploadAlbumImage($file, "content", $id);
+            $dest_url = $aliossobj->getMediaUrl($file);
         }
 
-        return $res;
+        return $dest_url;
 
     }
 }
