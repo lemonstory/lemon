@@ -32,7 +32,7 @@ class upload_oss extends controller
             $savedir = $uploadobj->getAlbumImageTmpDir();
         }
 
-        $save_dir = tempnam($savedir, "attachment_{$type}_{$id}");
+        $savedir = tempnam($savedir, "attachment_{$type}_{$id}_");
 
         $ext = strtolower(strrchr($url,'.'));
 
@@ -40,10 +40,9 @@ class upload_oss extends controller
             return false;
         }
 
-        $filename = $save_dir.$ext;
+        $filename = $savedir.$ext;
 
-        var_dump($savedir);
-        $file = Http::download($url, $savedir);
+        $file = Http::download($url, $filename);
 
         if ($type == 3) {
             $res = $uploadobj->uploadStoryMedia($file, "media");
