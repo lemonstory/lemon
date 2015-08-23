@@ -18,7 +18,7 @@ class upload_oss extends controller
      * 将本地文件上传到oss,删除本地文件
      * type 1 专辑封面 2 故事封面 3 故事音频
      */
-    private function middle_upload($url ＝ '', $id = '', $type = ''){
+    private function middle_upload($url = '', $id = '', $type = ''){
 
         if (!$url || !$id || !$type) {
             return false;
