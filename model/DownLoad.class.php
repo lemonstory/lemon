@@ -180,22 +180,36 @@ class DownLoad extends ModelBase
 	 * 获取用户下载列表
 	 * @param I $uid
 	 * @param I $taskstatus    状态
+	 * @param S $direction     up代表显示上边，down代表显示下边
+	 * @param I $startid       从某个id开始,默认为0表示从第一页获取
+	 * @param I $len           获取长度
 	 * @return array
 	 */
-	public function getUserDownLoadList($uid, $taskstatus = 0)
+	public function getUserDownLoadList($uid, $taskstatus = 0, $direction = 'down', $startid = 0, $len = 20)
 	{
 		if (empty($uid) || !in_array($taskstatus, array(0, $this->STATUS_DOWN_ING, $this->STATUS_DOWN_OVER))) {
 		    $this->setError(ErrorConf::paramError());
 			return array();
 		}
-		
-		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		$sql = "SELECT * FROM {$this->DOWNLOAD_TABLE_NAME} WHERE `uid` = '{$uid}'";
-		if (!empty($taskstatus)) {
-		    $sql .= " AND `taskstatus` = '{$taskstatus}'";
+		if (empty($len)) {
+		    $len = 20;
 		}
-		$sql .= " ORDER BY `addtime` DESC";
 		
+		$where = "";
+		if (!empty($startid)) {
+    		if ($direction == "up") {
+    		    $where .= " `id` > '{$startid}' AND";
+    		} else {
+    		    $where .= " `id` < '{$startid}' AND";
+    		}
+		}
+		
+		$where .= " `uid` = '{$uid}'";
+		if (!empty($taskstatus)) {
+		    $where .= " AND `taskstatus` = '{$taskstatus}'";
+		}
+		$sql = "SELECT * FROM {$this->DOWNLOAD_TABLE_NAME} WHERE {$where} ORDER BY `addtime` DESC LIMIT {$len}";
+		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 		$st = $db->prepare($sql);
 		$st->execute();
 		$res = $st->fetchAll(PDO::FETCH_ASSOC);

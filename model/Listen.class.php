@@ -4,7 +4,7 @@ class Listen extends ModelBase
 	public $MAIN_DB_INSTANCE = 'share_main';
 	public $LISTEN_TABLE_NAME = 'user_listen';
 	public $CACHE_INSTANCE = 'user_listen';
-	public $KVSTORE_INSTANCE = 'main';
+	public $KVSTORE_INSTANCE = 'user_listen';
 	
 	/**
 	 * 同龄在听排行列表
@@ -46,26 +46,26 @@ class Listen extends ModelBase
 	 * 收听用户排行列表
 	 * 每周更新一次，收听故事的用户排行
 	 * @param I $babyagetype	当前用户的宝宝年龄段
-	 * @param I $start			列表开始位置
+	 * @param I $startpos			列表开始位置
 	 * @param I $len			列表长度
 	 * @return array
 	 */
-	public function getRankListUserListen($babyagetype, $start = 0, $len = 20)
+	public function getRankListUserListen($babyagetype, $startpos = 0, $len = 20)
 	{
 		if (empty($babyagetype)) {
 			$this->setError(ErrorConf::paramError());
 			return array();
 		}
-		if ($start < 0) {
-			$start = 0;
+		if ($startpos < 0) {
+			$startpos = 0;
 		}
-		if ($len < 0 || $len > 200) {
+		if ($len < 0 || $len > 500) {
 			$len = 20;
 		}
 		
 		$key = RedisKey::getRankListenUserKey($babyagetype);
 		$redisobj = AliRedisConnecter::connRedis($this->KVSTORE_INSTANCE);
-		$uidlist = $redisobj->zRevRange($key, $start, $len - 1);
+		$uidlist = $redisobj->zRevRange($key, $startpos, $len - 1);
 		if (empty($uidlist)) {
 			return array();
 		}
@@ -82,19 +82,35 @@ class Listen extends ModelBase
 	/**
 	 * 获取用户收听列表
 	 * @param I $uid
+	 * @param S $direction     up代表显示上边，down代表显示下边
+	 * @param I $startid       从某个id开始,默认为0表示从第一页获取
+	 * @param I $len           获取长度
 	 * @return array
 	 */
-	public function getUserListenList($uid)
+	public function getUserListenList($uid, $direction, $startid, $len)
 	{
 		if (empty($uid)) {
 		    $this->setError(ErrorConf::paramError());
 			return array();
 		}
+		if (empty($len)) {
+		    $len = 20;
+		}
+		
+		$where = "";
+		if (!empty($startid)) {
+		    if ($direction == "up") {
+		        $where .= " `id` > '{$startid}' AND";
+		    } else {
+		        $where .= " `id` < '{$startid}' AND";
+		    }
+		}
+		$where .= " `uid` = '{$uid}'";
 		
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		$sql = "SELECT * FROM {$this->LISTEN_TABLE_NAME} WHERE `uid` = ?";
+		$sql = "SELECT * FROM {$this->LISTEN_TABLE_NAME} WHERE {$where} ORDER BY `addtime` DESC LIMIT {$len}";
 		$st = $db->prepare($sql);
-		$st->execute(array($uid));
+		$st->execute();
 		$res = $st->fetchAll(PDO::FETCH_ASSOC);
 		if (empty($res)) {
 			return array();

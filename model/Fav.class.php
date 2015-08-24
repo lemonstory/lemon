@@ -8,19 +8,35 @@ class Fav extends ModelBase
 	/**
 	 * 获取用户收藏列表
 	 * @param I $uid
+	 * @param S $direction     up代表显示上边，down代表显示下边
+	 * @param I $startid       从某个id开始,默认为0表示从第一页获取
+	 * @param I $len           获取长度
 	 * @return array
 	 */
-	public function getUserFavList($uid)
+	public function getUserFavList($uid, $direction = "down", $startid = 0, $len = 20)
 	{
 		if (empty($uid)) {
 		    $this->setError(ErrorConf::paramError());
 			return array();
 		}
+		if (empty($len)) {
+		    $len = 20;
+		}
+		
+		$where = "";
+		if (!empty($startid)) {
+		    if ($direction == "up") {
+		        $where .= " `id` > '{$startid}' AND";
+		    } else {
+		        $where .= " `id` < '{$startid}' AND";
+		    }
+		}
+		$where .= " `uid` = '{$uid}'";
 		
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		$sql = "SELECT * FROM {$this->FAV_TABLE_NAME} WHERE `uid` = ?";
+		$sql = "SELECT * FROM {$this->FAV_TABLE_NAME} WHERE {$where} ORDER BY `addtime` DESC LIMIT {$len}";
 		$st = $db->prepare($sql);
-		$st->execute(array($uid));
+		$st->execute();
 		$res = $st->fetchAll(PDO::FETCH_ASSOC);
 		if (empty($res)) {
 			return array();

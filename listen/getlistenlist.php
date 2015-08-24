@@ -7,19 +7,22 @@ class getlistenlist extends controller
 {
     public function action() 
     {
+        $direction = $this->getRequest("direction", "down");
+        $startid = $this->getRequest("startid", 0);
+        $len = $this->getRequest("len", 0);
         $uid = $this->getUid();
         if (empty($uid)) {
             $this->showErrorJson(ErrorConf::noLogin());
         }
         
-        /* $userobj = new User();
+        $userobj = new User();
         $userinfo = current($userobj->getUserInfo($uid));
         if (empty($userinfo)) {
             $this->showErrorJson(ErrorConf::userNoExist());
-        } */
+        }
         
         $listenobj = new Listen();
-        $listenlist = $listenobj->getUserListenList($uid);
+        $listenlist = $listenobj->getUserListenList($uid, $direction, $startid, $len);
         if (empty($listenlist)) {
             $this->showErrorJson(ErrorConf::userListenIsEmpty());
         }

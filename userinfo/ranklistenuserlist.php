@@ -7,6 +7,7 @@ class ranklistenuserlist extends controller
 {
     public function action() 
     {
+        $len = $this->getRequest("len", 20);
         $uid = $this->getUid();
         if (empty($uid)) {
         	$this->showErrorJson(ErrorConf::noLogin());
@@ -27,7 +28,7 @@ class ranklistenuserlist extends controller
 		$babyagetype = $userextinfo->getBabyAgeType($babyinfo['age']);
 		
         $listenobj = new Listen();
-        $userlist = $listenobj->getRankListUserListen($babyagetype);
+        $userlist = $listenobj->getRankListUserListen($babyagetype, 0, $len);
         
         $this->showSuccJson($userlist);
     }

@@ -7,19 +7,22 @@ class getfavlist extends controller
 {
     public function action() 
     {
+        $direction = $this->getRequest("direction", "down");
+        $startid = $this->getRequest("startid", 0);
+        $len = $this->getRequest("len", 0);
         $uid = $this->getUid();
         if (empty($uid)) {
             $this->showErrorJson(ErrorConf::noLogin());
         }
         
-        /* $userobj = new User();
+        $userobj = new User();
         $userinfo = current($userobj->getUserInfo($uid));
         if (empty($userinfo)) {
             $this->showErrorJson(ErrorConf::userNoExist());
-        } */
+        }
         
         $favobj = new Fav();
-        $favlist = $favobj->getUserFavList($uid);
+        $favlist = $favobj->getUserFavList($uid, $direction, $startid, $len);
         if (empty($favlist)) {
             $this->showErrorJson(ErrorConf::userFavIsEmpty());
         }

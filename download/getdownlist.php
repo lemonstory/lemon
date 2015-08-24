@@ -1,4 +1,7 @@
 <?php
+/*
+ * 我的下载列表
+ */
 include_once '../controller.php';
 
 class getdownlist extends controller
@@ -6,6 +9,9 @@ class getdownlist extends controller
     public function action()
     {
         $taskstatus = $this->getRequest("taskstatus");
+        $direction = $this->getRequest("direction", "down");
+        $startid = $this->getRequest("startid", 0);
+        $len = $this->getRequest("len", 0);
         $uid = $this->getUid();
         if (empty($uid)) {
             $this->showErrorJson(ErrorConf::noLogin());
@@ -13,7 +19,7 @@ class getdownlist extends controller
         
         $downloadlist = array();
         $downobj = new DownLoad();
-        $list = $downobj->getUserDownLoadList($uid, $taskstatus);
+        $list = $downobj->getUserDownLoadList($uid, $taskstatus, $direction, $startid, $len);
         if (!empty($list)) {
             $albumids = array();
             foreach ($list as $value) {
