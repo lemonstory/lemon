@@ -118,6 +118,7 @@ class Story extends ModelBase
 
         $db = DbConnecter::connectMysql('share_story');
         $sql = "UPDATE {$this->table} {$set_str} where {$where}";
+        echo $sql;echo "\n";
         $st = $db->query($sql);
         unset($tmp_data);
         return true;
