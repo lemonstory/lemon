@@ -24,12 +24,11 @@ class upload_oss extends controller
         // }
         // // 更新故事为本地地址
         $story = new Story();
-        $story_list = $story->get_list("audio_url=''", 1);
+        $story_list = $story->get_list("mediapath=''", 1);
         foreach ($story_list as $k => $v) {
             $r = $this->middle_upload($v['source_audio_url'], $v['id'], 3);
-            var_dump($r);exit;
-            if (is_string($r)) {
-                $story->update(array('cover' => $r), "`id`={$v['id']}");
+            if (is_array($r) && $r) {
+                $story->update(array('mediapath' => $r['mediapath'], 'times' => $r['times'], 'file_size' => $r['file_size']), "`id`={$v['id']}");
             }
         }
     }
