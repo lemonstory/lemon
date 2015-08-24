@@ -5,7 +5,7 @@ class upload_oss extends controller
 {
     public function action() {
         // // 更新专辑封面
-        // $album = new Album();
+        $album = new Album();
         // $album_list = $album->get_list("cover=''", 100);
         // foreach ($album_list as $k => $v) {
         //     $r = $this->middle_upload($v['s_cover'], $v['id'], 1);
@@ -29,7 +29,7 @@ class upload_oss extends controller
             $r = $this->middle_upload($v['audio_url'], $v['id'], 3);
             var_dump($r);exit;
             if (is_string($r)) {
-                $album->update(array('cover' = $r), "`id`={$v['id']}");
+                $album->update(array('cover' => $r), "`id`={$v['id']}");
             }
         }
     }
