@@ -59,6 +59,14 @@ class   ErrorConf
 	{
 	    return array('code'=>'100109','desc'=>'用户地址信息为空');
 	}
+	public static function userPasswordIsError()
+	{
+	    return array('code'=>'100110','desc'=>'用户名或者密码错误');
+	}
+	public static function phoneNumberIsIllegal()
+	{
+	    return array('code'=>'100111','desc'=>'手机号格式不正确');
+	}
 	
 	
 	// 上传

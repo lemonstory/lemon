@@ -190,6 +190,43 @@ class Sso extends ModelBase
         return $userinfo;
     }
     
+    
+    public function phonelogin($username, $password)
+    {
+        if (empty($username) || empty($password)) {
+            $this->setError(ErrorConf::paramError());
+            return false;
+        }
+        
+        $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+        $sql = "select * from {$this->PASSPORT_TABLE_NAME} where username = ?";
+        $st = $db->prepare ( $sql );
+        $st->execute (array($username));
+        $passportdata = $st->fetch(PDO::FETCH_ASSOC);
+        if(empty($passportdata)) {
+            $this->setError(ErrorConf::userNoExist());
+            return false;
+        }
+        
+        $uid = $passportdata['uid'];
+        if($passportdata['password'] != md5($password . strrev(strtotime($passportdata['addtime'])))){
+            $this->setError(ErrorConf::userPasswordIsError());
+            return false;
+        }
+        
+        $UserObj = new User();
+        $userinfo = current($UserObj->getUserInfo($uid));
+        if (!empty($userinfo['status']) && $userinfo['status'] == '-2') {
+            $this->showErrorJson(ErrorConf::userForbidenPost());
+        }
+        
+        $ssoobj = new Sso();
+        $ssoobj->setSsoCookie($passportdata, $userinfo);
+        
+        return $userinfo;
+    }
+    
+    
     public function logout() 
     {
         $domain = $this->domain;
