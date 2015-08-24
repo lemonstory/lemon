@@ -22,7 +22,7 @@ class upload_oss extends controller
         //         $album->update(array('cover' = $r), "`id`={$v['id']}");
         //     }
         // }
-        // // 更新故事为本地地址
+        // 更新故事为本地地址
         $story = new Story();
         $story_list = $story->get_list("mediapath=''", 1);
         foreach ($story_list as $k => $v) {
