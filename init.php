@@ -10,7 +10,7 @@ if (DIRECTORY_SEPARATOR == '/'){
 }
 
 include dirname(__FILE__)."/config/dbconf.php";
-include dirname(__FILE__)."/config/cacheconf.php";
+//include dirname(__FILE__)."/config/cacheconf.php";
 include dirname(__FILE__)."/config/config.php";
 include dirname(__FILE__)."/config/kvstoreconf.php";
 include dirname(__FILE__)."/libs/functions.php";
