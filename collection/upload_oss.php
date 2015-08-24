@@ -70,10 +70,10 @@ class upload_oss extends controller
 
         if ($type == 3) {
             $res = $uploadobj->uploadStoryMedia($file, "media", $id);
-            $dest_url  = $aliossobj->getImageUrlNg($file);
+            return $res;
         } else {
             $res = $uploadobj->uploadAlbumImage($file, "content", $id);
-            $dest_url = $aliossobj->getMediaUrl($file);
+            $dest_url  = $aliossobj->getImageUrlNg($file);
         }
 
         return $dest_url;
