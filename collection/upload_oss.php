@@ -54,11 +54,13 @@ class upload_oss extends controller
             $savedir = $aliossobj->LOCAL_IMG_TMP_PATH;
         }
 
+        $ext = strtolower(ltrim(strrchr($url,'.'), '.'));
+
+        $filename = date("Y_m_d_{$type}_{$id}");
+
         $savedir = $savedir.date("Y_m_d_{$type}_{$id}");
 
-        $ext = strtolower(strrchr($url,'.'));
-
-        if(!in_array($ext, array('.gif', '.jpg', '.jpeg', '.mp3', '.audio'))){
+        if(!in_array($ext, array('gif', 'jpg', 'jpeg', 'mp3', 'audio'))){
             return false;
         }
 
@@ -67,10 +69,10 @@ class upload_oss extends controller
         $file = Http::download($url, $filename);
 
         if ($type == 3) {
-            $res = $uploadobj->uploadStoryMedia($file, ltrim($ext, '.'), $id);
+            $res = $uploadobj->uploadStoryMedia($filename, $ext, $id);
             return $res;
         } else {
-            $res = $uploadobj->uploadAlbumImage($file, "content", $id);
+            $res = $uploadobj->uploadAlbumImage($filename, $ext, $id);
             $dest_url  = $aliossobj->getImageUrlNg($file);
         }
 
