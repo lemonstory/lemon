@@ -49,9 +49,9 @@ class upload_oss extends controller
         $aliossobj = new AliOss();
 
         if ($type == 3) {
-            $savedir = $uploadobj->getMediaTmpDir();
+            $savedir = $aliossobj->LOCAL_IMG_TMP_PATH;
         } else {
-            $savedir = $uploadobj->getAlbumImageTmpDir();
+            $savedir = $aliossobj->LOCAL_MEDIA_TMP_PATH;
         }
 
         $savedir = $savedir.date("Y_m_d_{$type}_{$id}");
