@@ -46,7 +46,7 @@ class Runtime {
 			$log = date('Y-m-d H:i:s')."@@".$_SERVER['SCRIPT_FILENAME']."@@".$logRunTime['spent']."@@"."GET--".json_encode($_GET)."@@"."POST--".json_encode($_POST)."\n";
 			
 			
-			$logfile = 'api.tutuim.com.slowpage.'.date('Ymd').'.log';
+			$logfile = 'api.lemon.com.slowpage.'.date('Ymd').'.log';
 			@file_put_contents(SLOWPAGELOGPATH.$logfile, $log, FILE_APPEND);
         }
     }

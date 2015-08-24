@@ -11,16 +11,12 @@ register_shutdown_function(array('Runtime', 'logRunTime'));
 abstract class controller
 {
     protected $actionData = array();
-    ## xhprof
-    protected $xhprofRandNum = 0;
     
     public function __construct()
     {
-        $this->xhprofRandNum = mt_rand(1, 1000);
         $this->getActionData();
         $this->checkFilters();
         $this->getAppVertion();
-        //$this->getLanguage();
         $this->action();
     }
     
@@ -165,50 +161,6 @@ abstract class controller
         if (!empty($httpCacheConf)){
             $httpCacheObj->checkHttpCache($httpCacheConf);
         }
-    }
-    
-    public function startXhprof()
-    {
-        if (XHPROF_DEBUG == 1) {
-            // 手动开启xhprof
-            if ($this->getRequest('debug') == 'tutu') {
-                // cpu:XHPROF_FLAGS_CPU 内存:XHPROF_FLAGS_MEMORY
-                // 如果两个一起：XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY
-                xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
-            }
-        } elseif (XHPROF_DEBUG == 2) {
-            // 随机数为1的请求才开启
-            if ($this->xhprofRandNum == 1) {
-                xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
-            }
-        }
-    }
-    
-    public function endXhprof()
-    {
-        include_once SERVER_ROOT . "/libs/xhprof/xhprof_lib/utils/xhprof_lib.php";
-        include_once SERVER_ROOT . "/libs/xhprof/xhprof_lib/utils/xhprof_runs.php";
-        $nameSpace = "tutu";
-        if (XHPROF_DEBUG == 1) {
-            if ($this->getRequest('debug') == 'tutu') {
-                $data = xhprof_disable();   //返回运行数据
-                $objXhprofRun = new XHProfRuns_Default();
-                
-                // 第一个参数j是xhprof_disable()函数返回的运行信息
-                // 第二个参数是自定义的命名空间字符串(任意字符串),
-                // 返回运行ID,用这个ID查看相关的运行结果
-                $runId = $objXhprofRun->save_run($data, $nameSpace);
-                echo "<br><a target='_blank' href='/libs/xhprof/xhprof_html/index.php?run={$runId}&source={$nameSpace}'>view</a>";
-            }
-        } elseif (XHPROF_DEBUG == 2) {
-            if ($this->xhprofRandNum == 1) {
-                $data = xhprof_disable();
-                $objXhprofRun = new XHProfRuns_Default();
-                $runId = $objXhprofRun->save_run($data, $nameSpace);
-            }
-        }
-        
-        
     }
     
     public function commonHumanTime($time)
