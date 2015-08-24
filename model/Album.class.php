@@ -69,7 +69,7 @@ class Album extends ModelBase
 
         $tmp_data = array();
         foreach ($data as $k => $v) {
-            $tmp_data[] = "`{$k}`＝'{$v}'";
+            $tmp_data[] = "`{$k}`='{$v}'";
         }
         $tmp_data = implode(",", $tmp_data);
         $set_str  = "SET {$tmp_data} ";
