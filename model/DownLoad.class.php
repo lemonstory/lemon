@@ -5,8 +5,8 @@ class DownLoad extends ModelBase
 	public $DOWNLOAD_TABLE_NAME = 'user_download';
 	public $CACHE_INSTANCE = '';
 	
-	public $STATUS_DOWN_ING = 1;
-	public $STATUS_DOWN_OVER = 2;
+	public $STATUS_DOWN_ING = 1; // 下载中状态
+	public $STATUS_DOWN_OVER = 2;// 已下载完状态
 	
 	
 	/** 将文件内容执行header输出
@@ -179,20 +179,23 @@ class DownLoad extends ModelBase
 	/**
 	 * 获取用户下载列表
 	 * @param I $uid
+	 * @param I $taskstatus    状态
 	 * @return array
 	 */
-	public function getUserDownLoadList($uid, $status = 0)
+	public function getUserDownLoadList($uid, $taskstatus = 0)
 	{
-		if (empty($uid)) {
+		if (empty($uid) || !in_array($taskstatus, array(0, $this->STATUS_DOWN_ING, $this->STATUS_DOWN_OVER))) {
 		    $this->setError(ErrorConf::paramError());
 			return array();
 		}
 		
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 		$sql = "SELECT * FROM {$this->DOWNLOAD_TABLE_NAME} WHERE `uid` = '{$uid}'";
-		if (!empty($status)) {
-		    $sql .= " AND `status` = '{$status}'";
+		if (!empty($taskstatus)) {
+		    $sql .= " AND `taskstatus` = '{$taskstatus}'";
 		}
+		$sql .= " ORDER BY `addtime` DESC";
+		
 		$st = $db->prepare($sql);
 		$st->execute();
 		$res = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -272,11 +275,11 @@ class DownLoad extends ModelBase
 	    if (empty($uid) || empty($albumid) || empty($taskid)) {
 	        return false;
 	    }
-	    $status = $this->STATUS_DOWN_OVER;
+	    $taskstatus = $this->STATUS_DOWN_OVER;
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-	    $sql = "UPDATE {$this->DOWNLOAD_TABLE_NAME} SET `status` = ? WHERE `uid` = ? and `exportid` = ?";
+	    $sql = "UPDATE {$this->DOWNLOAD_TABLE_NAME} SET `taskstatus` = ? WHERE `uid` = ? and `taskid` = ?";
 	    $st = $db->prepare ( $sql );
-	    $st->execute (array($status, $uid, $exportId));
+	    $st->execute (array($taskstatus, $uid, $taskid));
 	    return true;
 	}
 	
