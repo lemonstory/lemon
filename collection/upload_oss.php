@@ -4,29 +4,30 @@ include_once '../controller.php';
 class upload_oss extends controller
 {
     public function action() {
-        // 更新专辑封面
-        $album = new Album();
-        $album_list = $album->get_list("cover=''", 100);
-        foreach ($album_list as $k => $v) {
-            $r = $this->middle_upload($v['s_cover'], $v['id'], 1);
-            if (is_string($r)) {
-                $album->update(array('cover' = $r), "`id`={$v['id']}");
-            }
-        }
-        // 更新故事封面
-        $story = new Story();
-        $story_list = $album->get_list("cover=''", 100);
-        foreach ($story_list as $k => $v) {
-            $r = $this->middle_upload($v['s_cover'], $v['id'], 2);
-            if (is_string($r)) {
-                $album->update(array('cover' = $r), "`id`={$v['id']}");
-            }
-        }
-        // 更新故事为本地地址
-        $story = new Story();
-        $story_list = $album->get_list("source_audio_url=''", 100);
+        // // 更新专辑封面
+        // $album = new Album();
+        // $album_list = $album->get_list("cover=''", 100);
+        // foreach ($album_list as $k => $v) {
+        //     $r = $this->middle_upload($v['s_cover'], $v['id'], 1);
+        //     if (is_string($r)) {
+        //         $album->update(array('cover' = $r), "`id`={$v['id']}");
+        //     }
+        // }
+        // // 更新故事封面
+        // $story = new Story();
+        // $story_list = $album->get_list("cover=''", 100);
+        // foreach ($story_list as $k => $v) {
+        //     $r = $this->middle_upload($v['s_cover'], $v['id'], 2);
+        //     if (is_string($r)) {
+        //         $album->update(array('cover' = $r), "`id`={$v['id']}");
+        //     }
+        // }
+        // // 更新故事为本地地址
+        // $story = new Story();
+        $story_list = $album->get_list("source_audio_url=''", 1);
         foreach ($story_list as $k => $v) {
             $r = $this->middle_upload($v['audio_url'], $v['id'], 3);
+            var_dump($r);exit;
             if (is_string($r)) {
                 $album->update(array('cover' = $r), "`id`={$v['id']}");
             }
@@ -68,7 +69,7 @@ class upload_oss extends controller
         var_dump($file);
 
         if ($type == 3) {
-            $res = $uploadobj->uploadStoryMedia($file, "media");
+            $res = $uploadobj->uploadStoryMedia($file, "media", $id);
             $dest_url  = $aliossobj->getImageUrlNg($file);
         } else {
             $res = $uploadobj->uploadAlbumImage($file, "content", $id);
