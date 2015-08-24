@@ -64,7 +64,7 @@ class upload_oss extends controller
             return false;
         }
 
-        $full_file = $savedir.$ext;
+        $full_file = $savedir.'.'.$ext;
 
         if (file_exists($full_file)) {
             @unlink($full_file);
