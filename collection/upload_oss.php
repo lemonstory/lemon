@@ -28,7 +28,7 @@ class upload_oss extends controller
         foreach ($story_list as $k => $v) {
             $r = $this->middle_upload($v['source_audio_url'], $v['id'], 3);
             if (is_array($r) && $r) {
-                $story->update(array('mediapath' => $r['mediapath'], 'times' => $r['times'], 'file_size' => $r['file_size']), "`id`={$v['id']}");
+                $story->update(array('mediapath' => $r['mediapath'], 'times' => $r['times'], 'file_size' => $r['size']), "`id`={$v['id']}");
             }
         }
         var_dump($r);
