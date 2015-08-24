@@ -1,6 +1,6 @@
 <?php
 
-class Story extends ModelBase 
+class Story extends ModelBase
 {
 
 	private $table = 'story';
@@ -9,7 +9,7 @@ class Story extends ModelBase
 	 * 检查是否存在
 	 */
 	public function check_exists($where = '')
-	{	
+	{
 		if (!$where) {
 			return false;
 		}
@@ -99,6 +99,29 @@ class Story extends ModelBase
         	return $r;
         }
 	}
+
+	/**
+     * 更新
+     */
+    public function update($data, $where = '')
+    {
+        if (!$data) {
+            return false;
+        }
+
+        $tmp_data = array();
+        foreach ($data as $k => $v) {
+            $tmp_data[] = "`{$k}`＝'{$v}'";
+        }
+        $tmp_data = implode(",", $tmp_data);
+        $set_str  = "SET {$tmp_data} ";
+
+        $db = DbConnecter::connectMysql('share_story');
+        $sql = "UPDATE {$this->table} {$set_str} where {$where}";
+        $st = $db->query($sql);
+        unset($tmp_data);
+        return true;
+    }
 
 	/**
 	 * 获取专辑的故事列表

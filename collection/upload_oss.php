@@ -23,13 +23,13 @@ class upload_oss extends controller
         //     }
         // }
         // // 更新故事为本地地址
-        // $story = new Story();
-        $story_list = $album->get_list("source_audio_url=''", 1);
+        $story = new Story();
+        $story_list = $story->get_list("audio_url=''", 1);
         foreach ($story_list as $k => $v) {
-            $r = $this->middle_upload($v['audio_url'], $v['id'], 3);
+            $r = $this->middle_upload($v['source_audio_url'], $v['id'], 3);
             var_dump($r);exit;
             if (is_string($r)) {
-                $album->update(array('cover' => $r), "`id`={$v['id']}");
+                $story->update(array('cover' => $r), "`id`={$v['id']}");
             }
         }
     }

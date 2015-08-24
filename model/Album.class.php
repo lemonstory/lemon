@@ -1,6 +1,6 @@
 <?php
 
-class Album extends ModelBase 
+class Album extends ModelBase
 {
 
     private $table = 'album';
@@ -9,7 +9,7 @@ class Album extends ModelBase
      * 检查是否存在
      */
     public function check_exists($where = '')
-    {   
+    {
         if (!$where) {
             return false;
         }
@@ -108,6 +108,7 @@ class Album extends ModelBase
         } else {
             $sql = "select * from {$this->table}  where {$where}";
         }
+        echo $sql;echo "\n";
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
         $r = $st->fetchAll();
