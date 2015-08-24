@@ -67,7 +67,7 @@ class upload_oss extends controller
         $file = Http::download($url, $filename);
 
         if ($type == 3) {
-            $res = $uploadobj->uploadStoryMedia($file, "media", $id);
+            $res = $uploadobj->uploadStoryMedia($file, ltrim($ext, '.'), $id);
             return $res;
         } else {
             $res = $uploadobj->uploadAlbumImage($file, "content", $id);
