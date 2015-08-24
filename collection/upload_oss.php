@@ -31,6 +31,7 @@ class upload_oss extends controller
                 $story->update(array('mediapath' => $r['mediapath'], 'times' => $r['times'], 'file_size' => $r['file_size']), "`id`={$v['id']}");
             }
         }
+        var_dump($r);
     }
 
     /**
