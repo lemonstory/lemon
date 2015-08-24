@@ -64,9 +64,12 @@ class upload_oss extends controller
             return false;
         }
 
-        $filename = $savedir.$ext;
+        $full_file = $savedir.$ext;
 
-        $file = Http::download($url, $filename);
+        if (file_exists($full_file)) {
+            @unlink($full_file);
+        }
+        $file = Http::download($url, $full_file);
 
         if ($type == 3) {
             $res = $uploadobj->uploadStoryMedia($filename, $ext, $id);
