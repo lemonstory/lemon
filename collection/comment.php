@@ -20,7 +20,6 @@ class comment extends controller
             $content = json_decode($content, true);
 
             var_dump($content);
-
             // product_id
             // review_id
             // cust_id
