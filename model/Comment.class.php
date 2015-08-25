@@ -1,9 +1,9 @@
 <?php
 
-class Album extends ModelBase
+class Comment extends ModelBase
 {
 
-    private $table = 'album';
+    private $table = 'comment';
 
     /**
      * 检查是否存在
@@ -25,7 +25,7 @@ class Album extends ModelBase
      */
     public function get_total($where = '')
     {
-        $db = DbConnecter::connectMysql('share_story');
+        $db = DbConnecter::connectMysql('share_comment');
         $sql = "select count(*) as count from {$this->table}  where {$where}";
         $st = $db->query( $sql );
         $r = $st->fetchAll();
@@ -49,7 +49,7 @@ class Album extends ModelBase
         $tmp_filed = implode(",", $tmp_filed);
         $tmp_value = implode(",", $tmp_value);
 
-        $db = DbConnecter::connectMysql('share_story');
+        $db = DbConnecter::connectMysql('share_comment');
         $sql = "INSERT INTO {$this->table}(
                     {$tmp_filed}
                 ) VALUES({$tmp_value})";
@@ -74,7 +74,7 @@ class Album extends ModelBase
         $tmp_data = implode(",", $tmp_data);
         $set_str  = "SET {$tmp_data} ";
 
-        $db = DbConnecter::connectMysql('share_story');
+        $db = DbConnecter::connectMysql('share_comment');
         $sql = "UPDATE {$this->table} {$set_str} where {$where}";
         $st = $db->query($sql);
         unset($tmp_data);
@@ -86,7 +86,7 @@ class Album extends ModelBase
      */
     public function get_filed($where = '', $filed = '')
     {
-        $db = DbConnecter::connectMysql('share_story');
+        $db = DbConnecter::connectMysql('share_comment');
         $sql = "select * from {$this->table}  where {$where}";
         $st = $db->query( $sql );
         $r = $st->fetchAll();
@@ -102,7 +102,7 @@ class Album extends ModelBase
      */
     public function get_list($where = '', $limit = '', $filed = '')
     {
-        $db = DbConnecter::connectMysql('share_story');
+        $db = DbConnecter::connectMysql('share_comment');
         if ($limit) {
             $sql = "select * from {$this->table}  where {$where} limit {$limit}";
         } else {
@@ -164,7 +164,7 @@ class Album extends ModelBase
     /**
      * 获取封面信息
      */
-    public function get_album_info($album_id = 0, $filed = '')
+    public function get_comment_info($album_id = 0, $filed = '')
     {
         if (!$album_id) {
             return array();
@@ -172,7 +172,7 @@ class Album extends ModelBase
         $where = "`id`={$album_id}";
         $sql = "select * from {$this->table}  where {$where} limit 1";
 
-        $db = DbConnecter::connectMysql('share_story');
+        $db = DbConnecter::connectMysql('share_comment');
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
         $r  = $st->fetchAll();
@@ -187,16 +187,46 @@ class Album extends ModelBase
         return $r;
     }
 
-    public function format_to_api($alubm_info = array())
+    public function get_comment_list()
     {
-        $new_album_info['title'] = $alubm_info['title'];
-        $new_album_info['intro'] = $alubm_info['intro'];
-        $new_album_info['star_level'] = $alubm_info['star_level'];
-        if ($alubm_info['cover']) {
-            $new_album_info['cover'] = $alubm_info['cover'];
+    	$newcommentlist = array();
+    	$commentlist = $this->get_test_data();
+    	foreach ($commentlist as $k => $v) {
+    		$newcommentlist[] = $this->format_to_api($v);
+    	}
+    	return $newcommentlist;
+    }
+
+    public function get_test_data()
+    {
+    	$commentlist = array();
+    	for($i = 1; $i <= 10; $i ++) {
+    		$comment_info = array();
+    		$comment_info['id'] = $i;
+	        $comment_info['uid'] = 0;
+	        if (!$comment_info['uid']) {
+	        	$comment_info['uname'] = '匿名用户';
+	        } else {
+	        	$comment_info['uname'] = $comment_info['uname'];
+	        }
+	        $comment_info['start_level'] = mt_rand(4,5);
+	        $comment_info['comment'] = '123123';
+	        $commentlist[] = $comment_info;
+    	}
+    	return $commentlist;
+    }
+
+    public function format_to_api($comment_info = array())
+    {
+        $new_comment_info['id'] = $comment_info['id'];
+        $new_comment_info['uid'] = $comment_info['uid'];
+        if (!$comment_info['uid']) {
+        	$new_comment_info['uname'] = '匿名用户';
         } else {
-            $new_album_info['cover'] = $alubm_info['s_cover'];
+        	$new_comment_info['uname'] = $comment_info['uname'];
         }
-        return $new_album_info;
+        $new_comment_info['start_level'] = mt_rand(4,5);
+        $new_comment_info['comment'] = '123123';
+        return $new_comment_info;
     }
 }
