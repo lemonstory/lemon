@@ -101,6 +101,32 @@ class Story extends ModelBase
 	}
 
 	/**
+     * 获取故事信息
+     */
+    public function get_story_info($story_id = 0, $filed = '')
+    {
+        if (!$story_id) {
+            return array();
+        }
+        $where = "`id`={$story_id}";
+        $sql = "select * from {$this->table}  where {$where} limit 1";
+
+        $db = DbConnecter::connectMysql('share_story');
+        $st = $db->query( $sql );
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r  = $st->fetchAll();
+        $r  = array_pop($r);;
+        if ($filed) {
+            if (isset($r[$filed])) {
+                return $r[$filed];
+            } else {
+                return '';
+            }
+        }
+        return $r;
+    }
+
+	/**
      * 更新
      */
     public function update($data, $where = '')
