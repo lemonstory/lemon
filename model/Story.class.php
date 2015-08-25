@@ -185,7 +185,7 @@ class Story extends ModelBase
 		$info['title'] = $story_info['title'];
 		$info['intro'] = $story_info['intro'];
 		$info['times'] = $story_info['times'];
-		$info['file_size'] = $story_info['times'];
+		$info['file_size'] = $story_info['file_size'];
 		if ($story_info['cover']) {
 			$info['cover'] = $story_info['cover'];
 		} else {
