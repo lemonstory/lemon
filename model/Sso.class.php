@@ -17,8 +17,9 @@ class Sso extends ModelBase
     
     public function checkQqLoginFirst($openId) 
     {
-        $key = 'qqrecount_' . $openId;
-        $cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $key);
+        $key = RedisKey::getQqLoginFirstKey($openId);
+        $redisObj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $cacheData = $redisObj->get($key);
         if (empty($cacheData)) {
             $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
             $sql = "select count(1) from  {$this->QQ_RELATION_TABLE_NAME} where openid=?";
@@ -29,7 +30,7 @@ class Sso extends ModelBase
             $count = $st->fetch(PDO::FETCH_COLUMN);
             $db = null;
             if ($count == 1) {
-                CacheConnecter::set($this->CACHE_INSTANCE, $key, $count, 30 * 86400);
+                $redisObj->setex($key, 2592000, 1);
                 return false;
             }
             return true;
@@ -47,8 +48,9 @@ class Sso extends ModelBase
         if (empty($uid)) {
             return array();
         }
-        $key = 'qqrelation_' . $uid;
-        $cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $key);
+        $key = RedisKey::getQqRelationInfoKey($uid);
+        $redisObj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $cacheData = $redisObj->get($key);
         if (empty($cacheData)) {
             $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
             $sql = "select * from {$this->QQ_RELATION_TABLE_NAME} where uid = ?";
@@ -59,11 +61,11 @@ class Sso extends ModelBase
             $info = $st->fetch(PDO::FETCH_ASSOC);
             $db = null;
             if (! empty($info)) {
-                CacheConnecter::set($this->CACHE_INSTANCE, $key, $info, 86400);
+                $redisObj->setex($key, 86400, serialize($info));
             }
             return $info;
         } else {
-            return $cacheData;
+            return unserialize($cacheData);
         }
     }
     
@@ -264,7 +266,10 @@ class Sso extends ModelBase
         }
         
         $data = array();
-        $cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uid);
+        $key = RedisKey::getUserInfoKey($uid);
+        //$cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uid);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $cacheData = $redisobj->get($key);
         if (empty($cacheData)) {
             $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
             $sql = "select * from {$this->PASSPORT_TABLE_NAME} where uid=?";
@@ -279,12 +284,13 @@ class Sso extends ModelBase
                 $data['phonenumber'] = substr($data['username'], 2);
             }
             if (! empty($data)) {
-                CacheConnecter::set($this->CACHE_INSTANCE, $uid, $data, 86400);
+                //CacheConnecter::set($this->CACHE_INSTANCE, $uid, $data, 86400);
+                $redisobj->sexex($key, 86400, serialize($data));
             }
             
             return $data;
         } else {
-            return $cacheData;
+            return unserialize($cacheData);
         }
     }
     
@@ -297,10 +303,13 @@ class Sso extends ModelBase
             $uids = array($uids);
         }
         $data = array();
-        $cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uids);
-        $cacheIds = array();
+        //$cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uids);
+        $getkeys = RedisKey::getUserInfoKeys($uids);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $cacheData = $redisobj->mget($getkeys);
         if (is_array($cacheData)) {
             foreach ($cacheData as $onecachedata) {
+                $onecachedata = unserialize($onecachedata);
                 $cacheIds[] = $onecachedata['uid'];
             }
         } else {
@@ -320,9 +329,12 @@ class Sso extends ModelBase
             $st->execute();
             $tmpDbData = $st->fetchAll(PDO::FETCH_ASSOC);
             $db = null;
+            
+            $setkeys = array();
             foreach ($tmpDbData as $onedbdata) {
                 $dbData[$onedbdata['uid']] = $onedbdata;
-     			CacheConnecter::set($this->CACHE_INSTANCE, $onedbdata['uid'], $onedbdata, 864000);
+     			//CacheConnecter::set($this->CACHE_INSTANCE, $onedbdata['uid'], $onedbdata, 864000);
+                $redisobj->setex($onedbdata['uid'], 864000, serialize($onedbdata));
             }
         }
         
@@ -399,11 +411,15 @@ class Sso extends ModelBase
     
     public function clearPassportCacheByUid($uid) 
     {
-        return CacheConnecter::deleteMulti($this->CACHE_INSTANCE, $uid);
+        //return CacheConnecter::deleteMulti($this->CACHE_INSTANCE, $uid);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        return $redisobj->delete($uid);
     }
     public function clearPassportCacheByUserName($userName) 
     {
-        return CacheConnecter::deleteMulti($this->CACHE_INSTANCE, $userName);
+        //return CacheConnecter::deleteMulti($this->CACHE_INSTANCE, $userName);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        return $redisobj->delete($userName);
     }
     
     public function setSsoCookie($passportdata, $userinfo) 

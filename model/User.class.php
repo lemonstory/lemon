@@ -56,10 +56,14 @@ class User extends ModelBase
 			$uids = array($uids);
 		}
 		$data = array();
-		$cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uids);
+		//$cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uids);
+		$keys = RedisKey::getUserInfoKeys($uids);
+		$redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+		$cacheData = $redisobj->mget($keys);
 		$cacheIds = array();
 		if (is_array($cacheData)){
 			foreach ($cacheData as $onecachedata){
+			    $onecachedata = unserialize($onecachedata);
 				$cacheIds[] = $onecachedata['uid'];
 			}
 		} else {
@@ -80,7 +84,8 @@ class User extends ModelBase
 			$db=null;
 			foreach ($tmpDbData as $onedbdata){
 				$dbData[$onedbdata['uid']] = $onedbdata;
-				CacheConnecter::set($this->CACHE_INSTANCE, $onedbdata['uid'], $onedbdata, 2592000);
+				//CacheConnecter::set($this->CACHE_INSTANCE, $onedbdata['uid'], $onedbdata, 2592000);
+				$redisobj->setex($onedbdata['uid'], 2592000, serialize($onedbdata));
 			}
 		}
 
@@ -209,7 +214,9 @@ class User extends ModelBase
 	
 	public function clearUserCache($uid)
 	{
-		CacheConnecter::delete($this->CACHE_INSTANCE, $uid);
+		//CacheConnecter::delete($this->CACHE_INSTANCE, $uid);
+		$redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+		return $redisobj->delete($uid);
 		//$DataSyncManagerObj = new DataSyncManager();
 		//$DataSyncManagerObj->setRenewTime($DataSyncManagerObj->DATATYPEUSERINFO, $uid,time());
 	}
