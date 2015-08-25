@@ -15,22 +15,30 @@ class downalbum extends controller
         }
         
         // 获取专辑信息
-        
+        $albumlist = array();
         // 获取专辑所有故事列表、以及音频文件地址、总下载大小
         
         
+        $downurllist = array();
+        
+        $aliossobj = new AliOss();
+        $mediafile = "/2015/08/19/c4ca4238a0b923820dcc509a6f75849b.mp4";
+        $mediaurl = $aliossobj->getMediaUrl($mediafile);
+        $downurllist = array(
+                array(
+                        "name" => '',
+                        "times" => 0,
+                        "size" => 0,
+                        "mediaurl" => $mediaurl
+                        ),
+                array(
+                        "name" => '',
+                        "times" => 0,
+                        "size" => 0,
+                        "mediaurl" => $mediaurl
+                ),
+        );
+        $this->showSuccJson($downurllist);
     }
-    
-    /* public function emptyHttpHeader()
-    {
-        header("Accept-Length: 0");
-        header("Content-Length: 0");
-        header("Content-Transfer-Encoding: binary");
-        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-        header("Cache-Control: must-ridate, post-check=0, pre-check=0");
-        header("Pragma: no-cache");
-        die();
-    } */
 }
 new downalbum();
