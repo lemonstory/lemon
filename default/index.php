@@ -36,7 +36,7 @@ class index extends controller
 			"focuspic" => $focuspiclist,
 			"hotrecommend" => $hotrecommendlist,
 			"samgeage" => $sameagealbumlist,
-			"new" => $newalbumlist,
+			"newalbum" => $newalbumlist,
 		);
 		$this->showSuccJson($data);
 	}

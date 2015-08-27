@@ -1,2 +1,2 @@
 <?php die('forbidden'); ?>
-{"appid":"1104824842","appkey":"hMUYnXotKQsCYe4C","callback":"http://api.lemon.com/callback","scope":"get_user_info,add_share,get_info,add_t","errorReport":true,"storageType":"file","host":"localhost","user":"root","password":"root","database":"test"}
+{"appid":"1104756379","appkey":"ikRoNihiIJluOL0k","callback":"http://api.lemon.com/callback","scope":"get_user_info,add_share,get_info,add_t","errorReport":true,"storageType":"file","host":"localhost","user":"root","password":"root","database":"test"}
