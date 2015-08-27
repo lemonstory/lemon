@@ -189,6 +189,7 @@ class Album extends ModelBase
 
     public function format_to_api($alubm_info = array())
     {
+        $new_album_info['id'] = $alubm_info['id'];
         $new_album_info['title'] = $alubm_info['title'];
         $new_album_info['intro'] = $alubm_info['intro'];
         $new_album_info['star_level'] = $alubm_info['star_level'];
