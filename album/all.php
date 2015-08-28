@@ -4,13 +4,21 @@ include_once '../controller.php';
 class all extends controller
 {
     function action() {
+    	$direction = $this->getRequest("direction", "down");
+        $startid = $this->getRequest("startid", 0);
+        $len = $this->getRequest("len", 0);
+
         $album = new Album();
-        $album_id = $storyid = $this->getRequest("albumid", "1");;
-        $album_info = $album->get_album_info($album_id);
-        foreach ($story_list as $k => $v) {
-        	# code...
+
+        $albumlist = $album->getAlbumList($direction, $startid, $len);
+
+        $newalbumlist = array();
+
+        foreach ($albumlist as $k => $v) {
+        	$newalbumlist[] = $album->format_to_api($v);
         }
-        $album_info['storylist'] = $story->format();
+
+        $this->showSuccJson($newalbumlist);
     }
 }
 new all();

@@ -124,6 +124,46 @@ class Album extends ModelBase
     }
 
     /**
+     * 获取用户收藏列表
+     * @param I $uid
+     * @param S $direction     up代表显示上边，down代表显示下边
+     * @param I $startid       从某个id开始,默认为0表示从第一页获取
+     * @param I $len           获取长度
+     * @return array
+     */
+    public function getAlbumList( $direction = "down", $startid = 0, $len = 20, $uid = 0)
+    {
+        // if (empty($uid)) {
+        //     $this->setError(ErrorConf::paramError());
+        //     return array();
+        // }
+        if (empty($len)) {
+            $len = 20;
+        }
+        
+        $where = "";
+        if (!empty($startid)) {
+            if ($direction == "up") {
+                $where .= " `id` > '{$startid}' AND";
+            } else {
+                $where .= " `id` < '{$startid}' AND";
+            }
+        }
+        // $where .= " `uid` = '{$uid}'";
+        
+        $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY `addtime` DESC LIMIT {$len}";
+        $st = $db->prepare($sql);
+        $st->execute();
+        $res = $st->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($res)) {
+            return array();
+        } else {
+            return $res；
+        }
+    }
+
+    /**
      * 获取年龄类型
      */
     public function get_age_type($age_str = '')
