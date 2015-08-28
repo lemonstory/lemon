@@ -144,9 +144,9 @@ class Album extends ModelBase
         $where .= " `status` = '1'";
         if (!empty($startid)) {
             if ($direction == "up") {
-                $where .= " `id` > '{$startid}' AND";
+                $where .= " AND `id` > '{$startid}' ";
             } else {
-                $where .= " `id` < '{$startid}' AND";
+                $where .= " AND `id` < '{$startid}' ";
             }
         }
         // $where .= " `uid` = '{$uid}'";

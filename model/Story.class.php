@@ -108,7 +108,7 @@ class Story extends ModelBase
      * @param I $len           获取长度
      * @return array
      */
-    public function getStoryList( $direction = "down", $startid = 0, $len = 20, $uid = 0)
+    public function getStoryList($albumid = 0, $direction = "down", $startid = 0, $len = 20, $uid = 0)
     {
         // if (empty($uid)) {
         //     $this->setError(ErrorConf::paramError());
@@ -121,10 +121,13 @@ class Story extends ModelBase
         $where .= " `status` = '1'";
         if (!empty($startid)) {
             if ($direction == "up") {
-                $where .= " `id` > '{$startid}' AND";
+                $where .= " AND `id` > '{$startid}'";
             } else {
-                $where .= " `id` < '{$startid}' AND";
+                $where .= " AND `id` < '{$startid}'";
             }
+        }
+        if ($albumid) {
+        	$where .= " AND `album_id` = {$albumid} ";
         }
         // $where .= " `uid` = '{$uid}'";
         
