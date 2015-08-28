@@ -182,6 +182,7 @@ class Story extends ModelBase
 
 		$info = array();
 		$info['id'] = $story_info['id'];
+		$info['albumid'] = $story_info['album_id'];
 		$info['title'] = $story_info['title'];
 		$info['intro'] = $story_info['intro'];
 		$info['times'] = $story_info['times'];
