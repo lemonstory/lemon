@@ -159,7 +159,7 @@ class Album extends ModelBase
         if (empty($res)) {
             return array();
         } else {
-            return $res；
+            return $res;
         }
     }
 
