@@ -141,7 +141,7 @@ class Album extends ModelBase
             $len = 20;
         }
         
-        $where = "";
+        $where .= " `status` = '1'";
         if (!empty($startid)) {
             if ($direction == "up") {
                 $where .= " `id` > '{$startid}' AND";
