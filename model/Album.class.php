@@ -124,7 +124,7 @@ class Album extends ModelBase
     }
 
     /**
-     * 获取用户收藏列表
+     * 获取用户专辑列表
      * @param I $uid
      * @param S $direction     up代表显示上边，down代表显示下边
      * @param I $startid       从某个id开始,默认为0表示从第一页获取
