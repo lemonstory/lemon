@@ -16,13 +16,17 @@ class addfavalbum extends controller
         }
         
         // 获取专辑信息
+        $albumobj = new Album();
+        $albuminfo = $albumobj->get_album_info($albumid);
+        if (empty($albuminfo)) {
+            $this->showErrorJson(ErrorConf::albumInfoIsEmpty());
+        }
         
-        
-        /* $userobj = new User();
+        $userobj = new User();
         $userinfo = current($userobj->getUserInfo($uid));
         if (empty($userinfo)) {
             $this->showErrorJson(ErrorConf::userNoExist());
-        } */
+        }
         
         $favobj = new Fav();
         $favinfo = $favobj->getUserFavInfoByAlbumId($uid, $albumid);

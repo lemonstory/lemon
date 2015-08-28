@@ -1,6 +1,8 @@
 <?php
+/*
+ * 下载整个专辑
+ */
 include_once '../controller.php';
-
 class downalbum extends controller
 {
     public function action()
@@ -14,10 +16,12 @@ class downalbum extends controller
             $this->showErrorJson(ErrorConf::paramError());
         }
         
-        // 获取专辑信息
-        $albumlist = array();
         // 获取专辑所有故事列表、以及音频文件地址、总下载大小
-        
+        $storyobj = new Story();
+        $storylist = $storyobj->get_album_story_list($albumid);
+        if (empty($storylist)) {
+            $this->showErrorJson(ErrorConf::albumStoryListIsEmpty());
+        }
         
         $downurllist = array();
         

@@ -17,13 +17,17 @@ class addlistenstory extends controller
         }
         
         // 获取故事信息
+        $storyobj = new Story();
+        $storyinfo = $storyobj->get_story_info($storyid);
+        if (empty($storyinfo)) {
+            $this->showErrorJson(ErrorConf::storyInfoIsEmpty());
+        }
         
-        
-        /* $userobj = new User();
+        $userobj = new User();
         $userinfo = current($userobj->getUserInfo($uid));
         if (empty($userinfo)) {
             $this->showErrorJson(ErrorConf::userNoExist());
-        } */
+        }
         
         $listenobj = new Listen();
         $listeninfo = $listenobj->getUserListenInfoByStoryId($uid, $storyid);

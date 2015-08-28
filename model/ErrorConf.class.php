@@ -144,6 +144,23 @@ class   ErrorConf
 	    return array('code'=>'100503','desc'=>'收听数据错误');
 	}
 	
+	
+	// 专辑
+	public static function albumStoryListIsEmpty()
+	{
+	    return array('code'=>'100601','desc'=>'专辑中没有故事哦');
+	}
+	public static function albumInfoIsEmpty()
+	{
+	    return array('code'=>'100602','desc'=>'专辑信息不存在');
+	}
+	
+	// 故事
+	public static function storyInfoIsEmpty()
+	{
+	    return array('code'=>'100701','desc'=>'故事信息不存在');
+	}
+	
 	/**
 	 * 拼接错误信息
 	 * @param string $msg
