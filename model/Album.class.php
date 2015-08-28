@@ -152,7 +152,7 @@ class Album extends ModelBase
         // $where .= " `uid` = '{$uid}'";
         
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY `addtime` DESC LIMIT {$len}";
+        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY `id` DESC LIMIT {$len}";
         $st = $db->prepare($sql);
         $st->execute();
         $res = $st->fetchAll(PDO::FETCH_ASSOC);
