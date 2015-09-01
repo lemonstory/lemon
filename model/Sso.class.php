@@ -2,7 +2,7 @@
 class Sso extends ModelBase 
 {
     private $cookies;
-    private $domain = '121.40.117.197';
+    private $domain = '120.26.52.211';
     public $PASSPORT_DB_INSTANCE = 'share_main';
     public $PASSPORT_TABLE_NAME = 'passport';
     public $QQ_RELATION_TABLE_NAME = 'user_qq_relation';
