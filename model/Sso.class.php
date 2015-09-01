@@ -267,24 +267,16 @@ class Sso extends ModelBase
         
         $data = array();
         $key = RedisKey::getUserInfoKey($uid);
-        //$cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uid);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $cacheData = $redisobj->get($key);
         if (empty($cacheData)) {
             $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
             $sql = "select * from {$this->PASSPORT_TABLE_NAME} where uid=?";
             $st = $db->prepare($sql);
-            $st->execute(array(
-                    $uid 
-            ));
+            $st->execute(array($uid));
             $data = $st->fetch(PDO::FETCH_ASSOC);
             $db = null;
-            $data['phonenumber'] = '';
-            if ($data['phonenumber'] != "") {
-                $data['phonenumber'] = substr($data['username'], 2);
-            }
             if (! empty($data)) {
-                //CacheConnecter::set($this->CACHE_INSTANCE, $uid, $data, 86400);
                 $redisobj->setex($key, 86400, serialize($data));
             }
             

@@ -56,10 +56,13 @@ class User extends ModelBase
 			$uids = array($uids);
 		}
 		$data = array();
-		//$cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uids);
 		$keys = RedisKey::getUserInfoKeys($uids);
 		$redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
 		$cacheData = $redisobj->mget($keys);
+		if (!empty($cacheData)) {
+		    $cacheData = unserialize($cacheData);
+		}
+		
 		$cacheIds = array();
 		if (is_array($cacheData)){
 			foreach ($cacheData as $onecachedata){
@@ -84,7 +87,6 @@ class User extends ModelBase
 			$db=null;
 			foreach ($tmpDbData as $onedbdata){
 				$dbData[$onedbdata['uid']] = $onedbdata;
-				//CacheConnecter::set($this->CACHE_INSTANCE, $onedbdata['uid'], $onedbdata, 2592000);
 				$redisobj->setex($onedbdata['uid'], 2592000, serialize($onedbdata));
 			}
 		}
