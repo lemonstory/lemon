@@ -58,19 +58,18 @@ class User extends ModelBase
 		$data = array();
 		$keys = RedisKey::getUserInfoKeys($uids);
 		$redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
-		$cacheData = $redisobj->mget($keys);
-		if (!empty($cacheData)) {
-		    $cacheData = unserialize($cacheData);
-		}
+		$redisData = $redisobj->mget($keys);
 		
+		$cacheData = array();
 		$cacheIds = array();
-		if (is_array($cacheData)){
-			foreach ($cacheData as $onecachedata){
-			    $onecachedata = unserialize($onecachedata);
-				$cacheIds[] = $onecachedata['uid'];
+		if (is_array($redisData)){
+			foreach ($redisData as $oneredisdata){
+			    $oneredisdata = unserialize($oneredisdata);
+				$cacheIds[] = $oneredisdata['uid'];
+				$cacheData[$oneredisdata['uid']] = $oneredisdata;
 			}
 		} else {
-			$cacheData = array();
+			$redisData = array();
 		}
 		
 		$dbIds = array_diff($uids, $cacheIds);
