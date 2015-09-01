@@ -285,7 +285,7 @@ class Sso extends ModelBase
             }
             if (! empty($data)) {
                 //CacheConnecter::set($this->CACHE_INSTANCE, $uid, $data, 86400);
-                $redisobj->sexex($key, 86400, serialize($data));
+                $redisobj->setex($key, 86400, serialize($data));
             }
             
             return $data;
