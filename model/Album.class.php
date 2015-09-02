@@ -145,6 +145,9 @@ class Album extends ModelBase
             $r  = $st->fetchAll();
             $r  = array_pop($r);
             if ($r) {
+                if (!$r['cover']) {
+                    $r['cover'] = $r['s_cover'];
+                }
                 $albumlist[$r['id']] = $r;
             }
         }
