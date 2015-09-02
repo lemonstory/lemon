@@ -28,7 +28,7 @@ class getfavlist extends controller
         }
         
         $albumids = array();
-        foreach ($listenlist as $value) {
+        foreach ($favlist as $value) {
             $albumids[] = $value['albumid'];
         }
         if (empty($albumids)) {
