@@ -124,6 +124,37 @@ class Album extends ModelBase
     }
 
     /**
+     * 批量获取专辑信息
+     */
+    public function getListByIds($id)
+    {
+        if (is_array($id)) {
+            $idarr = $id;
+        } else {
+            $idarr = array($id);
+        }
+        $albumlist = array();
+        $albumkey  = array();
+        $db = DbConnecter::connectMysql('share_story');
+        foreach($idarr as $k => $v) {
+            if (isset($albumkey[$v])) {
+                $albumlist[$k] = $albumlist[$albumkey[$v]];
+            }
+            $albumkey[$v] = $k;
+            $sql = "select * from {$this->table}  where `id`='{$v}' limit 1";
+            $st = $db->query( $sql );
+            $st->setFetchMode(PDO::FETCH_ASSOC);
+            $r  = $st->fetchAll();
+            $r  = array_pop($r);
+            if ($r) {
+                $albumlist[$k] = $r;
+                $albumkey[$v] = $k;
+            }
+        }
+        return array_values($albumlist);
+    }
+
+    /**
      * 获取用户专辑列表
      * @param I $uid
      * @param S $direction     up代表显示上边，down代表显示下边
@@ -216,7 +247,7 @@ class Album extends ModelBase
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
         $r  = $st->fetchAll();
-        $r  = array_pop($r);;
+        $r  = array_pop($r);
         if ($filed) {
             if (isset($r[$filed])) {
                 return $r[$filed];
