@@ -148,7 +148,7 @@ class Album extends ModelBase
                 $albumlist[$r['id']] = $r;
             }
         }
-        return array_values($albumlist);
+        return $albumlist;
     }
 
     /**
