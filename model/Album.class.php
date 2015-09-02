@@ -134,21 +134,18 @@ class Album extends ModelBase
             $idarr = array($id);
         }
         $albumlist = array();
-        $albumkey  = array();
         $db = DbConnecter::connectMysql('share_story');
         foreach($idarr as $k => $v) {
-            if (isset($albumkey[$v])) {
-                $albumlist[$k] = $albumlist[$albumkey[$v]];
+            if (isset($albumlist[$v])) {
+                continue;
             }
-            $albumkey[$v] = $k;
             $sql = "select * from {$this->table}  where `id`='{$v}' limit 1";
             $st = $db->query( $sql );
             $st->setFetchMode(PDO::FETCH_ASSOC);
             $r  = $st->fetchAll();
             $r  = array_pop($r);
             if ($r) {
-                $albumlist[$k] = $r;
-                $albumkey[$v] = $k;
+                $albumlist[$r['id']] = $r;
             }
         }
         return array_values($albumlist);
