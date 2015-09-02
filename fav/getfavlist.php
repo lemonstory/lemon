@@ -37,7 +37,8 @@ class getfavlist extends controller
         $albumids = array_unique($albumids);
         
         // 批量获取专辑信息
-        $albumlist = array();
+        $albumobj = new Album();
+        $albumlist = $albumobj->getListByIds($albumids);
         
         $data = array();
         foreach ($favlist as $value) {
