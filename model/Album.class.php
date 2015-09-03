@@ -126,7 +126,7 @@ class Album extends ModelBase
     /**
      * 批量获取专辑信息
      */
-    public function getListByIds($id)
+    public function getListByIds($id = 0, $uid = 0)
     {
         if (is_array($id)) {
             $idarr = $id;
@@ -134,6 +134,7 @@ class Album extends ModelBase
             $idarr = array($id);
         }
         $albumlist = array();
+        $fav = new Fav();
         $db = DbConnecter::connectMysql('share_story');
         foreach($idarr as $k => $v) {
             if (isset($albumlist[$v])) {
@@ -147,6 +148,12 @@ class Album extends ModelBase
             if ($r) {
                 if (!$r['cover']) {
                     $r['cover'] = $r['s_cover'];
+                }
+                $favinfo = $fav->getUserFavInfoByAlbumId($uid, $r['id']);
+                if ($favinfo) {
+                    $r['fav'] = 1;
+                } else {
+                    $r['fav'] = 0;
                 }
                 $albumlist[$r['id']] = $r;
             }
