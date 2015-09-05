@@ -1,0 +1,280 @@
+<?php
+
+class Tag extends ModelBase
+{
+
+    private $table = 'album_tag';
+
+    /**
+     * 检查是否存在
+     */
+    public function check_exists($where = '')
+    {
+        if (!$where) {
+            return false;
+        }
+        if ($this->get_total($where)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 获取总数
+     */
+    public function get_total($where = '')
+    {
+        $db = DbConnecter::connectMysql('share_comment');
+        $sql = "select count(*) as count from {$this->table}  where {$where}";
+        $st = $db->query( $sql );
+        $r = $st->fetchAll();
+        return $r[0]['count'];
+    }
+
+    /**
+     * 插入记录
+     */
+    public function insert($data)
+    {
+        if (!$data) {
+            return 0;
+        }
+        $tmp_filed = array();
+        $tmp_value = array();
+        foreach ($data as $k => $v) {
+            $tmp_filed[] = "`{$k}`";
+            $tmp_value[] = "'{$v}'";
+        }
+        $tmp_filed = implode(",", $tmp_filed);
+        $tmp_value = implode(",", $tmp_value);
+
+        $db = DbConnecter::connectMysql('share_comment');
+        $sql = "INSERT INTO {$this->table}(
+                    {$tmp_filed}
+                ) VALUES({$tmp_value})";
+        $st = $db->query($sql);
+        unset($tmp_value, $tmp_filed);
+        return $db->lastInsertId();
+    }
+
+    /**
+     * 更新
+     */
+    public function update($data, $where = '')
+    {
+        if (!$data) {
+            return false;
+        }
+
+        $tmp_data = array();
+        foreach ($data as $k => $v) {
+            $tmp_data[] = "`{$k}`='{$v}'";
+        }
+        $tmp_data = implode(",", $tmp_data);
+        $set_str  = "SET {$tmp_data} ";
+
+        $db = DbConnecter::connectMysql('share_comment');
+        $sql = "UPDATE {$this->table} {$set_str} where {$where}";
+        $st = $db->query($sql);
+        unset($tmp_data);
+        return true;
+    }
+
+    /**
+     * 获取字段信息
+     */
+    public function get_filed($where = '', $filed = '')
+    {
+        $db = DbConnecter::connectMysql('share_comment');
+        $sql = "select * from {$this->table}  where {$where}";
+        $st = $db->query( $sql );
+        $r = $st->fetchAll();
+        if ($filed) {
+            return $r[0][$filed];
+        } else {
+            return $r[0];
+        }
+    }
+
+    /**
+     * 获取列表
+     */
+    public function get_list($where = '', $limit = '', $filed = '')
+    {
+        $db = DbConnecter::connectMysql('share_comment');
+        if ($limit) {
+            $sql = "select * from {$this->table}  where {$where} limit {$limit}";
+        } else {
+            $sql = "select * from {$this->table}  where {$where}";
+        }
+        $st = $db->query( $sql );
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r = $st->fetchAll();
+        if ($filed) {
+            $arr = array();
+            foreach($r as $k => $v) {
+                $arr[] = $v[$filed];
+            }
+            return $arr;
+        } else {
+            return $r;
+        }
+    }
+
+    /**
+     * 批量获取专辑信息
+     */
+    public function getListByIds($id = 0, $uid = 0)
+    {
+        if (is_array($id)) {
+            $idarr = $id;
+        } else {
+            $idarr = array($id);
+        }
+        $taglist = array();
+        $fav = new Fav();
+        $db = DbConnecter::connectMysql('share_comment');
+        foreach($idarr as $k => $v) {
+            if (isset($taglist[$v])) {
+                continue;
+            }
+            $sql = "select * from {$this->table}  where `id`='{$v}' limit 1";
+            $st = $db->query( $sql );
+            $st->setFetchMode(PDO::FETCH_ASSOC);
+            $r  = $st->fetchAll();
+            $r  = array_pop($r);
+            if ($r) {
+                if (!$r['cover']) {
+                    $r['cover'] = $r['s_cover'];
+                }
+                $favinfo = $fav->getUserFavInfoByTagId($uid, $r['id']);
+                if ($favinfo) {
+                    $r['fav'] = 1;
+                } else {
+                    $r['fav'] = 0;
+                }
+                $taglist[$r['id']] = $r;
+            }
+        }
+        return $taglist;
+    }
+
+    /**
+     * 获取用户专辑列表
+     * @param I $uid
+     * @param S $direction     up代表显示上边，down代表显示下边
+     * @param I $startid       从某个id开始,默认为0表示从第一页获取
+     * @param I $len           获取长度
+     * @return array
+     */
+    public function getTagList( $direction = "down", $startid = 0, $len = 20, $uid = 0)
+    {
+        // if (empty($uid)) {
+        //     $this->setError(ErrorConf::paramError());
+        //     return array();
+        // }
+        if (empty($len)) {
+            $len = 20;
+        }
+        
+        $where .= " `status` = '1'";
+        if (!empty($startid)) {
+            if ($direction == "up") {
+                $where .= " AND `id` > '{$startid}' ";
+            } else {
+                $where .= " AND `id` < '{$startid}' ";
+            }
+        }
+        // $where .= " `uid` = '{$uid}'";
+        
+        $db = DbConnecter::connectMysql('share_comment');
+        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY `id` DESC LIMIT {$len}";
+        $st = $db->prepare($sql);
+        $st->execute();
+        $res = $st->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($res)) {
+            return array();
+        } else {
+            return $res;
+        }
+    }
+
+    /**
+     * 获取年龄类型
+     */
+    public function get_age_type($age_str = '')
+    {
+        $age_type = 0;
+
+        if (!$age_str) {
+            return 0;
+        }
+
+        if (stristr($age_str, 'P')) {
+            $age = (int)str_replace(array('P', 'p', '-', '+'), array('', '', '', ''), $age_str);
+        } else if (stristr($age_str, '岁')) {
+            $tmp_str = str_replace('岁', '', $age_str);
+            if(strstr($tmp_str, '-')) {
+                $tmp_arr = explode('-', $tmp_str);
+                if (isset($tmp_arr[1])) {
+                    $age = (int)$tmp_arr[1];
+                } else {
+                    $age = (int)$tmp_arr[0];
+                }
+            }
+        }
+        // 没有取到年龄处理
+        if (!isset($age)) {
+            return 0;
+        }
+        if ($age >=0 && $age <= 2) {
+            $age_type = 1;
+        } else if ($age >=3 && $age <= 6) {
+            $age_type = 2;
+        } else if ($age >=7 && $age <= 10) {
+            $age_type = 3;
+        }
+        return $age_type;
+    }
+
+    /**
+     * 获取封面信息
+     */
+    public function get_tag_info($tag_id = 0, $filed = '')
+    {
+        if (!$tag_id) {
+            return array();
+        }
+        $where = "`id`={$tag_id}";
+        $sql = "select * from {$this->table}  where {$where} limit 1";
+
+        $db = DbConnecter::connectMysql('share_comment');
+        $st = $db->query( $sql );
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r  = $st->fetchAll();
+        $r  = array_pop($r);
+        if ($filed) {
+            if (isset($r[$filed])) {
+                return $r[$filed];
+            } else {
+                return '';
+            }
+        }
+        return $r;
+    }
+
+    public function format_to_api($alubm_info = array())
+    {
+        $new_tag_info['id'] = $alubm_info['id'];
+        $new_tag_info['title'] = $alubm_info['title'];
+        $new_tag_info['intro'] = $alubm_info['intro'];
+        $new_tag_info['star_level'] = $alubm_info['star_level'];
+        if ($alubm_info['cover']) {
+            $new_tag_info['cover'] = $alubm_info['cover'];
+        } else {
+            $new_tag_info['cover'] = $alubm_info['s_cover'];
+        }
+        return $new_tag_info;
+    }
+}
