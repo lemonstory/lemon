@@ -143,7 +143,11 @@ class   ErrorConf
 	{
 	    return array('code'=>'100503','desc'=>'收听数据错误');
 	}
-	
+
+	public static function userListenStoryNotExists()
+	{
+		return array('code'=>'100504','desc'=>'还没有收听该音乐');
+	}
 	
 	// 专辑
 	public static function albumStoryListIsEmpty()
