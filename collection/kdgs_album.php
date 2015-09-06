@@ -4,12 +4,13 @@ include_once '../controller.php';
 class kdgs_album extends controller 
 {
     function action() {
-        $category = new Category();
-        $kdgs = new Kdgs();
-        $album = new Album();
+        $kdgs      = new Kdgs();
+        $album     = new Album();
+        $category  = new Category();
         $story_url = new StoryUrl();
+        $manageobj = new ManageSystem();
+
         $category_list = $category->get_list("`res_name`='kdgs' and `parent_id`>0");
-        $count = 1;
 
         foreach($category_list as $k => $v) {
             $page = 1;
@@ -23,10 +24,8 @@ class kdgs_album extends controller
                     if ($exists) {
                         continue;
                     }
-                    $count++;
-                    if ($count > 25) {
-                        exit;
-                    }
+
+                    $age_type = $kdgs->get_age_type($v2['age_str']);
                     $album_id = $album->insert(array(
                         'title'       => $v2['title'],
                         'category_id' => $v['id'],
@@ -35,8 +34,11 @@ class kdgs_album extends controller
                         's_cover'     => $v2['cover'],
                         'link_url'    => $v2['url'],
                         'age_str'     => $v2['age_str'],
+                        'age_type'    => $age_type,
                         'add_time'    => date('Y-m-d H:i:s'),
                     ));
+                    // 最新上架
+                    $mangeobj->addRecommendNewOnlineDb($album_id, $age_type);
                     $story_url->insert(array(
                         'res_name' => 'album',
                         'res_id' => $album_id,
