@@ -1,5 +1,5 @@
 <?php
-class ModelBase
+class ModelBase extends ConfigVar
 {
 	private $errorinfo=array();
 	public function setError($errorinfo)
