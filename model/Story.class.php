@@ -202,7 +202,7 @@ class Story extends ModelBase
 			return array();
 		}
 		$new_list   = array();
-		$story_list = $this->get_list("`id`={$album_id}");
+		$story_list = $this->get_list("`album_id`={$album_id}");
 		foreach ($story_list as $k => $v) {
 			if (!$v['cover']) {
 				$v['cover'] = $v['s_cover'];

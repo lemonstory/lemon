@@ -24,24 +24,17 @@ class downalbum extends controller
         }
         
         $downurllist = array();
-        
         $aliossobj = new AliOss();
-        $mediafile = "/2015/08/19/c4ca4238a0b923820dcc509a6f75849b.mp4";
-        $mediaurl = $aliossobj->getMediaUrl($mediafile);
-        $downurllist = array(
-                array(
-                        "name" => '',
-                        "times" => 0,
-                        "size" => 0,
-                        "mediaurl" => $mediaurl
-                        ),
-                array(
-                        "name" => '',
-                        "times" => 0,
-                        "size" => 0,
-                        "mediaurl" => $mediaurl
-                ),
-        );
+        foreach ($storylist as $key => $storyinfo) {
+            $downurllist[$key]['id'] = $storyinfo['id'];
+            $downurllist[$key]['title'] = $storyinfo['title'];
+            $downurllist[$key]['times'] = $storyinfo['times'];
+            $downurllist[$key]['filesize'] = $storyinfo['file_size'];
+            
+            $mediafile = $storyinfo['mediapath'];
+            $downurllist[$key]['mediaurl'] = $aliossobj->getMediaUrl($mediafile);
+        }
+        
         $this->showSuccJson($downurllist);
     }
 }

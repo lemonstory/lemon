@@ -24,14 +24,14 @@ class downstory extends controller
         }
         
         $downurllist = array();
-        
         $aliossobj = new AliOss();
-        $mediafile = "/2015/08/19/c4ca4238a0b923820dcc509a6f75849b.mp4";
+        $mediafile = $storyinfo['mediapath'];
         $mediaurl = $aliossobj->getMediaUrl($mediafile);
         $downurllist = array(
-                "name" => '',
-                "times" => 0,
-                "size" => 0,
+                "id" => $storyinfo['id'],
+                "title" => $storyinfo['title'],
+                "times" => $storyinfo['times'],
+                "filesize" => $storyinfo['file_size'],
                 "mediaurl" => $mediaurl
         );
         $this->showSuccJson($downurllist);
