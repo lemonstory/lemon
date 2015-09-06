@@ -4,7 +4,7 @@ header("Content-type: text/html; charset=utf-8");
 date_default_timezone_set('PRC');
 define("SERVER_ROOT", dirname(__FILE__)."/");
 if (DIRECTORY_SEPARATOR == '/'){
-    define("MANAGE_ROOT", dirname(SERVER_ROOT)."/manage.lemon.com/");
+    define("MANAGE_ROOT", dirname(SERVER_ROOT)."/c.lemon.com/");
 } else {
     define("MANAGE_ROOT", dirname(dirname(dirname(SERVER_ROOT)))."/manage.git/trunk/");
 }
