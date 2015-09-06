@@ -3,7 +3,7 @@
 class Comment extends ModelBase
 {
 
-    private $table = 'comment';
+    private $table = 'album_comment';
 
     /**
      * 检查是否存在
@@ -121,44 +121,6 @@ class Comment extends ModelBase
         } else {
             return $r;
         }
-    }
-
-    /**
-     * 获取年龄类型
-     */
-    public function get_age_type($age_str = '')
-    {
-        $age_type = 0;
-
-        if (!$age_str) {
-            return 0;
-        }
-
-        if (stristr($age_str, 'P')) {
-            $age = (int)str_replace(array('P', 'p', '-', '+'), array('', '', '', ''), $age_str);
-        } else if (stristr($age_str, '岁')) {
-            $tmp_str = str_replace('岁', '', $age_str);
-            if(strstr($tmp_str, '-')) {
-                $tmp_arr = explode('-', $tmp_str);
-                if (isset($tmp_arr[1])) {
-                    $age = (int)$tmp_arr[1];
-                } else {
-                    $age = (int)$tmp_arr[0];
-                }
-            }
-        }
-        // 没有取到年龄处理
-        if (!isset($age)) {
-            return 0;
-        }
-        if ($age >=0 && $age <= 2) {
-            $age_type = 1;
-        } else if ($age >=3 && $age <= 6) {
-            $age_type = 2;
-        } else if ($age >=7 && $age <= 10) {
-            $age_type = 3;
-        }
-        return $age_type;
     }
 
     /**

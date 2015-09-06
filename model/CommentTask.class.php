@@ -1,9 +1,9 @@
 <?php
 
-class Tag extends ModelBase
+class CommentTask extends ModelBase
 {
 
-    private $table = 'album_tag';
+    private $table = 'comment_task';
 
     /**
      * 检查是否存在
@@ -122,9 +122,8 @@ class Tag extends ModelBase
         }
     }
 
-
     /**
-     * 获取标签信息
+     * 获取封面信息
      */
     public function get_tag_info($tag_id = 0, $filed = '')
     {
