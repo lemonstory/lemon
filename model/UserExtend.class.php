@@ -6,9 +6,6 @@ class UserExtend extends ModelBase
 	public $ADDRESS_INFO_TABLE_NAME = 'user_address_info';
 	public $CACHE_INSTANCE = 'user_info';
 	
-	public $GENDER_BOY = 1;
-	public $GENDER_GIRL = 2;
-	
 	/**
 	 * 获取宝宝信息
 	 * @param I $uid

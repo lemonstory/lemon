@@ -9,4 +9,6 @@ class ConfigVar
     public $RECOMMEND_STATUS_ONLIINE = 1; // 推荐上线状态
     public $RECOMMEND_STATUS_OFFLINE = 2; // 推荐下线状态
     
+    public $GENDER_BOY = 1;    // 男
+    public $GENDER_GIRL = 2;   // 女
 }
