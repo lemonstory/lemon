@@ -50,7 +50,6 @@ class Upload extends ModelBase
 	public function uploadFocusImage($file, $focusid)
     {
     	$ossObj = new AliOss();
-    	$filename = "focus_" . $focusid;
-    	return $ossObj->uploadAvatarImage($file, $focusid);
+    	return $ossObj->uploadFocusImage($file, $focusid);
     } 
 }

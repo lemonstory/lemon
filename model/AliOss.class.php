@@ -33,10 +33,46 @@ class AliOss extends ModelBase
     /**
      * 上传头像图片
      * @param S $file        $_FILES['xxx']的值
-     * @param I $relationid
+     * @param I $uid
      * @return array
      */
     public function uploadAvatarImage($file, $uid)
+    {
+        if (empty($file)){
+            $this->setError(ErrorConf::paramError());
+            return array();
+        }
+        $obj = new alioss_sdk();
+        $obj->set_debug_mode(FALSE);
+        $bucket = $this->OSS_BUCKET_AVATAR;
+        $tmpFile = $file['tmp_name'];
+    
+        $ext = array_search($file['type'], MimeTypes::$mime_types);
+        if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
+            $ext = "jpg";
+        }
+        $from = $this->LOCAL_IMG_TMP_PATH . $uid . '.' . $ext;
+        move_uploaded_file($tmpFile, $from);
+         
+        $to = $uid;
+        $responseObj = $obj->upload_file_by_file($bucket,$uid,$from);
+        if ($responseObj->status==200){
+            $path = $to;
+            return $path;
+        } else {
+            $this->setError(ErrorConf::uploadImgfileFail());
+            return array();
+        }
+    }
+    
+    
+    /**
+     * 上传焦点图图片
+     * @param S $file        $_FILES['xxx']的值
+     * @param I $focusid
+     * @return array
+     */
+    public function uploadFocusImage($file, $focusid)
     {
         if (empty($file)){
             $this->setError(ErrorConf::paramError());
@@ -51,17 +87,14 @@ class AliOss extends ModelBase
         if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
             $ext = "jpg";
         }
-        $from = $this->LOCAL_IMG_TMP_PATH . $uid . rand(1, 100) . '.' . $ext;
+        $from = $this->LOCAL_IMG_TMP_PATH . $focusid . '.' . $ext;
         move_uploaded_file($tmpFile, $from);
          
-        $to = $this->formatImageFile($uid, $ext);
+        $to = "focus/" . $focusid;
         $responseObj = $obj->upload_file_by_file($bucket,$to,$from);
         if ($responseObj->status==200){
-            list($width, $height, $type, $attr) = getimagesize($from);
-            $return['path'] = $to;
-            $return['width'] = $width;
-            $return['height'] = $height;
-            return $return;
+            $path = $to;
+            return $path;
         } else {
             $this->setError(ErrorConf::uploadImgfileFail());
             return array();
@@ -70,7 +103,7 @@ class AliOss extends ModelBase
     
     
     /**
-     * 上传抓取图片
+     * 上传抓取专辑图片
      * @param S $tmpfilename    临时目录文件名，如111
      * @param S $tmpfiletype    临时目录文件后缀，如png
      * @param S $relationid
