@@ -39,4 +39,18 @@ class Upload extends ModelBase
         $mediainfo = $ossObj->uploadMedia($tmpfilename, $tmpfiletype, $storyid);
         return $mediainfo;
     }
+    
+    
+    public function uploadAvatarImage($file, $uid)
+    {
+    	$ossObj = new AliOss();
+    	return $ossObj->uploadAvatarImage($file, $uid);
+    }
+    
+	public function uploadFocusImage($file, $focusid)
+    {
+    	$ossObj = new AliOss();
+    	$filename = "focus_" . $focusid;
+    	return $ossObj->uploadAvatarImage($file, $focusid);
+    } 
 }
