@@ -15,7 +15,7 @@ class cron_DaemonServerBooter extends DaemonBase {
 	private function getProcessList()
 	{
 		$list = array(
-			'album/cron_userListenStory.php',
+			'album/deal_userListenStory.php',
 		);
 		return $list;
 	}

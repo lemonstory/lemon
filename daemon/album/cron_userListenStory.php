@@ -1,18 +1,18 @@
 <?php
 include_once (dirname ( dirname ( __FILE__ ) ) . "/DaemonBase.php");
-class cron_userListenStory extends DaemonBase {
-	public $isWhile = false;
+class deal_userListenStory extends DaemonBase {
+    protected $processnum = 1;
 	protected function deal() {
 	    $queuevalue = QueueManager::popListenStoryQueue();
 	    if (empty($queuevalue)) {
-	        sleep(5);
+	        sleep(10);
 	        return true;
 	    }
 	    $queuearr = explode(":", $queuevalue);
 	    $uid = $queuearr[0];
 	    $storyid = $queuearr[1];
 	    if (empty($uid) || empty($storyid)) {
-	        return false;
+	        return true;
 	    }
 	    
 	    $listenobj = new Listen();
@@ -22,21 +22,21 @@ class cron_userListenStory extends DaemonBase {
 	        $userobj = new User();
 	        $userinfo = current($userobj->getUserInfo($uid));
 	        if (empty($userinfo)) {
-	            return false;
+	            return true;
 	        }
 	        $babyid = $userinfo['defaultbabyid'];
 	        
 	        $userextobj = new UserExtend();
 	        $babyinfo = $userextobj->getUserBabyInfo($babyid);
 	        if (empty($babyinfo)) {
-	            return false;
+	            return true;
 	        }
 	        $babyagetype = $userextobj->getBabyAgeType($babyinfo['age']);
 	        
 	        $story = new Story();
             $storyinfo = $story->get_story_info($storyid);
             if (empty($storyinfo)) {
-                return false;
+                return true;
             }
             $albumid = $storyinfo['albumid'];
             
@@ -50,4 +50,4 @@ class cron_userListenStory extends DaemonBase {
 	}
 
 }
-new cron_userListenStory ();
+new deal_userListenStory ();
