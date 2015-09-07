@@ -11,7 +11,6 @@ class info extends controller
         $userstoryrecord = new UserStoryRecord();
 
         $uid     = $this->getUid();
-        $uid     = 1;
 
         $album_id = $storyid = $this->getRequest("albumid", "1");;
         $album_info = $album->get_album_info($album_id);
