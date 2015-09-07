@@ -86,7 +86,7 @@ class User extends ModelBase
 			$db=null;
 			foreach ($tmpDbData as $onedbdata){
 				$dbData[$onedbdata['uid']] = $onedbdata;
-				$redisobj->setex($onedbdata['uid'], 2592000, serialize($onedbdata));
+				$redisobj->setex('ui_' . $onedbdata['uid'], 2592000, serialize($onedbdata));
 			}
 		}
 
