@@ -3,7 +3,7 @@ class Fav extends ModelBase
 {
 	public $MAIN_DB_INSTANCE = 'share_main';
 	public $FAV_TABLE_NAME = 'user_fav';
-	public $CACHE_INSTANCE = 'user_fav';
+	public $CACHE_INSTANCE = 'cache';
 	
 	/**
 	 * 获取用户收藏列表

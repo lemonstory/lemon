@@ -4,7 +4,7 @@ class UserExtend extends ModelBase
 	public $MAIN_DB_INSTANCE = 'share_main';
 	public $BABY_INFO_TABLE_NAME = 'user_baby_info';
 	public $ADDRESS_INFO_TABLE_NAME = 'user_address_info';
-	public $CACHE_INSTANCE = 'user_info';
+	public $CACHE_INSTANCE = 'cache';
 	
 	/**
 	 * 获取宝宝信息

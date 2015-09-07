@@ -3,7 +3,7 @@ class User extends ModelBase
 {
 	public $PASSPORT_DB_INSTANCE = 'share_main';
 	public $USER_INFO_TABLE_NAME = 'user_info';
-	public $CACHE_INSTANCE = 'user_info';
+	public $CACHE_INSTANCE = 'cache';
 	
 	public $TYPE_QQ = 1;
 	public $TYPE_WX = 2;

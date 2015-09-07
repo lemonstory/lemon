@@ -8,7 +8,7 @@ class Sso extends ModelBase
     public $QQ_RELATION_TABLE_NAME = 'user_qq_relation';
     public $WECHAT_RELATION_TABLE_NAME = 'user_wechat_relation';
     
-    public $CACHE_INSTANCE = 'user_info';
+    public $CACHE_INSTANCE = 'cache';
     
     public function __construct() 
     {
@@ -295,7 +295,6 @@ class Sso extends ModelBase
             $uids = array($uids);
         }
         $data = array();
-        //$cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $uids);
         $getkeys = RedisKey::getUserInfoKeys($uids);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $cacheData = $redisobj->mget($getkeys);
@@ -325,7 +324,6 @@ class Sso extends ModelBase
             $setkeys = array();
             foreach ($tmpDbData as $onedbdata) {
                 $dbData[$onedbdata['uid']] = $onedbdata;
-     			//CacheConnecter::set($this->CACHE_INSTANCE, $onedbdata['uid'], $onedbdata, 864000);
                 $redisobj->setex($onedbdata['uid'], 864000, serialize($onedbdata));
             }
         }

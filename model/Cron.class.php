@@ -3,7 +3,7 @@ class Cron extends ModelBase
 {
     public $MAIN_DB_INSTANCE = 'share_main';
     public $RECOMMEND_SAME_AGE_TABLE_NAME = 'recommend_same_age';
-    public $KVSTORE_INSTANCE = 'user_listen';
+    public $CACHE_INSTANCE = 'cache';
     
     /**
      * cron进程执行
@@ -20,7 +20,7 @@ class Cron extends ModelBase
         $len = 100;
         $addtime = date("Y-m-d H:i:s");
     
-        $redisobj = AliRedisConnecter::connRedis($this->KVSTORE_INSTANCE);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
         $sql = "INSERT INTO {$this->RECOMMEND_SAME_AGE_TABLE_NAME}
             (`albumid`, `agetype`, `order`, `status`, `addtime`)

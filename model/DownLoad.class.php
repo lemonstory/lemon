@@ -3,7 +3,7 @@ class DownLoad extends ModelBase
 {
 	public $MAIN_DB_INSTANCE = 'share_main';
 	public $DOWNLOAD_TABLE_NAME = 'user_download';
-	public $CACHE_INSTANCE = '';
+	public $CACHE_INSTANCE = 'cache';
 	
 	public $STATUS_DOWN_ING = 1; // 下载中状态
 	public $STATUS_DOWN_OVER = 2;// 已下载完状态

@@ -7,8 +7,7 @@ class Listen extends ModelBase
 	public $LISTEN_ALBUM_NUM_TABLE_NAME = 'album_listen_num';
 	public $RECOMMEND_SAME_AGE_TABLE_NAME = 'recommend_same_age';
 	
-	public $CACHE_INSTANCE = 'user_listen';
-	public $KVSTORE_INSTANCE = 'user_listen';
+	public $CACHE_INSTANCE = 'cache';
 	
 	/**
 	 * 获取同龄在听的上线列表
@@ -61,10 +60,6 @@ class Listen extends ModelBase
 		if (empty($len)) {
 			$len = 20;
 		}
-		
-		/* $key = RedisKey::getRankListenUserKey($babyagetype);
-		$redisobj = AliRedisConnecter::connRedis($this->KVSTORE_INSTANCE);
-		$uidlist = $redisobj->zRevRange($key, $startpos, $len - 1); */
 		
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 		$sql = "SELECT * FROM {$this->LISTEN_USER_NUM_TABLE_NAME} ORDER BY `num` DESC LIMIT {$len}";
@@ -246,6 +241,7 @@ class Listen extends ModelBase
 		
 		// cache: 某个年龄段的专辑收听次数排行队列
 		$listenalbumkey = RedisKey::getRankListenAlbumKey($babyagetype);
+		$redisObj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
 		$redisObj->zIncrBy($listenalbumkey, 1, $albumid);
 		return true;
 	}
