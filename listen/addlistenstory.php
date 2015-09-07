@@ -6,6 +6,8 @@ include_once '../controller.php';
 class addlistenstory extends controller 
 {
     function action() {
+        die();
+        
         $albumid = $this->getRequest("albumid");
         $storyid = $this->getRequest("storyid");
         if (empty($albumid) || empty($storyid)) {

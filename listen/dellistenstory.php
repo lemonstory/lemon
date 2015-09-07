@@ -7,6 +7,7 @@ class dellistenstory extends controller
 {
     public function action() 
     {
+        die();
         $albumid = $this->getRequest("albumid");
         $storyid = $this->getRequest("storyid");
         if (empty($albumid) || empty($storyid)) {

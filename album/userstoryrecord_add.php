@@ -4,19 +4,28 @@ include_once '../controller.php';
 class userstoryrecord_add extends controller
 {
     function action() {
-    	$userid    = (int)$this->getRequest('userid', 0);
+        $uid = $this->getUid();
+        if (empty($uid)) {
+            $this->showErrorJson(ErrorConf::noLogin());
+        }
+    	//$userid    = (int)$this->getRequest('userid', 0);
     	$albumid   = (int)$this->getRequest('albumid', 0);
     	$storyid   = (int)$this->getRequest('storyid', 0);
     	$playtimes = (int)$this->getRequest('playtimes', 0);
-
+    	if (empty($albumid) || empty($storyid)) {
+    	    $this->showErrorJson(ErrorConf::paramError());
+    	}
+    	
+    	$userobj = new User();
+    	$userinfo = current($userobj->getUserInfo($uid));
+    	if (empty($userinfo)) {
+    	    $this->showErrorJson(ErrorConf::userNoExist());
+    	}
+    	
     	$albuminfo = $storyinfo = array();
 
         $album = new Album();
         $story = new Story();
-
-        if (!$userid) {
-    		return $this->showErrorJson(ErrorConf::noLogin());
-    	}
 
         if ($albumid) {
         	$albuminfo = $album->get_album_info($albumid);
@@ -33,13 +42,26 @@ class userstoryrecord_add extends controller
 
         $userstoryrecord = new UserStoryRecord();
 
-        $userstoryrecord->insert(array(
-        	'userid'    => $userid,
+        $res = $userstoryrecord->insert(array(
+        	'userid'    => $uid,
         	'albumid'   => $albumid,
         	'storyid'   => $storyid,
         	'playtimes' => $playtimes,
         	'addtime'   => date('Y-m-d H:i:s'),
         ));
+        
+        if (!empty($res)) {
+            // 添加收听数量
+            $listenobj = new Listen();
+            $listeninfo = $listenobj->getUserListenInfoByStoryId($uid, $storyid);
+            if (empty($listeninfo)) {
+                $babyid = $userinfo['defaultbabyid'];
+                $userextobj = new UserExtend();
+                $babyinfo = $userextobj->getUserBabyInfo($babyid);
+                $babyagetype = $userextobj->getBabyAgeType($babyinfo['age']);
+                $listenobj->addUserListenStory($uid, $albumid, $storyid, $babyagetype);
+            }
+        }
 
         $this->showSuccJson();
     }

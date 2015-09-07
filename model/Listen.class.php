@@ -199,7 +199,7 @@ class Listen extends ModelBase
 	 * @param I $babyagetype	宝宝年龄段类型
 	 * @return boolean
 	 */
-	public function delUserListenStory($uid, $albumid, $storyid, $babyagetype)
+	/* public function delUserListenStory($uid, $albumid, $storyid, $babyagetype)
 	{
 	    if (empty($uid) || empty($albumid) || empty($storyid) || empty($babyagetype)) {
 	        $this->setError(ErrorConf::paramError());
@@ -222,5 +222,5 @@ class Listen extends ModelBase
 	    $listenalbumkey = RedisKey::getRankListenAlbumKey($babyagetype);
 		$redisObj->zIncrBy($listenalbumkey, 1, $albumid);
 	    return true;
-	}
+	} */
 }
