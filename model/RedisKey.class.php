@@ -67,4 +67,14 @@ class RedisKey
 	    }
 	    return $uidarr;
 	}
+	
+	
+	/**
+	 * 用户收听播放故事，延迟处理数据队列
+	 * @return string
+	 */
+	public static function getUserListenStoryQueueKey()
+	{
+	    return "userlistenstoryqueue";
+	}
 }

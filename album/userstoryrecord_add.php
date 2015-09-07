@@ -51,20 +51,11 @@ class userstoryrecord_add extends controller
         ));
         
         if (!empty($res)) {
-            // 添加收听数量
-            $listenobj = new Listen();
-            $listeninfo = $listenobj->getUserListenInfoByStoryId($uid, $storyid);
-            if (empty($listeninfo)) {
-                $babyid = $userinfo['defaultbabyid'];
-                $userextobj = new UserExtend();
-                $babyinfo = $userextobj->getUserBabyInfo($babyid);
-                $babyagetype = $userextobj->getBabyAgeType($babyinfo['age']);
-                $listenobj->addUserListenStory($uid, $albumid, $storyid, $babyagetype);
-            }
+            // 添加收听处理队列
+            QueueManager::pushListenStoryQueue($uid, $storyid);
         }
 
         $this->showSuccJson();
     }
 }
 new userstoryrecord_add();
-

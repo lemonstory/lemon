@@ -61,10 +61,15 @@ class index extends controller
 			foreach ($hotrecommendres as $value) {
 				$albumid = $value['albumid'];
 				if (!empty($albumlist[$albumid])) {
-					$hotrecommendlist[$albumid] = $albumlist[$albumid];
+				    $albuminfo['id'] = $albumlist[$albumid]['id'];
+				    $albuminfo['title'] = $albumlist[$albumid]['title'];
+				    $albuminfo['cover'] = $albumlist[$albumid]['cover'];
+					$hotrecommendlist[] = $albuminfo;
 				}
 			}
 		}
+		var_dump($hotrecommendlist);die();
+		
 		if (!empty($sameageres)) {
 			foreach ($sameageres as $value) {
 				$albumid = $value['albumid'];
