@@ -13,24 +13,36 @@ class ranklistenuserlist extends controller
         	$this->showErrorJson(ErrorConf::noLogin());
         }
         
-        $userobj = new User();
-		$userinfo = current($userobj->getUserInfo($uid));
-		if (empty($userinfo)) {
-			$this->showErrorJson(ErrorConf::userNoExist());
-		}
-		
-		$defaultbabyid = $userinfo['defaultbabyid'];
-		$userextinfo = new UserExtend();
-		$babyinfo = $userextinfo->getUserBabyInfo($defaultbabyid);
-		if (empty($babyinfo)) {
-			$this->showErrorJson(ErrorConf::userBabyInfoEmpty());
-		}
-		$babyagetype = $userextinfo->getBabyAgeType($babyinfo['age']);
-		
         $listenobj = new Listen();
-        $userlist = $listenobj->getRankListUserListen($babyagetype, 0, $len);
+        $ranklist = $listenobj->getRankListUserListen($len);
+        if (empty($ranklist)) {
+            $this->showErrorJson(ErrorConf::rankListenUserListIsEmpty());
+        }
         
-        $this->showSuccJson($userlist);
+        $uids = array();
+        foreach ($ranklist as $value) {
+            $uids[] = $value['uid'];
+        }
+        
+        // 批量获取用户信息
+        $userlist = $userobj->getUserInfo($uids);
+        if (empty($userlist)) {
+            $this->showErrorJson(ErrorConf::userNoExist());
+        }
+        
+        $list = array();
+        foreach ($ranklist as $value) {
+            $uid = $value['uid'];
+            if (!empty($userlist[$uid])) {
+                $info['uid'] = $value['uid'];
+                $info['num'] = $value['num'];
+                $info['avatar'] = $userlist[$uid]['avatar'];
+                $info['nickname'] = $userlist[$uid]['nickname'];
+                $list[$uid] = $info;
+            }
+        }
+        
+        $this->showSuccJson($list);
     }
 }
 new ranklistenuserlist();

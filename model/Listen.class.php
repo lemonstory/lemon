@@ -3,6 +3,8 @@ class Listen extends ModelBase
 {
 	public $MAIN_DB_INSTANCE = 'share_main';
 	public $LISTEN_TABLE_NAME = 'user_listen';
+	public $LISTEN_USER_NUM_TABLE_NAME = 'user_listen_num';
+	public $LISTEN_ALBUM_NUM_TABLE_NAME = 'album_listen_num';
 	public $RECOMMEND_SAME_AGE_TABLE_NAME = 'recommend_same_age';
 	
 	public $CACHE_INSTANCE = 'user_listen';
@@ -47,37 +49,32 @@ class Listen extends ModelBase
 	/**
 	 * 收听用户排行列表
 	 * 每周更新一次，收听故事的用户排行
-	 * @param I $babyagetype	当前用户的宝宝年龄段
-	 * @param I $startpos		列表开始位置
 	 * @param I $len			列表长度
 	 * @return array
 	 */
-	public function getRankListUserListen($babyagetype, $startpos = 0, $len = 20)
+	public function getRankListUserListen($len = 20)
 	{
 		if (empty($babyagetype)) {
 			$this->setError(ErrorConf::paramError());
 			return array();
 		}
-		if ($startpos < 0) {
-			$startpos = 0;
-		}
-		if ($len < 0 || $len > 500) {
+		if (empty($len)) {
 			$len = 20;
 		}
 		
-		$key = RedisKey::getRankListenUserKey($babyagetype);
+		/* $key = RedisKey::getRankListenUserKey($babyagetype);
 		$redisobj = AliRedisConnecter::connRedis($this->KVSTORE_INSTANCE);
-		$uidlist = $redisobj->zRevRange($key, $startpos, $len - 1);
-		if (empty($uidlist)) {
+		$uidlist = $redisobj->zRevRange($key, $startpos, $len - 1); */
+		
+		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+		$sql = "SELECT * FROM {$this->LISTEN_USER_NUM_TABLE_NAME} ORDER BY `num` DESC LIMIT {$len}";
+		$st = $db->prepare($sql);
+		$st->execute(array($uid, $storyid));
+		$reslist = $st->fetchAll(PDO::FETCH_ASSOC);
+		if (empty($reslist)) {
 			return array();
 		}
-		
-		$userlist = array();
-		// 批量获取用户信息
-		$userobj = new User();
-		$userlist = $userobj->getUserInfo($uidlist);
-		
-		return $userlist;
+		return $reslist;
 	}
 	
 	
@@ -157,7 +154,7 @@ class Listen extends ModelBase
 	 * @param I $uid
 	 * @param I $albumid    	专辑Id
 	 * @param I $storyid		故事id
-	 * @param I $babyagetype	宝宝年龄段类型
+	 * @param I $babyagetype	收听用户的宝宝年龄段类型
 	 * @return boolean
 	 */
 	public function addUserListenStory($uid, $albumid, $storyid, $babyagetype)
@@ -178,49 +175,78 @@ class Listen extends ModelBase
 		    return false;
 		}
 		
-		// 更新收听的用户排行
-		$listenuserkey = RedisKey::getRankListenUserKey($babyagetype);
-		$redisObj = AliRedisConnecter::connRedis($this->KVSTORE_INSTANCE);
-		$redisObj->zIncrBy($listenuserkey, 1, $uid);
-		
-		// 更新收听的专辑排行
-		$listenalbumkey = RedisKey::getRankListenAlbumKey($babyagetype);
-		$redisObj->zIncrBy($listenalbumkey, 1, $albumid);
-		
+		// 更新用户收听总数
+		$this->addUserListenCount($uid);
+		// 更新不同年龄段的，专辑的收听次数
+		$this->addAlbumListenCount($albumid, $babyagetype);
 		return true;
 	}
 	
 	
 	/**
-	 * 用户取消收听故事
+	 * 更新用户收听总数
 	 * @param I $uid
-	 * @param I $albumid
-	 * @param I $storyid    	故事Id
-	 * @param I $babyagetype	宝宝年龄段类型
 	 * @return boolean
 	 */
-	/* public function delUserListenStory($uid, $albumid, $storyid, $babyagetype)
+	private function addUserListenCount($uid)
 	{
-	    if (empty($uid) || empty($albumid) || empty($storyid) || empty($babyagetype)) {
+	    if (empty($uid)) {
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
-	    
+	    $tablename = 'user_listen_num';
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-	    $sql = "DELETE FROM {$this->LISTEN_TABLE_NAME} WHERE `uid` = ? AND `storyid` = ?";
-	    $st = $db->prepare($sql);
-	    $res = $st->execute(array($uid, $storyid));
-	    if (empty($res)) {
+	    
+	    $selectsql = "SELECT * FROM `{$tablename}` WHERE `uid` = ?";
+	    $selectst = $db->prepare($selectsql);
+	    $selectst->execute(array($uid));
+	    $selectres = $selectst->fetch(PDO::FETCH_ASSOC);
+	    if (empty($selectres)) {
+	        $sql = "INSERT INTO `{$tablename}` (`uid`, `num`) VALUES ('{$uid}', 1)";
+	    } else {
+	        $sql = "UPDATE `{$tablename}` SET `num` = `num` + 1 WHERE `uid` = '{$uid}'";
+	    }
+		$st = $db->prepare($sql);
+		$usernumres = $st->execute();
+		if (empty($usernumres)) {
+		    return false;
+		}
+		return true;
+	}
+	
+    /**
+     * 不同年龄段的，专辑的收听总数
+     * @param I $albumid
+     * @param I $babyagetype
+     * @return boolean
+     */
+    private function addAlbumListenCount($albumid, $babyagetype)
+	{
+	    if (empty($albumid) || empty($babyagetype)) {
+	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
+	    $tablename = 'album_listen_num';
+	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 	    
-	    // 更新用户的收听排行
-	    $listenuserkey = RedisKey::getRankListenUserKey($babyagetype);
-	    $redisObj = AliRedisConnecter::connRedis($this->KVSTORE_INSTANCE);
-	    $redisObj->zIncrBy($listenuserkey, -1, $uid);
-	    
-	    $listenalbumkey = RedisKey::getRankListenAlbumKey($babyagetype);
+	    $selectsql = "SELECT * FROM `{$tablename}` WHERE `albumid` = ?";
+	    $selectst = $db->prepare($selectsql);
+	    $selectst->execute(array($uid));
+	    $selectres = $selectst->fetch(PDO::FETCH_ASSOC);
+	    if (empty($selectres)) {
+	        $sql = "INSERT INTO `{$tablename}` (`albumid`, `agetype`, `num`) VALUES ('{$albumid}', '{$babyagetype}', 1)";
+	    } else {
+	        $sql = "UPDATE `{$tablename}` SET `num` = `num` + 1 WHERE `albumid` = '{$albumid}'";
+	    }
+		$st = $db->prepare($sql);
+		$numres = $st->execute();
+		if (empty($numres)) {
+		    return false;
+		}
+		
+		// cache: 某个年龄段的专辑收听次数排行队列
+		$listenalbumkey = RedisKey::getRankListenAlbumKey($babyagetype);
 		$redisObj->zIncrBy($listenalbumkey, 1, $albumid);
-	    return true;
-	} */
+		return true;
+	}
 }

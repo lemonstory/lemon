@@ -2,18 +2,7 @@
 class RedisKey
 {
 	/**
-	 * 收听用户排行榜key
-	 * @param I $babyagetype	宝宝年龄段
-	 * @return string
-	 */
-	public static function getRankListenUserKey($babyagetype)
-	{
-		$listenuserkey = 'ranklistenuser_' . $babyagetype;
-		return $listenuserkey;
-	}
-	
-	/**
-	 * 收听专辑排行榜key
+	 * 按用户宝宝年龄段，收听的专辑排行榜key
 	 * @param I $babyagetype	宝宝年龄段
 	 * @return string
 	 */

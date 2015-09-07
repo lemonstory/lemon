@@ -165,6 +165,13 @@ class   ErrorConf
 	    return array('code'=>'100701','desc'=>'故事信息不存在');
 	}
 	
+	
+	// rank 排行榜
+	public static function rankListenUserListIsEmpty()
+	{
+	    return array('code'=>'100801','desc'=>'用户收听排行榜为空');
+	}
+	
 	/**
 	 * 拼接错误信息
 	 * @param string $msg
