@@ -8,6 +8,8 @@ class getdownlist extends controller
 {
     public function action()
     {
+        die();
+        
         $taskstatus = $this->getRequest("taskstatus");
         $direction = $this->getRequest("direction", "down");
         $startid = $this->getRequest("startid", 0);
