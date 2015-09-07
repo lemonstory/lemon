@@ -45,9 +45,7 @@ class deal_userListenStory extends DaemonBase {
 	    }
 	}
 
-	protected function checkLogPath() {
-		// TODO Auto-generated method stub
-	}
+	protected function checkLogPath() {}
 
 }
 new deal_userListenStory ();
