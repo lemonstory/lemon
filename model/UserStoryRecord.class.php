@@ -162,4 +162,11 @@ class UserStoryRecord extends ModelBase
         }
         return $r;
     }
+
+    public function format_to_api($info = array())
+    {
+    	unset($info['id']);
+    	unset($info['userid']);
+    	return $info;
+    }
 }
