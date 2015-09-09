@@ -165,7 +165,6 @@ class   ErrorConf
 	    return array('code'=>'100701','desc'=>'故事信息不存在');
 	}
 	
-	
 	// rank 排行榜
 	public static function rankListenUserListIsEmpty()
 	{
@@ -177,6 +176,17 @@ class   ErrorConf
 	public static function searchAlbumIsEmpty()
 	{
 	    return array('code'=>'100901','desc'=>'搜索专辑结果为空');
+	}
+
+	// 评论
+	public static function CommentContentIsEmpty()
+	{
+	    return array('code'=>'101001','desc'=>'评论内容不能为空');
+	}
+
+	public static function CommentStarLevelIsError()
+	{
+	    return array('code'=>'101002','desc'=>'评论星级错误');
 	}
 	
 	/**
