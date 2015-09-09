@@ -16,5 +16,20 @@ class QueueManager
         $redisobj = AliRedisConnecter::connRedis(self::$QUEUE_INSTANCE);
         return $redisobj->rpop($key);
     }
+    
+    // 添加专辑数据到opensearch
+    public static function pushAlbumToSearchQueue($storyid)
+    {
+        $key = RedisKey::getAlbumToSearchQueueKey();
+        $redisobj = AliRedisConnecter::connRedis(self::$QUEUE_INSTANCE);
+        $redisobj->lpush($key, $storyid);
+        return true;
+    }
+    public static function popAlbumToSearchQueue()
+    {
+        $key = RedisKey::getAlbumToSearchQueueKey();
+        $redisobj = AliRedisConnecter::connRedis(self::$QUEUE_INSTANCE);
+        return $redisobj->rpop($key);
+    } 
 }
 ?>

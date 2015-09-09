@@ -66,4 +66,13 @@ class RedisKey
 	{
 	    return "userlistenstoryqueue";
 	}
+	
+	/**
+	 * 专辑数据，添加到opensearch表队列
+	 * @return string
+	 */
+	public static function getAlbumToSearchQueueKey()
+	{
+	    return "albumtosearch";
+	}
 }

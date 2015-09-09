@@ -47,7 +47,7 @@ class deal_userListenStory extends DaemonBase {
                         'add_time'    => date('Y-m-d H:i:s'),
                     ));
                     // 最新上架
-                    $mangeobj->addRecommendNewOnlineDb($album_id, $age_type);
+                    $manageobj->addRecommendNewOnlineDb($album_id, $age_type);
                     $story_url->insert(array(
                         'res_name' => 'album',
                         'res_id' => $album_id,
