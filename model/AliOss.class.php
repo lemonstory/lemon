@@ -197,6 +197,10 @@ class AliOss extends ModelBase
     
     public function getImageUrlNg($file, $style='')
     {
+        if (strstr($file, "http")) {
+            // @huqq 临时使用，允许加载外部域名的图片
+            return $file;
+        }
         $domains = $this->OSS_BUCKET_IMAGE_DOMAIN;
         $domainsCount = count($domains);
         $domainIndex = abs(crc32($file)%$domainsCount);
