@@ -1,4 +1,7 @@
 <?php
+/*
+ * 守护进程，添加收听记录
+ */
 include_once (dirname ( dirname ( __FILE__ ) ) . "/DaemonBase.php");
 class deal_userListenStory extends DaemonBase {
     protected $processnum = 1;
