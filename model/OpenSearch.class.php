@@ -11,12 +11,19 @@ class OpenSearch
 {
     public $OPEN_INSTANCE = 'album';
     
+    /**
+     * 搜索专辑名称、专辑作者、故事名称的专辑列表
+     * @param S $keyword    关键词
+     * @param I $len
+     * @return array        专辑id列表
+     */
     public function searchAlbum($keyword, $len = 140)
     {
         if (empty($keyword)) {
             return array();
         }
         
+        // 转化为分词
         $keywordpy = Pinyin($keyword);
         for  ($i = 0; $i < strlen($keywordpy); $i++) {
             $searchtext .= $keywordpy[$i] . " ";
@@ -66,8 +73,24 @@ class OpenSearch
     }
     
     
+    /**
+     * 添加数据到opensearch表
+     * 只有存在故事的专辑才可以添加，空故事的专辑不添加
+     * @param I $storyid        故事id
+     * @param S $storytitle     故事标题
+     * @param I $albumid        专辑id
+     * @param S $albumtitle     专辑标题
+     * @param S $albumauthor    专辑作者
+     * @param I $addtime        故事添加时间
+     * @return boolean
+     */
     public function addAlbumToSearch($storyid, $storytitle, $albumid, $albumtitle, $albumauthor, $addtime) 
     {
+        if (empty($storyid) || empty($storytitle) || empty($albumid) || empty($albumtitle)) {
+            return false;
+        }
+        
+        // 转化为字母分词
         $storytitlepy = Pinyin($storytitle);
         $storytitlepytmp = "";
         for($i = 0; $i < strlen($storytitlepy); $i++) {

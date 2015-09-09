@@ -6,7 +6,6 @@ class albumsearch extends controller
     {
         $searchcontent = $this->getRequest("searchcontent");
         $searchobj = new OpenSearch();
-        //$searchobj->addAlbumToSearch("4", "storytitle4", "3", "otheralbum3", "ggg", time());
         $albumids = $searchobj->searchAlbum($searchcontent);
         if (empty($albumids)) {
             $this->showErrorJson(ErrorConf::searchAlbumIsEmpty());

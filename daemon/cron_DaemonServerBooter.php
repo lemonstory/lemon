@@ -16,6 +16,7 @@ class cron_DaemonServerBooter extends DaemonBase {
 	{
 		$list = array(
 			'album/deal_userListenStory.php',
+	        'album/deal_saveAlbumToSearch.php'
 		);
 		return $list;
 	}
