@@ -172,6 +172,13 @@ class   ErrorConf
 	    return array('code'=>'100801','desc'=>'用户收听排行榜为空');
 	}
 	
+	
+	// search
+	public static function searchAlbumIsEmpty()
+	{
+	    return array('code'=>'100901','desc'=>'搜索专辑结果为空');
+	}
+	
 	/**
 	 * 拼接错误信息
 	 * @param string $msg

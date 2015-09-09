@@ -11,8 +11,12 @@ class OpenSearch
 {
     public $OPEN_INSTANCE = 'album';
     
-    public function searchAlbum($keyword, $len = 100)
+    public function searchAlbum($keyword, $len = 140)
     {
+        if (empty($keyword)) {
+            return array();
+        }
+        
         $keywordpy = Pinyin($keyword);
         for  ($i = 0; $i < strlen($keywordpy); $i++) {
             $searchtext .= $keywordpy[$i] . " ";
@@ -41,18 +45,24 @@ class OpenSearch
         if ($data['status'] != "OK") {
             return array();
         }
+        
+        /*
         $total = $data['result']['total'];
-        $result = array();
-        if (! empty($data['result']['items'])) {
+        if(!empty($data['result']['items'])) {
             foreach ($data['result']['items'] as $one) {
-                $result[] = array(
-                        'topicid' => $one['topicid'],
-                        'desc' => $one['desc'] 
-                );
+                $result[] = array('htid'=>$one['htid'],'huatitxt'=>$one['huatitxt']);
+            }
+        } */
+        
+        $albumids = array();
+        if (! empty($data['result']['facet'])) {
+            $items = $data['result']['facet'][0]['items'];
+            foreach ($items as $one) {
+                $albumids[] = $one['value'];
             }
         }
         
-        return array("result" => $result, 'total' => $total);
+        return $albumids;
     }
     
     
