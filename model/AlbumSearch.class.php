@@ -7,18 +7,15 @@ include_once SERVER_ROOT . "libs/opensearch/CloudsearchDoc.php";
 include_once SERVER_ROOT . "libs/opensearch/CloudsearchIndex.php";
 include_once SERVER_ROOT . "libs/opensearch/CloudsearchClient.php";
 include_once SERVER_ROOT . "libs/opensearch/CloudsearchSearch.php";
-class TopicDescSearch 
+class OpenSearch 
 {
-    public $OPEN_INSTANCE = 'albumsearch';
+    public $OPEN_INSTANCE = 'album';
     
-    public function searchAlbum($field, $keyword, $len = 100)
+    public function searchAlbum($keyword, $len = 100)
     {
-        if(!in_array($field, array('albumtitle','albumauthor','storytitle'))) {
-            return false;
-        }
         $keywordpy = Pinyin($keyword);
         for  ($i = 0; $i < strlen($keywordpy); $i++) {
-            $searchtext .= $keywordpy[$i]." ";
+            $searchtext .= $keywordpy[$i] . " ";
         }
         if ($searchtext == "") {
             $searchtext = $keyword;
@@ -29,29 +26,15 @@ class TopicDescSearch
         $search->addIndex($this->OPEN_INSTANCE);
         
         if(preg_match("/^[\x7f-\xff]+$/",$keyword)) {
-            if($field == 'albumtitle') {
-                $search->setQueryString("albumtitlepy:'{$keyword}'");
-            }
-            if($field == 'albumauthor') {
-                $search->setQueryString("albumauthorpy:'{$keyword}'");
-            }
-            if($field == 'storytitle') {
-                $search->setQueryString("storytitlepy:'{$keyword}'");
-            }
+            $query = "albumtitlepy:'{$keyword}' OR albumauthorpy:'{$keyword}' OR storytitlepy:'{$keyword}'";
         }else{
-            if($field == 'albumtitle') {
-                $search->setQueryString("albumtitlepy:'{$searchtext}'");
-            }
-            if($field == 'albumauthor') {
-                $search->setQueryString("albumauthorpy:'{$searchtext}'");
-            }
-            if($field == 'storytitle') {
-                $search->setQueryString("storytitlepy:'{$searchtext}'");
-            }
+            $query = "albumtitlepy:'{$searchtext}' OR albumauthorpy:'{$searchtext}' OR storytitlepy:'{$searchtext}'";
         }
+        $search->setQueryString($query);
         
+        $search->addAggregate("albumid", "count()");
         $search->addSort('addtime');
-        $search->setStartHit($start);
+        //$search->setStartHit($start);
         $search->setHits($len);
         $search->setFormat('json');
         $data = json_decode($search->search(), true);
@@ -72,21 +55,30 @@ class TopicDescSearch
         return array("result" => $result, 'total' => $total);
     }
     
-    /**
-     * @param S $topicid
-     * @param S $uid
-     * @param S $desc
-     * @param I $addtime
-     * @return boolean
-     */
-    public function addTopicDescToSearch($topicid, $uid, $desc, $addtime) 
+    
+    public function addAlbumToSearch($storyid, $storytitle, $albumid, $albumtitle, $albumauthor, $addtime) 
     {
-        $pinyin = Pinyin($huatitext);
-        $pinyintmp = "";
-        for($i = 0; $i < strlen($pinyin); $i++) {
-            $pinyintmp .= $pinyin[$i]." ";
+        $storytitlepy = Pinyin($storytitle);
+        $storytitlepytmp = "";
+        for($i = 0; $i < strlen($storytitlepy); $i++) {
+            $storytitlepytmp .= $storytitlepy[$i] . " ";
         }
-        $pinyintmp = $huatitext ." ".$pinyintmp;
+        $storytitlepytmp = $storytitle . " " . $storytitlepytmp;
+        
+        $albumtitlepy = Pinyin($albumtitle);
+        $albumtitlepytmp = "";
+        for($i = 0; $i < strlen($albumtitlepy); $i++) {
+            $albumtitlepytmp .= $albumtitlepy[$i] . " ";
+        }
+        $albumtitlepytmp = $albumtitle . " " . $albumtitlepytmp;
+        
+        
+        $albumauthorpy = Pinyin($albumauthor);
+        $albumauthorpytmp = "";
+        for($i = 0; $i < strlen($albumauthorpy); $i++) {
+            $albumauthorpytmp .= $albumauthorpy[$i] . " ";
+        }
+        $albumauthorpytmp = $albumauthor . " " . $albumauthorpytmp;
         
         
         $client = $this->getClientinfo();
@@ -94,18 +86,19 @@ class TopicDescSearch
         $info = array(
                 "cmd" => "UPDATE",
                 'fields' => array(
-                        'topicid' => $topicid,
-                        'uid' => $uid,
-                        'desc' => $desc,
+                        'storyid' => $storyid,
+                        'storytitle' => $storytitle,
+                        'storytitlepy' => $storytitlepytmp,
+                        'albumid' => $albumid,
+                        'albumtitle' => $albumtitle,
+                        'albumtitlepy' => $albumtitlepytmp,
+                        'albumauthor' => $albumauthor,
+                        'albumauthorpy' => $albumauthorpytmp,
                         'addtime' => $addtime,
-                        'huatitxt'=>$huatitext,
-                        'huatipy'=>$pinyintmp
                 ) 
         );
-        $docs = json_encode(array(
-                $info 
-        ));
-        $result = json_decode($doc->add($docs, 'tututopicdesc'), true);
+        $docs = json_encode(array($info));
+        $result = json_decode($doc->add($docs, $this->OPEN_INSTANCE), true);
         if ($result['status'] != 'OK') {
             return false;
         }
@@ -113,7 +106,7 @@ class TopicDescSearch
     }
     
     private function getClientinfo() {
-        $client = new CloudsearchClient('84KTqRKsyBIYnVJt', 'u72cpnMTt2mykMMluafimbhv5QD3uC', array(
+        $client = new CloudsearchClient('QHzux6QVXjQgfBNM', 'diWfijmBbiGlwle1s9KyAL8BQhB3Qc', array(
                 'host' => 'http://opensearch.aliyuncs.com' 
         ), 'aliyun');
         return $client;
