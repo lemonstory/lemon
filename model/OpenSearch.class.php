@@ -22,6 +22,9 @@ class OpenSearch
         if (empty($keyword)) {
             return array();
         }
+        if ($len > 200) {
+            $len = 200;
+        }
         
         // 转化为分词
         $keywordpy = Pinyin($keyword);

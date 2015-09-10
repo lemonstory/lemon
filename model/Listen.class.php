@@ -26,6 +26,9 @@ class Listen extends ModelBase
 		if (empty($len)) {
 			$len = 20;
 		}
+		if ($len > 50) {
+		    $len = 50;
+		}
 		
 		$status = $this->RECOMMEND_STATUS_ONLIINE; // 已上线状态
 		$where = "`status` = '{$status}'";
@@ -60,6 +63,9 @@ class Listen extends ModelBase
 		if (empty($len)) {
 			$len = 20;
 		}
+		if ($len > 50) {
+		    $len = 50;
+		}
 		
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 		$sql = "SELECT * FROM {$this->LISTEN_USER_NUM_TABLE_NAME} ORDER BY `num` DESC LIMIT {$len}";
@@ -89,6 +95,9 @@ class Listen extends ModelBase
 		}
 		if (empty($len)) {
 		    $len = 20;
+		}
+		if ($len > 50) {
+		    $len = 50;
 		}
 		
 		$where = "";

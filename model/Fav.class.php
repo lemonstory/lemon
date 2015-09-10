@@ -22,6 +22,9 @@ class Fav extends ModelBase
 		if (empty($len)) {
 		    $len = 20;
 		}
+		if ($len > 50) {
+		    $len = 50;
+		}
 		
 		$where = "";
 		if (!empty($startid)) {
