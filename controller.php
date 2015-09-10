@@ -66,10 +66,7 @@ abstract class controller
     
     public function checkFilters()
     {
-        $filters = $this->filters();
-        
-        $httpCacheConf = @$filters['httpCache'];
-        $this->checkHttpCache($httpCacheConf);
+        $this->checkHttpCache();
     }
     
     public function filters()
@@ -164,13 +161,10 @@ abstract class controller
         header('Location: ' . $url, true, $statusCode);
     }
     
-    public function checkHttpCache($httpCacheConf)
+    public function checkHttpCache()
     {
         $httpCacheObj = new HttpCache();
-        $httpCacheConf = $httpCacheObj->checkCacheConf($httpCacheConf, $this->actionData);
-        if (!empty($httpCacheConf)){
-            $httpCacheObj->checkHttpCache($httpCacheConf);
-        }
+        $httpCacheObj->checkHttpCache($this->actionData);
     }
     
     public function commonHumanTime($time)
