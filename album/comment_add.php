@@ -9,7 +9,6 @@ class comment_add extends controller
     	$star_level = (int)$this->getRequest('star_level', 0);
 
         $uid = $this->getUid();
-        $uid = 1;
 
         if (empty($uid)) {
             $this->showErrorJson(ErrorConf::noLogin());
