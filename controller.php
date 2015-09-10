@@ -66,7 +66,9 @@ abstract class controller
     
     public function checkFilters()
     {
-        $this->checkHttpCache();
+        if (HTTP_CACHE == true) {
+            $this->checkHttpCache();
+        }
     }
     
     public function filters()
