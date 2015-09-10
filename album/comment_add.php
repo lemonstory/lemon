@@ -20,7 +20,7 @@ class comment_add extends controller
         if (!$star_level) {
         	$this->showErrorJson(ErrorConf::CommentStarLevelIsError());
         }
-        if ($star_level >= 5 || $star_level <= 0) {
+        if ($star_level > 5 || $star_level <= 0) {
         	$this->showErrorJson(ErrorConf::CommentStarLevelIsError());
         }
     	
