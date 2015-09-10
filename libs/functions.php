@@ -43,13 +43,13 @@ function humanCommentTime($time)
 {
 	$dur = time() - $time;
 	if ($dur < 60) {
-		return $dur.$_SERVER['morelanguage']['sec'];
+		return $dur."秒";
 	} elseif ($dur < 3600) {
-		return floor ( $dur / 60 ) . $_SERVER['morelanguage']['mins'];
+		return floor ( $dur / 60 ) . "分";
 	} elseif ($time > mktime ( 0, 0, 0 )) {
-		return $_SERVER['morelanguage']['today'] . date ( 'H:i', $time );
+		return "今天" . date ( 'H:i', $time );
 	} elseif ($time > mktime ( 0, 0, 0 )-86400) {
-		return $_SERVER['morelanguage']['yesterday'] . date ( 'H:i', $time );
+		return "昨天" . date ( 'H:i', $time );
 	} elseif ($time > mktime ( 0, 0, 0 )-172800 ){
 		return $_SERVER['morelanguage']['tfyesterday'] . date ( 'H:i', $time );
 	}elseif ($time > mktime ( 0, 0, 0)-86400*365){
@@ -60,24 +60,7 @@ function humanCommentTime($time)
 }
 
 
-
-function humanTopicListTime($time){
-	$dur = time() - $time;
-	if ($dur < 60) {
-		$show = $dur.$_SERVER['morelanguage']['secs'];
-		return $show;
-	} elseif ($dur < 3600) {
-		$show =  floor ( $dur / 60 ) . $_SERVER['morelanguage']['mins'];
-		return $show;
-	} elseif ($time > mktime ( 0, 0, 0 )) {
-		return $_SERVER['morelanguage']['today'] . date ( 'H:i', $time );
-	} elseif ($time > mktime ( 0, 0, 0 )-86400) {
-		return $_SERVER['morelanguage']['yesterday'] . date ( 'H:i', $time );
-	} elseif ($time > mktime ( 0, 0, 0 )-172800 ){
-		return $_SERVER['morelanguage']['tfyesterday'] . date ( 'H:i', $time );
-	}elseif ($time > mktime ( 0, 0, 0)-86400*365){
-		return date ( 'm-d H:i', $time );
-	}else {
-		return date ( 'Y-m-d', $time );
-	}
+function getIsAjaxRequest()
+{
+    return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH']==='XMLHttpRequest';
 }

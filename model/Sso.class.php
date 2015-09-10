@@ -424,6 +424,13 @@ class Sso extends ModelBase
         setcookie('al', $this->makeCookie($R, 'al'), time() + 60 * 86400, '/', $domain, false, true);
     }
     
+    public function setCsrfCookie($csrftoken)
+    {
+        // 设置csrf密钥到cookie,有效时间是60秒
+        setcookie('csrftoken', $csrftoken, time() + 60, '/', $this->domain, false, true);
+        return true;
+    }
+    
     private function parseSession() 
     {
         if (! isset($this->cookies['us'])) {

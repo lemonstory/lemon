@@ -14,10 +14,20 @@ abstract class controller
     
     public function __construct()
     {
+        $this->checkHostInfo();
         $this->getActionData();
         $this->checkFilters();
-        $this->getAppVertion();
+        //$this->getAppVertion();
         $this->action();
+    }
+    
+    protected function checkHostInfo()
+    {
+        $host = $_SERVER['HTTP_HOST'];
+        if($host != '120.26.52.211') {
+            header("HTTP/1.0 404 Not Found");
+            exit;
+        }
     }
     
     protected function getAppVertion()

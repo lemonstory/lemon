@@ -189,6 +189,13 @@ class   ErrorConf
 	    return array('code'=>'101002','desc'=>'评论星级错误');
 	}
 	
+	
+	// 请求检测
+	public static function requestCsrfValidateError()
+	{
+	    return array('code'=>'102001','desc'=>'The CSRF token could not be verified.');
+	}
+	
 	/**
 	 * 拼接错误信息
 	 * @param string $msg
