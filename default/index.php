@@ -68,7 +68,7 @@ class index extends controller
 				}
 			}
 		}
-		var_dump($hotrecommendlist);die();
+		
 		
 		if (!empty($sameageres)) {
 			foreach ($sameageres as $value) {
