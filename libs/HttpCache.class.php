@@ -27,7 +27,7 @@ class HttpCache
             return false;
         }
         
-        $cacheKey = $this->getKey($action, $cacheConf['params']);
+        $cacheKey = $this->getKey($cacheConf['action'], $cacheConf['params']);
         $modifiedTime = $this->getModifiedTime($cacheKey, $cacheConf);
         
         if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && 
@@ -44,7 +44,6 @@ class HttpCache
             return;
         }
     }
-    
     
     
     /**
@@ -75,16 +74,9 @@ class HttpCache
         }
         
         // 所有url请求都需要携带visituid=当前访问Uid, 未登录为空
-        $cacheConf['params']['visituid'] = 0;
-        if (!empty($_SESSION['uid'])) {
-            $cacheConf['params']['visituid'] = $_SESSION['uid'];
-        }
+        array_unshift($cacheConf['params'], "visituid");
         
-        $actionParams = array();
         foreach ($cacheConf['params'] as $value){
-            if (empty($actionData['params'][$value])) {
-                continue;
-            }
             $actionParams[$value] = $actionData['params'][$value];
         }
         $cacheConf['params'] = $actionParams;
@@ -113,7 +105,7 @@ class HttpCache
             $expire = $cacheConf['cachetime'];
         }
         
-        $redisobj = new AliRedisConnecter($this->CACHE_INSTANCE);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $modifiedTime = $redisobj->get($key);
         if (empty($modifiedTime)){
             if (!empty($expire)){
@@ -136,7 +128,7 @@ class HttpCache
         if (empty($key) || empty($modifiedtime) || empty($expire)){
             return false;
         }
-        $redisobj = new AliRedisConnecter($this->CACHE_INSTANCE);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisobj->setex($key, $expire, $modifiedtime);
         return true;
     }
