@@ -215,12 +215,12 @@ class UserExtend extends ModelBase
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
+	    if (!empty($updatedata['birthday'])) {
+	        $updatedata['age'] = getAgeFromBirthDay($updatedata['birthday']);
+	    }
+	    
 	    $setstr = "";
 	    foreach ($updatedata as $column => $value) {
-	        if (!in_array($column, array("uid", "birthday", "gender", "age"))) {
-	            $this->setError(ErrorConf::systemError());
-	            return false;
-	        }
 	        $setstr .= "`{$column}` = '{$value}', ";
 	    }
 	    $setstr = rtrim($setstr, ",");
