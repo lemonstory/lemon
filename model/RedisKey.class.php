@@ -43,6 +43,15 @@ class RedisKey
 	{
 	    return 'ui_' . $uid;
 	}
+	public static function getBabyInfoKey($babyid)
+	{
+	    return 'bi_' . $babyid;
+	}
+	public static function getAddressInfoKey($addressid)
+	{
+	    return 'ai_' . $addressid;
+	}
+	
 	/**
 	 * 批量获取用户信息key
 	 * @param A $uids
@@ -52,9 +61,26 @@ class RedisKey
 	{
 	    $uidarr = array();
 	    foreach ($uids as $uid) {
-	        $uidarr[] = "ui_" . $uid;
+	        $uidarr[] = self::getUserInfoKey($uid);
 	    }
 	    return $uidarr;
+	}
+	
+	public static function getBabyInfoKeys($babyids)
+	{
+	    $idarr = array();
+	    foreach ($babyids as $id) {
+	        $idarr[] = self::getBabyInfoKey($id);
+	    }
+	    return $idarr;
+	}
+	public static function getAddressInfoKeys($addressids)
+	{
+	    $idarr = array();
+	    foreach ($addressids as $id) {
+	        $idarr[] = self::getAddressInfoKey($id);
+	    }
+	    return $idarr;
 	}
 	
 	

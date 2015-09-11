@@ -14,39 +14,14 @@ class User extends ModelBase
 	public $STATUS_FORBITEN = -2; // 封号
 	public $STATUS_DELETE = -3; // 删除
 	
-	public function initUser($uid,$addtime,$nickname)
-	{
-		if(empty($uid)) {
-			$this->setError(ErrorConf::paramError());
-			return false;
-		}
-		$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-		$sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid,nickname,addtime) values (?,?,?)";
-		$st = $db->prepare ( $sql );
-		$re = $st->execute (array($uid,$nickname,$addtime));
-		if($re) {
-			$this->clearUserCache($uid);
-			return true;
-		}
-		return false;
-	}	
-	
-	
-	public function initQQLoginUser($uid,$nickname,$avatartime,$type,$addtime)
+	public function initQQLoginUser($uid, $nickname, $avatartime, $birthday, $gender, $province, $city, $type, $addtime)
 	{
 		if(empty($uid) || empty($nickname) || empty($type)) {
 			$this->setError(ErrorConf::paramError());
 			return false;
 		}
-		$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-		$sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid,nickname,avatartime,type,addtime) values (?,?,?,?,?)";
-		$st = $db->prepare ( $sql );
-		$re = $st->execute (array($uid,$nickname,$avatartime,$type,$addtime));
-		if($re) {
-			return true;
-		}
-		$this->clearUserCache($uid);
-		return false;
+		$res = $this->initUser($uid, $nickname, $avatartime, $birthday, $gender, $province, $city, $type, $addtime);
+		return $res;
 	}
 	
 	
@@ -79,7 +54,6 @@ class User extends ModelBase
 		$dbData = array();
 		
 		if(!empty($dbIds)) {
-			$result = array();
 			$idlist = implode(',', $dbIds);
 			$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
 			$sql = "select * from {$this->USER_INFO_TABLE_NAME} where uid in ($idlist)";
@@ -87,9 +61,12 @@ class User extends ModelBase
 			$st->execute ();
 			$tmpDbData = $st->fetchAll ( PDO::FETCH_ASSOC );
 			$db=null;
-			foreach ($tmpDbData as $onedbdata){
-				$dbData[$onedbdata['uid']] = $onedbdata;
-				$redisobj->setex('ui_' . $onedbdata['uid'], 2592000, serialize($onedbdata));
+			if (!empty($tmpDbData)) {
+    			foreach ($tmpDbData as $onedbdata){
+    				$dbData[$onedbdata['uid']] = $onedbdata;
+    				$uikey = RedisKey::getUserInfoKey($onedbdata['uid']);
+    				$redisobj->setex($uikey, 604800, serialize($onedbdata));
+    			}
 			}
 		}
 
@@ -101,14 +78,12 @@ class User extends ModelBase
 			}
 		}
 		
-		$currentuid = @$_SESSION['uid'];
 		$result = array();
 		foreach ($data as $one) {
 			if(empty($one)) {
 				continue;
 			}
 			$one = $this->formatUserBaseInfo($one);
-			$one['age']=getAgeFromBirthDay($one['birthday']);
 			$result[$one['uid']] = $one;
 		}
 		return $result;
@@ -135,7 +110,7 @@ class User extends ModelBase
 	
 	public function setUserinfo($uid, $data)
 	{
-		if($uid==0) {
+		if(empty($uid)) {
 			$this->setError(ErrorConf::paramError());
 			return false;
 		}
@@ -153,8 +128,6 @@ class User extends ModelBase
 			} else {
 				$NicknameMd5Obj->addOne($data['nickname'], $uid);
 			}
-			
-			//QueueManager::pushUserInfoToSearch($uid);
 		}
 		
 		$setstr = "";
@@ -171,6 +144,7 @@ class User extends ModelBase
 		$st = $db->prepare ( $sql );
 		$st->execute ();
 		$this->clearUserCache($uid);
+		
 		return true;
 	}
 	
@@ -192,11 +166,6 @@ class User extends ModelBase
 		$st->execute (array($nickname));
 		$this->clearUserCache($uid);
 		
-		//QueueManager::pushUserInfoToSearch($uid);
-		// 添加到审核队列
-		//QueueManager::pushAuditTextAction($uid, 1);
-		
-		//QueueManager::pushUserToUpdateUserSysFriendLog($uid);
 		return true;
 	}
 	
@@ -210,27 +179,55 @@ class User extends ModelBase
 	
 	public function clearUserCache($uid)
 	{
-		//CacheConnecter::delete($this->CACHE_INSTANCE, $uid);
+	    $uikey = RedisKey::getUserInfoKey($uid);
 		$redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
-		return $redisobj->delete($uid);
-		//$DataSyncManagerObj = new DataSyncManager();
-		//$DataSyncManagerObj->setRenewTime($DataSyncManagerObj->DATATYPEUSERINFO, $uid,time());
+		$redisobj->delete($uikey);
+		return true;
+	}
+
+	/**
+	 * 初始化user_info、user_baby_info、user_address_info表
+	 * @param I $uid
+	 * @param S $nickname
+	 * @param I $avatartime
+	 * @param I $type
+	 * @param S $addtime
+	 * @return boolean
+	 */
+	protected function initUser($uid, $nickname, $avatartime, $birthday, $gender, $province, $city, $type, $addtime)
+	{
+	    if(empty($uid)) {
+	        $this->setError(ErrorConf::paramError());
+	        return false;
+	    }
+	    $userextobj = new UserExtend();
+	    $babyid = $userextobj->addUserBabyInfo($uid, $birthday, $gender);
+	    if (empty($babyid)) {
+	        return false;
+	    }
+	    
+	    $name = "";
+	    $phonenumber = "";
+	    $addressid = $userextobj->addUserAddressInfo($uid, $name, $phonenumber, $province, $city);
+	    if (empty($addressid)) {
+	        return false;
+	    }
+	    
+	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+	    $sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid, nickname, avatartime, defaultbabyid, defaultaddressid, type, addtime)
+	        values (?, ?, ?, ?, ?, ?, ?)";
+	    $st = $db->prepare ( $sql );
+	    $re = $st->execute (array($uid, $nickname, $avatartime, $babyid, $addressid, $type, $addtime));
+	    if($re) {
+	        return true;
+	    }
+		return false;
 	}
 	
-
 	private function formatUserBaseInfo($one)
 	{
 	    if($one['avatartime']+0 == 0) {
 	        $one['avatartime'] = strtotime($one['addtime']);
-	    }
-	    if($one['birthday'] == "0000-00-00") {
-	        $one['birthday'] = "";
-	    }
-	    if($one['birthday'] == null) {
-	        $one['birthday'] = "";
-	    }
-	    if($one['gender'] == 0) {
-	        $one['gender'] = 1;
 	    }
 	    return $one;
 	}

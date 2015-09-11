@@ -11,50 +11,146 @@ class UserExtend extends ModelBase
 	 * @param I $uid
 	 * @return array
 	 */
-	public function getUserBabyInfo($babyid)
+	public function getUserBabyInfo($babyids)
 	{
-		if (empty($babyid)) {
+		if (empty($babyids)) {
 		    $this->setError(ErrorConf::paramError());
 			return array();
 		}
-		
-		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		$sql = "SELECT * FROM {$this->BABY_INFO_TABLE_NAME} WHERE `id` = ?";
-		$st = $db->prepare($sql);
-		$st->execute(array($babyid));
-		$res = $st->fetch(PDO::FETCH_ASSOC);
-		if (empty($res)) {
-		    $this->setError(ErrorConf::userBabyInfoEmpty());
-			return array();
-		} else {
-			return $res;
+		if(!is_array($babyids)) {
+		    $babyids = array($babyids);
 		}
+		$data = array();
+		$keys = RedisKey::getBabyInfoKeys($babyids);
+		$redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+		$redisData = $redisobj->mget($keys);
+		
+		$cacheData = array();
+		$cacheIds = array();
+		if (is_array($redisData)){
+		    foreach ($redisData as $oneredisdata){
+		        if (empty($oneredisdata)) {
+		            continue;
+		        }
+		        $oneredisdata = unserialize($oneredisdata);
+		        $cacheIds[] = $oneredisdata['id'];
+		        $cacheData[$oneredisdata['id']] = $oneredisdata;
+		    }
+		} else {
+		    $redisData = array();
+		}
+		
+		$dbIds = array_diff($babyids, $cacheIds);
+		$dbData = array();
+		if(!empty($dbIds)) {
+		    $idlist = implode(',', $dbIds);
+    		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+    		$sql = "SELECT * FROM {$this->BABY_INFO_TABLE_NAME} WHERE `id` IN ($idlist)";
+    		$st = $db->prepare($sql);
+    		$st->execute();
+    		$tmpDbData = $st->fetchAll(PDO::FETCH_ASSOC);
+    		$db = null;
+    		if (!empty($tmpDbData)) {
+    		    foreach ($tmpDbData as $onedbdata){
+    		        $dbData[$onedbdata['id']] = $onedbdata;
+    		        $bikey = RedisKey::getBabyInfoKey($onedbdata['id']);
+    		        $redisobj->setex($bikey, 604800, serialize($onedbdata));
+    		    }
+    		}
+		}
+		
+		foreach($babyids as $id) {
+		    if(in_array($id, $dbIds)) {
+		        $data[$id] = @$dbData[$id];
+		    } else {
+		        $data[$id] = $cacheData[$id];
+		    }
+		}
+		
+		$result = array();
+		foreach ($data as $one) {
+		    if(empty($one)) {
+		        continue;
+		    }
+		    $one = $this->formatUserBaseInfo($one);
+		    $result[$one['id']] = $one;
+		}
+		
+		return $result;
 	}
 	
 	
 	/**
 	 * 获取用户地址信息
-	 * @param I $addressid
+	 * @param I $addressids
 	 * @return array()
 	 */
-	public function getUserAddressInfo($addressid)
+	public function getUserAddressInfo($addressids)
 	{
-	    if (empty($addressid)) {
+	    if (empty($addressids)) {
 	        $this->setError(ErrorConf::paramError());
 	        return array();
 	    }
 	    
-	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-	    $sql = "SELECT * FROM {$this->BABY_INFO_TABLE_NAME} WHERE `id` = ?";
-	    $st = $db->prepare($sql);
-	    $st->execute(array($addressid));
-	    $res = $st->fetch(PDO::FETCH_ASSOC);
-	    if (empty($res)) {
-	        $this->setError(ErrorConf::userAddressInfoEmpty());
-	        return array();
-	    } else {
-	        return $res;
+	    if(!is_array($addressids)) {
+	        $addressids = array($addressids);
 	    }
+	    $data = array();
+	    $keys = RedisKey::getAddressInfoKeys($addressids);
+	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+	    $redisData = $redisobj->mget($keys);
+	    
+	    $cacheData = array();
+	    $cacheIds = array();
+	    if (is_array($redisData)){
+	        foreach ($redisData as $oneredisdata){
+	            if (empty($oneredisdata)) {
+	                continue;
+	            }
+	            $oneredisdata = unserialize($oneredisdata);
+	            $cacheIds[] = $oneredisdata['id'];
+	            $cacheData[$oneredisdata['id']] = $oneredisdata;
+	        }
+	    } else {
+	        $redisData = array();
+	    }
+	    
+	    $dbIds = array_diff($addressids, $cacheIds);
+	    $dbData = array();
+	    if(!empty($dbIds)) {
+	        $idlist = implode(',', $dbIds);
+	        $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+	        $sql = "SELECT * FROM {$this->ADDRESS_INFO_TABLE_NAME} WHERE `id` IN ($idlist)";
+	        $st = $db->prepare($sql);
+	        $st->execute();
+	        $tmpDbData = $st->fetchAll(PDO::FETCH_ASSOC);
+	        $db = null;
+	        if (!empty($tmpDbData)) {
+	            foreach ($tmpDbData as $onedbdata){
+	                $dbData[$onedbdata['id']] = $onedbdata;
+	                $aikey = RedisKey::getAddressInfoKey($onedbdata['id']);
+	                $redisobj->setex($aikey, 604800, serialize($onedbdata));
+	            }
+	        }
+	    }
+	    
+	    foreach($addressids as $id) {
+	        if(in_array($id, $dbIds)) {
+	            $data[$id] = @$dbData[$id];
+	        } else {
+	            $data[$id] = $cacheData[$id];
+	        }
+	    }
+	    
+	    $result = array();
+	    foreach ($data as $one) {
+	        if(empty($one)) {
+	            continue;
+	        }
+	        $result[$one['id']] = $one;
+	    }
+	    
+	    return $result;
 	}
 	
 	/**
@@ -82,14 +178,17 @@ class UserExtend extends ModelBase
 	 * @param I $uid
 	 * @param S $birthday
 	 * @param I $gender
-	 * @param I $age
 	 * @return boolean
 	 */
-	public function addUserBabyInfo($uid, $birthday, $gender, $age)
+	public function addUserBabyInfo($uid, $birthday = "", $gender = 0)
 	{
-		if (empty($uid) || empty($birthday) || empty($gender) || empty($age)) {
+		if (empty($uid)) {
 			$this->setError(ErrorConf::paramError());
 			return false;
+		}
+		$age = 0;
+		if (!empty($birthday)) {
+		    $age = getAgeFromBirthDay($birthday);
 		}
 		
 		$addtime = date("Y-m-d H:i:s");
@@ -103,14 +202,7 @@ class UserExtend extends ModelBase
 		    return false;
 		}
 		$defaultbabyid = $db->lastInsertId() + 0;
-		
-		$data = array("defaultbabyid" => $defaultbabyid);
-		$userobj = new User();
-		$upres = $userobj->setUserinfo($uid, $data);
-		if (empty($upres)) {
-		    return false;
-		}
-		return true;
+		return $defaultbabyid;
 	}
 	
 	public function updateUserBabyInfo($babyid, $updatedata)
@@ -137,13 +229,16 @@ class UserExtend extends ModelBase
 	    $sql = "UPDATE {$this->BABY_INFO_TABLE_NAME} SET {$setstr} WHERE `id` = ?";
 	    $st = $db->prepare($sql);
 	    $res = $st->execute(array($babyid));
+	    if ($res) {
+	        $this->clearBabyinfoCache($babyid);
+	    }
 	    return $res;
 	}
 	
 	
-	public function addUserAddressInfo($uid, $name, $phonenumber, $address, $ecode = "")
+	public function addUserAddressInfo($uid, $name = "", $phonenumber = "", $province = "", $city = "", $area = "", $address = "", $ecode = "")
 	{
-	    if (empty($uid) || empty($name) || empty($phonenumber) || empty($address)) {
+	    if (empty($uid)) {
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
@@ -151,22 +246,15 @@ class UserExtend extends ModelBase
 	    $addtime = date("Y-m-d H:i:s");
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 	    $sql = "INSERT INTO {$this->ADDRESS_INFO_TABLE_NAME}
-	    (`uid`, `name`, `phonenumber`, `address`, `ecode`, `addtime`)
-	    VALUES (?, ?, ?, ?, ?, ?)";
+    	    (`uid`, `name`, `phonenumber`, `province`, `city`, `area`, `address`, `ecode`, `addtime`)
+    	    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	    $st = $db->prepare($sql);
-	    $res = $st->execute(array($uid, $name, $phonenumber, $address, $ecode, $addtime));
+	    $res = $st->execute(array($uid, $name, $phonenumber, $province, $city, $area, $address, $ecode, $addtime));
 	    if (empty($res)) {
 	        return false;
 	    }
 	    $defaultaddressid = $db->lastInsertId() + 0;
-	    
-	    $data = array("defaultaddressid" => $defaultaddressid);
-	    $userobj = new User();
-	    $upres = $userobj->setUserinfo($uid, $data);
-	    if (empty($upres)) {
-	        return false;
-	    }
-	    return true;
+	    return $defaultaddressid;
 	}
 	
 	public function updateUserAddressInfo($addressid, $updatedata)
@@ -193,7 +281,39 @@ class UserExtend extends ModelBase
 	    $sql = "UPDATE {$this->ADDRESS_INFO_TABLE_NAME} SET {$setstr} WHERE `id` = ?";
 	    $st = $db->prepare($sql);
 	    $res = $st->execute(array($addressid));
+	    if ($res) {
+	        $this->clearAddressinfoCache($addressid);
+	    }
 	    return $res;
 	}
 	
+	public function clearBabyinfoCache($babyid)
+	{
+	    $key = RedisKey::getBabyInfoKey($babyid);
+	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+	    $redisobj->delete($key);
+	    return true;
+	}
+	public function clearAddressinfoCache($addressid)
+	{
+	    $key = RedisKey::getAddressInfoKey($addressid);
+	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+	    $redisobj->delete($key);
+	    return true;
+	}
+	
+	
+	private function formatUserBaseInfo($one)
+	{
+	    if($one['birthday'] == "0000-00-00") {
+	        $one['birthday'] = "";
+	    }
+	    if(empty($one['birthday'])) {
+	        $one['birthday'] = "";
+	    }
+	    if($one['gender'] == 0) {
+	        $one['gender'] = 1;
+	    }
+	    return $one;
+	}
 }
