@@ -41,12 +41,24 @@ class Upload extends ModelBase
     }
     
     
+    /**
+     * Post上传用户头像图片
+     * @param S $file    如：$_FILES['avatarfile']
+     * @param I $uid
+     * @return S         图片的oss文件目录及文件名称
+     */
     public function uploadAvatarImage($file, $uid)
     {
     	$ossObj = new AliOss();
     	return $ossObj->uploadAvatarImage($file, $uid);
     }
     
+	/**
+	 * Post上传焦点图
+	 * @param S $file
+	 * @param I $focusid
+	 * @return S            图片的oss文件目录及文件名称
+	 */
 	public function uploadFocusImage($file, $focusid)
     {
     	$ossObj = new AliOss();

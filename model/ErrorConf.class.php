@@ -74,10 +74,6 @@ class   ErrorConf
 	{
 	    return array('code'=>'100201','desc'=>'上传头像文件不存在');
 	}
-	public static function uploadAvatarfileFail()
-	{
-	    return array('code'=>'100202','desc'=>'头像上传失败');
-	}
 	public static function uploadImgfileFail()
 	{
 	    return array('code'=>'100203','desc'=>'上传图片失败');

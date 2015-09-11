@@ -40,7 +40,7 @@ class AliOss extends ModelBase
     {
         if (empty($file)){
             $this->setError(ErrorConf::paramError());
-            return array();
+            return "";
         }
         $obj = new alioss_sdk();
         $obj->set_debug_mode(FALSE);
@@ -61,7 +61,7 @@ class AliOss extends ModelBase
             return $path;
         } else {
             $this->setError(ErrorConf::uploadImgfileFail());
-            return array();
+            return "";
         }
     }
     
@@ -76,7 +76,7 @@ class AliOss extends ModelBase
     {
         if (empty($file)){
             $this->setError(ErrorConf::paramError());
-            return array();
+            return "";
         }
         $obj = new alioss_sdk();
         $obj->set_debug_mode(FALSE);
@@ -97,7 +97,7 @@ class AliOss extends ModelBase
             return $path;
         } else {
             $this->setError(ErrorConf::uploadImgfileFail());
-            return array();
+            return "";
         }
     }
     

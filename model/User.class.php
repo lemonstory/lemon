@@ -64,6 +64,9 @@ class User extends ModelBase
 		$cacheIds = array();
 		if (is_array($redisData)){
 			foreach ($redisData as $oneredisdata){
+			    if (empty($oneredisdata)) {
+			        continue;
+			    }
 			    $oneredisdata = unserialize($oneredisdata);
 				$cacheIds[] = $oneredisdata['uid'];
 				$cacheData[$oneredisdata['uid']] = $oneredisdata;
@@ -100,40 +103,32 @@ class User extends ModelBase
 		
 		$currentuid = @$_SESSION['uid'];
 		$result = array();
-		foreach ($data as $one)
-		{
-			if(empty($one))
-			{
+		foreach ($data as $one) {
+			if(empty($one)) {
 				continue;
 			}
 			$one = $this->formatUserBaseInfo($one);
-			
-			//$one['age']=getAgeFromBirthDay($one['birthday']);
+			$one['age']=getAgeFromBirthDay($one['birthday']);
 			$result[$one['uid']] = $one;
 		}
 		return $result;
 	}
 	
 	
-	public function setAvatar($avatarfile,$uid)
+	public function setAvatar($file, $uid)
 	{
-		if(!is_file($avatarfile))
-		{
+		if(empty($file)) {
 			$this->setError(ErrorConf::noUploadAvatarfile());
 			return false;
 		}
-		$obj = new alioss_sdk();
-		//$obj->set_debug_mode(FALSE);
-		$bucket = 'tutuavatar';
-		$responseObj = $obj->upload_file_by_file($bucket,$uid,$avatarfile);
-		if ($responseObj->status!=200){
-			$this->setError(ErrorConf::uploadAvatarfileFail());
-		}
+		
+		$uploadobj = new Upload();
+		$uploadobj->uploadAvatarImage($file, $uid);
+		
 		$avatartime = time();
-		$this->setUserinfo($uid, array('avatartime'=>$avatartime));
+		$this->setUserinfo($uid, array('avatartime' => $avatartime));
 		$this->clearUserCache($uid);
  		
- 		//QueueManager::pushUserToUpdateUserSysFriendLog($uid);
 		return $avatartime;
 	}
 	
