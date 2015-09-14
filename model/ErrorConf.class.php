@@ -67,6 +67,10 @@ class   ErrorConf
 	{
 	    return array('code'=>'100111','desc'=>'手机号格式不正确');
 	}
+	public static function FeedbackContentIsEmpty()
+	{
+		return array('code'=>'100112','desc'=>'反馈内容不能为空');
+	}
 	
 	
 	// 上传
