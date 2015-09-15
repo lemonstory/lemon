@@ -7,7 +7,6 @@ class index extends controller
     	$content = $this->getRequest('content', '');
 
         $uid = $this->getUid();
-        $uid = 1;
 
         if (empty($uid)) {
             $this->showErrorJson(ErrorConf::noLogin());
