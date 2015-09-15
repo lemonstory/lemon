@@ -17,17 +17,20 @@ class index extends controller
 			}
 		}
 		
+		$babyagetype = 0;
 		if (!empty($uid)) {
 			$userobj = new User();
 			$userinfo = current($userobj->getUserInfo($uid));
 			if (!empty($userinfo)) {
 				$defaultbabyid = $userinfo['defaultbabyid'];
-				$userextinfo = new UserExtend();
-				$babyinfo = $userextinfo->getUserBabyInfo($defaultbabyid);
-				$babyagetype = $userextinfo->getBabyAgeType($babyinfo['age']);
+				if (!empty($defaultbabyid)) {
+    				$userextobj = new UserExtend();
+    				$babyinfo = $userextobj->getUserBabyInfo($defaultbabyid);
+    				if (!empty($babyinfo)) {
+    				    $babyagetype = $userextobj->getBabyAgeType($babyinfo['age']);
+    				}
+				}
 			}
-		} else {
-			$babyagetype = 0;
 		}
 		
 		// 同龄在听
@@ -87,7 +90,7 @@ class index extends controller
 				    $albuminfo['id'] = $albumlist[$albumid]['id'];
 				    $albuminfo['title'] = $albumlist[$albumid]['title'];
 				    $albuminfo['cover'] = $albumlist[$albumid]['cover'];
-					$newalbumlist[] = $albuminfo[$albumid];
+					$newalbumlist[] = $albuminfo;
 				}
 			}
 		}

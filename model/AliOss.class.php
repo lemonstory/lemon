@@ -90,7 +90,7 @@ class AliOss extends ModelBase
         $from = $this->LOCAL_IMG_TMP_PATH . $focuspicid . '.' . $ext;
         move_uploaded_file($tmpFile, $from);
          
-        $to = "focus/" . $focuspicid;
+        $to = "focus/" . $focuspicid . ".png";
         $responseObj = $obj->upload_file_by_file($bucket,$to,$from);
         if ($responseObj->status==200){
             $path = $to;
@@ -211,9 +211,9 @@ class AliOss extends ModelBase
     {
         $domains = $this->OSS_BUCKET_IMAGE_DOMAIN;
         $domainsCount = count($domains);
-        $domainIndex = abs(crc32($file)%$domainsCount);
+        $domainIndex = abs(crc32($focuspicid)%$domainsCount);
         $domain = $domains[$domainIndex];
-        return $domain . "focus/" . $focuspicid;
+        return $domain . "focus/" . $focuspicid . ".png";
     }
     
     public function getAvatarUrl($uid, $avatartime, $size='')
