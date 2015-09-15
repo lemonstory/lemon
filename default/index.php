@@ -54,6 +54,7 @@ class index extends controller
 			$albumlist = $albumobj->getListByIds($albumids);
 		}
 		
+		
 		$hotrecommendlist = array();
 		$sameagealbumlist = array();
 		$newalbumlist = array();
@@ -68,13 +69,14 @@ class index extends controller
 				}
 			}
 		}
-		
-		
 		if (!empty($sameageres)) {
 			foreach ($sameageres as $value) {
 				$albumid = $value['albumid'];
 				if (!empty($albumlist[$albumid])) {
-					$sameagealbumlist[$albumid] = $albumlist[$albumid];
+				    $albuminfo['id'] = $albumlist[$albumid]['id'];
+				    $albuminfo['title'] = $albumlist[$albumid]['title'];
+				    $albuminfo['cover'] = $albumlist[$albumid]['cover'];
+					$sameagealbumlist[] = $albuminfo;
 				}
 			}
 		}
@@ -82,14 +84,25 @@ class index extends controller
 			foreach ($newonlineres as $value) {
 				$albumid = $value['albumid'];
 				if (!empty($albumlist[$albumid])) {
-					$newalbumlist[$albumid] = $albumlist[$albumid];
+				    $albuminfo['id'] = $albumlist[$albumid]['id'];
+				    $albuminfo['title'] = $albumlist[$albumid]['title'];
+				    $albuminfo['cover'] = $albumlist[$albumid]['cover'];
+					$newalbumlist[] = $albuminfo[$albumid];
 				}
 			}
 		}
 		
 		// 推广位
 		$focuspiclist = array();
-		$focuspiclist = $managesysobj->getFocusList(6);
+		$focusres = $managesysobj->getFocusList(6);
+		if (!empty($focusres)) {
+		    $aliossobj = new AliOss();
+		    foreach ($focusres as $value) {
+		        $focusinfo['cover'] = $aliossobj->getFocusUrl($value['picid']);
+		        $focusinfo['linkurl'] = $value['linkurl'];
+		        $focuspiclist[] = $focusinfo;
+		    }
+		}
 		
 		// 私人订制
 		

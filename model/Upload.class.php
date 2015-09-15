@@ -56,12 +56,12 @@ class Upload extends ModelBase
 	/**
 	 * Post上传焦点图
 	 * @param S $file
-	 * @param I $focusid
-	 * @return S            图片的oss文件目录及文件名称
+	 * @param I $focuspicid     焦点图picid
+	 * @return S                图片的oss文件目录及文件名称
 	 */
-	public function uploadFocusImage($file, $focusid)
+	public function uploadFocusImage($file, $focuspicid)
     {
     	$ossObj = new AliOss();
-    	return $ossObj->uploadFocusImage($file, $focusid);
+    	return $ossObj->uploadFocusImage($file, $focuspicid);
     } 
 }

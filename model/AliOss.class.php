@@ -69,10 +69,10 @@ class AliOss extends ModelBase
     /**
      * 上传焦点图图片
      * @param S $file        $_FILES['xxx']的值
-     * @param I $focusid
+     * @param I $focuspicid
      * @return array
      */
-    public function uploadFocusImage($file, $focusid)
+    public function uploadFocusImage($file, $focuspicid)
     {
         if (empty($file)){
             $this->setError(ErrorConf::paramError());
@@ -87,10 +87,10 @@ class AliOss extends ModelBase
         if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
             $ext = "jpg";
         }
-        $from = $this->LOCAL_IMG_TMP_PATH . $focusid . '.' . $ext;
+        $from = $this->LOCAL_IMG_TMP_PATH . $focuspicid . '.' . $ext;
         move_uploaded_file($tmpFile, $from);
          
-        $to = "focus/" . $focusid;
+        $to = "focus/" . $focuspicid;
         $responseObj = $obj->upload_file_by_file($bucket,$to,$from);
         if ($responseObj->status==200){
             $path = $to;
@@ -206,6 +206,14 @@ class AliOss extends ModelBase
         $domainIndex = abs(crc32($file)%$domainsCount);
         $domain = $domains[$domainIndex];
         return $domain.trim($file, '/').$style;
+    }
+    public function getFocusUrl($focuspicid)
+    {
+        $domains = $this->OSS_BUCKET_IMAGE_DOMAIN;
+        $domainsCount = count($domains);
+        $domainIndex = abs(crc32($file)%$domainsCount);
+        $domain = $domains[$domainIndex];
+        return $domain . "focus/" . $focuspicid;
     }
     
     public function getAvatarUrl($uid, $avatartime, $size='')
