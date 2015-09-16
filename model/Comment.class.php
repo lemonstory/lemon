@@ -33,6 +33,23 @@ class Comment extends ModelBase
     }
 
     /**
+     * 批量获取专辑评论数
+     */
+    public function countAlbumComment($albumid = '')
+    {
+        if (is_array($albumid)) {
+            $albumidarr = $albumid;
+        } else {
+            $albumidarr = array($albumid);
+        }
+        $countarr = array();
+        foreach($albumidarr as $k => $v) {
+            $countarr[$v] = $this->get_total("`albumid`='{$v}' and `status`=1");
+        }
+        return $countarr;
+    }
+
+    /**
      * 插入记录
      */
     public function insert($data)
