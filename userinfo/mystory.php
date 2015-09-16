@@ -3,7 +3,7 @@
  * 我的故事页
  */
 include_once '../controller.php';
-class getlistenlist extends controller 
+class mystory extends controller 
 {
     public function action() 
     {
@@ -107,4 +107,4 @@ class getlistenlist extends controller
         $this->showSuccJson($data);
     }
 }
-new getlistenlist();
+new mystory();
