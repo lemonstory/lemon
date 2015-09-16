@@ -100,6 +100,42 @@ class Story extends ModelBase
         }
 	}
 
+
+    /**
+     * 批量获取故事信息
+     */
+    public function getListByIds($id = 0, $uid = 0)
+    {
+        if (is_array($id)) {
+            $idarr = $id;
+        } else {
+            $idarr = array($id);
+        }
+        $storylist = array();
+        $fav = new Fav();
+        $db = DbConnecter::connectMysql('share_story');
+        foreach($idarr as $k => $v) {
+            if (isset($storylist[$v])) {
+                continue;
+            }
+            $sql = "select * from {$this->table}  where `id`='{$v}' limit 1";
+            $st = $db->query( $sql );
+            $st->setFetchMode(PDO::FETCH_ASSOC);
+            $r  = $st->fetchAll();
+            $r  = array_pop($r);
+            if ($r) {
+                if (!$r['cover']) {
+                    $r['cover'] = $r['s_cover'];
+                }
+                if (!$r['mediapath']) {
+                	$r['mediapath'] = $r['source_audio_url'];
+                }
+                $storylist[$r['id']] = $r;
+            }
+        }
+        return $storylist;
+    }
+
     /**
      * 获取用户故事列表
      * @param I $uid
