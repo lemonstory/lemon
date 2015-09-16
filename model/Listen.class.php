@@ -154,7 +154,39 @@ class Listen extends ModelBase
 	
 	
 	/**
-	 * 用户添加收听故事
+	 * 批量获取专辑的收听总量
+	 * @param A $albumids    
+	 * @return array
+	 */
+	public function getAlbumListenNum($albumids)
+	{
+	    if (empty($albumids)) {
+	        return array();
+	    }
+	    if (!is_array($albumids)) {
+	        $albumids = array($albumids);
+	    }
+	    
+	    $albumidstr = implode(",", $albumids);
+	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+	    $sql = "SELECT * FROM {$this->LISTEN_ALBUM_NUM_TABLE_NAME} WHERE `albumid` IN ($albumidstr)";
+	    $st = $db->prepare($sql);
+	    $st->execute();
+	    $res = $st->fetchAll(PDO::FETCH_ASSOC);
+	    if (empty($res)) {
+	        return array();
+	    } else {
+	        $list = array();
+	        foreach ($res as $value) {
+	            $list[$value['albumid']] = $value;
+	        }
+	        return $list;
+	    }
+	}
+	
+	
+	/**
+	 * 延迟队列执行，用户添加收听故事
 	 * @param I $uid
 	 * @param I $albumid    	专辑Id
 	 * @param I $storyid		故事id
