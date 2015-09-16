@@ -2,8 +2,8 @@
 class Fav extends ModelBase
 {
 	public $MAIN_DB_INSTANCE = 'share_main';
-	public $FAV_TABLE_NAME = 'user_fav';
-	public $FAV_ALBUM_COUNT_TABLE_NAME = 'album_fav_count';
+	public $FAV_TABLE_NAME = 'fav_album';    // 用户收藏专辑记录表
+	public $FAV_ALBUM_COUNT_TABLE_NAME = 'fav_album_count';    // 专辑被收藏的总数
 	public $CACHE_INSTANCE = 'cache';
 	
 	/**

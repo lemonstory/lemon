@@ -2,11 +2,11 @@
 class Listen extends ModelBase
 {
 	public $MAIN_DB_INSTANCE = 'share_main';
-	public $LISTEN_RECORD_TABLE_NAME = 'user_listen_record';
-	public $LISTEN_ALBUM_TABLE_NAME = 'user_listen_album';
-	public $LISTEN_USER_COUNT_TABLE_NAME = 'user_listen_count';
-	public $LISTEN_ALBUM_COUNT_TABLE_NAME = 'album_listen_count';
-	public $RECOMMEND_SAME_AGE_TABLE_NAME = 'recommend_same_age';
+	public $LISTEN_RECORD_TABLE_NAME = 'listen_story';    // 用户收听故事记录
+	public $LISTEN_ALBUM_TABLE_NAME = 'listen_album';     // 用户收听的故事，所属的专辑列表
+	public $LISTEN_USER_COUNT_TABLE_NAME = 'listen_user_count';    // 用户收听总次数
+	public $LISTEN_ALBUM_COUNT_TABLE_NAME = 'listen_album_count';  // 专辑被收听总数
+	public $RECOMMEND_SAME_AGE_TABLE_NAME = 'recommend_same_age';  // 同龄在听推荐表
 	
 	public $CACHE_INSTANCE = 'cache';
 	
