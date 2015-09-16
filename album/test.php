@@ -4,8 +4,10 @@ include_once '../controller.php';
 class test extends controller
 {
     function action() {
-    	// $album = new Album();
-     //    $album_list = $album->getListByIds(array(1,2,3), 1);
+    	$story = new Story();
+        $storylist = $story->getListByIds(1);
+        var_dump($storylist);
+        exit;
      //    var_dump($album_list);
     	$album = new Album();
     	$album_list = $album->get_list("`id` > 0");
