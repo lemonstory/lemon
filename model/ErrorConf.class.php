@@ -162,11 +162,31 @@ class   ErrorConf
 	{
 	    return array('code'=>'100602','desc'=>'专辑信息不存在');
 	}
+	public static function albumTitleNotEmpty()
+	{
+	    return array('code'=>'100603','desc'=>'title-标题不能为空');
+	}
+	public static function albumIntroNotEmpty()
+	{
+	    return array('code'=>'100604','desc'=>'intro-简介不能为空');
+	}
+	public static function albumViewOrderNotEmpty()
+	{
+	    return array('code'=>'100605','desc'=>'view_order-排序不正确');
+	}
 	
 	// 故事
 	public static function storyInfoIsEmpty()
 	{
 	    return array('code'=>'100701','desc'=>'故事信息不存在');
+	}
+	public static function storyTitleNotEmpty()
+	{
+	    return array('code'=>'100702','desc'=>'title-标题不能为空');
+	}
+	public static function storyIntroNotEmpty()
+	{
+	    return array('code'=>'100703','desc'=>'intro-简介不能为空');
 	}
 	
 	// rank 排行榜
