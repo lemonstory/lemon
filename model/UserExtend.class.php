@@ -201,8 +201,8 @@ class UserExtend extends ModelBase
 		if (empty($res)) {
 		    return false;
 		}
-		$defaultbabyid = $db->lastInsertId() + 0;
-		return $defaultbabyid;
+		$lastbabyid = $db->lastInsertId() + 0;
+		return $lastbabyid;
 	}
 	
 	public function updateUserBabyInfo($babyid, $updatedata)
@@ -253,8 +253,8 @@ class UserExtend extends ModelBase
 	    if (empty($res)) {
 	        return false;
 	    }
-	    $defaultaddressid = $db->lastInsertId() + 0;
-	    return $defaultaddressid;
+	    $lastaddressid = $db->lastInsertId() + 0;
+	    return $lastaddressid;
 	}
 	
 	public function updateUserAddressInfo($addressid, $updatedata)

@@ -71,6 +71,10 @@ class   ErrorConf
 	{
 		return array('code'=>'100112','desc'=>'反馈内容不能为空');
 	}
+	public static function userAddAddressFail()
+	{
+	    return array('code'=>'100113','desc'=>'添加收货地址错误');
+	}
 	
 	
 	// 上传

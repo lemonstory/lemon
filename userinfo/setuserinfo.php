@@ -15,6 +15,8 @@ class setuserinfo extends controller
         $city = $this->getRequest('city');
         $area = $this->getRequest('area');
         $phonenumber = $this->getRequest('phonenumber');
+        $defaultbabyid = $this->getRequest('defaultbabyid');
+        $defaultaddressid = $this->getRequest('defaultaddressid');
         
         $UserObj = new User();
         $userinfo = current($UserObj->getUserInfo($uid));
@@ -41,6 +43,12 @@ class setuserinfo extends controller
         }
         if (!empty($phonenumber)) {
             $data['phonenumber'] = str_replace(",", "", strip_tags(trim($phonenumber)));
+        }
+        if (!empty($defaultbabyid)) {
+            $data['defaultbabyid'] = $defaultbabyid;
+        }
+        if (!empty($defaultaddressid)) {
+            $data['defaultaddressid'] = $defaultaddressid;
         }
         if (!empty($gender)) {
             $babydata['gender'] = $gender;
