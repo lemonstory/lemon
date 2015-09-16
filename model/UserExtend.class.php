@@ -81,6 +81,37 @@ class UserExtend extends ModelBase
 	
 	
 	/**
+	 * 获取指定用户的收货地址列表
+	 * @param I $uid
+	 * @return array
+	 */
+	public function getUserAddressList($uid)
+	{
+	    if (empty($uid)) {
+	        return array();
+	    }
+	    
+	    $key = RedisKey::getUserAddressListKey($uid);
+	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+	    $redisData = $redisobj->get($key);
+	    if (empty($redisData)) {
+	        $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+	        $sql = "SELECT * FROM {$this->ADDRESS_INFO_TABLE_NAME} WHERE `uid` = ?";
+	        $st = $db->prepare($sql);
+	        $st->execute(array($uid));
+	        $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
+	        $db = null;
+	        if (empty($dbData)) {
+	            return array();
+	        }
+	        $redisobj->setex($key, 86400, serialize($dbData));
+	        return $dbData;
+	    } else {
+	        return unserialize($redisData);
+	    }
+	}
+	
+	/**
 	 * 获取用户地址信息
 	 * @param I $addressids
 	 * @return array()

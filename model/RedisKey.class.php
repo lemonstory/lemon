@@ -43,13 +43,26 @@ class RedisKey
 	{
 	    return 'ui_' . $uid;
 	}
+	/**
+	 * 单个宝宝信息
+	 */
 	public static function getBabyInfoKey($babyid)
 	{
 	    return 'bi_' . $babyid;
 	}
+	/**
+	 * 单个收货地址信息
+	 */
 	public static function getAddressInfoKey($addressid)
 	{
 	    return 'ai_' . $addressid;
+	}
+	/**
+	 * 用户的收货地址列表key
+	 */
+	public static function getUserAddressListKey($uid)
+	{
+	    return 'ual_' . $uid;
 	}
 	
 	/**
