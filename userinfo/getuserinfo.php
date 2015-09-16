@@ -3,7 +3,7 @@ include_once '../controller.php';
 class getuserinfo extends controller 
 {
     public function action() {
-        // 个人主页信息
+        // 个人资料页
         $uid = $this->getUid();
         if (empty($uid)) {
             $this->showErrorJson(ErrorConf::noLogin());

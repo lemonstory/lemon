@@ -141,91 +141,6 @@ class DownLoad extends ModelBase
 	
 	
 	/**
-	 * 获取远程服务器文件的大小
-	 * @param S $filePath        http://lemonpic.oss-cn-hangzhou.aliyuncs.com/2015/08/19/c4ca4238a0b923820dcc509a6f75849b.png
-	 * @return string|boolean
-	 */
-	/* public function getRemoteFileSize($filePath)
-	{
-	    $remoteHttpUrl = $filePath;
-	
-	    $url = parse_url($remoteHttpUrl);
-	    $port = empty($url['port']) ? 80 : $url['port'];
-	    $path = empty($url['path']) ? '/' : $url['path'];
-	    if ($fp = @fsockopen($url['host'], $port, $error)){
-	        fputs($fp, "GET " . $path." HTTP/1.1\r\n");
-	        fputs($fp, "Host:$url[host]\r\n\r\n");
-	        $status = '';
-	        while (!feof($fp)){
-	            $tmp = fgets($fp);
-	            if (empty($status)) {
-	                $status = trim($tmp);
-	            }
-	            if ($status != "HTTP/1.1 200 OK") {
-	                break;
-	            }
-	            if (trim($tmp) == ''){
-	                break;
-	            } elseif (preg_match('/Content-Length:(.*)/si', $tmp, $arr)) {
-	                return trim($arr[1]);
-	            }
-	        }
-	        return false;
-	    } else {
-	        return false;
-	    }
-	} */
-	
-	/**
-	 * 获取用户下载列表
-	 * @param I $uid
-	 * @param I $taskstatus    状态
-	 * @param S $direction     up代表显示上边，down代表显示下边
-	 * @param I $startid       从某个id开始,默认为0表示从第一页获取
-	 * @param I $len           获取长度
-	 * @return array
-	 */
-	public function getUserDownLoadList($uid, $taskstatus = 0, $direction = 'down', $startid = 0, $len = 20)
-	{
-		if (empty($uid) || !in_array($taskstatus, array(0, $this->STATUS_DOWN_ING, $this->STATUS_DOWN_OVER))) {
-		    $this->setError(ErrorConf::paramError());
-			return array();
-		}
-		if (empty($len)) {
-		    $len = 20;
-		}
-		
-		$where = "";
-		if (!empty($startid)) {
-    		if ($direction == "up") {
-    		    $where .= " `id` > '{$startid}' AND";
-    		} else {
-    		    $where .= " `id` < '{$startid}' AND";
-    		}
-		}
-		
-		$where .= " `uid` = '{$uid}'";
-		if (!empty($taskstatus)) {
-		    $where .= " AND `taskstatus` = '{$taskstatus}'";
-		}
-		$sql = "SELECT * FROM {$this->DOWNLOAD_TABLE_NAME} WHERE {$where} ORDER BY `addtime` DESC LIMIT {$len}";
-		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		$st = $db->prepare($sql);
-		$st->execute();
-		$res = $st->fetchAll(PDO::FETCH_ASSOC);
-		if (empty($res)) {
-			return array();
-		} else {
-		    $list = array();
-		    foreach ($res as $value) {
-		        $list[$value['id']] = $value;
-		    }
-			return $list;
-		}
-	}
-	
-	
-	/**
 	 * 获取用户下载的专辑记录
 	 * @param I $uid
 	 * @param I $albumid
@@ -300,7 +215,7 @@ class DownLoad extends ModelBase
 	/**
 	 * 用户删除下载任务
 	 * @param I $uid
-	 * @param I $albumid    
+	 * @param I $albumid
 	 * @param I $taskid
 	 * @return boolean
 	 */

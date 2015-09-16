@@ -68,9 +68,7 @@ class index extends controller
 			foreach ($hotrecommendres as $value) {
 				$albumid = $value['albumid'];
 				if (!empty($albumlist[$albumid])) {
-				    $albuminfo['id'] = $albumlist[$albumid]['id'];
-				    $albuminfo['title'] = $albumlist[$albumid]['title'];
-				    $albuminfo['cover'] = $albumlist[$albumid]['cover'];
+				    $albuminfo = $albumlist[$albumid];
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
 				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;
@@ -83,9 +81,7 @@ class index extends controller
 			foreach ($sameageres as $value) {
 				$albumid = $value['albumid'];
 				if (!empty($albumlist[$albumid])) {
-				    $albuminfo['id'] = $albumlist[$albumid]['id'];
-				    $albuminfo['title'] = $albumlist[$albumid]['title'];
-				    $albuminfo['cover'] = $albumlist[$albumid]['cover'];
+				    $albuminfo = $albumlist[$albumid];
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
 				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;
@@ -98,9 +94,7 @@ class index extends controller
 			foreach ($newonlineres as $value) {
 				$albumid = $value['albumid'];
 				if (!empty($albumlist[$albumid])) {
-				    $albuminfo['id'] = $albumlist[$albumid]['id'];
-				    $albuminfo['title'] = $albumlist[$albumid]['title'];
-				    $albuminfo['cover'] = $albumlist[$albumid]['cover'];
+				    $albuminfo = $albumlist[$albumid];
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
 				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;

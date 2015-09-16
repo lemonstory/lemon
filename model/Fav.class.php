@@ -3,6 +3,7 @@ class Fav extends ModelBase
 {
 	public $MAIN_DB_INSTANCE = 'share_main';
 	public $FAV_TABLE_NAME = 'user_fav';
+	public $FAV_ALBUM_COUNT_TABLE_NAME = 'album_fav_count';
 	public $CACHE_INSTANCE = 'cache';
 	
 	/**
@@ -80,6 +81,61 @@ class Fav extends ModelBase
 	
 	
 	/**
+	 * 批量获取专辑的收藏总量
+	 * @param A $albumids
+	 * @return array
+	 */
+	public function getAlbumFavCount($albumids)
+	{
+	    if (empty($albumids)) {
+	        return array();
+	    }
+	    if (!is_array($albumids)) {
+	        $albumids = array($albumids);
+	    }
+	     
+	    $albumidstr = implode(",", $albumids);
+	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+	    $sql = "SELECT * FROM {$this->FAV_ALBUM_COUNT_TABLE_NAME} WHERE `albumid` IN ($albumidstr)";
+	    $st = $db->prepare($sql);
+	    $st->execute();
+	    $res = $st->fetchAll(PDO::FETCH_ASSOC);
+	    if (empty($res)) {
+	        return array();
+	    } else {
+	        $list = array();
+	        foreach ($res as $value) {
+	            $list[$value['albumid']] = $value;
+	        }
+	        return $list;
+	    }
+	}
+	
+	/**
+	 * 获取用户的收藏专辑总数
+	 * @param I $uid
+	 * @return I
+	 */
+	public function getUserFavCount($uid)
+	{
+	    if (empty($uid)) {
+	        return 0;
+	    }
+	    
+	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+	    $sql = "SELECT COUNT(*) FROM {$this->FAV_ALBUM_COUNT_TABLE_NAME} WHERE `uid` = ?";
+	    $st = $db->prepare($sql);
+	    $st->execute(array($uid));
+	    $res = $st->fetch(PDO::FETCH_COLUMN);
+	    if (empty($res)) {
+	        return 0;
+	    } else {
+	        return $res;
+	    }
+	}
+	
+	
+	/**
 	 * 用户添加收藏
 	 * @param I $uid
 	 * @param I $albumid	专辑id
@@ -98,6 +154,12 @@ class Fav extends ModelBase
 			VALUES (?, ?, ?)";
 		$st = $db->prepare($sql);
 		$res = $st->execute(array($uid, $albumid, $addtime));
+		if (empty($res)) {
+		    return false;
+		}
+		
+		// 更新专辑的收藏总数
+		$this->addAlbumFavNum($albumid);
 		return $res;
 	}
 	
@@ -121,4 +183,34 @@ class Fav extends ModelBase
 	    return $res;
 	}
 	
+	
+	/**
+	 * 统计，专辑的收藏总数
+	 * @param I $albumid
+	 * @return boolean
+	 */
+	private function addAlbumFavNum($albumid)
+	{
+	    if (empty($albumid)) {
+	        $this->setError(ErrorConf::paramError());
+	        return false;
+	    }
+	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+	     
+	    $selectsql = "SELECT * FROM `{$this->FAV_ALBUM_COUNT_TABLE_NAME}` WHERE `albumid` = ?";
+	    $selectst = $db->prepare($selectsql);
+	    $selectst->execute(array($albumid));
+	    $selectres = $selectst->fetch(PDO::FETCH_ASSOC);
+	    if (empty($selectres)) {
+	        $sql = "INSERT INTO `{$this->FAV_ALBUM_COUNT_TABLE_NAME}` (`albumid`, `num`) VALUES ('{$albumid}', 1)";
+	    } else {
+	        $sql = "UPDATE `{$this->FAV_ALBUM_COUNT_TABLE_NAME}` SET `num` = `num` + 1 WHERE `albumid` = '{$albumid}'";
+	    }
+	    $st = $db->prepare($sql);
+	    $numres = $st->execute();
+	    if (empty($numres)) {
+	        return false;
+	    }
+	    return true;
+	}
 }

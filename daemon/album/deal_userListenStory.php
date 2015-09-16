@@ -20,7 +20,7 @@ class deal_userListenStory extends DaemonBase {
 	    
 	    $listenobj = new Listen();
 	    // 检测是否已收听过
-	    $listeninfo = $listenobj->getUserListenInfoByStoryId($uid, $storyid);
+	    $listeninfo = $listenobj->getUserListenStoryInfo($uid, $storyid);
 	    if (empty($listeninfo)) {
 	        $userobj = new User();
 	        $userinfo = current($userobj->getUserInfo($uid));
