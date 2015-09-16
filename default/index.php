@@ -73,7 +73,7 @@ class index extends controller
 				    $albuminfo['cover'] = $albumlist[$albumid]['cover'];
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
-				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num'];
+				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;
 				    }
 					$hotrecommendlist[] = $albuminfo;
 				}
@@ -88,7 +88,7 @@ class index extends controller
 				    $albuminfo['cover'] = $albumlist[$albumid]['cover'];
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
-				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num'];
+				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;
 				    }
 					$sameagealbumlist[] = $albuminfo;
 				}
@@ -103,7 +103,7 @@ class index extends controller
 				    $albuminfo['cover'] = $albumlist[$albumid]['cover'];
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
-				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num'];
+				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;
 				    }
 					$newalbumlist[] = $albuminfo;
 				}
