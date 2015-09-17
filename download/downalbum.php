@@ -8,10 +8,6 @@ class downalbum extends controller
     public function action()
     {
         $albumid = $this->getRequest("albumid");
-        $uid = $this->getUid();
-        if (empty($uid)) {
-            $this->showErrorJson(ErrorConf::noLogin());
-        }
         if (empty($albumid)) {
             $this->showErrorJson(ErrorConf::paramError());
         }

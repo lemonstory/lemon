@@ -8,10 +8,6 @@ class downstory extends controller
     public function action()
     {
         $storyid = $this->getRequest("storyid");
-        $uid = $this->getUid();
-        if (empty($uid)) {
-            $this->showErrorJson(ErrorConf::noLogin());
-        }
         if (empty($storyid)) {
             $this->showErrorJson(ErrorConf::paramError());
         }
