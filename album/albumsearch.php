@@ -5,6 +5,14 @@ class albumsearch extends controller
     public function action()
     {
         $searchcontent = $this->getRequest("searchcontent");
+        if (empty($searchcontent)) {
+            $this->showErrorJson(ErrorConf::paramError());
+        }
+        
+        // add search count
+        $searchcountobj = new SearchCount();
+        $searchcountobj->addSearchContentCount($searchcontent);
+        
         $searchobj = new OpenSearch();
         $albumids = $searchobj->searchAlbum($searchcontent);
         if (empty($albumids)) {
@@ -20,8 +28,7 @@ class albumsearch extends controller
         $aliossobj = new AliOss();
         $searchlist = array();
         foreach ($albumlist as $value) {
-            $info['id'] = $value['id'];
-            $info['title'] = $value['title'];
+            $info = $value;
             $info['cover'] = $aliossobj->getImageUrlNg($value['cover']);
             $searchlist[] = $info;
         }
