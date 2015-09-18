@@ -142,9 +142,12 @@ class OpenSearch
     }
     
     private function getClientinfo() {
-        $client = new CloudsearchClient('QHzux6QVXjQgfBNM', 'diWfijmBbiGlwle1s9KyAL8BQhB3Qc', array(
-                'host' => 'http://opensearch.aliyuncs.com' 
-        ), 'aliyun');
+        $client = new CloudsearchClient(
+                $_SERVER['CONFIG']['opensearch_accessKeyId'],
+                $_SERVER['CONFIG']['opensearch_accessKeySecret'], 
+                array('host' => 'http://opensearch.aliyuncs.com' ),
+                'aliyun'
+                );
         return $client;
     }
 }
