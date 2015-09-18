@@ -7,7 +7,7 @@ class test extends controller
         $comment = new Comment();
         $albumcountarr = $comment->countAlbumComment(array(1,2,3));
         var_dump($albumcountarr);
-    	$story = new Story();
+        $story = new Story();
         $storylist = $story->getListByIds(1);
         var_dump($storylist);
         exit;
