@@ -3,6 +3,7 @@ class User extends ModelBase
 {
 	public $PASSPORT_DB_INSTANCE = 'share_main';
 	public $USER_INFO_TABLE_NAME = 'user_info';
+	//public $USER_IMSI_INFO_TABLE_NAME = 'user_imsi_info';
 	public $CACHE_INSTANCE = 'cache';
 	
 	public $TYPE_QQ = 1;
@@ -90,6 +91,29 @@ class User extends ModelBase
 	}
 	
 	
+	/**
+	 * 获取指定imsi的最近登录账户的关联记录
+	 * @param S $imsi
+	 * @return array
+	 */
+	/* public function getUserImsiInfoByImsi($imsi)
+	{
+	    if (empty($imsi)) {
+	        return array();
+	    }
+	    
+	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+	    $sql = "select * from {$this->USER_IMSI_INFO_TABLE_NAME} where `imsi` = ? order by `lastlogintime` desc limit 1";
+	    $st = $db->prepare ( $sql );
+	    $st->execute (array($imsi));
+	    $list = $st->fetch( PDO::FETCH_ASSOC );
+	    if (empty($list)) {
+	        return array();
+	    }
+	    return $list;
+	} */
+	
+	
 	public function setAvatar($file, $uid)
 	{
 		if(empty($file)) {
@@ -168,6 +192,52 @@ class User extends ModelBase
 		
 		return true;
 	}
+	
+	
+	/**
+	 * 添加用户的imsi与uid的对应关系记录
+	 * @param S $imsi    手机设备唯一标识
+	 * @param I $uid     用户uid，未登录的用户为0
+	 * @return boolean
+	 */
+	/* public function addUserImsiInfo($imsi, $uid = 0)
+	{
+	    if (empty($imsi)) {
+	        return false;
+	    }
+	    
+	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+	    $sql = "INSERT INTO `{$this->USER_IMSI_INFO_TABLE_NAME}` (`uid`, `imsi`, `lastlogintime`) VALUES (?, ?, ?)";
+	    $st = $db->prepare ( $sql );
+	    $res = $st->execute (array($uid, $imsi, time()));
+	    if (empty($res)) {
+	        return false;
+	    }
+	    $uimid = $db->lastInsertId() + 0;
+	    return $uimid;
+	} */
+	
+	/**
+	 * 登录状态下，更新imsi设备的最近登录的Uid
+	 * @param S $imsi
+	 * @param I $uid
+	 * @return boolean
+	 */
+	/* public function updateUidByImsi($imsi, $uid)
+	{
+	    if (empty($imsi) || empty($uid)) {
+	        return false;
+	    }
+	    
+	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+	    $sql = "UPDATE `{$this->USER_IMSI_INFO_TABLE_NAME}` SET `uid` = ?, `lastlogintime` = ? WHERE `imsi` = ?";
+	    $st = $db->prepare ( $sql );
+	    $res = $st->execute (array($uid, time(), $imsi));
+	    if (empty($res)) {
+	        return false;
+	    }
+	    return true;
+	} */
 	
 	/*public function moveAvatarImage($uid)
 	{

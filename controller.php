@@ -115,6 +115,39 @@ abstract class controller
         return $uid;
     }
     
+    protected function getUimid()
+    {
+        $uid = $this->getUid();
+        $userobj = new User();
+        if (empty($uid)) {
+            $userAgent = @$_SERVER['HTTP_USER_AGENT'];
+            if (empty($userAgent)) {
+                return 0;
+            }
+            $agentArr = explode('/', $userAgent); // agent头
+            if (empty($agentArr)) {
+                return 0;
+            }
+            // 设备唯一标识imsi
+            $imsi = '';
+            if (empty($imsi)) {
+                return 0;
+            }
+            
+            $uiminfo = $userobj->getUserImsiInfoByImsi($imsi);
+            if (empty($uiminfo)) {
+                $uimid = $userobj->addUserImsiInfo($imsi, $uid);
+            } else {
+                $uiminfo = current($uiminfo);
+                $uimid = $uiminfo['uimi'];
+            }
+        } else {
+            
+        }
+        
+        return $uimid;
+    }
+    
     abstract  function action();
     
     
