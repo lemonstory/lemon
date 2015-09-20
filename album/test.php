@@ -5,6 +5,10 @@ class test extends controller
 {
     function action() {
         $comment = new Comment();
+        $r = $comment->getStarLevel(2);
+        var_dump($r);
+        exit;
+        
         $albumcountarr = $comment->countAlbumComment(array(1,2,3));
         var_dump($albumcountarr);
         $story = new Story();

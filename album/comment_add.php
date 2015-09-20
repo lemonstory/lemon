@@ -23,11 +23,11 @@ class comment_add extends controller
         	$this->showErrorJson(ErrorConf::CommentStarLevelIsError());
         }
     	
-    	// $userobj = new User();
-    	// $userinfo = current($userobj->getUserInfo($uid));
-    	// if (empty($userinfo)) {
-    	//     $this->showErrorJson(ErrorConf::userNoExist());
-    	// }
+    	$userobj = new User();
+    	$userinfo = current($userobj->getUserInfo($uid));
+    	if (empty($userinfo)) {
+    	    $this->showErrorJson(ErrorConf::userNoExist());
+    	}
     	
     	$albuminfo = array();
         $album = new Album();
@@ -42,11 +42,16 @@ class comment_add extends controller
 
         $comment = new Comment();
         $res = $comment->insert(array(
-        	'userid'    => $uid,
-        	'albumid'   => $albumid,
-        	'content'   => $content,
-        	'addtime'   => date('Y-m-d H:i:s'),
+        	'userid'     => $uid,
+        	'albumid'    => $albumid,
+            'content'    => $content,
+        	'star_level' => $star_level,
+        	'addtime'    => date('Y-m-d H:i:s'),
         ));
+        // 更新星级
+        $star_level = $comment->getStarLevel($albumid);
+        $album = new Album();
+        $album->update(array('star_level' => $star_level), " `id`={$albumid} ");
 
         $this->showSuccJson();
     }

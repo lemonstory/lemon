@@ -71,8 +71,36 @@ class Comment extends ModelBase
                     {$tmp_filed}
                 ) VALUES({$tmp_value})";
         $st = $db->query($sql);
-        unset($tmp_value, $tmp_filed);
         return $db->lastInsertId();
+    }
+
+    /**
+     * 获取星级
+     */
+    public function getStarLevel($albumid)
+    {
+        $db = DbConnecter::connectMysql('share_comment');
+        $sql = "SELECT sum(star_level) as star_sum from {$this->table} where `albumid`={$albumid}";
+        $st = $db->query($sql);
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r  = $st->fetchAll();
+        $r  = array_pop($r);
+        if (isset($r['star_sum'])) {
+            $star_sum = $r['star_sum'];
+        } else {
+            $star_sum = 0;
+        }
+        
+
+        $countalbumcomment = $this->countAlbumComment($albumid);
+        if ($countalbumcomment) {
+            $star_level = $star_sum/$countalbumcomment[$albumid];
+        } else {
+            $star_level = 0;
+        }
+        
+        return floor($star_level);
+
     }
 
     /**
