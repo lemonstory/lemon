@@ -8,17 +8,21 @@ class info extends controller
         $album   = new Album();
         $story   = new Story();
         $comment = new Comment();
-        $userstoryrecord = new UserStoryRecord();
+        $useralbumlog = new UserAlbumLog();
+        $useralbumlastlog = new UserAlbumLastlog();
 
         $uid     = $this->getUid();
+        $uid =1;
 
         $album_id = $storyid = $this->getRequest("albumid", "1");;
         $album_info = $album->get_album_info($album_id);
 
-        $result['albuminfo'] = $album->format_to_api($album_info);
-        $playinfo            = $userstoryrecord->get_last_record("`userid`={$uid} and `albumid`={$album_id} ");
-        if ($playinfo) {
-            $playinfo = $userstoryrecord->format_to_api($playinfo);
+        $result['albuminfo']  = $album->format_to_api($album_info);
+        // 获取播放信息
+        $useralbumlastloginfo = $useralbumlastlog->getInfo("`uid`={$uid} and `albumid`={$album_id} ");
+        if ($useralbumlastloginfo) {
+            $useralbumloginfo = $useralbumlog->getInfo("`logid`={$useralbumlastloginfo['lastlogid']}");
+            $playinfo = $useralbumlog->format_to_api($useralbumloginfo);
         } else {
             $playinfo = [];
         }
