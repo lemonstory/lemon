@@ -217,7 +217,7 @@ Class mqs{
             //'x-mqs-version' => self::_getVersion()
             'x-mns-version' => self::_getVersion()
         );
-        $RequestResource = "/queues" . self::$accessQueue . "/messages?" . http_build_query( $data );
+        $RequestResource = "/queues/" . self::$accessQueue . "/messages?" . http_build_query( $data );
         $sign = self::_getSignature( $VERB, $CONTENT_MD5, $CONTENT_TYPE, $GMT_DATE, $CanonicalizedMQSHeaders, $RequestResource );
         $headers = array(
             'Host' => self::_getAccessHost(),
