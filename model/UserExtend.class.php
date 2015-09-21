@@ -252,10 +252,10 @@ class UserExtend extends ModelBase
 	    
 	    $setstr = "";
 	    foreach ($updatedata as $column => $value) {
-	        $setstr .= "`{$column}` = '{$value}', ";
+	        $setstr .= "`{$column}` = '{$value}',";
 	    }
 	    $setstr = rtrim($setstr, ",");
-	     
+	    
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 	    $sql = "UPDATE {$this->BABY_INFO_TABLE_NAME} SET {$setstr} WHERE `id` = ?";
 	    $st = $db->prepare($sql);
