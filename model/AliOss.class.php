@@ -13,8 +13,10 @@ class AliOss extends ModelBase
         'http://lemonpic.oss-cn-hangzhou.aliyuncs.com/',
     );
     public $OSS_BUCKET_AVATAR_DOMAIN = array(
-    	'http://a.xiaoningmeng.me/avatar/',
-    	'http://a.xiaoningmeng.me/avatar/',
+    	//'http://a.xiaoningmeng.me/avatar/',
+    	//'http://a.xiaoningmeng.me/avatar/',
+        'http://http://120.26.52.211/avatar/',
+        'http://http://120.26.52.211/avatar/',
     );
     public $OSS_BUCKET_MEDIA_DOMAIN = array(
         //'http://mf.xiaoningmeng.me/',
