@@ -5,22 +5,16 @@ class userstoryrecord_add extends controller
 {
     function action() {
         $uid = $this->getUid();
-
-        if (empty($uid)) {
-            $this->showErrorJson(ErrorConf::noLogin());
+        $uimid = $this->getUimid($uid);
+        if (empty($uimid)) {
+            $this->showErrorJson(ErrorConf::userImsiIdError());
         }
-
+        
         $albumid   = (int)$this->getRequest('albumid', 0);
         $storyid   = (int)$this->getRequest('storyid', 0);
         $playtimes = (int)$this->getRequest('playtimes', 0);
         if (empty($albumid) || empty($storyid)) {
             $this->showErrorJson(ErrorConf::paramError());
-        }
-        
-        $userobj = new User();
-        $userinfo = current($userobj->getUserInfo($uid));
-        if (empty($userinfo)) {
-            $this->showErrorJson(ErrorConf::userNoExist());
         }
         
         $albuminfo = $storyinfo = array();
@@ -58,11 +52,9 @@ class userstoryrecord_add extends controller
             ));
         }
 
-        $userstoryrecord = new UserStoryRecord();
-
         if (!empty($lastid)) {
             // 添加收听处理队列
-            QueueManager::pushListenStoryQueue($uid, $storyid);
+            MnsQueueManager::pushListenStoryQueue($uimid, $storyid);
         }
 
         $this->showSuccJson();

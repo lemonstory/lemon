@@ -95,6 +95,22 @@ class User extends ModelBase
 	}
 	
 	
+	public function getUserImsiInfoByUimid($uimid)
+	{
+	    if (empty($uimid)) {
+	        return array();
+	    }
+	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+	    $sql = "select * from {$this->USER_IMSI_INFO_TABLE_NAME} where `uimid` = ?";
+	    $st = $db->prepare ( $sql );
+	    $st->execute (array($uimid));
+	    $list = $st->fetch( PDO::FETCH_ASSOC );
+	    if (empty($list)) {
+	        return array();
+	    }
+	    return $list;
+	}
+	
 	/**
 	 * 获取指定imsi的最近登录账户的关联记录
 	 * @param S $resid
@@ -104,7 +120,7 @@ class User extends ModelBase
 	public function getUserImsiInfo($resid, $restype)
 	{
 	    if (empty($resid) || !in_array($restype, array($this->USER_IMSI_INFO_RESTYPE_UID, $this->USER_IMSI_INFO_RESTYPE_IMSI))) {
-	        return false;
+	        return array();
 	    }
 	    
 	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);

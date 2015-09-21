@@ -142,9 +142,8 @@ abstract class controller
             
             $uiminfo = $userobj->getUserImsiInfo($imsi, $userobj->USER_IMSI_INFO_RESTYPE_IMSI);
             if (empty($uiminfo)) {
-                $uimid = $userobj->addUserImsiInfo($resid, $userobj->USER_IMSI_INFO_RESTYPE_IMSI);
+                $uimid = $userobj->addUserImsiInfo($imsi, $userobj->USER_IMSI_INFO_RESTYPE_IMSI);
             } else {
-                $uiminfo = current($uiminfo);
                 $uimid = $uiminfo['uimid'];
             }
         } else {
@@ -155,9 +154,8 @@ abstract class controller
             
             $uiminfo = $userobj->getUserImsiInfo($uid, $userobj->USER_IMSI_INFO_RESTYPE_UID);
             if (empty($uiminfo)) {
-                $uimid = $userobj->addUserImsiInfo($resid, $userobj->USER_IMSI_INFO_RESTYPE_UID);
+                $uimid = $userobj->addUserImsiInfo($uid, $userobj->USER_IMSI_INFO_RESTYPE_UID);
             } else {
-                $uiminfo = current($uiminfo);
                 $uimid = $uiminfo['uimid'];
             }
         }

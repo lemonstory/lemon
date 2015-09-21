@@ -24,9 +24,9 @@ class MnsQueueManager
     /**
      * 收听播放故事队列
      */
-    public static function pushListenStoryQueue($uid, $storyid)
+    public static function pushListenStoryQueue($uimid, $storyid)
     {
-        $res = self::doPush("lemon-userlistenstoryqueue", $uid . ":" . $storyid);
+        $res = self::doPush("lemon-userlistenstoryqueue", $uimid . ":" . $storyid);
         return true;
     }
     public static function popListenStoryQueue()

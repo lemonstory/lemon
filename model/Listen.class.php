@@ -81,7 +81,7 @@ class Listen extends ModelBase
 	
 	
 	/**
-	 * 分页获取uid或设备收听的专辑列表
+	 * 分页获取当前uid或设备，收听的专辑列表
 	 * @param I $uimid
 	 * @param S $direction     up代表显示上边，down代表显示下边
 	 * @param I $startalbumid  从某个专辑开始,默认为0表示从第一页获取
@@ -128,7 +128,7 @@ class Listen extends ModelBase
 	
 	
 	/**
-	 * 获取uid或设备收听的专辑信息
+	 * 获取当前uid或设备，收听的专辑信息
 	 * @param I $uimid
 	 * @param I $albumid
 	 * @return array
@@ -243,14 +243,15 @@ class Listen extends ModelBase
 	/**
 	 * 延迟队列执行，uid或设备收听播放某个故事
 	 * @param I $uimid
+	 * @param I $uid            未登录收听为0
 	 * @param I $albumid    	专辑Id
 	 * @param I $storyid		故事id
-	 * @param I $babyagetype	收听用户的宝宝年龄段类型
+	 * @param I $babyagetype	收听用户的宝宝年龄段类型，未登录为0
 	 * @return boolean
 	 */
-	public function addUserListenStory($uimid, $albumid, $storyid, $babyagetype)
+	public function addUserListenStory($uimid, $uid, $albumid, $storyid, $babyagetype)
 	{
-		if (empty($uimid) || empty($albumid) || empty($storyid) || empty($babyagetype)) {
+		if (empty($uimid) || empty($albumid) || empty($storyid)) {
 			$this->setError(ErrorConf::paramError());
 			return false;
 		}
@@ -268,10 +269,13 @@ class Listen extends ModelBase
 		
 		// 收听专辑记录
 		$this->addUserListenAlbum($uimid, $albumid);
-		// 更新用户收听总数
-		$this->addUserListenCount($uimid);
-		// 更新不同年龄段的，专辑的收听次数
-		$this->addAlbumListenCount($albumid, $babyagetype);
+	    // 更新专辑的收听次数
+	    $this->addAlbumListenCount($albumid, $babyagetype);
+		
+		if (!empty($uid)) {
+		    // 登录账户：更新用户收听总数
+		    $this->addUserListenCount($uid);
+		}
 		return true;
 	}
 	
@@ -304,26 +308,26 @@ class Listen extends ModelBase
 	
 	
 	/**
-	 * 统计uid或设备的收听总数
-	 * @param I $uimid
+	 * 统计用户的收听总数，排行榜不统计设备的收听总数
+	 * @param I $uid
 	 * @return boolean
 	 */
-	private function addUserListenCount($uimid)
+	private function addUserListenCount($uid)
 	{
-	    if (empty($uimid)) {
+	    if (empty($uid)) {
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 	    
-	    $selectsql = "SELECT * FROM `{$this->LISTEN_USER_COUNT_TABLE_NAME}` WHERE `uimid` = ?";
+	    $selectsql = "SELECT * FROM `{$this->LISTEN_USER_COUNT_TABLE_NAME}` WHERE `uid` = ?";
 	    $selectst = $db->prepare($selectsql);
 	    $selectst->execute(array($uimid));
 	    $selectres = $selectst->fetch(PDO::FETCH_ASSOC);
 	    if (empty($selectres)) {
-	        $sql = "INSERT INTO `{$this->LISTEN_USER_COUNT_TABLE_NAME}` (`uimid`, `num`) VALUES ('{$uimid}', 1)";
+	        $sql = "INSERT INTO `{$this->LISTEN_USER_COUNT_TABLE_NAME}` (`uid`, `num`) VALUES ('{$uid}', 1)";
 	    } else {
-	        $sql = "UPDATE `{$this->LISTEN_USER_COUNT_TABLE_NAME}` SET `num` = `num` + 1 WHERE `uimid` = '{$uimid}'";
+	        $sql = "UPDATE `{$this->LISTEN_USER_COUNT_TABLE_NAME}` SET `num` = `num` + 1 WHERE `uid` = '{$uid}'";
 	    }
 		$st = $db->prepare($sql);
 		$usernumres = $st->execute();
@@ -334,14 +338,15 @@ class Listen extends ModelBase
 	}
 	
     /**
-     * 统计不同年龄段的，专辑的收听总数
+     * 统计专辑的收听总数
+     * Redis:更新某个年龄段的专辑收听次数排行队列，用于同龄在听的后台自动生成数据cron
      * @param I $albumid
-     * @param I $babyagetype
+     * @param I $babyagetype    当前登录用户的宝宝年龄段，未登录为0
      * @return boolean
      */
-    private function addAlbumListenCount($albumid, $babyagetype)
+    private function addAlbumListenCount($albumid, $babyagetype = 0)
 	{
-	    if (empty($albumid) || empty($babyagetype)) {
+	    if (empty($albumid)) {
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
@@ -352,7 +357,7 @@ class Listen extends ModelBase
 	    $selectst->execute(array($albumid));
 	    $selectres = $selectst->fetch(PDO::FETCH_ASSOC);
 	    if (empty($selectres)) {
-	        $sql = "INSERT INTO `{$this->LISTEN_ALBUM_COUNT_TABLE_NAME}` (`albumid`, `agetype`, `num`) VALUES ('{$albumid}', '{$babyagetype}', 1)";
+	        $sql = "INSERT INTO `{$this->LISTEN_ALBUM_COUNT_TABLE_NAME}` (`albumid`, `num`) VALUES ('{$albumid}', 1)";
 	    } else {
 	        $sql = "UPDATE `{$this->LISTEN_ALBUM_COUNT_TABLE_NAME}` SET `num` = `num` + 1 WHERE `albumid` = '{$albumid}'";
 	    }
@@ -362,10 +367,13 @@ class Listen extends ModelBase
 		    return false;
 		}
 		
-		// cache: 某个年龄段的专辑收听次数排行队列
-		$listenalbumkey = RedisKey::getRankListenAlbumKey($babyagetype);
-		$redisObj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
-		$redisObj->zIncrBy($listenalbumkey, 1, $albumid);
+		if (!empty($babyagetype)) {
+    		// list: 更新某个年龄段的专辑收听次数排行队列
+    		$listenalbumkey = RedisKey::getRankListenAlbumKey($babyagetype);
+    		$redisObj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+    		$redisObj->zIncrBy($listenalbumkey, 1, $albumid);
+		}
+		
 		return true;
 	}
 }

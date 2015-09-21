@@ -38,7 +38,7 @@ class SearchCount extends ModelBase
         if (empty($selectres)) {
             $sql = "INSERT INTO `{$this->SEARCH_COUNT_TABLE_NAME}` (`searchcontent`, `count`) VALUES ('{$searchcontent}', 1)";
         } else {
-            $sql = "UPDATE `{$this->LISTEN_ALBUM_COUNT_TABLE_NAME}` SET `count` = `count` + 1 WHERE `searchcontent` = '{$searchcontent}'";
+            $sql = "UPDATE `{$this->SEARCH_COUNT_TABLE_NAME}` SET `count` = `count` + 1 WHERE `searchcontent` = '{$searchcontent}'";
         }
         $st = $db->prepare($sql);
         $countres = $st->execute();

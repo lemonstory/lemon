@@ -12,29 +12,43 @@ class deal_userListenStory extends DaemonBase {
 	        return true;
 	    }
 	    $queuearr = explode(":", $queuevalue);
-	    $uid = $queuearr[0];
+	    $uimid = $queuearr[0];
 	    $storyid = $queuearr[1];
-	    if (empty($uid) || empty($storyid)) {
+	    if (empty($uimid) || empty($storyid)) {
 	        return true;
 	    }
 	    
 	    $listenobj = new Listen();
 	    // 检测是否已收听过
-	    $listeninfo = $listenobj->getUserListenStoryInfo($uid, $storyid);
+	    $listeninfo = $listenobj->getUserListenStoryInfo($uimid, $storyid);
 	    if (empty($listeninfo)) {
 	        $userobj = new User();
-	        $userinfo = current($userobj->getUserInfo($uid));
-	        if (empty($userinfo)) {
+	        $uiminfo = $userobj->getUserImsiInfoByUimid($uimid);
+	        if (empty($uiminfo)) {
 	            return true;
 	        }
-	        $babyid = $userinfo['defaultbabyid'];
+	        $resid = $uiminfo['resid'];
+	        $restype = $uiminfo['restype'];
 	        
-	        $userextobj = new UserExtend();
-	        $babyinfo = $userextobj->getUserBabyInfo($babyid);
-	        if (empty($babyinfo)) {
-	            return true;
+	        if ($restype == $userobj->USER_IMSI_INFO_RESTYPE_UID) {
+	            // 登录后的收听
+	            $uid = $resid;
+    	        $userinfo = current($userobj->getUserInfo($uid));
+    	        if (empty($userinfo)) {
+    	            return true;
+    	        }
+    	        $babyid = $userinfo['defaultbabyid'];
+    	        
+    	        $userextobj = new UserExtend();
+    	        $babyinfo = $userextobj->getUserBabyInfo($babyid);
+    	        if (empty($babyinfo)) {
+    	            return true;
+    	        }
+    	        $babyagetype = $userextobj->getBabyAgeType($babyinfo['age']);
+	        } else {
+	            // 未登录的收听
+	            $babyagetype = 0;
 	        }
-	        $babyagetype = $userextobj->getBabyAgeType($babyinfo['age']);
 	        
 	        $story = new Story();
             $storyinfo = $story->get_story_info($storyid);
@@ -44,7 +58,7 @@ class deal_userListenStory extends DaemonBase {
             $albumid = $storyinfo['albumid'];
             
             // 添加收听记录
-	        $listenobj->addUserListenStory($uid, $albumid, $storyid, $babyagetype);
+	        $listenobj->addUserListenStory($uimid, $uid, $albumid, $storyid, $babyagetype);
 	    }
 	}
 

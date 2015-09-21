@@ -13,6 +13,10 @@ class mystory extends controller
         $len = $this->getRequest("len", 0);
         
         $uid = $this->getUid();
+        if (empty($uid)) {
+            // 未登录返回空数据
+            $this->showSuccJson();
+        }
         $uimid = $this->getUimid($uid);
         if (empty($uimid)) {
             $this->showErrorJson(ErrorConf::userImsiIdError());
