@@ -32,7 +32,7 @@ class getuserinfo extends controller
         $aliossobj = new AliOss();
         $data['uid'] = $userinfo['uid'];
         $data['nickname'] = $userinfo['nickname'];
-        $data['avatar'] = $aliossobj->getAvatarUrl($uid, $data['avatartime']);
+        $data['avatartime'] = $userinfo['avatartime'];
         $data['province'] = $userinfo['province'];
         $data['city'] = $userinfo['city'];
         $data['area'] = $userinfo['area'];

@@ -36,7 +36,7 @@ class ranklistenuserlist extends controller
             if (!empty($userlist[$uid])) {
                 $info['uid'] = $value['uid'];
                 $info['num'] = $value['num'];
-                $info['avatar'] = $userlist[$uid]['avatar'];
+                $info['avatartime'] = $userlist[$uid]['avatartime'];
                 $info['nickname'] = $userlist[$uid]['nickname'];
                 $list[$uid] = $info;
             }

@@ -32,7 +32,6 @@ class gethomeinfo extends controller
             
             $aliossobj = new AliOss();
             $data = $userinfo;
-            $data['avatar'] = $aliossobj->getAvatarUrl($uid, $data['avatartime']);
         }
         
         $listenalbumlist = array();
