@@ -138,6 +138,40 @@ class UserStoryRecord extends ModelBase
     }
 
     /**
+     * 获取播放信息通过专辑ID
+     */
+    public function getPlayInfoByAlbumIds($albumid = array())
+    {
+        $albumplayinfo = array();
+
+        if (!$albumid) {
+            return array();
+        }
+        if (!is_array($albumid)) {
+            $albumid = array($albumid);
+        }
+
+        $db = DbConnecter::connectMysql('share_story');
+        
+        foreach ($albumid as $k => $v) {
+            $sql = "select * from {$this->table}  where `id`={$v} order by id DESC limit 1";
+            $st = $db->query( $sql );
+            $st->setFetchMode(PDO::FETCH_ASSOC);
+            $r = $st->fetchAll();
+            $r  = array_pop($r);
+            if ($r) {
+                $albumplayinfo[$v] = $r;
+            } else {
+                $albumplayinfo[$v] = array();
+            }
+            
+        }
+
+        return $albumplayinfo;
+        
+    }
+
+    /**
      * 获取封面信息
      */
     public function get_info($user_story_record_id = 0, $filed = '')
