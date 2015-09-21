@@ -3,8 +3,6 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
-        MnsQueueManager::pushActionLogQueue("10001", "login");
-        die();
         $type = $this->getRequest("type");
         
         if ($type == 1) {

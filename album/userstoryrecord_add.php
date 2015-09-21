@@ -52,7 +52,7 @@ class userstoryrecord_add extends controller
         
         if (!empty($res)) {
             // 添加收听处理队列
-            QueueManager::pushListenStoryQueue($uid, $storyid);
+            MnsQueueManager::pushListenStoryQueue($uid, $storyid);
         }
 
         $this->showSuccJson();

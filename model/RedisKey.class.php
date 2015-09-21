@@ -96,22 +96,4 @@ class RedisKey
 	    return $idarr;
 	}
 	
-	
-	/**
-	 * 用户收听播放故事，延迟处理数据队列
-	 * @return string
-	 */
-	public static function getUserListenStoryQueueKey()
-	{
-	    return "userlistenstoryqueue";
-	}
-	
-	/**
-	 * 专辑数据，添加到opensearch表队列
-	 * @return string
-	 */
-	public static function getAlbumToSearchQueueKey()
-	{
-	    return "albumtosearch";
-	}
 }

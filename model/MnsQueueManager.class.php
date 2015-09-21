@@ -21,6 +21,35 @@ class MnsQueueManager
     }
     
     
+    /**
+     * 收听播放故事队列
+     */
+    public static function pushListenStoryQueue($uid, $storyid)
+    {
+        $res = self::doPush("lemon-userlistenstoryqueue", $uid . ":" . $storyid);
+        return true;
+    }
+    public static function popListenStoryQueue()
+    {
+        return self::doPop('lemon-userlistenstoryqueue');
+    }
+    
+    
+    /**
+     * 添加专辑数据到opensearch
+     */
+    public static function pushAlbumToSearchQueue($storyid)
+    {
+        $res = self::doPush("lemon-albumtosearch", $storyid);
+        return true;
+    }
+    public static function popAlbumToSearchQueue()
+    {
+        return self::doPop('lemon-albumtosearch');
+    }
+    
+    
+    
     protected static function doPop($business) 
     {
         $queueobj = self::connectQueue($business);
