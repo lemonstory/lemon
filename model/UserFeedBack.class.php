@@ -98,6 +98,32 @@ class UserFeedback extends ModelBase
     }
 
     /**
+     * 获取封面信息
+     */
+    public function getInfo($feedback_id = 0, $filed = '')
+    {
+        if (!$feedback_id) {
+            return array();
+        }
+        $where = "`id`={$feedback_id}";
+        $sql = "select * from {$this->table}  where {$where} limit 1";
+
+        $db = DbConnecter::connectMysql('share_main');
+        $st = $db->query( $sql );
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r  = $st->fetchAll();
+        $r  = array_pop($r);
+        if ($filed) {
+            if (isset($r[$filed])) {
+                return $r[$filed];
+            } else {
+                return '';
+            }
+        }
+        return $r;
+    }
+
+    /**
      * 获取列表
      */
     public function get_list($where = '', $limit = '', $filed = '')
@@ -119,84 +145,6 @@ class UserFeedback extends ModelBase
             return $arr;
         } else {
             return $r;
-        }
-    }
-
-    /**
-     * 批量获取专辑信息
-     */
-    public function getListByIds($id = 0, $uid = 0)
-    {
-        if (is_array($id)) {
-            $idarr = $id;
-        } else {
-            $idarr = array($id);
-        }
-        $albumlist = array();
-        $fav = new Fav();
-        $db = DbConnecter::connectMysql('share_main');
-        foreach($idarr as $k => $v) {
-            if (isset($albumlist[$v])) {
-                continue;
-            }
-            $sql = "select * from {$this->table}  where `id`='{$v}' limit 1";
-            $st = $db->query( $sql );
-            $st->setFetchMode(PDO::FETCH_ASSOC);
-            $r  = $st->fetchAll();
-            $r  = array_pop($r);
-            if ($r) {
-                if (!$r['cover']) {
-                    $r['cover'] = $r['s_cover'];
-                }
-                $favinfo = $fav->getUserFavInfoByFeedbackId($uid, $r['id']);
-                if ($favinfo) {
-                    $r['fav'] = 1;
-                } else {
-                    $r['fav'] = 0;
-                }
-                $albumlist[$r['id']] = $r;
-            }
-        }
-        return $albumlist;
-    }
-
-    /**
-     * 获取用户专辑列表
-     * @param I $uid
-     * @param S $direction     up代表显示上边，down代表显示下边
-     * @param I $startid       从某个id开始,默认为0表示从第一页获取
-     * @param I $len           获取长度
-     * @return array
-     */
-    public function getFeedbackList( $direction = "down", $startid = 0, $len = 20, $uid = 0)
-    {
-        // if (empty($uid)) {
-        //     $this->setError(ErrorConf::paramError());
-        //     return array();
-        // }
-        if (empty($len)) {
-            $len = 20;
-        }
-        
-        $where = "`is_show`=1 AND `status` = '1'";
-        if (!empty($startid)) {
-            if ($direction == "up") {
-                $where .= " AND `id` > '{$startid}' ";
-            } else {
-                $where .= " AND `id` < '{$startid}' ";
-            }
-        }
-        // $where .= " `uid` = '{$uid}'";
-        
-        $db = DbConnecter::connectMysql('share_main');
-        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY `id` DESC LIMIT {$len}";
-        $st = $db->prepare($sql);
-        $st->execute();
-        $res = $st->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($res)) {
-            return array();
-        } else {
-            return $res;
         }
     }
 }
