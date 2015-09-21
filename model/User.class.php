@@ -3,7 +3,7 @@ class User extends ModelBase
 {
 	public $PASSPORT_DB_INSTANCE = 'share_main';
 	public $USER_INFO_TABLE_NAME = 'user_info';
-	//public $USER_IMSI_INFO_TABLE_NAME = 'user_imsi_info';
+	public $USER_IMSI_INFO_TABLE_NAME = 'user_imsi_info';
 	public $CACHE_INSTANCE = 'cache';
 	
 	public $TYPE_QQ = 1;
@@ -14,6 +14,10 @@ class User extends ModelBase
 	public $STATUS_FORZEN = -1; // 冻结
 	public $STATUS_FORBITEN = -2; // 封号
 	public $STATUS_DELETE = -3; // 删除
+	
+	public $USER_IMSI_INFO_RESTYPE_UID = 1;
+	public $USER_IMSI_INFO_RESTYPE_IMSI = 2;
+	
 	
 	public function initQQLoginUser($uid, $nickname, $avatartime, $birthday, $gender, $province, $city, $type, $addtime)
 	{
@@ -93,25 +97,26 @@ class User extends ModelBase
 	
 	/**
 	 * 获取指定imsi的最近登录账户的关联记录
-	 * @param S $imsi
+	 * @param S $resid
+	 * @param I $restype    1为uid, 2为imsi
 	 * @return array
 	 */
-	/* public function getUserImsiInfoByImsi($imsi)
+	public function getUserImsiInfo($resid, $restype)
 	{
-	    if (empty($imsi)) {
-	        return array();
+	    if (empty($resid) || !in_array($restype, array($this->USER_IMSI_INFO_RESTYPE_UID, $this->USER_IMSI_INFO_RESTYPE_IMSI))) {
+	        return false;
 	    }
 	    
 	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-	    $sql = "select * from {$this->USER_IMSI_INFO_TABLE_NAME} where `imsi` = ? order by `lastlogintime` desc limit 1";
+	    $sql = "select * from {$this->USER_IMSI_INFO_TABLE_NAME} where `resid` = ? and `restype` = ?";
 	    $st = $db->prepare ( $sql );
-	    $st->execute (array($imsi));
+	    $st->execute (array($resid, $restype));
 	    $list = $st->fetch( PDO::FETCH_ASSOC );
 	    if (empty($list)) {
 	        return array();
 	    }
 	    return $list;
-	} */
+	}
 	
 	
 	public function setAvatar($file, $uid)
@@ -195,49 +200,28 @@ class User extends ModelBase
 	
 	
 	/**
-	 * 添加用户的imsi与uid的对应关系记录
-	 * @param S $imsi    手机设备唯一标识
-	 * @param I $uid     用户uid，未登录的用户为0
+	 * 添加用户的imsi或uid的唯一记录
+	 * @param S $resid       手机设备唯一标识或uid
+	 * @param I $restype     1为uid, 2为imsi
 	 * @return boolean
 	 */
-	/* public function addUserImsiInfo($imsi, $uid = 0)
+	public function addUserImsiInfo($resid, $restype)
 	{
-	    if (empty($imsi)) {
+	    if (empty($resid) || !in_array($restype, array($this->USER_IMSI_INFO_RESTYPE_UID, $this->USER_IMSI_INFO_RESTYPE_IMSI))) {
 	        return false;
 	    }
 	    
 	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-	    $sql = "INSERT INTO `{$this->USER_IMSI_INFO_TABLE_NAME}` (`uid`, `imsi`, `lastlogintime`) VALUES (?, ?, ?)";
+	    $sql = "INSERT INTO `{$this->USER_IMSI_INFO_TABLE_NAME}` (`resid`, `restype`) VALUES (?, ?)";
 	    $st = $db->prepare ( $sql );
-	    $res = $st->execute (array($uid, $imsi, time()));
+	    $res = $st->execute (array($resid, $restype));
 	    if (empty($res)) {
 	        return false;
 	    }
 	    $uimid = $db->lastInsertId() + 0;
 	    return $uimid;
-	} */
+	}
 	
-	/**
-	 * 登录状态下，更新imsi设备的最近登录的Uid
-	 * @param S $imsi
-	 * @param I $uid
-	 * @return boolean
-	 */
-	/* public function updateUidByImsi($imsi, $uid)
-	{
-	    if (empty($imsi) || empty($uid)) {
-	        return false;
-	    }
-	    
-	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-	    $sql = "UPDATE `{$this->USER_IMSI_INFO_TABLE_NAME}` SET `uid` = ?, `lastlogintime` = ? WHERE `imsi` = ?";
-	    $st = $db->prepare ( $sql );
-	    $res = $st->execute (array($uid, time(), $imsi));
-	    if (empty($res)) {
-	        return false;
-	    }
-	    return true;
-	} */
 	
 	/*public function moveAvatarImage($uid)
 	{

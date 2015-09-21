@@ -9,13 +9,15 @@ class gethomeinfo extends controller
         $direction = $this->getRequest("direction");
         $startalbumid = $this->getRequest("startalbumid");
         $len = $this->getRequest("len");
+        
         $uid = $this->getUid();
-        if (empty($uid)) {
-            $this->showErrorJson(ErrorConf::noLogin());
+        $uimid = $this->getUimid($uid);
+        if (empty($uimid)) {
+            $this->showErrorJson(ErrorConf::userImsiIdError());
         }
         
         $data = array();
-        if ($isgetuserinfo == 1) {
+        if ($isgetuserinfo == 1 && !empty($uid)) {
             $userobj = new User();
             $userinfo = current($userobj->getUserInfo($uid));
             if (empty($userinfo)) {
@@ -36,7 +38,7 @@ class gethomeinfo extends controller
         
         $listenalbumlist = array();
         $listenobj = new Listen();
-        $listenalbumres = $listenobj->getUserAlbumListenList($uid, $direction, $startalbumid, $len);
+        $listenalbumres = $listenobj->getUserAlbumListenList($uimid, $direction, $startalbumid, $len);
         if (!empty($listenalbumres)) {
             $albumids = array();
             $albumlist = array();

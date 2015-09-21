@@ -71,7 +71,7 @@ class Listen extends ModelBase
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 		$sql = "SELECT * FROM {$this->LISTEN_USER_COUNT_TABLE_NAME} ORDER BY `num` DESC LIMIT {$len}";
 		$st = $db->prepare($sql);
-		$st->execute(array($uid, $storyid));
+		$st->execute();
 		$reslist = $st->fetchAll(PDO::FETCH_ASSOC);
 		if (empty($reslist)) {
 			return array();
@@ -81,16 +81,16 @@ class Listen extends ModelBase
 	
 	
 	/**
-	 * 分页获取用户收听的专辑列表
-	 * @param I $uid
+	 * 分页获取uid或设备收听的专辑列表
+	 * @param I $uimid
 	 * @param S $direction     up代表显示上边，down代表显示下边
 	 * @param I $startalbumid  从某个专辑开始,默认为0表示从第一页获取
 	 * @param I $len           获取长度
 	 * @return array
 	 */
-	public function getUserAlbumListenList($uid, $direction = "down", $startalbumid = 0, $len = 20)
+	public function getUserAlbumListenList($uimid, $direction = "down", $startalbumid = 0, $len = 20)
 	{
-		if (empty($uid)) {
+		if (empty($uimid)) {
 		    $this->setError(ErrorConf::paramError());
 			return array();
 		}
@@ -101,9 +101,9 @@ class Listen extends ModelBase
 		    $len = 100;
 		}
 		
-		$where = " `uid` = '{$uid}'";
+		$where = " `uimid` = '{$uimid}'";
 		if (!empty($startalbumid)) {
-		    $startalbuminfo = current($this->getUserListenAlbumInfo($uid, $startalbumid));
+		    $startalbuminfo = current($this->getUserListenAlbumInfo($uimid, $startalbumid));
 		    $startuptime = $startalbuminfo['uptime'];
 		    if (!empty($startuptime)) {
 		        if ($direction == "up") {
@@ -128,22 +128,22 @@ class Listen extends ModelBase
 	
 	
 	/**
-	 * 获取用户收听的专辑信息
-	 * @param I $uid
+	 * 获取uid或设备收听的专辑信息
+	 * @param I $uimid
 	 * @param I $albumid
 	 * @return array
 	 */
-	public function getUserListenAlbumInfo($uid, $albumid)
+	public function getUserListenAlbumInfo($uimid, $albumid)
 	{
-	    if (empty($uid) || empty($albumid)) {
+	    if (empty($uimid) || empty($albumid)) {
 	        $this->setError(ErrorConf::paramError());
 	        return array();
 	    }
 	     
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-	    $sql = "SELECT * FROM {$this->LISTEN_ALBUM_TABLE_NAME} WHERE `uid` = ? and `albumid` = ?";
+	    $sql = "SELECT * FROM {$this->LISTEN_ALBUM_TABLE_NAME} WHERE `uimid` = ? and `albumid` = ?";
 	    $st = $db->prepare($sql);
-	    $st->execute(array($uid, $albumid));
+	    $st->execute(array($uimid, $albumid));
 	    $res = $st->fetch(PDO::FETCH_ASSOC);
 	    if (empty($res)) {
 	        return array();
@@ -154,14 +154,14 @@ class Listen extends ModelBase
 	
 	
 	/**
-	 * 获取用户，指定专辑下收听过的故事列表
-	 * @param I $uid
+	 * 获取uid或设备，指定专辑下收听过的故事列表
+	 * @param I $uimid
 	 * @param I $albumid
 	 * @return array
 	 */
-	public function getUserListenStoryListByAlbumId($uid, $albumids)
+	public function getUserListenStoryListByAlbumId($uimid, $albumids)
 	{
-	    if (empty($uid) || empty($albumids)) {
+	    if (empty($uimid) || empty($albumids)) {
 	        $this->setError(ErrorConf::paramError());
 	        return array();
 	    }
@@ -171,9 +171,9 @@ class Listen extends ModelBase
 	    $albumidstr = implode(",", $albumids);
 	    
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-	    $sql = "SELECT * FROM {$this->LISTEN_RECORD_TABLE_NAME} WHERE `uid` = ? and `albumid` IN ($albumidstr) ORDER BY `uptime` DESC";
+	    $sql = "SELECT * FROM {$this->LISTEN_RECORD_TABLE_NAME} WHERE `uimid` = ? and `albumid` IN ($albumidstr) ORDER BY `uptime` DESC";
 	    $st = $db->prepare($sql);
-	    $st->execute(array($uid));
+	    $st->execute(array($uimid));
 	    $res = $st->fetch(PDO::FETCH_ASSOC);
 	    if (empty($res)) {
 	        return array();
@@ -183,22 +183,22 @@ class Listen extends ModelBase
 	}
 	
 	/**
-	 * 获取用户收听的故事记录
-	 * @param I $uid
+	 * 获取uid或设备收听的故事记录
+	 * @param I $uimid
 	 * @param I $storyid
 	 * @return array
 	 */
-	public function getUserListenStoryInfo($uid, $storyid)
+	public function getUserListenStoryInfo($uimid, $storyid)
 	{
-	    if (empty($uid) || empty($storyid)) {
+	    if (empty($uimid) || empty($storyid)) {
 	        $this->setError(ErrorConf::paramError());
 	        return array();
 	    }
 	    
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-	    $sql = "SELECT * FROM {$this->LISTEN_RECORD_TABLE_NAME} WHERE `uid` = ? and `storyid` = ?";
+	    $sql = "SELECT * FROM {$this->LISTEN_RECORD_TABLE_NAME} WHERE `uimid` = ? and `storyid` = ?";
 	    $st = $db->prepare($sql);
-	    $st->execute(array($uid, $storyid));
+	    $st->execute(array($uimid, $storyid));
 	    $res = $st->fetch(PDO::FETCH_ASSOC);
 	    if (empty($res)) {
 	        return array();
@@ -241,16 +241,16 @@ class Listen extends ModelBase
 	
 	
 	/**
-	 * 延迟队列执行，用户收听播放某个故事
-	 * @param I $uid
+	 * 延迟队列执行，uid或设备收听播放某个故事
+	 * @param I $uimid
 	 * @param I $albumid    	专辑Id
 	 * @param I $storyid		故事id
 	 * @param I $babyagetype	收听用户的宝宝年龄段类型
 	 * @return boolean
 	 */
-	public function addUserListenStory($uid, $albumid, $storyid, $babyagetype)
+	public function addUserListenStory($uimid, $albumid, $storyid, $babyagetype)
 	{
-		if (empty($uid) || empty($albumid) || empty($storyid) || empty($babyagetype)) {
+		if (empty($uimid) || empty($albumid) || empty($storyid) || empty($babyagetype)) {
 			$this->setError(ErrorConf::paramError());
 			return false;
 		}
@@ -258,18 +258,18 @@ class Listen extends ModelBase
 		$addtime = date("Y-m-d H:i:s");
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 		$sql = "REPLACE INTO {$this->LISTEN_RECORD_TABLE_NAME} 
-			(`uid`, `storyid`, `albumid`, `uptime`) 
+			(`uimid`, `storyid`, `albumid`, `uptime`) 
 			VALUES (?, ?, ?, ?)";
 		$st = $db->prepare($sql);
-		$res = $st->execute(array($uid, $storyid, $albumid, time()));
+		$res = $st->execute(array($uimid, $storyid, $albumid, time()));
 		if (empty($res)) {
 		    return false;
 		}
 		
 		// 收听专辑记录
-		$this->addUserListenAlbum($uid, $albumid);
+		$this->addUserListenAlbum($uimid, $albumid);
 		// 更新用户收听总数
-		$this->addUserListenCount($uid);
+		$this->addUserListenCount($uimid);
 		// 更新不同年龄段的，专辑的收听次数
 		$this->addAlbumListenCount($albumid, $babyagetype);
 		return true;
@@ -277,14 +277,14 @@ class Listen extends ModelBase
 	
 	
 	/**
-	 * 用户收听专辑记录
-	 * @param I $uid
+	 * 添加uid或设备收听专辑记录
+	 * @param I $uimid
 	 * @param I $albumid
 	 * @return boolean
 	 */
-	private function addUserListenAlbum($uid, $albumid)
+	private function addUserListenAlbum($uimid, $albumid)
 	{
-	    if (empty($uid) || empty($albumid)) {
+	    if (empty($uimid) || empty($albumid)) {
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
@@ -292,10 +292,10 @@ class Listen extends ModelBase
 	    $addtime = date("Y-m-d H:i:s");
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 	    $sql = "REPLACE INTO {$this->LISTEN_ALBUM_TABLE_NAME}
-    	    (`uid`, `albumid`, `uptime`)
+    	    (`uimid`, `albumid`, `uptime`)
     	    VALUES (?, ?, ?)";
 	    $st = $db->prepare($sql);
-	    $res = $st->execute(array($uid, $albumid, time()));
+	    $res = $st->execute(array($uimid, $albumid, time()));
 	    if (empty($res)) {
 	        return false;
 	    }
@@ -304,26 +304,26 @@ class Listen extends ModelBase
 	
 	
 	/**
-	 * 统计用户的收听总数
-	 * @param I $uid
+	 * 统计uid或设备的收听总数
+	 * @param I $uimid
 	 * @return boolean
 	 */
-	private function addUserListenCount($uid)
+	private function addUserListenCount($uimid)
 	{
-	    if (empty($uid)) {
+	    if (empty($uimid)) {
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 	    
-	    $selectsql = "SELECT * FROM `{$this->LISTEN_USER_COUNT_TABLE_NAME}` WHERE `uid` = ?";
+	    $selectsql = "SELECT * FROM `{$this->LISTEN_USER_COUNT_TABLE_NAME}` WHERE `uimid` = ?";
 	    $selectst = $db->prepare($selectsql);
-	    $selectst->execute(array($uid));
+	    $selectst->execute(array($uimid));
 	    $selectres = $selectst->fetch(PDO::FETCH_ASSOC);
 	    if (empty($selectres)) {
-	        $sql = "INSERT INTO `{$this->LISTEN_USER_COUNT_TABLE_NAME}` (`uid`, `num`) VALUES ('{$uid}', 1)";
+	        $sql = "INSERT INTO `{$this->LISTEN_USER_COUNT_TABLE_NAME}` (`uimid`, `num`) VALUES ('{$uimid}', 1)";
 	    } else {
-	        $sql = "UPDATE `{$this->LISTEN_USER_COUNT_TABLE_NAME}` SET `num` = `num` + 1 WHERE `uid` = '{$uid}'";
+	        $sql = "UPDATE `{$this->LISTEN_USER_COUNT_TABLE_NAME}` SET `num` = `num` + 1 WHERE `uimid` = '{$uimid}'";
 	    }
 		$st = $db->prepare($sql);
 		$usernumres = $st->execute();

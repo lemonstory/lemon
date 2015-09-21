@@ -11,22 +11,18 @@ class mystory extends controller
         $direction = $this->getRequest("direction", "down");
         $startalbumid = $this->getRequest("startalbumid", 0);
         $len = $this->getRequest("len", 0);
-        $uid = $this->getUid();
-        if (empty($uid)) {
-            $this->showErrorJson(ErrorConf::noLogin());
-        }
         
-        $userobj = new User();
-        $userinfo = current($userobj->getUserInfo($uid));
-        if (empty($userinfo)) {
-            $this->showErrorJson(ErrorConf::userNoExist());
+        $uid = $this->getUid();
+        $uimid = $this->getUimid($uid);
+        if (empty($uimid)) {
+            $this->showErrorJson(ErrorConf::userImsiIdError());
         }
         
         // 收听历史列表
         $listenalbumlist = array();
         $listenobj = new Listen();
         $favobj = new Fav();
-        $listenalbumres = $listenobj->getUserAlbumListenList($uid, $direction, $startalbumid, $len);
+        $listenalbumres = $listenobj->getUserAlbumListenList($uimid, $direction, $startalbumid, $len);
         if (!empty($listenalbumres)) {
             $albumids = array();
             $albumlist = array();
@@ -46,9 +42,9 @@ class mystory extends controller
                 $commentobj = new Comment();
                 $albumcommentnum = $commentobj->countAlbumComment($albumids);
                 
-                // 专辑下，用户收听的故事列表
+                // 专辑下，uid或设备收听的故事列表
                 $listenstorylist = array();
-                $listenstoryres = $listenobj->getUserListenStoryListByAlbumId($uid, $albumids);
+                $listenstoryres = $listenobj->getUserListenStoryListByAlbumId($uimid, $albumids);
                 if (!empty($listenstoryres)) {
                     $storyids = array();
                     $storylist = array();
@@ -96,10 +92,13 @@ class mystory extends controller
             }
         }
         
+        $favcount = 0;
         if ($isgetcount == 1) {
             // 我的收藏总数
-            $favcount = $favobj->getUserFavCount($uid);
-            // 我的下载总数
+            if (!empty($uid)) {
+                $favcount = $favobj->getUserFavCount($uid);
+            }
+            // 我的下载总数本地存储
             
         }
         

@@ -75,6 +75,10 @@ class   ErrorConf
 	{
 	    return array('code'=>'100113','desc'=>'添加收货地址错误');
 	}
+	public static function userImsiIdError()
+	{
+	    return array('code'=>'100114','desc'=>'获取uimid错误');
+	}
 	
 	
 	// 上传

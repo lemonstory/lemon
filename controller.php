@@ -115,9 +115,15 @@ abstract class controller
         return $uid;
     }
     
-    protected function getUimid()
+    /**
+     * 获取uid或者设备号的uimid
+     */
+    protected function getUimid($uid = 0)
     {
-        $uid = $this->getUid();
+        if (empty($uid)) {
+            $uid = $this->getUid();
+        }
+        
         $userobj = new User();
         if (empty($uid)) {
             $userAgent = @$_SERVER['HTTP_USER_AGENT'];
@@ -134,15 +140,26 @@ abstract class controller
                 return 0;
             }
             
-            $uiminfo = $userobj->getUserImsiInfoByImsi($imsi);
+            $uiminfo = $userobj->getUserImsiInfo($imsi, $userobj->USER_IMSI_INFO_RESTYPE_IMSI);
             if (empty($uiminfo)) {
-                $uimid = $userobj->addUserImsiInfo($imsi, $uid);
+                $uimid = $userobj->addUserImsiInfo($resid, $userobj->USER_IMSI_INFO_RESTYPE_IMSI);
             } else {
                 $uiminfo = current($uiminfo);
-                $uimid = $uiminfo['uimi'];
+                $uimid = $uiminfo['uimid'];
             }
         } else {
+            $userinfo = current($userobj->getUserInfo($uid));
+            if (empty($userinfo)) {
+                return 0;
+            }
             
+            $uiminfo = $userobj->getUserImsiInfo($uid, $userobj->USER_IMSI_INFO_RESTYPE_UID);
+            if (empty($uiminfo)) {
+                $uimid = $userobj->addUserImsiInfo($resid, $userobj->USER_IMSI_INFO_RESTYPE_UID);
+            } else {
+                $uiminfo = current($uiminfo);
+                $uimid = $uiminfo['uimid'];
+            }
         }
         
         return $uimid;
