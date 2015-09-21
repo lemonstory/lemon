@@ -4,8 +4,8 @@ include_once '../controller.php';
 class test extends controller
 {
     function action() {
-        $userstoryrecord = new UserStoryRecord();
-        $r = $userstoryrecord->getPlayInfoByAlbumIds(array(1,2,3));
+        $useralbumlastlog = new UserAlbumLastlog();
+        $r = $useralbumlastlog->getPlayInfoByAlbumIds(1,array(1,2,3));
         var_dump($r);
         exit;
         $comment = new Comment();
