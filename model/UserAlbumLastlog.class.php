@@ -125,11 +125,11 @@ class UserAlbumLastlog extends ModelBase
     /**
      * 获取最后一条记录
      */
-    public function get_last_record($where = '')
+    public function getInfo($where = '')
     {
         $db = DbConnecter::connectMysql('share_story');
         
-        $sql = "select * from {$this->table}  where {$where} order by id DESC limit 1";
+        $sql = "select * from {$this->table}  where {$where} limit 1";
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
         $r = $st->fetchAll();

@@ -32,6 +32,17 @@ class UserAlbumLog extends ModelBase
         return $r[0]['count'];
     }
 
+    public function getInfo($where)
+    {
+    	$db = DbConnecter::connectMysql('share_story');
+        
+        $sql = "select * from {$this->table}  where {$where} limit 1";
+        $st = $db->query( $sql );
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r = $st->fetchAll();
+        $r  = array_pop($r);
+        return $r;
+    }
     /**
      * 插入记录
      */
@@ -56,6 +67,13 @@ class UserAlbumLog extends ModelBase
         $st = $db->query($sql);
         unset($tmp_value, $tmp_filed);
         return $db->lastInsertId();
+    }
+
+    public function format_to_api($info)
+    {
+    	unset($info['uid']);
+    	unset($info['logid']);
+    	return $info;
     }
 
 
