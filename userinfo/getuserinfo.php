@@ -39,7 +39,7 @@ class getuserinfo extends controller
         $data['phonenumber'] = $userinfo['phonenumber'];
         $data['gender'] = $babyinfo['gender'];
         $data['age'] = $babyinfo['age'];
-        $data['address'] = $addressinfo['address'];
+        $data['addressinfo'] = $addressinfo;
         
         $this->showSuccJson($data);
     }
