@@ -6,7 +6,7 @@ include_once (dirname ( dirname ( __FILE__ ) ) . "/DaemonBase.php");
 class deal_saveAlbumToSearch extends DaemonBase {
     protected $processnum = 1;
 	protected function deal() {
-	    $storyid = QueueManager::popAlbumToSearchQueue();
+	    $storyid = MnsQueueManager::popAlbumToSearchQueue();
 	    if (empty($storyid)) {
 	        sleep(10);
 	        return true;

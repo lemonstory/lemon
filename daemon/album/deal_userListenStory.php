@@ -6,7 +6,7 @@ include_once (dirname ( dirname ( __FILE__ ) ) . "/DaemonBase.php");
 class deal_userListenStory extends DaemonBase {
     protected $processnum = 1;
 	protected function deal() {
-	    $queuevalue = QueueManager::popListenStoryQueue();
+	    $queuevalue = MnsQueueManager::popListenStoryQueue();
 	    if (empty($queuevalue)) {
 	        sleep(10);
 	        return true;
