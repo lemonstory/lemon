@@ -40,7 +40,7 @@ class deal_userListenStory extends DaemonBase {
     	        $babyid = $userinfo['defaultbabyid'];
     	        
     	        $userextobj = new UserExtend();
-    	        $babyinfo = $userextobj->getUserBabyInfo($babyid);
+    	        $babyinfo = current($userextobj->getUserBabyInfo($babyid));
     	        if (empty($babyinfo)) {
     	            return true;
     	        }

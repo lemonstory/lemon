@@ -15,35 +15,33 @@ class getfavlist extends controller
             $this->showErrorJson(ErrorConf::noLogin());
         }
         
+        $albumids = array();
         $favobj = new Fav();
         $favlist = $favobj->getUserFavList($uid, $direction, $startid, $len);
-        if (empty($favlist)) {
-            $this->showSuccJson();
+        if (!empty($favlist)) {
+            $albumids = array();
+            foreach ($favlist as $value) {
+                $albumids[] = $value['albumid'];
+            }
         }
-        
-        $albumids = array();
-        foreach ($favlist as $value) {
-            $albumids[] = $value['albumid'];
-        }
-        if (empty($albumids)) {
-            $this->showErrorJson(ErrorConf::userListenDataError());
-        }
-        $albumids = array_unique($albumids);
-        
-        // 批量获取专辑信息
-        $albumobj = new Album();
-        $albumlist = $albumobj->getListByIds($albumids);
         
         $data = array();
-        foreach ($favlist as $value) {
-            $albumid = $value['albumid'];
-            if (!empty($albumlist[$albumid])) {
-                $value['albuminfo'] = $albumlist[$albumid];
-            } else {
-                $value['albuminfo'] = array();
-            }
+        if (!empty($albumids)) {
+            $albumids = array_unique($albumids);
+            // 批量获取专辑信息
+            $albumobj = new Album();
+            $albumlist = $albumobj->getListByIds($albumids);
             
-            $data[] = $value;
+            foreach ($favlist as $value) {
+                $albumid = $value['albumid'];
+                if (!empty($albumlist[$albumid])) {
+                    $value['albuminfo'] = $albumlist[$albumid];
+                } else {
+                    $value['albuminfo'] = array();
+                }
+                
+                $data[] = $value;
+            }
         }
         
         $this->showSuccJson($data);
