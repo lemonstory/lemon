@@ -2,7 +2,7 @@
 class DownLoad extends ModelBase
 {
 	public $MAIN_DB_INSTANCE = 'share_main';
-	public $DOWNLOAD_TABLE_NAME = 'user_download';
+	public $DOWNLOAD_TABLE_NAME = 'download_story';
 	public $CACHE_INSTANCE = 'cache';
 	
 	public $STATUS_DOWN_ING = 1; // 下载中状态
@@ -15,7 +15,7 @@ class DownLoad extends ModelBase
 	 * @param I      $fileLen   文件的字节数
 	 * @param B      $header    是否输出下载头
 	 */
-	public function startDownload($file, $fileLen, $header = true)
+	/* public function startDownload($file, $fileLen, $header = true)
 	{
 	    ob_start();
 	    if (empty($file) || empty($fileLen)) {
@@ -35,20 +35,6 @@ class DownLoad extends ModelBase
 	        header("Content-Disposition: attachment; filename=" . basename($file));
 	    }
 	
-	    /*
-	     * 实现断点传送功能，用$_SERVER['HTTP_RANGE']取得取得用户请求的文件的range，如 request header 中的Range: bytes=0-801
-	    * 然后程序去控制文件的输出。比如第一次请求一个文件的从0到999字节，第二次请求1000到1999
-	    * 字节，以此类推，每次请求1000字节的内容，然后程序通过fseek函数去取得对应的文件位置， 然后输出。
-	    * Range头域  Range头域可以请求实体的一个或者多个子范围。
-	    * 例如，
-	    * 表示头500个字节：bytes=0-499
-	    * 表示第二个500字节：bytes=500-999
-	    * 表示最后500个字节：bytes=-500
-	    * 表示500字节以后的范围：bytes=500-
-	    * 第一个和最后一个字节：bytes=0-0,-1
-	    * 同时指定几个范围：bytes=500-600,601-999
-	    * 但是服务器可以忽略此请求头，如果无条件GET包含Range请求头，响应会以状态码206（PartialContent）返回而不是以200 （OK）
-	    */
 	    //$_SERVER['HTTP_RANGE'] = "bytes=2000-";
 	    //$rangeLog = "/alidata1/range.log";
 	    //$rangeFp = fopen($rangeLog, 'a+');
@@ -95,7 +81,7 @@ class DownLoad extends ModelBase
 	    }
 	    
 	    return true;
-	}
+	} */
 	
 	
 	/**
@@ -105,7 +91,7 @@ class DownLoad extends ModelBase
 	 * @param I $bytesLen      每次读取指定长度字节，默认一次读取10kb
 	 * @return array           返回读取的文件内容，以及当前文件的指针位置
 	 */
-	public function getFileContent($file, $startBytes = 0, $bytesLen = 10240)
+	/* public function getFileContent($file, $startBytes = 0, $bytesLen = 10240)
 	{
 	    if (empty($file)) {
 	        return false;
@@ -137,16 +123,16 @@ class DownLoad extends ModelBase
 	
 	
 	    return array('fileContent' => $fileContent, 'bytesPost' => $bytesPost);
-	}
+	} */
 	
 	
 	/**
-	 * 获取用户下载的专辑记录
-	 * @param I $uid
+	 * 获取uid或设备的下载的专辑记录
+	 * @param I $uimid
 	 * @param I $albumid
 	 * @return array
 	 */
-	public function getUserDownLoadInfoByAlbumId($uid, $albumid)
+	/* public function getDownLoadInfoByAlbumId($uimid, $albumid)
 	{
 	    if (empty($uid) || empty($albumid)) {
 	        $this->setError(ErrorConf::paramError());
@@ -163,18 +149,19 @@ class DownLoad extends ModelBase
 	    } else {
 	        return $res;
 	    }
-	}
+	} */
 	
 	
 	/**
-	 * 用户开始下载专辑任务
-	 * @param I $uid
+	 * uid或设备号，开始下载故事任务
+	 * @param I $uimid
 	 * @param I $albumid    专辑Id
+	 * @param I $storyid    故事id
 	 * @return boolean
 	 */
-	public function addUserDownLoadAlbum($uid, $albumid)
+	public function addDownLoadStoryInfo($uimid, $albumid, $storyid)
 	{
-		if (empty($uid) || empty($albumid)) {
+		if (empty($uimid) || empty($albumid) || empty($storyid)) {
 			$this->setError(ErrorConf::paramError());
 			return false;
 		}
