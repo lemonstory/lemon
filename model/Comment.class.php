@@ -218,6 +218,7 @@ class Comment extends ModelBase
 	        }
 	        $comment_info['start_level'] = mt_rand(4,5);
 	        $comment_info['comment'] = '123123';
+            $comment_info['avatartime'] = 1442980916;
 	        $commentlist[] = $comment_info;
     	}
     	return $commentlist;
