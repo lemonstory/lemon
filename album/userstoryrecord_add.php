@@ -9,52 +9,39 @@ class userstoryrecord_add extends controller
         if (empty($uimid)) {
             $this->showErrorJson(ErrorConf::userImsiIdError());
         }
-        
-        $albumid   = (int)$this->getRequest('albumid', 0);
-        $storyid   = (int)$this->getRequest('storyid', 0);
-        $playtimes = (int)$this->getRequest('playtimes', 0);
-        if (empty($albumid) || empty($storyid)) {
-            $this->showErrorJson(ErrorConf::paramError());
-        }
-        
-        $albuminfo = $storyinfo = array();
 
-        $album = new Album();
-        $story = new Story();
-
-        if ($albumid) {
-            $albuminfo = $album->get_album_info($albumid);
+        $content = $this->getRequest('content');
+        if (!$content) {
+            $this->showErrorJson(ErrorConf::UserAlbumLogContentError());
         }
-        if ($storyid) {
-            $storyinfo = $story->get_story_info($storyid);
-        }
-        if (!$albuminfo) {
-            return $this->showErrorJson(ErrorConf::albumInfoIsEmpty());
-        }
-        if (!$storyinfo) {
-            return $this->showErrorJson(ErrorConf::storyInfoIsEmpty());
+        $r = json_decode($content, true);
+        if (!$r) {
+            $this->showErrorJson(ErrorConf::UserAlbumLogContentError());
         }
 
         $useralbumlog = new UserAlbumLog();
-        $lastid = $useralbumlog->insert(array(
-            'uid'       => $uimid,
-            'albumid'   => $albumid,
-            'storyid'   => $storyid,
-            'playtimes' => $playtimes,
-            'addtime'   => date('Y-m-d H:i:s'),
-        ));
-        if ($lastid) {
-            $useralbumlastlog = new UserAlbumLastlog();
-            $useralbumlastlog->replace(array(
-                'uid'       => $uimid,
-                'albumid'   => $albumid,
-                'lastlogid' => $lastid,
-            ));
-        }
+        $useralbumlastlog = new UserAlbumLastlog();
 
-        if (!empty($lastid)) {
-            // 添加收听处理队列
-            MnsQueueManager::pushListenStoryQueue($uimid, $storyid);
+        foreach ($r as $k => $v) {
+            $lastid = $useralbumlog->insert(array(
+                'uimid'       => $uimid,
+                'albumid'   => $v['albumid'],
+                'storyid'   => $v['storyid'],
+                'playtimes' => $v['playtimes'],
+                'addtime'   => date('Y-m-d H:i:s'),
+            ));
+            if ($lastid) {
+                $useralbumlastlog->replace(array(
+                    'uimid'       => $uimid,
+                    'albumid'   => $v['albumid'],
+                    'lastlogid' => $lastid,
+                ));
+            }
+
+            if (!empty($lastid)) {
+                // 添加收听处理队列
+                MnsQueueManager::pushListenStoryQueue($uimid, $v['storyid']);
+            }
         }
 
         $this->showSuccJson();
