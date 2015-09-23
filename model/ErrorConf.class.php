@@ -156,6 +156,10 @@ class   ErrorConf
 	{
 		return array('code'=>'100504','desc'=>'还没有收听该音乐');
 	}
+	public static function UserAlbumLogContentError()
+	{
+		return array('code'=>'100505','desc'=>'解析content出错');
+	}
 	
 	// 专辑
 	public static function albumStoryListIsEmpty()

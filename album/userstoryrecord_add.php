@@ -37,7 +37,7 @@ class userstoryrecord_add extends controller
 
         $useralbumlog = new UserAlbumLog();
         $lastid = $useralbumlog->insert(array(
-            'uid'       => $uid,
+            'uid'       => $uimid,
             'albumid'   => $albumid,
             'storyid'   => $storyid,
             'playtimes' => $playtimes,
@@ -46,7 +46,7 @@ class userstoryrecord_add extends controller
         if ($lastid) {
             $useralbumlastlog = new UserAlbumLastlog();
             $useralbumlastlog->replace(array(
-                'uid'       => $uid,
+                'uid'       => $uimid,
                 'albumid'   => $albumid,
                 'lastlogid' => $lastid,
             ));
