@@ -80,10 +80,10 @@ class gethomeinfo extends controller
                 }
                 $albuminfo['commentnum'] = 0;
                 if (!empty($albumcommentnum[$albumid])) {
-                    $albuminfo['commentnum'] = $albumcommentnum[$albumid]['num']+0;
+                    $albuminfo['commentnum'] = $albumcommentnum[$albumid]+0;
                 }
-                $value['albuminfo'] = $albuminfo;
                 
+                $value['albuminfo'] = $albuminfo;
                 $listenalbumlist[] = $value;
             }
         }
