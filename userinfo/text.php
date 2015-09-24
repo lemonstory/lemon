@@ -4,7 +4,7 @@ class text extends controller
 {
     function action() {
         $type = $this->getRequest("type");
-        
+        var_dump(getImsi());die();
         if ($type == 1) {
             $storyid = $this->getRequest("storyid", "1");
             $uploadobj = new Upload();

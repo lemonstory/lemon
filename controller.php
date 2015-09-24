@@ -15,6 +15,7 @@ abstract class controller
     public function __construct()
     {
         $this->checkHostInfo();
+        $this->checkImsiInfo();
         $this->getActionData();
         $this->checkFilters();
         //$this->getAppVertion();
@@ -25,6 +26,15 @@ abstract class controller
     {
         $host = $_SERVER['HTTP_HOST'];
         if($host != '120.26.52.211') {
+            header("HTTP/1.0 404 Not Found");
+            exit;
+        }
+    }
+    
+    protected function checkImsiInfo()
+    {
+        $imsi = getImsi();
+        if(empty($imsi)) {
             header("HTTP/1.0 404 Not Found");
             exit;
         }
