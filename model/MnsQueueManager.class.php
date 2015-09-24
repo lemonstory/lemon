@@ -13,7 +13,8 @@ class MnsQueueManager
      */
     public static function pushActionLogQueue($uimid, $actionid, $actiontype)
     {
-        $res = self::doPush('lemon-actionlogqueue', $uimid . ":" . $actionid . ":" . $actiontype);
+        $addtime = date("Y-m-d H:i:s");
+        $res = self::doPush('lemon-actionlogqueue', $uimid . ":" . $actionid . ":" . $actiontype . ":" . $addtime);
         return true;
     }
     public static function popActionLogQueue() 

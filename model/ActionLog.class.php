@@ -13,13 +13,15 @@ class ActionLog extends ModelBase
     
     
     
-    public function addUserImsiActionLog($uimid, $actionid, $actiontype)
+    public function addUserImsiActionLog($uimid, $actionid, $actiontype, $addtime = "")
     {
         if (empty($uimid) || empty($actionid) || empty($actiontype)) {
             return false;
         }
+        if (empty($addtime)) {
+            $addtime = date("Y-m-d H:i:s");
+        }
         
-        $addtime = date("Y-m-d H:i:s");
         $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
         $sql = "INSERT INTO `{$this->ACTION_LOG_TABLE_NAME}` (`uimid`, `actionid`, `actiontype`, `addtime`) VALUES (?, ?, ?, ?)";
         $st = $db->prepare($sql);

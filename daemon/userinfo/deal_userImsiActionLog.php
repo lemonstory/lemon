@@ -16,13 +16,14 @@ class deal_userImsiActionLog extends DaemonBase {
 	    $uimid = $queuearr[0];
 	    $actionid = $queuearr[1];
 	    $actiontype = $queuearr[2];
+	    $addtime = $queuearr[3];
 	    if (empty($uimid) || empty($actionid) || empty($actiontype)) {
 	        return true;
 	    }
 	    
 	    // 记录user_imsi_action_log
 	    $actionlogobj = new ActionLog();
-	    $actionlogobj->addUserImsiActionLog($uimid, $actionid, $actiontype);
+	    $actionlogobj->addUserImsiActionLog($uimid, $actionid, $actiontype, $addtime);
 	}
 
 	protected function checkLogPath() {}
