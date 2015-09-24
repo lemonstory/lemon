@@ -22,7 +22,7 @@ class info extends controller
 
         $result['albuminfo']  = $album->format_to_api($album_info);
         // 获取播放信息
-        $useralbumlastloginfo = $useralbumlastlog->getInfo("`uid`={$uid} and `albumid`={$album_id} ");
+        $useralbumlastloginfo = $useralbumlastlog->getInfo("`uimid`={$uid} and `albumid`={$album_id} ");
         if ($useralbumlastloginfo) {
             $useralbumloginfo = $useralbumlog->getInfo("`logid`={$useralbumlastloginfo['lastlogid']}");
             $playinfo = $useralbumlog->format_to_api($useralbumloginfo);
