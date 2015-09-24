@@ -140,7 +140,13 @@ class WechatSso extends Sso
         
         // 登录后的处理
         $actionlogobj = new ActionLog();
-        MnsQueueManager::pushActionLogQueue($uid, $actionlogobj->ACTION_TYPE_LOGIN);
+        $userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid();
+        MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_LOGIN);
+        
+        // add login log
+        $loginlogobj = new UserLoginLog();
+        $loginlogobj->addUserLoginLog($uid, getImsi());
         
         //QueueManager::pushAfterRegQueue($uid);
         //QueueManager::pushUserInfoToSearch($uid);
@@ -162,15 +168,19 @@ class WechatSso extends Sso
         
         $passportdata = $this->getInfoWithUid($uid);
         $UserObj = new User();
-        //$this->setLoginType($uid, 'qq');
-        //$userinfo = $UserObj->getSelfInfo($uid);
         $userinfo = current($UserObj->getUserInfo($uid));
         
         $this->setSsoCookie($passportdata, $userinfo);
         
         // 登录后的处理
         $actionlogobj = new ActionLog();
-        MnsQueueManager::pushActionLogQueue($uid, $actionlogobj->ACTION_TYPE_LOGIN);
+        $userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid();
+        MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_LOGIN);
+        
+        // add login log
+        $loginlogobj = new UserLoginLog();
+        $loginlogobj->addUserLoginLog($uid, getImsi());
         
         return $userinfo;
     }

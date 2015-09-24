@@ -8,7 +8,6 @@ class qqloginreg extends controller
         $accessToken = $this->getRequest('accessToken', '');
         $openId = $this->getRequest('openId', '');
         $nickName = trim($this->getRequest('nickName', ''));
-        
         if ($accessToken == "" || $openId == "" || $nickName == "") {
             $this->showErrorJson();
         }

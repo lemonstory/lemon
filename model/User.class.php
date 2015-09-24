@@ -3,7 +3,7 @@ class User extends ModelBase
 {
 	public $PASSPORT_DB_INSTANCE = 'share_main';
 	public $USER_INFO_TABLE_NAME = 'user_info';
-	public $USER_IMSI_INFO_TABLE_NAME = 'user_imsi_info';
+	
 	public $CACHE_INSTANCE = 'cache';
 	
 	public $TYPE_QQ = 1;
@@ -14,9 +14,6 @@ class User extends ModelBase
 	public $STATUS_FORZEN = -1; // 冻结
 	public $STATUS_FORBITEN = -2; // 封号
 	public $STATUS_DELETE = -3; // 删除
-	
-	public $USER_IMSI_INFO_RESTYPE_UID = 1;
-	public $USER_IMSI_INFO_RESTYPE_IMSI = 2;
 	
 	
 	public function initQQLoginUser($uid, $nickname, $avatartime, $birthday, $gender, $province, $city, $type, $addtime)
@@ -92,46 +89,6 @@ class User extends ModelBase
 			$result[$one['uid']] = $one;
 		}
 		return $result;
-	}
-	
-	
-	public function getUserImsiInfoByUimid($uimid)
-	{
-	    if (empty($uimid)) {
-	        return array();
-	    }
-	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-	    $sql = "select * from {$this->USER_IMSI_INFO_TABLE_NAME} where `uimid` = ?";
-	    $st = $db->prepare ( $sql );
-	    $st->execute (array($uimid));
-	    $list = $st->fetch( PDO::FETCH_ASSOC );
-	    if (empty($list)) {
-	        return array();
-	    }
-	    return $list;
-	}
-	
-	/**
-	 * 获取指定imsi的最近登录账户的关联记录
-	 * @param S $resid
-	 * @param I $restype    1为uid, 2为imsi
-	 * @return array
-	 */
-	public function getUserImsiInfo($resid, $restype)
-	{
-	    if (empty($resid) || !in_array($restype, array($this->USER_IMSI_INFO_RESTYPE_UID, $this->USER_IMSI_INFO_RESTYPE_IMSI))) {
-	        return array();
-	    }
-	    
-	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-	    $sql = "select * from {$this->USER_IMSI_INFO_TABLE_NAME} where `resid` = ? and `restype` = ?";
-	    $st = $db->prepare ( $sql );
-	    $st->execute (array($resid, $restype));
-	    $list = $st->fetch( PDO::FETCH_ASSOC );
-	    if (empty($list)) {
-	        return array();
-	    }
-	    return $list;
 	}
 	
 	
@@ -212,30 +169,6 @@ class User extends ModelBase
 		$this->clearUserCache($uid);
 		
 		return true;
-	}
-	
-	
-	/**
-	 * 添加用户的imsi或uid的唯一记录
-	 * @param S $resid       手机设备唯一标识或uid
-	 * @param I $restype     1为uid, 2为imsi
-	 * @return boolean
-	 */
-	public function addUserImsiInfo($resid, $restype)
-	{
-	    if (empty($resid) || !in_array($restype, array($this->USER_IMSI_INFO_RESTYPE_UID, $this->USER_IMSI_INFO_RESTYPE_IMSI))) {
-	        return false;
-	    }
-	    
-	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-	    $sql = "INSERT INTO `{$this->USER_IMSI_INFO_TABLE_NAME}` (`resid`, `restype`) VALUES (?, ?)";
-	    $st = $db->prepare ( $sql );
-	    $res = $st->execute (array($resid, $restype));
-	    if (empty($res)) {
-	        return false;
-	    }
-	    $uimid = $db->lastInsertId() + 0;
-	    return $uimid;
 	}
 	
 	

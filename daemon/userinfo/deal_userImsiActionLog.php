@@ -13,22 +13,15 @@ class deal_userImsiActionLog extends DaemonBase {
 	    }
 	    
 	    $queuearr = explode(":", $queuevalue);
-	    $actionid = $queuearr[0];
-	    $actiontype = $queuearr[1];
-	    if (empty($actionid) || empty($actiontype)) {
+	    $uimid = $queuearr[0];
+	    $actionid = $queuearr[1];
+	    $actiontype = $queuearr[2];
+	    if (empty($uimid) || empty($actionid) || empty($actiontype)) {
 	        return true;
 	    }
 	    
-	    
+	    // 记录user_imsi_action_log
 	    $actionlogobj = new ActionLog();
-	    if ($actiontype == $actionlogobj->ACTION_TYPE_LOGIN) {
-	        // 记录登录日志
-	        $uid = $actionid;
-	        $loginlogobj = new UserLoginLog();
-	        $loginlogobj->addUserLoginLog($uid, $imsi);
-	        
-	    }
-	    
 	    $actionlogobj->addUserImsiActionLog($uimid, $actionid, $actiontype);
 	}
 

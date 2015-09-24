@@ -64,3 +64,18 @@ function getIsAjaxRequest()
 {
     return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH']==='XMLHttpRequest';
 }
+
+function getImsi()
+{
+    $userAgent = @$_SERVER['HTTP_USER_AGENT'];
+    if (empty($userAgent)) {
+        return '';
+    }
+    $agentArr = explode(',', $userAgent); // agent头
+    if (empty($agentArr)) {
+        return '';
+    }
+    // 设备唯一标识imsi
+    $imsi = $agentArr[1];
+    return $imsi;
+}

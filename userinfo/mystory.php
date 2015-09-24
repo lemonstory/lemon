@@ -17,7 +17,8 @@ class mystory extends controller
             // 未登录返回空数据
             $this->showSuccJson();
         }
-        $uimid = $this->getUimid($uid);
+        $userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid($uid);
         if (empty($uimid)) {
             $this->showErrorJson(ErrorConf::userImsiIdError());
         }

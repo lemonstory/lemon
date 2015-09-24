@@ -11,7 +11,8 @@ class gethomeinfo extends controller
         $len = $this->getRequest("len");
         
         $uid = $this->getUid();
-        $uimid = $this->getUimid($uid);
+        $userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid($uid);
         if (empty($uimid)) {
             $this->showErrorJson(ErrorConf::userImsiIdError());
         }

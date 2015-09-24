@@ -115,54 +115,6 @@ abstract class controller
         return $uid;
     }
     
-    /**
-     * 获取uid或者设备号的uimid
-     */
-    protected function getUimid($uid = 0)
-    {
-        if (empty($uid)) {
-            $uid = $this->getUid();
-        }
-        
-        $userobj = new User();
-        if (empty($uid)) {
-            $imsi = $this->getImsi();
-            if (empty($imsi)) {
-                return 0;
-            }
-            
-            $uiminfo = $userobj->getUserImsiInfo($imsi, $userobj->USER_IMSI_INFO_RESTYPE_IMSI);
-            if (empty($uiminfo)) {
-                $uimid = $userobj->addUserImsiInfo($imsi, $userobj->USER_IMSI_INFO_RESTYPE_IMSI);
-            } else {
-                $uimid = $uiminfo['uimid'];
-            }
-        } else {
-            $uiminfo = $userobj->getUserImsiInfo($uid, $userobj->USER_IMSI_INFO_RESTYPE_UID);
-            if (empty($uiminfo)) {
-                $uimid = $userobj->addUserImsiInfo($uid, $userobj->USER_IMSI_INFO_RESTYPE_UID);
-            } else {
-                $uimid = $uiminfo['uimid'];
-            }
-        }
-        
-        return $uimid;
-    }
-    
-    public function getImsi()
-    {
-        $userAgent = @$_SERVER['HTTP_USER_AGENT'];
-        if (empty($userAgent)) {
-            return '';
-        }
-        $agentArr = explode(',', $userAgent); // agent头
-        if (empty($agentArr)) {
-            return '';
-        }
-        // 设备唯一标识imsi
-        $imsi = $agentArr[1];
-        return $imsi;
-    }
     
     abstract  function action();
     

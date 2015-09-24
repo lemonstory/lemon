@@ -160,10 +160,15 @@ class Sso extends ModelBase
         $UserObj->initQQLoginUser($uid, $nickName, $avatartime, $birthday, $gender, $province, $city, $type, $addtime);
         $this->setSsoCookie(array('uid' => $uid, 'password' => $qquserpasword), array('nickname' => $nickName));
         
-        // 登录后的处理 @huqq
-        $uimid = 0;
+        // 登录后的处理
         $actionlogobj = new ActionLog();
+        $userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid();
         MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_LOGIN);
+        
+        // add login log
+        $loginlogobj = new UserLoginLog();
+        $loginlogobj->addUserLoginLog($uid, getImsi());
         
         $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         return $return;
@@ -184,22 +189,27 @@ class Sso extends ModelBase
         
         $passportdata = $this->getInfoWithUid($uid);
         $UserObj = new User();
-        //$this->setLoginType($uid, 'qq');
-        //$userinfo = $UserObj->getSelfInfo($uid);
         $userinfo = current($UserObj->getUserInfo($uid));
         
         $this->setSsoCookie($passportdata, $userinfo);
         
         // 登录后的处理
         $actionlogobj = new ActionLog();
-        MnsQueueManager::pushActionLogQueue($uid, $actionlogobj->ACTION_TYPE_LOGIN);
+        $userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid();
+        MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_LOGIN);
+        
+        // add login log
+        $loginlogobj = new UserLoginLog();
+        $loginlogobj->addUserLoginLog($uid, getImsi());
+        
         return $userinfo;
     }
     
     
-    public function phonelogin($username, $password)
+    public function phonelogin($username, $password, $uimid)
     {
-        if (empty($username) || empty($password)) {
+        if (empty($username) || empty($password) || empty($uimid)) {
             $this->setError(ErrorConf::paramError());
             return false;
         }
@@ -228,6 +238,16 @@ class Sso extends ModelBase
         
         $ssoobj = new Sso();
         $ssoobj->setSsoCookie($passportdata, $userinfo);
+        
+        // 登录后的处理
+        $actionlogobj = new ActionLog();
+        $userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid();
+        MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_LOGIN);
+        
+        // add login log
+        $loginlogobj = new UserLoginLog();
+        $loginlogobj->addUserLoginLog($uid, getImsi());
         
         return $userinfo;
     }
@@ -375,36 +395,6 @@ class Sso extends ModelBase
         return true;
     }
     
-    /*public function setLoginType($uid,$logintype)
-	{
-		if($logintype=="")
-		{
-			return false;
-		}
-		CacheConnecter::set('passport',	"logintype:".$uid, $logintype, -1);
-		return true;
-	}*/
-    /*public function getLoginType($uid)
-	{
-		$logintype=CacheConnecter::get('passport',	"logintype:".$uid);
-		if($logintype=="" || $logintype==false)
-		{
-			$passportinfo = $this->getInfoWithUid($uid);
-			if($passportinfo['username']=="QL")
-			{
-				$logintype='qq';
-			} elseif ($passportinfo['username']=="WL") {
-			    $logintype='wb';
-			} elseif ($passportinfo['username']=="FL") {
-			    $logintype='fb';
-			} elseif ($passportinfo['username']=="TL") {
-			    $logintype='tt';
-			} else {
-				$logintype='phone';
-			}
-		}
-		return $logintype;
-	}*/
     
     public function clearPassportCacheByUid($uid) 
     {
@@ -486,33 +476,6 @@ class Sso extends ModelBase
         return $cookie;
     }
     
-    
-    /*public function getMaxUid()
-	{
-		$db = DbConnecter::connectMysql('share_passport');
-		$sql = "select max(uid) from  passport";
-		$st = $db->prepare ( $sql );
-		$st->execute ();
-		$maxuid = $st->fetch(PDO::FETCH_COLUMN);
-	
-		return $maxuid;
-	}
-	
-	public function getMaxUidWithTime($day)
-	{
-		$day = $day+0;
-		if($day==0)
-		{
-			$day=1;
-		}
-		$db = DbConnecter::connectMysql('share_passport');
-		$sql = "select * from passport where addtime>? order by uid asc limit 1";
-		$st = $db->prepare ( $sql );
-		$st->execute (array(date('Y-m-d H:i:s',time()-86400*$day)));
-		$maxuid = $st->fetch(PDO::FETCH_COLUMN);
-		
-		return $maxuid;	
-	}*/
     
     private function md5Together($a = '', $b = '') 
     {
