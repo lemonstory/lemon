@@ -201,6 +201,7 @@ class User extends ModelBase
 	    $userextobj = new UserExtend();
 	    $babyid = $userextobj->addUserBabyInfo($uid, $birthday, $gender);
 	    if (empty($babyid)) {
+	        $this->setError($userextobj->getError());
 	        return false;
 	    }
 	    
@@ -208,6 +209,7 @@ class User extends ModelBase
 	    $phonenumber = "";
 	    $addressid = $userextobj->addUserAddressInfo($uid, $name, $phonenumber, $province, $city);
 	    if (empty($addressid)) {
+	        $this->setError($userextobj->getError());
 	        return false;
 	    }
 	    
