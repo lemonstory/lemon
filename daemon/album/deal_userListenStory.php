@@ -11,7 +11,7 @@ class deal_userListenStory extends DaemonBase {
 	        sleep(10);
 	        return true;
 	    }
-	    $queuearr = explode(":", $queuevalue);
+	    $queuearr = explode("@@", $queuevalue);
 	    $uimid = $queuearr[0];
 	    $storyid = $queuearr[1];
 	    if (empty($uimid) || empty($storyid)) {

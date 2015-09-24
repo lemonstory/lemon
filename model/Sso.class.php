@@ -151,14 +151,14 @@ class Sso extends ModelBase
         $NicknameMd5Obj->addOne($nickName, $uid);
         
         $avatartime = 0;
-        if ($qqavatar != "") {
-            //QueueManager::pushLoadUserQqavatar($uid, $qqavatar);
-        }
-        
         $UserObj = new User();
         $type = $UserObj->TYPE_QQ;
         $UserObj->initQQLoginUser($uid, $nickName, $avatartime, $birthday, $gender, $province, $city, $type, $addtime);
         $this->setSsoCookie(array('uid' => $uid, 'password' => $qquserpasword), array('nickname' => $nickName));
+        
+        if ($qqavatar != "") {
+            MnsQueueManager::pushLoadUserQqavatar($uid, $qqavatar);
+        }
         
         // 登录后的处理
         $actionlogobj = new ActionLog();

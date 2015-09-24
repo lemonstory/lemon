@@ -12,7 +12,7 @@ class deal_userImsiActionLog extends DaemonBase {
 	        return true;
 	    }
 	    
-	    $queuearr = explode(":", $queuevalue);
+	    $queuearr = explode("@@", $queuevalue);
 	    $uimid = $queuearr[0];
 	    $actionid = $queuearr[1];
 	    $actiontype = $queuearr[2];

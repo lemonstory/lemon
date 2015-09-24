@@ -14,7 +14,7 @@ class MnsQueueManager
     public static function pushActionLogQueue($uimid, $actionid, $actiontype)
     {
         $addtime = date("Y-m-d H:i:s");
-        $res = self::doPush('lemon-actionlogqueue', $uimid . ":" . $actionid . ":" . $actiontype . ":" . $addtime);
+        $res = self::doPush('lemon-actionlogqueue', $uimid . "@@" . $actionid . "@@" . $actiontype . "@@" . $addtime);
         return true;
     }
     public static function popActionLogQueue() 
@@ -28,7 +28,7 @@ class MnsQueueManager
      */
     public static function pushListenStoryQueue($uimid, $storyid)
     {
-        $res = self::doPush("lemon-userlistenstoryqueue", $uimid . ":" . $storyid);
+        $res = self::doPush("lemon-userlistenstoryqueue", $uimid . "@@" . $storyid);
         return true;
     }
     public static function popListenStoryQueue()
@@ -48,6 +48,19 @@ class MnsQueueManager
     public static function popAlbumToSearchQueue()
     {
         return self::doPop('lemon-albumtosearch');
+    }
+    
+    /**
+     * 上传QQ联合登录头像
+     */
+    public static function pushLoadUserQqavatar($uid, $qqavatarurl)
+    {
+        self::doPush('lemon-userqqavatar', $uid . "@@" . $qqavatarurl);
+        return true;
+    }
+    public static function popLoadUserQqavatar()
+    {
+        return self::doPop('lemon-userqqavatar');
     }
     
     

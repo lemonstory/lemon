@@ -21,7 +21,8 @@ class cron_DaemonServerBooter extends DaemonBase
                 'album/deal_userListenStory.php',
                 'album/deal_saveAlbumToSearch.php',
                 
-                'userinfo/deal_userImsiActionLog.php' 
+                'userinfo/deal_userImsiActionLog.php',
+                'userinfo/deal_loadUserQqavatar.php',
         );
         return $list;
     }
