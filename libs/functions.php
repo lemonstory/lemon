@@ -77,5 +77,8 @@ function getImsi()
     }
     // 设备唯一标识imsi
     $imsi = $agentArr[1];
+    if (strlen($imsi) != 15) {
+        return '';
+    }
     return $imsi;
 }
