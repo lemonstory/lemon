@@ -9,22 +9,12 @@ class User extends ModelBase
 	public $TYPE_QQ = 1;
 	public $TYPE_WX = 2;
 	public $TYPE_PH = 3;
+	public $TYPE_SYS = 4;// 系统用户
 	
 	public $STATUS_NORMAL = 1;
 	public $STATUS_FORZEN = -1; // 冻结
 	public $STATUS_FORBITEN = -2; // 封号
 	public $STATUS_DELETE = -3; // 删除
-	
-	
-	public function initQQLoginUser($uid, $nickname, $avatartime, $birthday, $gender, $province, $city, $type, $addtime)
-	{
-		if(empty($uid) || empty($nickname) || empty($type)) {
-			$this->setError(ErrorConf::paramError());
-			return false;
-		}
-		$res = $this->initUser($uid, $nickname, $avatartime, $birthday, $gender, $province, $city, $type, $addtime);
-		return $res;
-	}
 	
 	
 	public function getUserInfo($uids)
@@ -193,16 +183,21 @@ class User extends ModelBase
 	 * @param I $uid
 	 * @param S $nickname
 	 * @param I $avatartime
+	 * @param S $birthday
+	 * @param I $gender
+	 * @param S $province
+	 * @param S $city
 	 * @param I $type
 	 * @param S $addtime
 	 * @return boolean
 	 */
-	protected function initUser($uid, $nickname, $avatartime, $birthday, $gender, $province, $city, $type, $addtime)
+	public function initUser($uid, $nickname, $avatartime, $birthday, $gender, $province, $city, $type, $addtime)
 	{
-	    if(empty($uid)) {
+	    if(empty($uid) || empty($nickname) || empty($type)) {
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
+	    
 	    $userextobj = new UserExtend();
 	    $babyid = $userextobj->addUserBabyInfo($uid, $birthday, $gender);
 	    if (empty($babyid)) {
@@ -217,10 +212,10 @@ class User extends ModelBase
 	    }
 	    
 	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-	    $sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid, nickname, avatartime, defaultbabyid, defaultaddressid, type, addtime)
+	    $sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid, nickname, avatartime, defaultbabyid, defaultaddressid, province, city, type, addtime)
 	        values (?, ?, ?, ?, ?, ?, ?)";
 	    $st = $db->prepare ( $sql );
-	    $re = $st->execute (array($uid, $nickname, $avatartime, $babyid, $addressid, $type, $addtime));
+	    $re = $st->execute (array($uid, $nickname, $avatartime, $babyid, $addressid, $province, $city, $type, $addtime));
 	    if($re) {
 	        return true;
 	    }

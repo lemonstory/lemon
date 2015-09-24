@@ -128,15 +128,13 @@ class WechatSso extends Sso
         
         $avatartime = 0;
         if ($avatarurl != "") {
-            //QueueManager::pushLoadUserQqavatar($uid, $avatarurl);
+            MnsQueueManager::pushLoadUserQqavatar($uid, $avatarurl);
         }
         
         $UserObj = new User();
         $type = $UserObj->TYPE_WX;
-        $UserObj->initQQLoginUser($uid, $nickName, $avatartime, $type, $addtime);
+        $UserObj->initUser($uid, $nickName, $avatartime, $type, $addtime);
         $this->setSsoCookie(array('uid' => $uid, 'password' => $userpasword), array('nickname' => $nickName));
-        
-        $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         
         // 登录后的处理
         $actionlogobj = new ActionLog();
@@ -148,8 +146,7 @@ class WechatSso extends Sso
         $loginlogobj = new UserLoginLog();
         $loginlogobj->addUserLoginLog($uid, getImsi());
         
-        //QueueManager::pushAfterRegQueue($uid);
-        //QueueManager::pushUserInfoToSearch($uid);
+        $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         return $return;
     }
     

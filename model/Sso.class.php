@@ -153,7 +153,7 @@ class Sso extends ModelBase
         $avatartime = 0;
         $UserObj = new User();
         $type = $UserObj->TYPE_QQ;
-        $UserObj->initQQLoginUser($uid, $nickName, $avatartime, $birthday, $gender, $province, $city, $type, $addtime);
+        $UserObj->initUser($uid, $nickName, $avatartime, $birthday, $gender, $province, $city, $type, $addtime);
         $this->setSsoCookie(array('uid' => $uid, 'password' => $qquserpasword), array('nickname' => $nickName));
         
         if ($qqavatar != "") {
