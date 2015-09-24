@@ -207,9 +207,9 @@ class Sso extends ModelBase
     }
     
     
-    public function phonelogin($username, $password, $uimid)
+    public function phonelogin($username, $password)
     {
-        if (empty($username) || empty($password) || empty($uimid)) {
+        if (empty($username) || empty($password)) {
             $this->setError(ErrorConf::paramError());
             return false;
         }
