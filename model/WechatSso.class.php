@@ -138,6 +138,10 @@ class WechatSso extends Sso
         
         $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         
+        // 登录后的处理
+        $actionlogobj = new ActionLog();
+        MnsQueueManager::pushActionLogQueue($uid, $actionlogobj->ACTION_TYPE_LOGIN);
+        
         //QueueManager::pushAfterRegQueue($uid);
         //QueueManager::pushUserInfoToSearch($uid);
         return $return;
@@ -163,6 +167,11 @@ class WechatSso extends Sso
         $userinfo = current($UserObj->getUserInfo($uid));
         
         $this->setSsoCookie($passportdata, $userinfo);
+        
+        // 登录后的处理
+        $actionlogobj = new ActionLog();
+        MnsQueueManager::pushActionLogQueue($uid, $actionlogobj->ACTION_TYPE_LOGIN);
+        
         return $userinfo;
     }
     

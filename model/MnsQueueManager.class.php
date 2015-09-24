@@ -6,13 +6,14 @@ class MnsQueueManager
 {
     /**
      * 登录uid或未登录的设备imsi号，的行为日志记录
-     * @param S $resid        用户uid或设备imsi
+     * @param I $uimid        用户uid或设备imsi
+     * @param S $actionid     行为关联id：如uid
      * @param I $actiontype   行为类型:英文字母
      * @return boolean
      */
-    public static function pushActionLogQueue($resid, $actiontype)
+    public static function pushActionLogQueue($uimid, $actionid, $actiontype)
     {
-        $res = self::doPush('lemon-actionlogqueue', $resid . ":" . $actiontype);
+        $res = self::doPush('lemon-actionlogqueue', $uimid . ":" . $actionid . ":" . $actiontype);
         return true;
     }
     public static function popActionLogQueue() 

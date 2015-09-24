@@ -45,6 +45,9 @@ class sameagelist extends controller
             $albumlist = $albumobj->getListByIds($albumids);
             // 专辑收听数
             $albumlistennum = $listenobj->getAlbumListenNum($albumids);
+            // 专辑收藏数
+            $favobj = new Fav();
+            $albumfavnum = $favobj->getAlbumFavCount($albumids);
         }
         
         $sameagealbumlist = array();
@@ -56,6 +59,10 @@ class sameagelist extends controller
                     $albuminfo['listennum'] = 0;
                     if (! empty($albumlistennum[$albumid])) {
                         $albuminfo['listennum'] = $albumlistennum[$albumid]['num'] + 0;
+                    }
+                    $albuminfo['favnum'] = 0;
+                    if (!empty($albumfavnum[$albumid])) {
+                        $albuminfo['favnum'] = $albumfavnum[$albumid]['num'] + 0;
                     }
                     $sameagealbumlist[] = $albuminfo;
                 }

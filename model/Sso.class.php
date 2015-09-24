@@ -160,6 +160,11 @@ class Sso extends ModelBase
         $UserObj->initQQLoginUser($uid, $nickName, $avatartime, $birthday, $gender, $province, $city, $type, $addtime);
         $this->setSsoCookie(array('uid' => $uid, 'password' => $qquserpasword), array('nickname' => $nickName));
         
+        // 登录后的处理 @huqq
+        $uimid = 0;
+        $actionlogobj = new ActionLog();
+        MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_LOGIN);
+        
         $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         return $return;
     }
@@ -184,6 +189,10 @@ class Sso extends ModelBase
         $userinfo = current($UserObj->getUserInfo($uid));
         
         $this->setSsoCookie($passportdata, $userinfo);
+        
+        // 登录后的处理
+        $actionlogobj = new ActionLog();
+        MnsQueueManager::pushActionLogQueue($uid, $actionlogobj->ACTION_TYPE_LOGIN);
         return $userinfo;
     }
     

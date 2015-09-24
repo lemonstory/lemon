@@ -126,16 +126,7 @@ abstract class controller
         
         $userobj = new User();
         if (empty($uid)) {
-            $userAgent = @$_SERVER['HTTP_USER_AGENT'];
-            if (empty($userAgent)) {
-                return 0;
-            }
-            $agentArr = explode('/', $userAgent); // agent头
-            if (empty($agentArr)) {
-                return 0;
-            }
-            // 设备唯一标识imsi
-            $imsi = '';
+            $imsi = $this->getImsi();
             if (empty($imsi)) {
                 return 0;
             }
@@ -147,11 +138,6 @@ abstract class controller
                 $uimid = $uiminfo['uimid'];
             }
         } else {
-            $userinfo = current($userobj->getUserInfo($uid));
-            if (empty($userinfo)) {
-                return 0;
-            }
-            
             $uiminfo = $userobj->getUserImsiInfo($uid, $userobj->USER_IMSI_INFO_RESTYPE_UID);
             if (empty($uiminfo)) {
                 $uimid = $userobj->addUserImsiInfo($uid, $userobj->USER_IMSI_INFO_RESTYPE_UID);
@@ -161,6 +147,21 @@ abstract class controller
         }
         
         return $uimid;
+    }
+    
+    public function getImsi()
+    {
+        $userAgent = @$_SERVER['HTTP_USER_AGENT'];
+        if (empty($userAgent)) {
+            return '';
+        }
+        $agentArr = explode(',', $userAgent); // agent头
+        if (empty($agentArr)) {
+            return '';
+        }
+        // 设备唯一标识imsi
+        $imsi = $agentArr[1];
+        return $imsi;
     }
     
     abstract  function action();

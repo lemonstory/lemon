@@ -27,7 +27,7 @@ class info extends controller
             $useralbumloginfo = $useralbumlog->getInfo("`logid`={$useralbumlastloginfo['lastlogid']}");
             $playinfo = $useralbumlog->format_to_api($useralbumloginfo);
         } else {
-            $playinfo = [];
+            $playinfo = array();
         }
         $result['playinfo'] = $playinfo;
         // 是否收藏
@@ -40,11 +40,19 @@ class info extends controller
         // 收听数量
         $albumlistennum = $listenobj->getAlbumListenNum($album_id);
         if ($albumlistennum) {
-            $result['albumlistennum'] = $albumlistennum[$album_id];
+            $result['listennum'] = $albumlistennum[$album_id];
         } else {
-            $result['albumlistennum'] = 0;
+            $result['listennum'] = 0;
         }
         
+        // 专辑收藏数
+        $favobj = new Fav();
+        $albumfavnum = $favobj->getAlbumFavCount($album_id);
+        if ($albumlistennum) {
+            $result['favnum'] = $albumfavnum[$album_id];
+        } else {
+            $result['favnum'] = 0;
+        }
 
         $story_list = $story->get_list("`album_id`={$album_id}");
         foreach ($story_list as $k => $v) {
