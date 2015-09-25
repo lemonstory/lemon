@@ -7,7 +7,7 @@ $avatartime = $_GET['avatartime'];
 $domain = "http://lemonavatar.oss-cn-hangzhou.aliyuncs.com/";
 $osspath = $domain . $uid . "?v=" . $avatartime;
 if($size > 0) {
-    if(in_array($size ,array(100, 176, 80))) {
+    if(in_array($size ,array(100, 140))) {
         $osspath = $domain . $uid . "@!s" . $size . "?v=" . $avatartime;
     }
 }
