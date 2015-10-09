@@ -11,6 +11,12 @@ class downalbum extends controller
         if (empty($albumid)) {
             $this->showErrorJson(ErrorConf::paramError());
         }
+    	
+        $userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid();
+        if (empty($uimid)) {
+            $this->showErrorJson(ErrorConf::userImsiIdError());
+        }
         
         // 获取专辑所有故事列表、以及音频文件地址、总下载大小
         $storyobj = new Story();

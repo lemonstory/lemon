@@ -160,6 +160,12 @@ class Fav extends ModelBase
 		
 		// 更新专辑的收藏总数
 		$this->addAlbumFavNum($albumid);
+		
+		// 收藏行为log
+		$actionlogobj = new ActionLog();
+        $userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid($uid);
+        MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_FAV_ALBUM);
 		return $res;
 	}
 	

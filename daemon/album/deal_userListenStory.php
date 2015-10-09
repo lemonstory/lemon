@@ -19,19 +19,23 @@ class deal_userListenStory extends DaemonBase {
 	    }
 	    
 	    $listenobj = new Listen();
+	    $actionlogobj = new ActionLog();
+        $userimsiobj = new UserImsi();
+        $uid = 0;
+        
 	    // 检测是否已收听过
 	    $listeninfo = $listenobj->getUserListenStoryInfo($uimid, $storyid);
 	    if (empty($listeninfo)) {
-	        $userobj = new User();
-	        $uiminfo = $userobj->getUserImsiInfoByUimid($uimid);
+	        $uiminfo = $userimsiobj->getUserImsiInfoByUimid($uimid);
 	        if (empty($uiminfo)) {
 	            return true;
 	        }
 	        $resid = $uiminfo['resid'];
 	        $restype = $uiminfo['restype'];
 	        
-	        if ($restype == $userobj->USER_IMSI_INFO_RESTYPE_UID) {
+	        if ($restype == $userimsiobj->USER_IMSI_INFO_RESTYPE_UID) {
 	            // 登录后的收听
+	            $userobj = new User();
 	            $uid = $resid;
     	        $userinfo = current($userobj->getUserInfo($uid));
     	        if (empty($userinfo)) {
@@ -60,6 +64,9 @@ class deal_userListenStory extends DaemonBase {
             // 添加收听记录
 	        $listenobj->addUserListenStory($uimid, $uid, $albumid, $storyid, $babyagetype);
 	    }
+	    
+	    // 收听故事行为log
+	    MnsQueueManager::pushActionLogQueue($uimid, $storyid, $actionlogobj->ACTION_TYPE_LISTEN_STORY);
 	}
 
 	protected function checkLogPath() {}

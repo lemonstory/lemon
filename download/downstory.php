@@ -12,6 +12,12 @@ class downstory extends controller
             $this->showErrorJson(ErrorConf::paramError());
         }
         
+    	$userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid();
+        if (empty($uimid)) {
+            $this->showErrorJson(ErrorConf::userImsiIdError());
+        }
+        
         // 获取故事文件地址、下载大小
         $storyobj = new Story();
         $storyinfo = $storyobj->get_story_info($storyid);

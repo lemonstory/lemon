@@ -9,7 +9,16 @@ class ActionLog extends ModelBase
     public $MAIN_DB_INSTANCE = 'share_main';
     public $ACTION_LOG_TABLE_NAME = 'user_imsi_action_log';
     
-    public $ACTION_TYPE_LOGIN = 'login'; // 登录
+    // 用户登录
+    public $ACTION_TYPE_LOGIN = 'login';
+    // 收听故事
+    public $ACTION_TYPE_LISTEN_STORY = 'listenstory';
+    // 收藏专辑
+    public $ACTION_TYPE_FAV_ALBUM = 'favalbum';
+    // 下载故事
+    public $ACTION_TYPE_DOWNLOAD_STORY = 'downloadstory';
+    // 下载整个专辑
+    //public $ACTION_TYPE_DOWNLOAD_ALBUM = 'downloadalbum';
     
     
     

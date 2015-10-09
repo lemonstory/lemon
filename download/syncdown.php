@@ -7,19 +7,34 @@ class syncdown extends controller
 {
     public function action()
     {
-        $uid = $this->getUid();
-        $restype = $this->getRequest("restype");// album or story
-        $actiontype = $this->getRequest("actiontype"); // start or end
-        $albumid = $this->getRequest("albumid");
-        $storyid = $this->getRequest("storyid");
-        if (empty($restype) || empty($actiontype) || empty($albumid) || empty($storyid)) {
+        $syncdata = $this->getRequest("syncdata");
+        if (empty($syncdata)) {
             $this->showErrorJson(ErrorConf::paramError());
-            return false;
         }
-        if (empty($uid)) {
-            // 记录未登录用户的下载数据
-            $uid = 0;
+        $data = json_decode($syncdata, true);
+        if (!is_array($data)) {
+        	$this->showErrorJson(ErrorConf::paramError());
         }
+        
+        $uid = $this->getUid();
+    	$userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid($uid);
+        if (empty($uimid)) {
+            $this->showErrorJson(ErrorConf::userImsiIdError());
+        }
+        
+        $downloadobj = new DownLoad();
+        $actionlogobj = new ActionLog();
+        foreach ($data as $value) {
+        	if (empty($value['albumid']) || empty($value['storyid']) || empty($value['status'])) {
+        		continue;
+        	}
+        	$res = $downloadobj->addDownLoadStoryInfo($uimid, $value['albumid'], $value['storyid'], $value['status']);
+        	if ($res == true) {
+		        MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_DOWNLOAD_STORY);
+        	}
+        }
+        
     }
     
 }
