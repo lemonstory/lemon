@@ -44,7 +44,7 @@ class DownLoad extends ModelBase
 	 */
 	public function addDownLoadStoryInfo($uimid, $albumid, $storyid, $status)
 	{
-		if (empty($uimid) || empty($albumid) || empty($storyid) || !in_array($this->STATUS_DOWN_LIST, $status)) {
+		if (empty($uimid) || empty($albumid) || empty($storyid) || !in_array($status, $this->STATUS_DOWN_LIST)) {
 			$this->setError(ErrorConf::paramError());
 			return false;
 		}
