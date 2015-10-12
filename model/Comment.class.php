@@ -212,8 +212,8 @@ class Comment extends ModelBase
         $new_comment_info['id'] = $comment_info['id'];
         $new_comment_info['uid'] = $comment_info['userid'];
         if ($user_info) {
-            $new_comment_info['uname'] = $user_info['nickname'];
-        	$new_comment_info['avatartime'] = $user_info['avatartime'];
+            $new_comment_info['uname'] = $user_info[$comment_info['userid']]['nickname'];
+        	$new_comment_info['avatartime'] = $user_info[$comment_info['userid']]['avatartime'];
         } else {
             $new_comment_info['uname'] = '匿名用户';
             $new_comment_info['avatartime'] = 0;
