@@ -208,9 +208,9 @@ class Comment extends ModelBase
     public function format_to_api($comment_info = array())
     {
         $user = new User();
-        $user_info = $user->getUserInfo($comment_info['uid']);
+        $user_info = $user->getUserInfo($comment_info['userid']);
         $new_comment_info['id'] = $comment_info['id'];
-        $new_comment_info['uid'] = $comment_info['uid'];
+        $new_comment_info['uid'] = $comment_info['userid'];
         if ($user_info) {
             $new_comment_info['uname'] = $user_info['nickname'];
         	$new_comment_info['avatartime'] = $user_info['avatartime'];
