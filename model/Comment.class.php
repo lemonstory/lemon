@@ -194,47 +194,33 @@ class Comment extends ModelBase
         return $r;
     }
 
-    public function get_comment_list()
+    // 获取评论列表
+    public function get_comment_list($where = '')
     {
     	$newcommentlist = array();
-    	$commentlist = $this->get_test_data();
+    	$commentlist = $this->get_list($where);
     	foreach ($commentlist as $k => $v) {
     		$newcommentlist[] = $this->format_to_api($v);
     	}
     	return $newcommentlist;
     }
 
-    public function get_test_data()
-    {
-    	$commentlist = array();
-    	for($i = 1; $i <= 10; $i ++) {
-    		$comment_info = array();
-    		$comment_info['id'] = $i;
-	        $comment_info['uid'] = 0;
-	        if (!$comment_info['uid']) {
-	        	$comment_info['uname'] = '匿名用户';
-	        } else {
-	        	$comment_info['uname'] = $comment_info['uname'];
-	        }
-	        $comment_info['start_level'] = mt_rand(4,5);
-	        $comment_info['comment'] = '123123';
-            $comment_info['avatartime'] = 1442980916;
-	        $commentlist[] = $comment_info;
-    	}
-    	return $commentlist;
-    }
-
+    // 格式化评论数据
     public function format_to_api($comment_info = array())
     {
+        $user = new User();
+        $user_info = $user->getUserInfo($comment_info['uid']);
         $new_comment_info['id'] = $comment_info['id'];
         $new_comment_info['uid'] = $comment_info['uid'];
-        if (!$comment_info['uid']) {
-        	$new_comment_info['uname'] = '匿名用户';
+        if ($user_info) {
+            $new_comment_info['uname'] = $user_info['nickname'];
+        	$new_comment_info['avatartime'] = $user_info['avatartime'];
         } else {
-        	$new_comment_info['uname'] = $comment_info['uname'];
+            $new_comment_info['uname'] = '匿名用户';
+            $new_comment_info['avatartime'] = 0;
         }
-        $new_comment_info['start_level'] = mt_rand(4,5);
-        $new_comment_info['comment'] = '123123';
+        $new_comment_info['start_level'] = $comment_info['star_level'];
+        $new_comment_info['comment'] = $comment_info['content'];
         return $new_comment_info;
     }
 }
