@@ -60,7 +60,7 @@ class info extends controller
         }
         // 评论数量
         $result['commentcount'] = $comment->get_total("`albumid`={$album_id}");
-        $result['commentlist'] = $comment->get_comment_list();
+        $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}");
 
         // 返回成功json
         $this->showSuccJson($result);
