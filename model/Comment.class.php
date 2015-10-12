@@ -153,7 +153,6 @@ class Comment extends ModelBase
         } else {
             $sql = "select * from {$this->table}  where {$where}";
         }
-        echo $sql;echo "\n";
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
         $r = $st->fetchAll();
