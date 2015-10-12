@@ -33,9 +33,9 @@ class info extends controller
         // 是否收藏
         $favinfo = $fav->getUserFavInfoByAlbumId($uid, $album_id);
         if ($favinfo) {
-            $result['fav'] = 1;
+            $result['isfav'] = 1;
         } else {
-            $result['fav'] = 0;
+            $result['isfav'] = 0;
         }
         // 收听数量
         $albumlistennum = $listenobj->getAlbumListenNum($album_id);
@@ -49,9 +49,9 @@ class info extends controller
         $favobj = new Fav();
         $albumfavnum = $favobj->getAlbumFavCount($album_id);
         if ($albumlistennum) {
-            $result['favnum'] = $albumfavnum[$album_id];
+            $result['favcount'] = $albumfavnum[$album_id];
         } else {
-            $result['favnum'] = 0;
+            $result['favcount'] = 0;
         }
 
         $story_list = $story->get_list("`album_id`={$album_id}");
