@@ -29,6 +29,7 @@ class userstoryrecord_add extends controller
                 'albumid'   => $v['albumid'],
                 'storyid'   => $v['storyid'],
                 'playtimes' => $v['playtimes'],
+                'datetimes' => $v['datetimes'],
                 'addtime'   => date('Y-m-d H:i:s'),
             ));
             if ($lastid) {
