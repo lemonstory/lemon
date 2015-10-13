@@ -219,6 +219,7 @@ class Comment extends ModelBase
             $new_comment_info['avatartime'] = 0;
         }
         $new_comment_info['start_level'] = $comment_info['star_level'];
+        $new_comment_info['addtime'] = $comment_info['addtime'];
         $new_comment_info['comment'] = $comment_info['content'];
         return $new_comment_info;
     }
