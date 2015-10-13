@@ -25,6 +25,7 @@ class ranklistenuserlist extends controller
         }
         
         // 批量获取用户信息
+        $userobj = new User();
         $userlist = $userobj->getUserInfo($uids);
         if (empty($userlist)) {
             $this->showErrorJson(ErrorConf::userNoExist());
@@ -34,11 +35,9 @@ class ranklistenuserlist extends controller
         foreach ($ranklist as $value) {
             $uid = $value['uid'];
             if (!empty($userlist[$uid])) {
-                $info['uid'] = $value['uid'];
-                $info['num'] = $value['num'];
-                $info['avatartime'] = $userlist[$uid]['avatartime'];
-                $info['nickname'] = $userlist[$uid]['nickname'];
-                $list[$uid] = $info;
+                $info = $userlist[$uid];
+                $info['listennum'] = $value['num'];
+                $list[] = $info;
             }
         }
         

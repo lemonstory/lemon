@@ -66,10 +66,6 @@ class Listen extends ModelBase
 	 */
 	public function getRankListUserListen($len = 20)
 	{
-		if (empty($babyagetype)) {
-			$this->setError(ErrorConf::paramError());
-			return array();
-		}
 		if (empty($len)) {
 			$len = 20;
 		}
