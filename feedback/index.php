@@ -4,7 +4,9 @@ include_once '../controller.php';
 class index extends controller
 {
     function action() {
-    	$content = $this->getRequest('content', '');
+        $content = $this->getRequest('content', '');
+        $tel     = $this->getRequest('tel', '');
+    	$qq      = $this->getRequest('qq', '');
 
         $uid = $this->getUid();
 
@@ -23,7 +25,9 @@ class index extends controller
 
         $userFeedback = new UserFeedback();
         $userFeedbackId = $userFeedback->insert(array(
-        	'uid'       => $uid,
+            'uid'       => $uid,
+            'qq'        => $qq,
+        	'tel'       => $tel,
         	'content'   => $content,
             'status'    => 1,
         	'addtime'   => date('Y-m-d H:i:s'),
