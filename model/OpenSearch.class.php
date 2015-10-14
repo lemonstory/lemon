@@ -28,6 +28,7 @@ class OpenSearch
         
         // 转化为分词
         $keywordpy = Pinyin($keyword);
+        $searchtext = "";
         for  ($i = 0; $i < strlen($keywordpy); $i++) {
             $searchtext .= $keywordpy[$i] . " ";
         }
