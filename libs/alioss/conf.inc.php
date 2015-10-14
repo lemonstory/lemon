@@ -10,7 +10,7 @@ define('OSS_ACCESS_KEY', 'diWfijmBbiGlwle1s9KyAL8BQhB3Qc');
 define('ALI_LOG', false);
 
 //自定义日志路径，如果没有设置，则使用系统默认路径，在./logs/
-define('ALI_LOG_PATH','/alidata/log/php/alioss.upload.log');
+define('ALI_LOG_PATH','/alidata1/www/logs/');
 
 //是否显示LOG输出
 define('ALI_DISPLAY_LOG', FALSE);
