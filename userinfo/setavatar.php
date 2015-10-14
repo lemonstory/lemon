@@ -3,6 +3,7 @@ include_once '../controller.php';
 class setavatar extends controller
 {
 	function action() {
+	    die();
 		$uid = $this->getUid();
 		if(empty($uid)) {
 			$this->showErrorJson(ErrorConf::noLogin());

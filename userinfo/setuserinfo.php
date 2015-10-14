@@ -9,6 +9,7 @@ class setuserinfo extends controller
             $this->showErrorJson(ErrorConf::noLogin());
         }
         $nickname = $this->getRequest('nickname');
+        $avatartime = $this->getRequest('avatartime');
         $gender = $this->getRequest('gender');
         $birthday = $this->getRequest('birthday');
         $province = $this->getRequest('province');
@@ -31,6 +32,9 @@ class setuserinfo extends controller
         $data = $babydata = array();
         if (!empty($nickname)) {
             $data['nickname'] = str_replace(",", "", strip_tags(trim($nickname)));
+        }
+        if(!empty($avatartime)) {
+            $data['avatartime'] = time();
         }
         if (!empty($province)) {
             $data['province'] = $province;
