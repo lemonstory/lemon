@@ -64,6 +64,17 @@ class MnsQueueManager
     }
     
     
+    public static function pushRepairUserInfo($uid, $column, $value)
+    {
+        self::doPush('lemon-repairuserinfo', $uid . "@@" . $column . "@@" . $value);
+        return true;
+    }
+    public static function popRepairUserInfo()
+    {
+        return self::doPop('lemon-repairuserinfo');
+    }
+    
+    
     
     protected static function doPop($business) 
     {

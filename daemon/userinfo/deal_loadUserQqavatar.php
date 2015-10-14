@@ -1,4 +1,7 @@
 <?php
+/*
+ * 上传处理QQ联合登录的头像
+ */
 include_once (dirname(dirname(__FILE__)) . "/DaemonBase.php");
 include_once SERVER_ROOT . "libs/qqlogin/qqConnectAPI.php";
 class deal_loadUserQqavatar extends DaemonBase 
@@ -8,7 +11,7 @@ class deal_loadUserQqavatar extends DaemonBase
     {
         $data = MnsQueueManager::popLoadUserQqavatar();
         if (empty($data)) {
-            sleep(3);
+            sleep(10);
             return true;
         }
         $dataar = explode("@@", $data);

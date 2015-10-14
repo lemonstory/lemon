@@ -23,6 +23,7 @@ class cron_DaemonServerBooter extends DaemonBase
                 
                 'userinfo/deal_userImsiActionLog.php',
                 'userinfo/deal_loadUserQqavatar.php',
+                'userinfo/deal_repairUserInfo.php',
         );
         return $list;
     }
