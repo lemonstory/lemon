@@ -11,6 +11,9 @@ class gethomeinfo extends controller
         $len = $this->getRequest("len");
         
         $uid = $this->getUid();
+        if (empty($uid)) {
+            $this->showErrorJson(ErrorConf::noLogin());
+        }
         $userimsiobj = new UserImsi();
         $uimid = $userimsiobj->getUimid($uid);
         if (empty($uimid)) {
@@ -24,7 +27,7 @@ class gethomeinfo extends controller
             if (empty($userinfo)) {
                 $this->showErrorJson(ErrorConf::userNoExist());
             }
-            $defaultbabyid = $userinfo['defaultbabyid'];
+            /* $defaultbabyid = $userinfo['defaultbabyid'];
             $defaultaddressid = $userinfo['defaultaddressid'];
             
             $userextobj = new UserExtend();
@@ -33,7 +36,7 @@ class gethomeinfo extends controller
                 $this->showErrorJson(ErrorConf::userBabyInfoEmpty());
             }
             
-            $aliossobj = new AliOss();
+            $aliossobj = new AliOss(); */
             $data = $userinfo;
         }
         
