@@ -7,7 +7,7 @@ $avatartime = $_GET['avatartime'];
 $domain = "http://lemonavatar.oss-cn-hangzhou.aliyuncs.com/";
 $osspath = $domain . $uid . "?v=" . $avatartime;
 if($size > 0) {
-    if(in_array($size ,array(100, 140))) {
+    if(in_array($size ,array(100, 200))) {
         $osspath = $domain . $uid . "@!s" . $size . "?v=" . $avatartime;
     }
 }
@@ -22,8 +22,8 @@ curl_close($ch);
 
 header("content-type: image/jpeg");
 if(strlen($content) < 1000) {
-    $defaultfile = $size . "-" . ($uid % 7 + 1) . ".png";
-    echo file_get_contents(dirname(__FILE__) . "/" . $defaultfile);
+    $defaultfile = "default.png";
+    echo file_get_contents(dirname(dirname(__FILE__)) . "/static/" . $defaultfile);
 }else{
     echo $content;
 }
