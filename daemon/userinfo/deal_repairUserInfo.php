@@ -22,24 +22,27 @@ class deal_repairUserInfo extends DaemonBase
         }
         
         $userobj = new User();
+        $userinfo = current($userobj->getUserInfo($uid));
+        if (empty($userinfo)) {
+            return true;
+        }
+        
         if ($column == 'defaultbabyid') {
             // repair baby info
-            if (empty($value)) {
+            $defaultbabyid = $userinfo['defaultbabyid'];
+            if (empty($defaultbabyid)) {
                 $userextobj = new UserExtend();
                 $newbabyid = $userextobj->addUserBabyInfo($uid);
-            } else {
-                $newbabyid = $value;
+                $userobj->setUserinfo($uid, array($column => $newbabyid));
             }
-            $userobj->setUserinfo($uid, array($column => $newbabyid));
         } elseif ($column == 'defaultaddressid') {
             // repair address info
-            if (empty($value)) {
+            $defaultaddressid = $userinfo['defaultaddressid'];
+            if (empty($defaultaddressid)) {
                 $userextobj = new UserExtend();
                 $newaddressid = $userextobj->addUserAddressInfo($uid);
-            } else {
-                $newaddressid = $value;
+                $userobj->setUserinfo($uid, array($column => $newaddressid));
             }
-            $userobj->setUserinfo($uid, array($column => $newaddressid));
         }
         
     }

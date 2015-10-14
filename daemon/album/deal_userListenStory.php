@@ -42,6 +42,9 @@ class deal_userListenStory extends DaemonBase {
     	            return true;
     	        }
     	        $babyid = $userinfo['defaultbabyid'];
+    	        if (empty($babyid)) {
+    	            MnsQueueManager::pushRepairUserInfo($uid, "defaultbabyid", 0);
+    	        }
     	        
     	        $userextobj = new UserExtend();
     	        $babyinfo = current($userextobj->getUserBabyInfo($babyid));

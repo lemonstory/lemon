@@ -9,6 +9,8 @@ class UserImsi extends ModelBase
     
     /**
      * 获取uid或者设备号的uimid
+     * @param I $uid        获取指定uid的uimid，为空则获取当前登录用户的uimid
+     * @return int
      */
     public function getUimid($uid = 0)
     {

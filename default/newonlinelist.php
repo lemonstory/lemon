@@ -23,6 +23,8 @@ class newonlinelist extends controller
                     if (!empty($babyinfo)) {
                         $babyagetype = $userextobj->getBabyAgeType($babyinfo['age']);
                     }
+                } else {
+                    MnsQueueManager::pushRepairUserInfo($uid, "defaultbabyid", 0);
                 }
             }
         }
