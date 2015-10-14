@@ -5,17 +5,18 @@ class gethomeinfo extends controller
     public function action() 
     {
         // 个人主页
+        $uid = $this->getRequest("uid", 0); // 被访问的用户uid
         $isgetuserinfo = $this->getRequest("isgetuserinfo", 0);
         $direction = $this->getRequest("direction");
         $startalbumid = $this->getRequest("startalbumid");
         $len = $this->getRequest("len");
-        
-        $uid = $this->getUid();
         if (empty($uid)) {
-            $this->showErrorJson(ErrorConf::noLogin());
+            $this->showErrorJson(ErrorConf::userNoExist());
         }
+        
+        $loginuid = $this->getUid();
         $userimsiobj = new UserImsi();
-        $uimid = $userimsiobj->getUimid($uid);
+        $uimid = $userimsiobj->getUimid($loginuid);
         if (empty($uimid)) {
             $this->showErrorJson(ErrorConf::userImsiIdError());
         }
@@ -27,16 +28,6 @@ class gethomeinfo extends controller
             if (empty($userinfo)) {
                 $this->showErrorJson(ErrorConf::userNoExist());
             }
-            /* $defaultbabyid = $userinfo['defaultbabyid'];
-            $defaultaddressid = $userinfo['defaultaddressid'];
-            
-            $userextobj = new UserExtend();
-            $babyinfo = current($userextobj->getUserBabyInfo($defaultbabyid));
-            if (empty($babyinfo)) {
-                $this->showErrorJson(ErrorConf::userBabyInfoEmpty());
-            }
-            
-            $aliossobj = new AliOss(); */
             $data = $userinfo;
         }
         
