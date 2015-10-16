@@ -4,12 +4,18 @@ class SearchCount extends ModelBase
     public $MAIN_DB_INSTANCE = 'share_main';
     public $SEARCH_COUNT_TABLE_NAME = 'search_content_count';
     
-    public function getSearchContentList()
+    public $STATUS_ONLINE = 1;
+    public $STATUS_OFFLINE = 2;
+    
+    public function getHotSearchContentList($len = 10)
     {
+        if (empty($len) || $len > 50) {
+            $len = 10;
+        }
         $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-        $selectsql = "SELECT * FROM `{$this->SEARCH_COUNT_TABLE_NAME}` ORDER BY `count` DESC";
+        $selectsql = "SELECT * FROM `{$this->SEARCH_COUNT_TABLE_NAME}` WHERE `status` = ? ORDER BY `count` DESC LIMIT {$len}";
         $selectst = $db->prepare($selectsql);
-        $selectst->execute();
+        $selectst->execute(array($this->STATUS_ONLINE));
         $selectres = $selectst->fetchAll(PDO::FETCH_ASSOC);
         if (empty($selectres)) {
             return array();
@@ -36,7 +42,7 @@ class SearchCount extends ModelBase
         $selectst->execute(array($searchcontent));
         $selectres = $selectst->fetch(PDO::FETCH_ASSOC);
         if (empty($selectres)) {
-            $sql = "INSERT INTO `{$this->SEARCH_COUNT_TABLE_NAME}` (`searchcontent`, `count`) VALUES ('{$searchcontent}', 1)";
+            $sql = "INSERT INTO `{$this->SEARCH_COUNT_TABLE_NAME}` (`searchcontent`, `count`, `status`) VALUES ('{$searchcontent}', 1, {$this->STATUS_ONLINE})";
         } else {
             $sql = "UPDATE `{$this->SEARCH_COUNT_TABLE_NAME}` SET `count` = `count` + 1 WHERE `searchcontent` = '{$searchcontent}'";
         }
