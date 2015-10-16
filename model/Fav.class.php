@@ -123,7 +123,7 @@ class Fav extends ModelBase
 	    }
 	    
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-	    $sql = "SELECT COUNT(*) FROM {$this->FAV_ALBUM_COUNT_TABLE_NAME} WHERE `uid` = ?";
+	    $sql = "SELECT COUNT(*) FROM {$this->FAV_TABLE_NAME} WHERE `uid` = ?";
 	    $st = $db->prepare($sql);
 	    $st->execute(array($uid));
 	    $res = $st->fetch(PDO::FETCH_COLUMN);
