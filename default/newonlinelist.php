@@ -50,6 +50,9 @@ class newonlinelist extends controller
             // 专辑收藏数
             $favobj = new Fav();
             $albumfavnum = $favobj->getAlbumFavCount($albumids);
+            // 专辑评论总数
+            $commentobj = new Comment();
+            $albumcommentnum = $commentobj->countAlbumComment($albumids);
         }
         
         $newalbumlist = array();
@@ -65,6 +68,10 @@ class newonlinelist extends controller
                     $albuminfo['favnum'] = 0;
                     if (!empty($albumfavnum[$albumid])) {
                         $albuminfo['favnum'] = $albumfavnum[$albumid]['num'] + 0;
+                    }
+                    $albuminfo['commentnum'] = 0;
+                    if (!empty($albumcommentnum[$albumid])) {
+                        $albuminfo['commentnum'] = $albumcommentnum[$albumid] + 0;
                     }
                     $newalbumlist[] = $albuminfo;
                 }

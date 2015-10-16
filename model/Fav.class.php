@@ -10,11 +10,11 @@ class Fav extends ModelBase
 	 * 获取用户收藏列表
 	 * @param I $uid
 	 * @param S $direction     up代表显示上边，down代表显示下边
-	 * @param I $startid       从某个id开始,默认为0表示从第一页获取
+	 * @param I $startfavid    从某个收藏id开始,默认为0表示从第一页获取
 	 * @param I $len           获取长度
 	 * @return array
 	 */
-	public function getUserFavList($uid, $direction = "down", $startid = 0, $len = 20)
+	public function getUserFavList($uid, $direction = "down", $startfavid = 0, $len = 20)
 	{
 		if (empty($uid)) {
 		    $this->setError(ErrorConf::paramError());
