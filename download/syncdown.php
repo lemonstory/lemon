@@ -63,7 +63,7 @@ class syncdown extends controller
         	$res = $downloadobj->addDownLoadStoryInfo($uimid, $value['albumid'], $value['storyid'], $value['status']);
         	if ($res == true) {
         		$tmplist = array('clientid' => $value['clientid'], 'result' => true);
-		        MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_DOWNLOAD_STORY);
+		        MnsQueueManager::pushActionLogQueue($uimid, $value['storyid'], $actionlogobj->ACTION_TYPE_DOWNLOAD_STORY);
         	}
         	
         	$successdata[] = $tmplist;

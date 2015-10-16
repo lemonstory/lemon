@@ -165,7 +165,7 @@ class Fav extends ModelBase
 		$actionlogobj = new ActionLog();
         $userimsiobj = new UserImsi();
         $uimid = $userimsiobj->getUimid($uid);
-        MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_FAV_ALBUM);
+        MnsQueueManager::pushActionLogQueue($uimid, $albumid, $actionlogobj->ACTION_TYPE_FAV_ALBUM);
 		return $res;
 	}
 	
