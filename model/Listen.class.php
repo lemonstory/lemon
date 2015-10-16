@@ -120,7 +120,8 @@ class Listen extends ModelBase
 		}
 		
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		$sql = "SELECT * FROM {$this->LISTEN_RECORD_TABLE_NAME} WHERE {$where} ORDER BY `uptime` DESC LIMIT {$len}";
+		//$sql = "SELECT * FROM {$this->LISTEN_RECORD_TABLE_NAME} WHERE {$where} ORDER BY `uptime` DESC LIMIT {$len}";
+		$sql = "SELECT * FROM {$this->LISTEN_ALBUM_TABLE_NAME} WHERE {$where} ORDER BY `uptime` DESC LIMIT {$len}";
 		$st = $db->prepare($sql);
 		$st->execute();
 		$list = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -179,7 +180,7 @@ class Listen extends ModelBase
 	    $sql = "SELECT * FROM {$this->LISTEN_RECORD_TABLE_NAME} WHERE `uimid` = ? and `albumid` IN ($albumidstr) ORDER BY `uptime` DESC";
 	    $st = $db->prepare($sql);
 	    $st->execute(array($uimid));
-	    $res = $st->fetch(PDO::FETCH_ASSOC);
+	    $res = $st->fetchAll(PDO::FETCH_ASSOC);
 	    if (empty($res)) {
 	        return array();
 	    } else {

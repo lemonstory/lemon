@@ -25,6 +25,7 @@ class mystory extends controller
         
         // 收听历史列表
         $listenalbumlist = array();
+        $storylist = array();
         $listenobj = new Listen();
         $favobj = new Fav();
         $listenalbumres = $listenobj->getUserAlbumListenList($uimid, $direction, $startalbumid, $len);
@@ -50,9 +51,8 @@ class mystory extends controller
                 // 专辑下，uid或设备收听的故事列表
                 $listenstorylist = array();
                 $listenstoryres = $listenobj->getUserListenStoryListByAlbumId($uimid, $albumids);
+                $storyids = array();
                 if (!empty($listenstoryres)) {
-                    $storyids = array();
-                    $storylist = array();
                     foreach ($listenstoryres as $value) {
                         $storyids[] = $value['storyid'];
                     }
@@ -60,16 +60,19 @@ class mystory extends controller
                         $storyids = array_unique($storyids);
                         $storyobj = new Story();
                         $storyres = $storyobj->getListByIds($storyids);
-                        if (!empty($storyres)) {
-                            foreach ($storyres as $value) {
-                                $storylist[$value['album_id']][] = $value;
-                            }
+                        foreach ($storyres as $storyinfo) {
+                            $storylist[$storyinfo['album_id']][] = $storyinfo;
                         }
                     }
                 }
             }
             
             foreach ($listenalbumres as $value) {
+                $albuminfo = array();
+                $listeninfo = array();
+                
+                $listeninfo = $value;
+                
                 $albumid = $value['albumid'];
                 if (empty($albumlist[$albumid])) {
                     continue;
@@ -77,23 +80,21 @@ class mystory extends controller
                 $albuminfo = $albumlist[$albumid];
                 $albuminfo['listennum'] = 0;
                 if (!empty($albumlistennum[$albumid])) {
-                    $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;
+                    $albuminfo['listennum'] = $albumlistennum[$albumid]['num'] + 0;
                 }
                 $albuminfo['favnum'] = 0;
                 if (!empty($albumfavnum[$albumid])) {
-                    $albuminfo['favnum'] = $albumfavnum[$albumid]['num']+0;
+                    $albuminfo['favnum'] = $albumfavnum[$albumid]['num'] + 0;
                 }
                 $albuminfo['commentnum'] = 0;
                 if (!empty($albumcommentnum[$albumid])) {
-                    $albuminfo['commentnum'] = $albumcommentnum[$albumid]['num']+0;
+                    $albuminfo['commentnum'] = $albumcommentnum[$albumid] + 0;
                 }
-                $albuminfo['storylist'] = array();
                 if (!empty($storylist[$albumid])) {
                     $albuminfo['storylist'] = $storylist[$albumid];
                 }
-                $value['albuminfo'] = $albuminfo;
                 
-                $listenalbumlist[] = $value;
+                $listenalbumlist[] = array_merge($listeninfo, $albuminfo);;
             }
         }
         
