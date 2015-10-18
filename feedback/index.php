@@ -23,8 +23,8 @@ class index extends controller
     	    $this->showErrorJson(ErrorConf::userNoExist());
     	}
 
-        $userFeedback = new UserFeedback();
-        $userFeedbackId = $userFeedback->insert(array(
+        $userFeedBack = new UserFeedBack();
+        $userFeedBackId = $userFeedBack->insert(array(
             'uid'       => $uid,
             'qq'        => $qq,
         	'tel'       => $tel,

@@ -1,6 +1,6 @@
 <?php
 
-class UserFeedback extends ModelBase
+class UserFeedBack extends ModelBase
 {
 
     private $table = 'user_feed_back';
