@@ -74,17 +74,14 @@ class mystory extends controller
             }
             
             foreach ($listenalbumres as $value) {
-                $albuminfo = array();
-                $listeninfo = array();
-                // 专辑收听历史更新时间
-                $value['albumlistenuptime'] = date("Y-m-d H:i:s", $value['uptime']);
-                $listeninfo = $value;
-                
                 $albumid = $value['albumid'];
                 if (empty($albumlist[$albumid])) {
                     continue;
                 }
+                // 专辑收听历史更新时间
+                $value['listenalbumuptime'] = date("Y-m-d H:i:s", $value['uptime']);
                 $albuminfo = $albumlist[$albumid];
+                
                 $albuminfo['listennum'] = 0;
                 if (!empty($albumlistennum[$albumid])) {
                     $albuminfo['listennum'] = $albumlistennum[$albumid]['num'] + 0;
@@ -105,7 +102,8 @@ class mystory extends controller
                     $albuminfo['storylist'] = $storylist[$albumid];
                 }
                 
-                $listenalbumlist[] = array_merge($listeninfo, $albuminfo);;
+                $value['albuminfo'] = $albuminfo;
+                $listenalbumlist[] = $value;
             }
         }
         

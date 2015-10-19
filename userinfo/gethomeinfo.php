@@ -62,6 +62,8 @@ class gethomeinfo extends controller
                 if (empty($albumlist[$albumid])) {
                     continue;
                 }
+                // 专辑收听历史更新时间
+                $value['listenalbumuptime'] = date("Y-m-d H:i:s", $value['uptime']);
                 $albuminfo = $albumlist[$albumid];
                 $albuminfo['listennum'] = 0;
                 if (!empty($albumlistennum[$albumid])) {
