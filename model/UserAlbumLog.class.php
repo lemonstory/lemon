@@ -43,6 +43,20 @@ class UserAlbumLog extends ModelBase
         $r  = array_pop($r);
         return $r;
     }
+
+    // 获取最后一次播放信息
+    public function getLastInfo($where)
+    {
+        $db = DbConnecter::connectMysql('share_story');
+        
+        $sql = "select * from {$this->table}  where {$where} order by logid desc limit 1";
+        $st = $db->query( $sql );
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r = $st->fetchAll();
+        $r  = array_pop($r);
+        return $r;
+    }
+
     /**
      * 插入记录
      */
@@ -67,6 +81,22 @@ class UserAlbumLog extends ModelBase
         $st = $db->query($sql);
         unset($tmp_value, $tmp_filed);
         return $db->lastInsertId();
+    }
+
+    // 获取专辑播放信息
+    public function getPlayInfoByAlbumIds($albumids)
+    {
+        if (!is_array($albumids)) {
+            $albumids = array($albumids);
+        }
+        $playlist = array();
+        foreach ($albumids as $k => $v) {
+            $r = $this->format_to_api($this->getLastInfo("albumid = {$v}"));
+            if ($r) {
+                $playlist[] = $r;
+            }
+        }
+        return $playlist;
     }
 
     public function format_to_api($info)
