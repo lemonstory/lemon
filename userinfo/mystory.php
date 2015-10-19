@@ -76,7 +76,8 @@ class mystory extends controller
             foreach ($listenalbumres as $value) {
                 $albuminfo = array();
                 $listeninfo = array();
-                $value['uptime'] = date("Y-m-d H:i:s", $value['uptime']);
+                // 专辑收听历史更新时间
+                $value['albumlistenuptime'] = date("Y-m-d H:i:s", $value['uptime']);
                 $listeninfo = $value;
                 
                 $albumid = $value['albumid'];
