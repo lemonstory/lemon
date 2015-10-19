@@ -32,6 +32,7 @@ class mystory extends controller
         if (!empty($listenalbumres)) {
             $albumids = array();
             $albumlist = array();
+            $playloglist = array();
             foreach ($listenalbumres as $value) {
                 $albumids[] = $value['albumid'];
             }
@@ -48,6 +49,10 @@ class mystory extends controller
                 $commentobj = new Comment();
                 $albumcommentnum = $commentobj->countAlbumComment($albumids);
                 
+                // 专辑下最近播放的故事记录
+                $useralbumlogobj = new UserAlbumLog();
+                $playloglist = $useralbumlogobj->getPlayInfoByAlbumIds($albumids);
+                
                 // 专辑下，uid或设备收听的故事列表
                 $listenstorylist = array();
                 $listenstoryres = $listenobj->getUserListenStoryListByAlbumId($uimid, $albumids);
@@ -61,7 +66,14 @@ class mystory extends controller
                         $storyobj = new Story();
                         $storyres = $storyobj->getListByIds($storyids);
                         foreach ($storyres as $storyinfo) {
-                            $storylist[$storyinfo['album_id']][] = $storyinfo;
+                            $albumid = $storyinfo['album_id'];
+                            $playloginfo = $playloglist[$albumid];
+                            $storyinfo['continueplay'] = 0;
+                            if (!empty($playloginfo) && $playloginfo['storyid'] == $storyinfo['id']) {
+                                // 继续播放
+                                $storyinfo['continueplay'] = 1;
+                            }
+                            $storylist[$albumid][] = $storyinfo;
                         }
                     }
                 }

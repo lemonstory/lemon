@@ -3,6 +3,10 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
+        $useralbumlogobj = new UserAlbumLog();
+        $r = $useralbumlogobj->getPlayInfoByAlbumIds(array(1,2));
+        var_dump($r);
+        die();
         $type = $this->getRequest("type");
         if ($type == 1) {
             $storyid = $this->getRequest("storyid", "1");
