@@ -1,0 +1,166 @@
+@charset "utf-8";
+    html,body{
+    - webkit - text - size - adjust:none;
+    width:100 %;
+}
+
+body{
+    font:16px "黑体",sans - serif;
+}
+
+input,select,textarea{
+    font - size:12px;
+    font - family:"Microsoft YaHei";
+    color:#000;
+}
+
+table{
+    border - collapse:collapse;
+    border - spacing:0;
+}
+
+input:-webkit - autofill{
+    - webkit - box - shadow:0 0 0 1000px white inset;
+}
+
+a{
+    text - decoration:none;
+    color:#000;
+    cursor:pointer;
+}
+
+a:hover{
+    text - decoration:none;
+}
+
+input,button,select,textarea,label{
+    outline:none;
+    font - size:12px;
+    vertical - align:middle;
+}
+
+textarea{
+    resize:none;
+    padding:5px;
+}
+
+img,ul,li,p,dl,dt,dd,li,ol,s,textarea{
+    margin:0;
+    border:0 none;
+    padding:0;
+    list - style - type:none;
+}
+
+body,form,input,select,label,button,xmp,h1,h2,h3,h4,h5,h6,label{
+    margin:0;
+    padding:0;
+}
+
+label{
+    vertical - align:middle;
+    margin - left:5px;
+}
+
+xmp{
+    display:none;
+}
+
+em,i{
+    font - style:normal;
+    list - style - type:none;
+}
+
+img{
+    vertical - align:middle;
+    max - width:100 %;
+}
+
+*::-moz - selection{
+    background - color:#316ac5;
+    color:#fff;
+}
+
+.nocursor a{
+    cursor:auto;
+}
+
+*:focus,*:active{
+    outline:none;
+}
+
+input:active,input:focus{
+    outline:none;
+    inline:none;
+}
+
+br{
+    height:0;
+    overflow:hidden;
+}
+
+.clear{
+    clear:both;
+}
+
+.clearx:after{
+    visibility:hidden;
+    display:block;
+    font - size:0;
+    content:" ";
+    clear:both;
+    height:0;
+}
+
+.clearx{
+    zoom:1;
+}
+
+body{
+    - webkit - tap - highlight - color:transparent;
+    - moz - tap - highlight - color:transparent;
+    - ms - tap - highlight - color:transparent;
+    - o - tap - highlight - color:transparent;
+    tap - highlight - color:transparent;
+}
+
+.wrap{
+    width:100 %;
+    box - sizing:border - box;
+    padding:10px 4.6875 % 40px 4.6875 %;
+    font - size:24px;
+    color:#000;
+    font - weight:normal;
+}
+
+.wrap h1{
+    font - size:36px;
+    text - align:center;
+    padding:28px 0 30px 0;
+}
+
+.wrap.tit{
+    font - size:20px;
+    font - weight:normal;
+    margin - bottom:15px;
+}
+
+.wrap p{
+    margin - bottom:8px;
+    font - size:16px;
+}
+
+.wrap p.p1{
+    margin - bottom:25px;
+}
+
+.box1{
+    margin - bottom:70px;
+}
+
+.wrap span{
+    font - family:Arial;
+}
+
+.hei{
+    font - weight:600;
+}
