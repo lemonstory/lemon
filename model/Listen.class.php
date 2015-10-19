@@ -273,7 +273,7 @@ class Listen extends ModelBase
 		    return false;
 		}
 		
-		// 收听专辑记录
+		// 收听专辑记录，若重复收听则更新时间
 		$this->addUserListenAlbum($uimid, $albumid);
 	    // 更新专辑的收听次数
 	    $this->addAlbumListenCount($albumid, $babyagetype);
