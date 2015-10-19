@@ -93,7 +93,7 @@ class UserAlbumLog extends ModelBase
         foreach ($albumids as $k => $v) {
             $r = $this->format_to_api($this->getLastInfo("albumid = {$v}"));
             if ($r) {
-                $playlist[] = $r;
+                $playlist[$r['albumid']] = $r;
             }
         }
         return $playlist;
