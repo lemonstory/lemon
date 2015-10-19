@@ -67,12 +67,6 @@ class mystory extends controller
                         $storyres = $storyobj->getListByIds($storyids);
                         foreach ($storyres as $storyinfo) {
                             $albumid = $storyinfo['album_id'];
-                            $playloginfo = $playloglist[$albumid];
-                            $storyinfo['continueplay'] = 0;
-                            if (!empty($playloginfo) && $playloginfo['storyid'] == $storyinfo['id']) {
-                                // 继续播放
-                                $storyinfo['continueplay'] = 1;
-                            }
                             $storylist[$albumid][] = $storyinfo;
                         }
                     }
@@ -101,6 +95,10 @@ class mystory extends controller
                 $albuminfo['commentnum'] = 0;
                 if (!empty($albumcommentnum[$albumid])) {
                     $albuminfo['commentnum'] = $albumcommentnum[$albumid] + 0;
+                }
+                $albuminfo['playstoryid'] = 0;
+                if (!empty($playloglist[$albumid])) {
+                    $albuminfo['playstoryid'] = $playloglist[$albumid]['storyid'] + 0;
                 }
                 if (!empty($storylist[$albumid])) {
                     $albuminfo['storylist'] = $storylist[$albumid];
