@@ -18,11 +18,7 @@ class all extends controller
 
         $newalbumlist = array();
 
-        foreach ($albumlist as $k => $v) {
-        	$newalbumlist[] = $album->format_to_api($v);
-        }
-
-        $this->showSuccJson($newalbumlist);
+        $this->showSuccJson($albumlist);
     }
 }
 new all();
