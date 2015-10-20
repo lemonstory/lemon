@@ -264,17 +264,12 @@ class Album extends ModelBase
         return $r;
     }
 
+    // 格化成接口
     public function format_to_api($alubm_info = array())
     {
-        $new_album_info['id'] = $alubm_info['id'];
-        $new_album_info['title'] = $alubm_info['title'];
-        $new_album_info['intro'] = $alubm_info['intro'];
-        $new_album_info['star_level'] = $alubm_info['star_level'];
-        if ($alubm_info['cover']) {
-            $new_album_info['cover'] = $alubm_info['cover'];
-        } else {
-            $new_album_info['cover'] = $alubm_info['s_cover'];
+        if (!$alubm_info['cover']) {
+            $alubm_info['cover'] = $alubm_info['s_cover'];
         }
-        return $new_album_info;
+        return $alubm_info;
     }
 }

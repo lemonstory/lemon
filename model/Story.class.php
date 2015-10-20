@@ -259,24 +259,15 @@ class Story extends ModelBase
 	{
 		$aliossobj = new AliOss();
 
-		$info = array();
-		$info['id'] = $story_info['id'];
-		$info['albumid'] = $story_info['album_id'];
-        $info['title'] = $story_info['title'];
-		// $info['intro'] = $story_info['intro'];
-		$info['times'] = $story_info['times'];
-		$info['file_size'] = $story_info['file_size'];
-		if ($story_info['cover']) {
-			$info['cover'] = $story_info['cover'];
-		} else {
-			$info['cover'] = $story_info['s_cover'];
+		if (!$story_info['cover']) {
+			$story_info['cover'] = $story_info['s_cover'];
 		}
 		if ($story_info['mediapath']) {
-			$info['mediapath'] = $aliossobj->getMediaUrl($story_info['mediapath']);
+			$story_info['mediapath'] = $aliossobj->getMediaUrl($story_info['mediapath']);
 		} else {
-			$info['mediapath'] = '';
+			$story_info['mediapath'] = '';
 		}
 
-		return $info;
+		return $story_info;
 	}
 }
