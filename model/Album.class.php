@@ -118,7 +118,11 @@ class Album extends ModelBase
             }
             return $arr;
         } else {
-            return $r;
+            $albumlist = array();
+            foreach ($r as $k => $v) {
+                $albumlist[$k] = $this->format_to_api($v);
+            }
+            return $albumlist;
         }
     }
 
@@ -145,9 +149,7 @@ class Album extends ModelBase
             $r  = $st->fetchAll();
             $r  = array_pop($r);
             if ($r) {
-                if (!$r['cover']) {
-                    $r['cover'] = $r['s_cover'];
-                }
+                $r = $this->format_to_api($r);
                 $favinfo = $fav->getUserFavInfoByAlbumId($uid, $r['id']);
                 if ($favinfo) {
                     $r['fav'] = 1;
@@ -193,11 +195,11 @@ class Album extends ModelBase
         $st = $db->prepare($sql);
         $st->execute();
         $res = $st->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($res)) {
-            return array();
-        } else {
-            return $res;
+        $albumlist = array();
+        foreach ($res as $k => $v) {
+            $albumlist[$k] = $this->format_to_api($v);
         }
+        return $albumlist;
     }
 
     /**
@@ -261,7 +263,7 @@ class Album extends ModelBase
                 return '';
             }
         }
-        return $r;
+        return $this->format_to_api($r);
     }
 
     // 格式化成接口数据

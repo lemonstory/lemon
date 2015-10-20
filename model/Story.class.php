@@ -96,7 +96,11 @@ class Story extends ModelBase
         	}
         	return $arr;
         } else {
-        	return $r;
+        	$storylist = array();
+            foreach ($r as $k => $v) {
+                $storylist[$k] = $this->format_to_api($v);
+            }
+            return $storylist;
         }
 	}
 
@@ -124,13 +128,7 @@ class Story extends ModelBase
             $r  = $st->fetchAll();
             $r  = array_pop($r);
             if ($r) {
-                if (!$r['cover']) {
-                    $r['cover'] = $r['s_cover'];
-                }
-                if (!$r['mediapath']) {
-                	$r['mediapath'] = $r['source_audio_url'];
-                }
-                $storylist[$r['id']] = $r;
+                $storylist[$r['id']] = $this->format_to_api($r);
             }
         }
         return $storylist;
@@ -175,7 +173,11 @@ class Story extends ModelBase
         if (empty($res)) {
             return array();
         } else {
-            return $res;
+            $storylist = array();
+            foreach ($res as $k => $v) {
+                $storylist[$k] = $this->format_to_api($v);
+            }
+            return $storylist;
         }
     }
 
@@ -202,7 +204,7 @@ class Story extends ModelBase
                 return '';
             }
         }
-        return $r;
+        return $this->format_to_api($r);
     }
 
 	/**
@@ -240,14 +242,7 @@ class Story extends ModelBase
 		$new_list   = array();
 		$story_list = $this->get_list("`album_id`={$album_id}");
 		foreach ($story_list as $k => $v) {
-			if (!$v['cover']) {
-				$v['cover'] = $v['s_cover'];
-			}
-			if (!$v['audio_url']) {
-				$v['audio_url'] = $v['source_audio_url'];
-			}
-			unset($v['s_cover'], $v['source_audio_url']);
-			$new_list[] = $v;
+			$new_list[] = $this->format_to_api($v);
 		}
 		return $new_list;
 	}
@@ -256,14 +251,19 @@ class Story extends ModelBase
 	public function format_to_api($story_info = array())
 	{
 		$aliossobj = new AliOss();
+        // 去除下划线的album_ids
+        $story_info['albumid'] = $story_info['album_id'];unset($story_info['album_id']);
 
 		if (!$story_info['cover']) {
 			$story_info['cover'] = $story_info['s_cover'];
 		}
+        if (!$story_info['audio_url']) {
+            $story_info['audio_url'] = $story_info['source_audio_url'];
+        }
 		if ($story_info['mediapath']) {
 			$story_info['mediapath'] = $aliossobj->getMediaUrl($story_info['mediapath']);
 		} else {
-			$story_info['mediapath'] = '';
+			$story_info['mediapath'] = $story_info['source_audio_url'];
 		}
 
 		return $story_info;
