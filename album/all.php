@@ -16,8 +16,6 @@ class all extends controller
 
         $albumlist = $album->getAlbumList($direction, $startid, $len);
 
-        $newalbumlist = array();
-
         $this->showSuccJson($albumlist);
     }
 }

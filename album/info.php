@@ -17,7 +17,7 @@ class info extends controller
 
         $uid = $this->getUid();
 
-        $album_id = $storyid = $this->getRequest("albumid", "1");
+        $album_id = $this->getRequest("albumid", "1");
         // 专辑信息
         $result['albuminfo']  = $album->get_album_info($album_id);
         // 获取播放信息
