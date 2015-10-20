@@ -264,7 +264,7 @@ class Album extends ModelBase
         return $r;
     }
 
-    // 格化成接口
+    // 格式化成接口数据
     public function format_to_api($alubm_info = array())
     {
         if (!$alubm_info['cover']) {

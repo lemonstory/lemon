@@ -252,9 +252,7 @@ class Story extends ModelBase
 		return $new_list;
 	}
 
-	/**
-	 * 格式化成接口数据
-	 */
+	// 格式化成接口数据
 	public function format_to_api($story_info = array())
 	{
 		$aliossobj = new AliOss();
