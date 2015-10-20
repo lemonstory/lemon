@@ -250,22 +250,20 @@ class Story extends ModelBase
 	// 格式化成接口数据
 	public function format_to_api($story_info = array())
 	{
-        $new_story_info = $story_info;
         // 去除下划线的album_id
-        $new_story_info['albumid'] = $new_story_info['album_id'];
-        unset($new_story_info['album_id']);
-
-		if (!$new_story_info['cover']) {
-			$new_story_info['cover'] = $new_story_info['s_cover'];
+        $story_info['albumid'] = $story_info['album_id'];
+        
+		if (!$story_info['cover']) {
+			$story_info['cover'] = $story_info['s_cover'];
 		}
 
-		if ($new_story_info['mediapath']) {
+		if ($story_info['mediapath']) {
             $aliossobj = new AliOss();
-			$new_story_info['mediapath'] = $aliossobj->getMediaUrl($new_story_info['mediapath']);
+			$story_info['mediapath'] = $aliossobj->getMediaUrl($story_info['mediapath']);
 		} else {
-			$new_story_info['mediapath'] = $new_story_info['source_audio_url'];
+			$story_info['mediapath'] = $story_info['source_audio_url'];
 		}
 
-		return $new_story_info;
+		return $story_info;
 	}
 }
