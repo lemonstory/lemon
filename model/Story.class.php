@@ -250,6 +250,7 @@ class Story extends ModelBase
 	// 格式化成接口数据
 	public function format_to_api($story_info = array())
 	{
+        $story_info = $story_info;
         // 去除下划线的album_id
         $story_info['albumid'] = $story_info['album_id'];
         unset($story_info['album_id']);
