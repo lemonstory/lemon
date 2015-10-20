@@ -13,13 +13,7 @@ class story_list extends controller
 
         $storylist = $story->getStoryList($albumid, $direction, $startid, $len);
 
-        $newstorylist = array();
-
-        foreach ($storylist as $k => $v) {
-        	$newstorylist[] = $story->format_to_api($v);
-        }
-
-        $this->showSuccJson($newstorylist);
+        $this->showSuccJson($storylist);
     }
 }
 new story_list();
