@@ -236,9 +236,9 @@ class UserExtend extends ModelBase
 		return $lastbabyid;
 	}
 	
-	public function updateUserBabyInfo($babyid, $updatedata)
+	public function updateUserBabyInfo($babyid, $uid, $updatedata)
 	{
-	    if (empty($babyid) || empty($updatedata)) {
+	    if (empty($babyid) || empty($uid) || empty($updatedata)) {
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
@@ -257,13 +257,15 @@ class UserExtend extends ModelBase
 	    $setstr = rtrim($setstr, ",");
 	    
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-	    $sql = "UPDATE {$this->BABY_INFO_TABLE_NAME} SET {$setstr} WHERE `id` = ?";
+	    $sql = "UPDATE {$this->BABY_INFO_TABLE_NAME} SET {$setstr} WHERE `id` = ? AND `uid` = ?";
 	    $st = $db->prepare($sql);
-	    $res = $st->execute(array($babyid));
+	    $res = $st->execute(array($babyid, $uid));
 	    if ($res) {
 	        $this->clearBabyinfoCache($babyid);
+	        return true;
+	    } else {
+	        return false;
 	    }
-	    return $res;
 	}
 	
 	
@@ -288,9 +290,9 @@ class UserExtend extends ModelBase
 	    return $lastaddressid;
 	}
 	
-	public function updateUserAddressInfo($addressid, $updatedata)
+	public function updateUserAddressInfo($addressid, $uid, $updatedata)
 	{
-	    if (empty($addressid) || empty($updatedata)) {
+	    if (empty($addressid) || empty($uid) || empty($updatedata)) {
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
@@ -298,24 +300,42 @@ class UserExtend extends ModelBase
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
+	    
 	    $setstr = "";
 	    foreach ($updatedata as $column => $value) {
-	        if (!in_array($column, array("uid", "name", "phonenumber", "address", "ecode"))) {
-	            $this->setError(ErrorConf::systemError());
-	            return false;
-	        }
-	        $setstr .= "`{$column}` = '{$value}', ";
+	        $setstr .= "`{$column}` = '{$value}',";
 	    }
 	    $setstr = rtrim($setstr, ",");
 	    
 	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-	    $sql = "UPDATE {$this->ADDRESS_INFO_TABLE_NAME} SET {$setstr} WHERE `id` = ?";
+	    $sql = "UPDATE {$this->ADDRESS_INFO_TABLE_NAME} SET {$setstr} WHERE `id` = ? AND `uid` = ?";
 	    $st = $db->prepare($sql);
-	    $res = $st->execute(array($addressid));
+	    $res = $st->execute(array($addressid, $uid));
 	    if ($res) {
 	        $this->clearAddressinfoCache($addressid);
+	        return true;
+	    } else {
+	        return false;
 	    }
-	    return $res;
+	}
+	
+	public function delUserAddressInfo($addressid, $uid)
+	{
+	    if (empty($addressid) || empty($uid)) {
+	        $this->setError(ErrorConf::paramError());
+	        return false;
+	    }
+	    
+	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+	    $sql = "DELETE FROM {$this->ADDRESS_INFO_TABLE_NAME} WHERE `id` = ? AND `uid` = ?";
+	    $st = $db->prepare($sql);
+	    $res = $st->execute(array($addressid, $uid));
+	    if ($res) {
+	        $this->clearAddressinfoCache($addressid);
+	        return true;
+	    } else {
+	        return false;
+	    }
 	}
 	
 	public function clearBabyinfoCache($babyid)

@@ -70,7 +70,7 @@ class setuserinfo extends controller
         if (!empty($babydata)) {
             $babyid = $userinfo['defaultbabyid'];
             $userextobj = new UserExtend();
-            $babyres = $userextobj->updateUserBabyInfo($babyid, $babydata);
+            $babyres = $userextobj->updateUserBabyInfo($babyid, $uid, $babydata);
             if ($babyres === false) {
                 $this->showErrorJson($userextobj->getError());
             }
