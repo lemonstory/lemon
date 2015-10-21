@@ -15,18 +15,10 @@ class sameagelist extends controller
         $babyagetype = 0;
         if (! empty($uid)) {
             $userobj = new User();
-            $userinfo = current($userobj->getUserInfo($uid));
+            $userinfo = current($userobj->getUserInfo($uid, 1));
             if (! empty($userinfo)) {
-                $defaultbabyid = $userinfo['defaultbabyid'];
-                if (! empty($defaultbabyid)) {
-                    $userextobj = new UserExtend();
-                    $babyinfo = current($userextobj->getUserBabyInfo($defaultbabyid));
-                    if (! empty($babyinfo)) {
-                        $babyagetype = $userextobj->getBabyAgeType($babyinfo['age']);
-                    }
-                } else {
-                    MnsQueueManager::pushRepairUserInfo($uid, "defaultbabyid", 0);
-                }
+                $userextobj = new UserExtend();
+                $babyagetype = $userextobj->getBabyAgeType($userinfo['age']);
             }
         }
         

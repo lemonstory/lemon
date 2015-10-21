@@ -189,7 +189,7 @@ class Sso extends ModelBase
         
         $passportdata = $this->getInfoWithUid($uid);
         $UserObj = new User();
-        $userinfo = current($UserObj->getUserInfo($uid));
+        $userinfo = current($UserObj->getUserInfo($uid, 1));
         
         $this->setSsoCookie($passportdata, $userinfo);
         
@@ -237,23 +237,13 @@ class Sso extends ModelBase
         }
         
         $UserObj = new User();
-        $userinfo = current($UserObj->getUserInfo($uid));
+        $userinfo = current($UserObj->getUserInfo($uid, 1));
         if (!empty($userinfo['status']) && $userinfo['status'] == '-2') {
             $this->showErrorJson(ErrorConf::userForbidenPost());
         }
         
         $ssoobj = new Sso();
         $ssoobj->setSsoCookie($passportdata, $userinfo);
-        
-        // 登录后的处理
-        /* $actionlogobj = new ActionLog();
-        $userimsiobj = new UserImsi();
-        $uimid = $userimsiobj->getUimid();
-        MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_LOGIN);
-        
-        // add login log
-        $loginlogobj = new UserLoginLog();
-        $loginlogobj->addUserLoginLog($uid, getImsi()); */
         
         return $userinfo;
     }
@@ -389,7 +379,7 @@ class Sso extends ModelBase
         $uid = intval($info['uid']);
         $passportdata = $this->getInfoWithUid($uid);
         $UserObj = new User();
-        $userinfo = current($UserObj->getUserInfo($uid));
+        $userinfo = current($UserObj->getUserInfo($uid, 1));
     
         if (! empty($passportdata['password'])) {
             if ($this->md5Together($uid, $passportdata['password']) != $info['cert']) {

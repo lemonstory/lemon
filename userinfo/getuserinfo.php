@@ -11,7 +11,7 @@ class getuserinfo extends controller
         
         $data = array();
         $userobj = new User();
-        $userinfo = current($userobj->getUserInfo($uid));
+        $userinfo = current($userobj->getUserInfo($uid, 1));
         if (empty($userinfo)) {
             $this->showErrorJson(ErrorConf::userNoExist());
         }
@@ -23,26 +23,16 @@ class getuserinfo extends controller
         $data['city'] = $userinfo['city'];
         $data['area'] = $userinfo['area'];
         $data['phonenumber'] = $userinfo['phonenumber'];
+        $data['birthday'] = $userinfo['birthday'];
+        $data['gender'] = $userinfo['gender'];
+        $data['age'] = $userinfo['age'];
         
-        $defaultbabyid = $userinfo['defaultbabyid'];
         $defaultaddressid = $userinfo['defaultaddressid'];
-        if (empty($defaultbabyid)) {
-            MnsQueueManager::pushRepairUserInfo($uid, "defaultbabyid", 0);
-        }
         if (empty($defaultaddressid)) {
             MnsQueueManager::pushRepairUserInfo($uid, "defaultaddressid", 0);
         }
         
         $userextobj = new UserExtend();
-        $babyinfo = current($userextobj->getUserBabyInfo($defaultbabyid));
-        if (empty($babyinfo)) {
-            $data['gender'] = 0;
-            $data['age'] = 0;
-        } else {
-            $data['gender'] = $babyinfo['gender'];
-            $data['age'] = $babyinfo['age'];
-        }
-        
         $addressinfo = current($userextobj->getUserAddressInfo($defaultaddressid));
         if (empty($addressinfo)) {
             $data['addressinfo'] = array();

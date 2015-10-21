@@ -165,7 +165,7 @@ class WechatSso extends Sso
         
         $passportdata = $this->getInfoWithUid($uid);
         $UserObj = new User();
-        $userinfo = current($UserObj->getUserInfo($uid));
+        $userinfo = current($UserObj->getUserInfo($uid, 1));
         
         $this->setSsoCookie($passportdata, $userinfo);
         

@@ -43,21 +43,13 @@ class deal_userListenStory extends DaemonBase {
 	            // 登录后的收听
 	            $userobj = new User();
 	            $uid = $resid;
-    	        $userinfo = current($userobj->getUserInfo($uid));
+    	        $userinfo = current($userobj->getUserInfo($uid, 1));
     	        if (empty($userinfo)) {
     	            return true;
     	        }
-    	        $babyid = $userinfo['defaultbabyid'];
-    	        if (empty($babyid)) {
-    	            MnsQueueManager::pushRepairUserInfo($uid, "defaultbabyid", 0);
-    	        }
     	        
     	        $userextobj = new UserExtend();
-    	        $babyinfo = current($userextobj->getUserBabyInfo($babyid));
-    	        if (empty($babyinfo)) {
-    	            return true;
-    	        }
-    	        $babyagetype = $userextobj->getBabyAgeType($babyinfo['age']);
+    	        $babyagetype = $userextobj->getBabyAgeType($userinfo['age']);
 	        } else {
 	            // 未登录的收听
 	            $babyagetype = 0;

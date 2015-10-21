@@ -17,7 +17,7 @@ class User extends ModelBase
 	public $STATUS_DELETE = -3; // 删除
 	
 	
-	public function getUserInfo($uids)
+	public function getUserInfo($uids, $isgetbabay = 0)
 	{
 		if(!is_array($uids)) {
 			$uids = array($uids);
@@ -70,10 +70,35 @@ class User extends ModelBase
 			}
 		}
 		
+		// 获取babyinfo
+		$babylist = array();
+		if ($isgetbabay == 1) {
+		    $babyids = array();
+		    foreach ($data as $one) {
+		        if (!empty($one['defaultbabyid'])) {
+		            $babyids[] = $one['defaultbabyid'];
+		        } else {
+		            MnsQueueManager::pushRepairUserInfo($one['uid'], "defaultbabyid", 0);
+		        }
+		    }
+		    if (!empty($babyids)) {
+		        $userextobj = new UserExtend();
+		        $babylist = $userextobj->getUserBabyInfo($babyids);
+		    }
+		}
+		
 		$result = array();
 		foreach ($data as $one) {
 			if(empty($one)) {
 				continue;
+			}
+			$one['birthday'] = "";
+			$one['gender'] = 0;
+			$one['age'] = 0;
+			if ($isgetbabay == 1 && !empty($babylist[$one['defaultbabyid']])) {
+			    $one['birthday'] = $babylist[$one['defaultbabyid']]['birthday'];
+			    $one['gender'] = $babylist[$one['defaultbabyid']]['gender'];
+			    $one['age'] = $babylist[$one['defaultbabyid']]['age'];
 			}
 			$one = $this->formatUserBaseInfo($one);
 			$result[$one['uid']] = $one;

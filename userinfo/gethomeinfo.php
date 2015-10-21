@@ -23,7 +23,7 @@ class gethomeinfo extends controller
         $data = array();
         if ($isgetuserinfo == 1 && !empty($uid)) {
             $userobj = new User();
-            $userinfo = current($userobj->getUserInfo($uid));
+            $userinfo = current($userobj->getUserInfo($uid, 1));
             if (empty($userinfo)) {
                 $this->showErrorJson(ErrorConf::userNoExist());
             }
