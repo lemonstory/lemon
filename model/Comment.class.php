@@ -145,13 +145,13 @@ class Comment extends ModelBase
     /**
      * 获取列表
      */
-    public function get_list($where = '', $limit = '', $filed = '')
+    public function get_list($where = '', $limit = '', $order_by = '')
     {
         $db = DbConnecter::connectMysql('share_comment');
         if ($limit) {
-            $sql = "select * from {$this->table}  where {$where} limit {$limit}";
+            $sql = "select * from {$this->table}  where {$where} {$order_by} limit {$limit}";
         } else {
-            $sql = "select * from {$this->table}  where {$where}";
+            $sql = "select * from {$this->table}  where {$where} {$order_by}";
         }
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
@@ -194,10 +194,10 @@ class Comment extends ModelBase
     }
 
     // 获取评论列表
-    public function get_comment_list($where = '', $limit = '')
+    public function get_comment_list($where = '', $order_by = '')
     {
     	$newcommentlist = array();
-    	$commentlist = $this->get_list($where, $limit);
+    	$commentlist = $this->get_list($where, '', $order_by);
     	foreach ($commentlist as $k => $v) {
     		$newcommentlist[] = $this->format_to_api($v);
     	}
