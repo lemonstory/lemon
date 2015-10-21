@@ -194,10 +194,10 @@ class Comment extends ModelBase
     }
 
     // 获取评论列表
-    public function get_comment_list($where = '')
+    public function get_comment_list($where = '', $limit = '')
     {
     	$newcommentlist = array();
-    	$commentlist = $this->get_list($where);
+    	$commentlist = $this->get_list($where, $limit);
     	foreach ($commentlist as $k => $v) {
     		$newcommentlist[] = $this->format_to_api($v);
     	}
