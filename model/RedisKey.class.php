@@ -12,6 +12,13 @@ class RedisKey
 		return $listenalbumkey;
 	}
 	
+	/**
+	 * 收听的用户榜单key
+	 */
+	public static function getRankListenUserKey()
+	{
+	    return 'ranklistenuser';
+	}
 	
 	/**
 	 * QQ联合登录，是否第一次授权的Key

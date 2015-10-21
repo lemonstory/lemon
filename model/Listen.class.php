@@ -4,11 +4,11 @@ class Listen extends ModelBase
 	public $MAIN_DB_INSTANCE = 'share_main';
 	public $LISTEN_RECORD_TABLE_NAME = 'listen_story';    // 用户收听故事记录
 	public $LISTEN_ALBUM_TABLE_NAME = 'listen_album';     // 用户收听的故事，所属的专辑列表
-	public $LISTEN_USER_COUNT_TABLE_NAME = 'listen_user_count';    // 用户收听总次数
 	public $LISTEN_ALBUM_COUNT_TABLE_NAME = 'listen_album_count';  // 专辑被收听总数
 	public $RECOMMEND_SAME_AGE_TABLE_NAME = 'recommend_same_age';  // 同龄在听推荐表
 	
 	public $CACHE_INSTANCE = 'cache';
+	public $RANK_INSTANCE = 'rank';
 	
 	/**
 	 * 获取同龄在听的上线列表
@@ -60,28 +60,30 @@ class Listen extends ModelBase
 	
 	/**
 	 * 收听用户排行列表
-	 * 每周更新一次，收听故事的用户排行
 	 * @param I $len			列表长度
 	 * @return array
 	 */
-	public function getRankListUserListen($len = 20)
+	public function getRankListUserListen($len = 20, $uid = 0)
 	{
 		if (empty($len)) {
 			$len = 20;
 		}
-		if ($len > 50) {
-		    $len = 50;
+		if ($len > 200) {
+		    $len = 200;
 		}
 		
-		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		$sql = "SELECT * FROM {$this->LISTEN_USER_COUNT_TABLE_NAME} ORDER BY `num` DESC LIMIT {$len}";
-		$st = $db->prepare($sql);
-		$st->execute();
-		$reslist = $st->fetchAll(PDO::FETCH_ASSOC);
-		if (empty($reslist)) {
-			return array();
+		$list = array();
+		$rankkey = RedisKey::getRankListenUserKey();
+		$redisobj = AliRedisConnecter::connRedis($this->RANK_INSTANCE);
+		$list = $redisobj->zRevRange($rankkey, 0, 19, true);
+		
+		$userranknum = 0;
+		if (!empty($uid) && !empty($list)) {
+		    $userranknum = $redisobj->zRevRank($rankkey, $uid) + 1;
 		}
-		return $reslist;
+		$userrankuptime = date("Y-m-d H:i:s");
+		
+		return array("list" => $list, "userranknum" => $userranknum, "userrankuptime" => $userrankuptime);
 	}
 	
 	
@@ -324,23 +326,11 @@ class Listen extends ModelBase
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
-	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 	    
-	    $selectsql = "SELECT * FROM `{$this->LISTEN_USER_COUNT_TABLE_NAME}` WHERE `uid` = ?";
-	    $selectst = $db->prepare($selectsql);
-	    $selectst->execute(array($uid));
-	    $selectres = $selectst->fetch(PDO::FETCH_ASSOC);
-	    if (empty($selectres)) {
-	        $sql = "INSERT INTO `{$this->LISTEN_USER_COUNT_TABLE_NAME}` (`uid`, `num`) VALUES ('{$uid}', 1)";
-	    } else {
-	        $sql = "UPDATE `{$this->LISTEN_USER_COUNT_TABLE_NAME}` SET `num` = `num` + 1 WHERE `uid` = '{$uid}'";
-	    }
-		$st = $db->prepare($sql);
-		$usernumres = $st->execute();
-		if (empty($usernumres)) {
-		    return false;
-		}
-		return true;
+	    $rankkey = RedisKey::getRankListenUserKey();
+	    $redisobj = AliRedisConnecter::connRedis($this->RANK_INSTANCE);
+	    $redisobj->zIncrBy($rankkey, 1, $uid);
+	    return true;
 	}
 	
     /**
