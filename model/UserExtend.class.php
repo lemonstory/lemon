@@ -250,6 +250,16 @@ class UserExtend extends ModelBase
 	        $updatedata['age'] = getAgeFromBirthDay($updatedata['birthday']);
 	    }
 	    
+	    $babyinfo = current($this->getUserBabyInfo($babyid));
+	    if (empty($babyinfo)) {
+	        $this->setError(ErrorConf::userBabyInfoEmpty());
+	        return false;
+	    }
+	    if ($babyinfo['uid'] != $uid) {
+	        $this->setError(ErrorConf::userBabyInfoEmpty());
+	        return false;
+	    }
+	    
 	    $setstr = "";
 	    foreach ($updatedata as $column => $value) {
 	        $setstr .= "`{$column}` = '{$value}',";
@@ -300,6 +310,15 @@ class UserExtend extends ModelBase
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
+	    $addressinfo = current($this->getUserAddressInfo($addressid));
+	    if (empty($addressinfo)) {
+	        $this->setError(ErrorConf::userAddressInfoEmpty());
+	        return false;
+	    }
+	    if ($addressinfo['uid'] != $uid) {
+	        $this->setError(ErrorConf::userAddressInfoEmpty());
+	        return false;
+	    }
 	    
 	    $setstr = "";
 	    foreach ($updatedata as $column => $value) {
@@ -323,6 +342,15 @@ class UserExtend extends ModelBase
 	{
 	    if (empty($addressid) || empty($uid)) {
 	        $this->setError(ErrorConf::paramError());
+	        return false;
+	    }
+	    $addressinfo = current($this->getUserAddressInfo($addressid));
+	    if (empty($addressinfo)) {
+	        $this->setError(ErrorConf::userAddressInfoEmpty());
+	        return false;
+	    }
+	    if ($addressinfo['uid'] != $uid) {
+	        $this->setError(ErrorConf::userAddressInfoEmpty());
 	        return false;
 	    }
 	    
