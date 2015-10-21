@@ -56,7 +56,7 @@ class info extends controller
         $result['storylist'] = $story->get_list("`album_id`={$album_id}");
         // 评论数量
         $result['albuminfo']['commentnum'] = (int)$comment->get_total("`albumid`={$album_id}");
-        $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}");
+        $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ");
 
         // 返回成功json
         $this->showSuccJson($result);
