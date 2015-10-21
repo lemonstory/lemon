@@ -47,15 +47,15 @@ class info extends controller
         // 专辑收藏数
         $favobj = new Fav();
         $albumfavnum = $favobj->getAlbumFavCount($album_id);
-        if ($albumlistennum) {
-            $result['albuminfo']['favcount'] = $albumfavnum[$album_id]['num'];
+        if ($albumfavnum) {
+            $result['albuminfo']['favnum'] = $albumfavnum[$album_id]['num'];
         } else {
-            $result['albuminfo']['favcount'] = 0;
+            $result['albuminfo']['favnum'] = 0;
         }
 
         $result['storylist'] = $story->get_list("`album_id`={$album_id}");
         // 评论数量
-        $result['albuminfo']['commentcount'] = $comment->get_total("`albumid`={$album_id}");
+        $result['albuminfo']['commentnum'] = $comment->get_total("`albumid`={$album_id}");
         $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}");
 
         // 返回成功json
