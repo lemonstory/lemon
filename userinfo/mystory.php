@@ -83,6 +83,7 @@ class mystory extends controller
                 $value['playstoryid'] = 0;
                 if (!empty($playloglist[$albumid])) {
                     $value['playstoryid'] = $playloglist[$albumid]['storyid'] + 0;
+                    $value['playtimes'] = $playloglist[$albumid]['playtimes'] + 0;
                 }
                 
                 $albuminfo = $albumlist[$albumid];

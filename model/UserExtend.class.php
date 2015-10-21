@@ -271,7 +271,7 @@ class UserExtend extends ModelBase
 	    $st = $db->prepare($sql);
 	    $res = $st->execute(array($babyid, $uid));
 	    if ($res) {
-	        $this->clearBabyinfoCache($babyid);
+	        $this->clearBabyInfoCache($babyid);
 	        return true;
 	    } else {
 	        return false;
@@ -331,7 +331,8 @@ class UserExtend extends ModelBase
 	    $st = $db->prepare($sql);
 	    $res = $st->execute(array($addressid, $uid));
 	    if ($res) {
-	        $this->clearAddressinfoCache($addressid);
+	        $this->clearAddressInfoCache($addressid);
+	        $this->clearUserAddressListCache($uid);
 	        return true;
 	    } else {
 	        return false;
@@ -359,23 +360,31 @@ class UserExtend extends ModelBase
 	    $st = $db->prepare($sql);
 	    $res = $st->execute(array($addressid, $uid));
 	    if ($res) {
-	        $this->clearAddressinfoCache($addressid);
+	        $this->clearAddressInfoCache($addressid);
+	        $this->clearUserAddressListCache($uid);
 	        return true;
 	    } else {
 	        return false;
 	    }
 	}
 	
-	public function clearBabyinfoCache($babyid)
+	public function clearBabyInfoCache($babyid)
 	{
 	    $key = RedisKey::getBabyInfoKey($babyid);
 	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
 	    $redisobj->delete($key);
 	    return true;
 	}
-	public function clearAddressinfoCache($addressid)
+	public function clearAddressInfoCache($addressid)
 	{
 	    $key = RedisKey::getAddressInfoKey($addressid);
+	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+	    $redisobj->delete($key);
+	    return true;
+	}
+	public function clearUserAddressListCache($uid)
+	{
+	    $key = RedisKey::getUserAddressListKey($uid);
 	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
 	    $redisobj->delete($key);
 	    return true;
