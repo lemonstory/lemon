@@ -151,7 +151,7 @@ class Comment extends ModelBase
         if ($limit) {
             $sql = "select * from {$this->table}  where {$where} {$order_by} limit {$limit}";
         } else {
-            $sql = "select * from {$this->table}  where {$where} {$order_by}";
+            $sql = "select * from {$this->table}  where {$where}  {$order_by}";
         }
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
