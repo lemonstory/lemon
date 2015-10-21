@@ -15,9 +15,9 @@ class story_info extends controller
 		// 专辑收藏总数
 		$fav_list   = $fav->getAlbumFavCount($story_info['albumid']);
 		if ($fav_list) {
-			$story_info['albumfavcount'] = $fav_list[$story_info['albumid']]['num'];
+			$story_info['favnum'] = $fav_list[$story_info['albumid']]['num'];
 		} else {
-			$story_info['albumfavcount'] = 0;
+			$story_info['favnum'] = 0;
 		}
 
         // 返回成功json
