@@ -328,7 +328,7 @@ class Listen extends ModelBase
 	    
 	    $selectsql = "SELECT * FROM `{$this->LISTEN_USER_COUNT_TABLE_NAME}` WHERE `uid` = ?";
 	    $selectst = $db->prepare($selectsql);
-	    $selectst->execute(array($uimid));
+	    $selectst->execute(array($uid));
 	    $selectres = $selectst->fetch(PDO::FETCH_ASSOC);
 	    if (empty($selectres)) {
 	        $sql = "INSERT INTO `{$this->LISTEN_USER_COUNT_TABLE_NAME}` (`uid`, `num`) VALUES ('{$uid}', 1)";

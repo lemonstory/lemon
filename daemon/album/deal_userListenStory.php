@@ -32,34 +32,28 @@ class deal_userListenStory extends DaemonBase {
         if (empty($storyinfo)) {
             return true;
         }
-        $albumid = $storyinfo['albumid'];
+        $albumid = $storyinfo['album_id'];
         
-	    // 检测是否已收听过
-        $listenobj = new Listen();
-	    $listeninfo = $listenobj->getUserListenStoryInfo($uimid, $storyid);
-	    if (empty($listeninfo)) {
-	        // 第一次收听该故事
-	        if ($restype == $userimsiobj->USER_IMSI_INFO_RESTYPE_UID) {
-	            // 登录后的收听
-	            $userobj = new User();
-	            $uid = $resid;
-    	        $userinfo = current($userobj->getUserInfo($uid, 1));
-    	        if (empty($userinfo)) {
-    	            return true;
-    	        }
-    	        
-    	        $userextobj = new UserExtend();
-    	        $babyagetype = $userextobj->getBabyAgeType($userinfo['age']);
-	        } else {
-	            // 未登录的收听
-	            $babyagetype = 0;
+        // 第一次或重复收听该故事
+        if ($restype == $userimsiobj->USER_IMSI_INFO_RESTYPE_UID) {
+            // 登录后的收听
+            $userobj = new User();
+            $uid = $resid;
+	        $userinfo = current($userobj->getUserInfo($uid, 1));
+	        if (empty($userinfo)) {
+	            return true;
 	        }
 	        
-            // 添加收听记录
-	        $listenobj->addUserListenStory($uimid, $uid, $albumid, $storyid, $babyagetype);
-	    } else {
-	        // 重复收听该故事
-	    }
+	        $userextobj = new UserExtend();
+	        $babyagetype = $userextobj->getBabyAgeType($userinfo['age']);
+        } else {
+            // 未登录的收听
+            $babyagetype = 0;
+        }
+        
+        // 添加收听记录
+        $listenobj = new Listen();
+        $listenobj->addUserListenStory($uimid, $uid, $albumid, $storyid, $babyagetype);
 	    
 	    // 收听故事行为log
 	    $actionlogobj = new ActionLog();
