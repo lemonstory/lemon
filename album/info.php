@@ -39,7 +39,7 @@ class info extends controller
         // 收听数量
         $albumlistennum = $listenobj->getAlbumListenNum($album_id);
         if ($albumlistennum) {
-            $result['albuminfo']['listennum'] = $albumlistennum[$album_id]['num'];
+            $result['albuminfo']['listennum'] = (int)$albumlistennum[$album_id]['num'];
         } else {
             $result['albuminfo']['listennum'] = 0;
         }
@@ -48,14 +48,14 @@ class info extends controller
         $favobj = new Fav();
         $albumfavnum = $favobj->getAlbumFavCount($album_id);
         if ($albumfavnum) {
-            $result['albuminfo']['favnum'] = $albumfavnum[$album_id]['num'];
+            $result['albuminfo']['favnum'] = (int)$albumfavnum[$album_id]['num'];
         } else {
             $result['albuminfo']['favnum'] = 0;
         }
 
         $result['storylist'] = $story->get_list("`album_id`={$album_id}");
         // 评论数量
-        $result['albuminfo']['commentnum'] = $comment->get_total("`albumid`={$album_id}");
+        $result['albuminfo']['commentnum'] = (int)$comment->get_total("`albumid`={$album_id}");
         $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}");
 
         // 返回成功json
