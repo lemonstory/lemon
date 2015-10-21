@@ -80,6 +80,11 @@ class mystory extends controller
                 }
                 // 专辑收听历史更新时间
                 $value['listenalbumuptime'] = date("Y-m-d H:i:s", $value['uptime']);
+                $value['playstoryid'] = 0;
+                if (!empty($playloglist[$albumid])) {
+                    $value['playstoryid'] = $playloglist[$albumid]['storyid'] + 0;
+                }
+                
                 $albuminfo = $albumlist[$albumid];
                 
                 $albuminfo['listennum'] = 0;
@@ -93,10 +98,6 @@ class mystory extends controller
                 $albuminfo['commentnum'] = 0;
                 if (!empty($albumcommentnum[$albumid])) {
                     $albuminfo['commentnum'] = $albumcommentnum[$albumid] + 0;
-                }
-                $albuminfo['playstoryid'] = 0;
-                if (!empty($playloglist[$albumid])) {
-                    $albuminfo['playstoryid'] = $playloglist[$albumid]['storyid'] + 0;
                 }
                 if (!empty($storylist[$albumid])) {
                     $albuminfo['storylist'] = $storylist[$albumid];
