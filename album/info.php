@@ -32,9 +32,9 @@ class info extends controller
         // 是否收藏
         $favinfo = $fav->getUserFavInfoByAlbumId($uid, $album_id);
         if ($favinfo) {
-            $result['albuminfo']['isfav'] = 1;
+            $result['albuminfo']['fav'] = 1;
         } else {
-            $result['albuminfo']['isfav'] = 0;
+            $result['albuminfo']['fav'] = 0;
         }
         // 收听数量
         $albumlistennum = $listenobj->getAlbumListenNum($album_id);
