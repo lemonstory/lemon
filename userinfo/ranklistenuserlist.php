@@ -14,10 +14,10 @@ class ranklistenuserlist extends controller
         }
         
         $listenobj = new Listen();
-        $rankres = $listenobj->getRankListUserListen($len, $uid);
-        $ranklist = $rankres['list'];
-        $userranknum = $rankres['userranknum'];
-        $userrankuptime = $rankres['userrankuptime'];
+        $ranklist = $listenobj->getRankListUserListen($len, $uid);
+        $ranknum = $listenobj->getUserListenRankNum($uid);
+        $userranknum = $ranknum['userranknum'];
+        $userrankuptime = $ranknum['userrankuptime'];
         
         $list = array();
         $uids = array();

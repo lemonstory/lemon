@@ -63,9 +63,9 @@ class Listen extends ModelBase
 	 * @param I $len			列表长度
 	 * @return array
 	 */
-	public function getRankListUserListen($len = 20, $uid = 0)
+	public function getRankListUserListen($len = 20)
 	{
-		if (empty($len)) {
+		if ($len < 1) {
 			$len = 20;
 		}
 		if ($len > 200) {
@@ -75,15 +75,31 @@ class Listen extends ModelBase
 		$list = array();
 		$rankkey = RedisKey::getRankListenUserKey();
 		$redisobj = AliRedisConnecter::connRedis($this->RANK_INSTANCE);
-		$list = $redisobj->zRevRange($rankkey, 0, 19, true);
+		$list = $redisobj->zRevRange($rankkey, 0, $len - 1, true);
 		
-		$userranknum = 0;
-		if (!empty($uid) && !empty($list)) {
-		    $userranknum = $redisobj->zRevRank($rankkey, $uid) + 1;
-		}
-		$userrankuptime = date("Y-m-d H:i:s");
-		
-		return array("list" => $list, "userranknum" => $userranknum, "userrankuptime" => $userrankuptime);
+		return $list;
+	}
+	
+	/**
+	 * 获取用户的收听用户榜单排名，及排名最后更新时间
+	 * @param I $uid
+	 * @return array
+	 */
+	public function getUserListenRankNum($uid)
+	{
+	    if (empty($uid)) {
+	        return 0;
+	    }
+	    
+	    $userranknum = 0;
+	    if (!empty($uid)) {
+	        $rankkey = RedisKey::getRankListenUserKey();
+	        $redisobj = AliRedisConnecter::connRedis($this->RANK_INSTANCE);
+	        $userranknum = $redisobj->zRevRank($rankkey, $uid) + 1;
+	    }
+	    $userrankuptime = date("Y-m-d H:i:s");
+	    
+	    return array("userranknum" => $userranknum, "userrankuptime" => $userrankuptime);
 	}
 	
 	
