@@ -9,15 +9,18 @@ class ranklistenuserlist extends controller
     {
         $len = $this->getRequest("len", 20);
         $uid = $this->getUid();
-        if (empty($uid)) {
-        	$this->showErrorJson(ErrorConf::noLogin());
-        }
         
+        $userranknum = 0;
+        $userrankuptime = 0;
         $listenobj = new Listen();
-        $ranklist = $listenobj->getRankListUserListen($len, $uid);
-        $ranknum = $listenobj->getUserListenRankNum($uid);
-        $userranknum = $ranknum['userranknum'];
-        $userrankuptime = $ranknum['userrankuptime'];
+        $ranklist = $listenobj->getRankListUserListen($len);
+        if (!empty($uid)) {
+            $ranknum = $listenobj->getUserListenRankNum($uid);
+            if (!empty($ranknum)) {
+                $userranknum = $ranknum['userranknum'];
+                $userrankuptime = $ranknum['userrankuptime'];
+            }
+        }
         
         $list = array();
         $uids = array();

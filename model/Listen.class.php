@@ -88,7 +88,7 @@ class Listen extends ModelBase
 	public function getUserListenRankNum($uid)
 	{
 	    if (empty($uid)) {
-	        return 0;
+	        return array();
 	    }
 	    
 	    $userranknum = 0;
