@@ -19,7 +19,7 @@ class deal_saveAlbumToSearch extends DaemonBase {
         }
         $albumid = $storyinfo['album_id'];
         $storytitle = $storyinfo['title'];
-        $addtime = $storyinfo['add_time'];
+        //$addtime = $storyinfo['add_time'];
         
         $albumobj = new Album();
         $albuminfo = $albumobj->get_album_info($albumid);
@@ -27,11 +27,11 @@ class deal_saveAlbumToSearch extends DaemonBase {
             return true;
         }
         $albumtitle = $albuminfo['title'];
-        $albumauthor = $albuminfo['author'];
+        //$albumauthor = $albuminfo['author'];
         
         // add data to opensearch
         $searchobj = new OpenSearch();
-        $searchobj->addAlbumToSearch($storyid, $storytitle, $albumid, $albumtitle, $albumauthor, $addtime);
+        $searchobj->addAlbumToSearch($storyid, $storytitle, $albumid, $albumtitle);
 	}
 
 	protected function checkLogPath() {}

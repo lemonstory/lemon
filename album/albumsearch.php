@@ -4,6 +4,7 @@ class albumsearch extends controller
 {
     public function action()
     {
+        die();
         $searchcontent = $this->getRequest("searchcontent");
         if (empty($searchcontent)) {
             $this->showErrorJson(ErrorConf::paramError());
