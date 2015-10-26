@@ -315,6 +315,7 @@ class Sso extends ModelBase
             $uids = array($uids);
         }
         $data = array();
+        $cacheIds = array();
         $getkeys = RedisKey::getUserInfoKeys($uids);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $cacheData = $redisobj->mget($getkeys);
