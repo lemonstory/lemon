@@ -1,5 +1,5 @@
 <?php
-// 冻结屏蔽
+// 封号
 class ForbiddenUser extends ModelBase
 {
     public $FORBIDDEN_DB_INSTANCE = 'share_manage';
