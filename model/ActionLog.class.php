@@ -20,6 +20,12 @@ class ActionLog extends ModelBase
     // 下载整个专辑
     //public $ACTION_TYPE_DOWNLOAD_ALBUM = 'downloadalbum';
     
+    public $ACTION_TYPE_LIST = array(
+            "login" => "登录",
+            "listenstory" => "收听故事",
+            "favalbum" => "收藏故事辑",
+            "downloadstory" => "下载故事",
+            );
     
     
     public function addUserImsiActionLog($uimid, $actionid, $actiontype, $addtime = "")
