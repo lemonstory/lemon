@@ -23,6 +23,7 @@ class mystory extends controller
             $this->showErrorJson(ErrorConf::userImsiIdError());
         }
         
+        $aliossobj = new AliOss();
         // 收听历史列表
         $listenalbumlist = array();
         $storylist = array();
@@ -87,6 +88,9 @@ class mystory extends controller
                 }
                 
                 $albuminfo = $albumlist[$albumid];
+                if (!empty($albuminfo['cover'])) {
+                    $albuminfo['cover'] = $aliossobj->getImageUrlNg($albuminfo['cover'], 100);
+                }
                 
                 $albuminfo['listennum'] = 0;
                 if (!empty($albumlistennum[$albumid])) {

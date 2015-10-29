@@ -58,7 +58,11 @@ class albumstorysearch extends controller
             if (!empty($albumres)) {
                 foreach ($albumres as $value) {
                     $info = $value;
-                    $info['cover'] = $aliossobj->getImageUrlNg($value['cover']);
+                    if (!empty($value['cover'])) {
+                        $info['cover'] = $aliossobj->getImageUrlNg($value['cover'], 100);
+                    } else {
+                        $info['cover'] = "";
+                    }
                     $albumlist[] = $info;
                 }
             }

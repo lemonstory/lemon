@@ -11,6 +11,7 @@ class sameagelist extends controller
         $uid = $this->getUid();
         $userinfo = array();
         $albumids = array();
+        $aliossobj = new AliOss();
         
         $babyagetype = 0;
         if (! empty($uid)) {
@@ -53,6 +54,9 @@ class sameagelist extends controller
                 $albumid = $value['albumid'];
                 if (! empty($albumlist[$albumid])) {
                     $albuminfo = $albumlist[$albumid];
+                    if (!empty($albuminfo['cover'])) {
+                        $albuminfo['cover'] = $aliossobj->getImageUrlNg($albuminfo['cover'], 100);
+                    }
                     $albuminfo['listennum'] = 0;
                     if (! empty($albumlistennum[$albumid])) {
                         $albuminfo['listennum'] = $albumlistennum[$albumid]['num'] + 0;

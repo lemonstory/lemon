@@ -30,6 +30,7 @@ class gethomeinfo extends controller
             $data = $userinfo;
         }
         
+        $aliossobj = new AliOss();
         $listenalbumlist = array();
         $listenobj = new Listen();
         $listenalbumres = $listenobj->getUserAlbumListenList($uimid, $direction, $startalbumid, $len);
@@ -65,6 +66,9 @@ class gethomeinfo extends controller
                 // 专辑收听历史更新时间
                 $value['listenalbumuptime'] = date("Y-m-d H:i:s", $value['uptime']);
                 $albuminfo = $albumlist[$albumid];
+                if (!empty($albuminfo['cover'])) {
+                    $albuminfo['cover'] = $aliossobj->getImageUrlNg($albuminfo['cover'], 100);
+                }
                 $albuminfo['listennum'] = 0;
                 if (!empty($albumlistennum[$albumid])) {
                     $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;

@@ -15,6 +15,7 @@ class getfavlist extends controller
             $this->showErrorJson(ErrorConf::noLogin());
         }
         
+        $aliossobj = new AliOss();
         $albumids = array();
         $favobj = new Fav();
         $favlist = $favobj->getUserFavList($uid, $direction, $startfavid, $len);
@@ -52,6 +53,9 @@ class getfavlist extends controller
                 $albumid = $value['albumid'];
                 if (! empty($albumlist[$albumid])) {
                     $albuminfo = $albumlist[$albumid];
+                    if (!empty($albuminfo['cover'])) {
+                        $albuminfo['cover'] = $aliossobj->getImageUrlNg($albuminfo['cover'], 100);
+                    }
                     
                     $albuminfo['listennum'] = 0;
                     if (! empty($albumlistennum[$albumid])) {

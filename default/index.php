@@ -8,6 +8,7 @@ class index extends controller
 		$userinfo = array();
 		$albumids = array();
 		$managesysobj = new ManageSystem();
+		$aliossobj = new AliOss();
 		
 		// 热门推荐
 		$hotrecommendres = $managesysobj->getRecommendHotList("", 0, 9);
@@ -63,6 +64,9 @@ class index extends controller
 				$albumid = $value['albumid'];
 				if (!empty($albumlist[$albumid])) {
 				    $albuminfo = $albumlist[$albumid];
+				    if (!empty($albuminfo['cover'])) {
+				        $albuminfo['cover'] = $aliossobj->getImageUrlNg($albuminfo['cover'], 200);
+				    }
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
 				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;
@@ -76,6 +80,9 @@ class index extends controller
 				$albumid = $value['albumid'];
 				if (!empty($albumlist[$albumid])) {
 				    $albuminfo = $albumlist[$albumid];
+				    if (!empty($albuminfo['cover'])) {
+				        $albuminfo['cover'] = $aliossobj->getImageUrlNg($albuminfo['cover'], 200);
+				    }
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
 				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;
@@ -89,6 +96,9 @@ class index extends controller
 				$albumid = $value['albumid'];
 				if (!empty($albumlist[$albumid])) {
 				    $albuminfo = $albumlist[$albumid];
+				    if (!empty($albuminfo['cover'])) {
+				        $albuminfo['cover'] = $aliossobj->getImageUrlNg($albuminfo['cover'], 200);
+				    }
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
 				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;
@@ -104,7 +114,7 @@ class index extends controller
 		if (!empty($focusres)) {
 		    $aliossobj = new AliOss();
 		    foreach ($focusres as $value) {
-		        $focusinfo['cover'] = $aliossobj->getFocusUrl($value['picid']);
+		        $focusinfo['cover'] = $aliossobj->getFocusUrl($value['picid'], 1);
 		        $focusinfo['linkurl'] = $value['linkurl'];
 		        $focuspiclist[] = $focusinfo;
 		    }

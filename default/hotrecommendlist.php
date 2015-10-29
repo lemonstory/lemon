@@ -13,6 +13,7 @@ class hotrecommendlist extends controller
         $albumlist = array();
         $listenobj = new Listen();
         $managesysobj = new ManageSystem();
+        $aliossobj = new AliOss();
         
         // 热门推荐
         $hotrecommendres = $managesysobj->getRecommendHotList($direction, $startalbumid, $len);
@@ -43,6 +44,9 @@ class hotrecommendlist extends controller
                 $albumid = $value['albumid'];
                 if (! empty($albumlist[$albumid])) {
                     $albuminfo = $albumlist[$albumid];
+                    if (!empty($albuminfo['cover'])) {
+                        $albuminfo['cover'] = $aliossobj->getImageUrlNg($albuminfo['cover'], 100);
+                    }
                     $albuminfo['listennum'] = 0;
                     if (! empty($albumlistennum[$albumid])) {
                         $albuminfo['listennum'] = $albumlistennum[$albumid]['num'] + 0;
