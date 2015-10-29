@@ -7,22 +7,16 @@ class AliOss extends ModelBase
     public $OSS_BUCKET_AVATAR = 'lemonavatar';
     public $OSS_BUCKET_MEDIA = 'lemonmedia';
     public $OSS_BUCKET_IMAGE_DOMAIN = array(
-    	//'http://p.xiaoningmeng.me/',
-    	//'http://p.xiaoningmeng.me/',
-        'http://lemonpic.oss-cn-hangzhou.aliyuncs.com/',
-        'http://lemonpic.oss-cn-hangzhou.aliyuncs.com/',
+    	'http://p.xiaoningmeng.net/',
+    	'http://p.xiaoningmeng.net/',
     );
     public $OSS_BUCKET_AVATAR_DOMAIN = array(
-    	//'http://a.xiaoningmeng.me/avatar/',
-    	//'http://a.xiaoningmeng.me/avatar/',
-        'http://120.26.52.211/avatar/',
-        'http://120.26.52.211/avatar/',
+    	'http://a.xiaoningmeng.net/avatar/',
+    	'http://a.xiaoningmeng.net/avatar/',
     );
     public $OSS_BUCKET_MEDIA_DOMAIN = array(
-        //'http://mf.xiaoningmeng.me/',
-        //'http://mf.xiaoningmeng.me/',
-        'http://lemonmedia.oss-cn-hangzhou.aliyuncs.com/',
-        'http://lemonmedia.oss-cn-hangzhou.aliyuncs.com/'
+        'http://mf.xiaoningmeng.net/',
+        'http://mf.xiaoningmeng.net/',
     );
     
     public $OSS_IMAGE_ENABLE = array('jpg','jpeg','png');
