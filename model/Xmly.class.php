@@ -65,7 +65,8 @@ class Xmly extends Http
             $count = Http::sub_data($v, 'icon-player mgr-5"></i>', '<');
             if ($title && $url) {
                 $arr[$k]['title'] = $title;
-                $arr[$k]['cover'] = $cover;
+                // http://fdfs.xmcdn.com/group7/M05/53/22/wKgDX1W24DjS695KAApQxFCdpw4454_web_meduim.jpg
+                $arr[$k]['cover'] = str_replace("_meduim", "_large", $cover);
                 $arr[$k]['url']   = 'http://m.ximalaya.com'.$url;
                 $arr[$k]['count'] = $count;
             }
@@ -100,11 +101,13 @@ class Xmly extends Http
 
         preg_match_all('/<li [\s|\S]*?<\/li>/', $content['html'], $result);
 
+
         $r = array();
 
         foreach ($result[0] as $k => $v) {
             $r[]= 'http://m.ximalaya.com'.Http::sub_data($v, 'data-url="', '"');
         }
+
         $n = array();
         foreach ($r as $k => $v) {
             $content = Http::get($v);
@@ -122,7 +125,6 @@ class Xmly extends Http
                 $n[$k]['intro'] = $intro;
                 $n[$k]['s_cover'] = $cover;
             }
-            return $n;
         }
         return $n;
     }
