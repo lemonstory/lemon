@@ -4,9 +4,9 @@ header("Content-type: text/html; charset=utf-8");
 date_default_timezone_set('PRC');
 define("SERVER_ROOT", dirname(__FILE__)."/");
 if (DIRECTORY_SEPARATOR == '/'){
-    define("MANAGE_ROOT", dirname(SERVER_ROOT)."/c.lemon.com/");
+    define("MANAGE_ROOT", dirname(SERVER_ROOT)."/c.xiaoningmeng.net/");
 } else {
-    define("MANAGE_ROOT", dirname(dirname(dirname(SERVER_ROOT)))."/manage.git/trunk/");
+    define("MANAGE_ROOT", dirname(dirname(dirname(SERVER_ROOT)))."/www/c.xiaoningmeng.net/");
 }
 define("HTTP_CACHE", false);
 
@@ -21,7 +21,7 @@ include dirname(__FILE__)."/libs/functions.php";
  * autoload : SERVER_ROOT.[model/lib]
  * usage : new oss_sdk() => include('lib/oss/sdk.class.php');new oss_sdk();
  */
-function __autoload($className){
+function xiaoningmeng_autoload($className){
 	$className = (str_replace("_", DIRECTORY_SEPARATOR, $className));
 
 	$incFile = SERVER_ROOT."model/$className.class.php";
@@ -48,4 +48,4 @@ function __autoload($className){
 	    return;
 	}
 }
-
+spl_autoload_register("xiaoningmeng_autoload");

@@ -25,7 +25,7 @@ abstract class controller
     protected function checkHostInfo()
     {
         $host = $_SERVER['HTTP_HOST'];
-        if($host != '120.26.52.211') {
+        if($host != 'api.xiaoningmeng.net' && $host != 'a.xiaoningmeng.net') {
             header("HTTP/1.0 404 Not Found");
             exit;
         }
