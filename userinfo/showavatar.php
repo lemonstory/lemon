@@ -3,12 +3,11 @@ $uid = $_GET['uid'];
 $size = $_GET['size'];
 $avatartime = $_GET['avatartime'];
 
-//$domain = "http://aoss.xiaoningmeng.me/"; // oss中lemonavatar的cdn域名
-$domain = "http://lemonavatar.oss-cn-hangzhou.aliyuncs.com/";
+$domain = "http://aoss.xiaoningmeng.net/"; // oss中lemonavatar的cdn域名
 $osspath = $domain . $uid . "?v=" . $avatartime;
 if($size > 0) {
-    if(in_array($size ,array(100, 200))) {
-        $osspath = $domain . $uid . "@!s" . $size . "?v=" . $avatartime;
+    if(in_array($size ,array(80, 100, 120))) {
+        $osspath = $domain . $uid . "@!{$size}x{$size}" . "?v=" . $avatartime;
     }
 }
 
