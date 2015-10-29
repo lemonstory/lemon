@@ -6,9 +6,10 @@ $avatartime = $_GET['avatartime'];
 $domain = "http://aoss.xiaoningmeng.net/"; // oss中lemonavatar的cdn域名
 $osspath = $domain . $uid . "?v=" . $avatartime;
 if($size > 0) {
-    if(in_array($size ,array(80, 100, 120))) {
-        $osspath = $domain . $uid . "@!{$size}x{$size}" . "?v=" . $avatartime;
+    if(!in_array($size ,array(80, 100, 120))) {
+        $size = 120;
     }
+    $osspath = $domain . $uid . "@!{$size}x{$size}" . "?v=" . $avatartime;
 }
 
 $ch = curl_init();
