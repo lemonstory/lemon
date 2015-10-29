@@ -25,6 +25,8 @@ class AliOss extends ModelBase
     public $LOCAL_IMG_TMP_PATH = '/alidata1/tmppicfile/';
     public $LOCAL_MEDIA_TMP_PATH = '/alidata1/tmpmediafile/';
     
+    public $OSS_IMAGE_THUMB_SIZE_LIST = array(100, 200, 230, 460); // lemonpic图片缩略尺寸
+    public $OSS_IMAGE_THUMB_MAX_SIZE = 460; // lemonpic图片缩略最大尺寸
     
     /**
      * 上传头像图片
@@ -191,21 +193,35 @@ class AliOss extends ModelBase
         }
     }
     
-    public function getImageUrlNg($file, $style='')
+    public function getImageUrlNg($file, $size='')
     {
         $domains = $this->OSS_BUCKET_IMAGE_DOMAIN;
         $domainsCount = count($domains);
         $domainIndex = abs(crc32($file)%$domainsCount);
         $domain = $domains[$domainIndex];
-        return $domain.trim($file, '/').$style;
+        if ($size > 0) {
+            if (!in_array($size, $this->OSS_IMAGE_THUMB_SIZE_LIST)) {
+                $size = $this->OSS_IMAGE_THUMB_MAX_SIZE;
+            }
+            $fileurl = $domain . $file . "@!{$size}x{$size}";
+        } else {
+            $fileurl = $domain . trim($file, "/");
+        }
+        return $fileurl;
     }
-    public function getFocusUrl($focuspicid)
+    
+    public function getFocusUrl($focuspicid, $isthumb = 1)
     {
         $domains = $this->OSS_BUCKET_IMAGE_DOMAIN;
         $domainsCount = count($domains);
         $domainIndex = abs(crc32($focuspicid)%$domainsCount);
         $domain = $domains[$domainIndex];
-        return $domain . "focus/" . $focuspicid . ".png";
+        if ($isthumb == 1) {
+            $fileurl = $domain . "focus/{$focuspicid}.png@!640x260";
+        } else {
+            $fileurl = $domain . "focus/{$focuspicid}.png";
+        }
+        return $fileurl;
     }
     
     public function getAvatarUrl($uid, $avatartime, $size='')
