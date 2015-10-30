@@ -37,7 +37,8 @@ class deal_saveAlbumToSearch extends DaemonBase {
         //if($ret == true) {
             $this->writeLog($storyid, $albumid, "ret={$ret}");
         //}
-        usleep(10000);
+        // 控制opensearch写入频率
+        sleep(2);
 	}
 
 	protected function checkLogPath() {}
