@@ -15,6 +15,7 @@ class deal_saveAlbumToSearch extends DaemonBase {
         $story = new Story();
         $storyinfo = $story->get_story_info($storyid);
         if (empty($storyinfo)) {
+            $this->writeLog($storyid, 0, "storyinfo is empty");
             return true;
         }
         $albumid = $storyinfo['album_id'];
@@ -24,6 +25,7 @@ class deal_saveAlbumToSearch extends DaemonBase {
         $albumobj = new Album();
         $albuminfo = $albumobj->get_album_info($albumid);
         if (empty($albuminfo)) {
+            $this->writeLog($storyid, $albumid, "albuminfo is empty");
             return true;
         }
         $albumtitle = $albuminfo['title'];
@@ -33,16 +35,20 @@ class deal_saveAlbumToSearch extends DaemonBase {
         $searchobj = new OpenSearch();
         $ret = $searchobj->addAlbumToSearch($storyid, $storytitle, $albumid, $albumtitle);
         //if($ret == true) {
-            $dataline = "---storyid---".$storyid."---albumid---{$albumid}---ret---{$ret}\n";
-            $filepath	= dirname ( __FILE__ ).'/logs/saveAlbumToSearch'.date('Y-m-d').".log";
-            $fp = @fopen($filepath, 'a+');
-            @fwrite($fp, $dataline."\n");
-            @fclose($fp);
+            $this->writeLog($storyid, $albumid, "ret={$ret}");
         //}
         usleep(10000);
 	}
 
 	protected function checkLogPath() {}
+	
+	private function writeLog($storyid, $albumid = 0, $error = "") {
+	    $dataline = "---storyid---".$storyid."---albumid---{$albumid}---error---{$error}\n";
+	    $filepath = dirname ( __FILE__ ).'/logs/saveAlbumToSearch'.date('Y-m-d').".log";
+	    $fp = @fopen($filepath, 'a+');
+	    @fwrite($fp, $dataline."\n");
+	    @fclose($fp);
+	}
 
 }
 new deal_saveAlbumToSearch ();
