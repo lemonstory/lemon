@@ -31,7 +31,15 @@ class deal_saveAlbumToSearch extends DaemonBase {
         
         // add data to opensearch
         $searchobj = new OpenSearch();
-        $searchobj->addAlbumToSearch($storyid, $storytitle, $albumid, $albumtitle);
+        $ret = $searchobj->addAlbumToSearch($storyid, $storytitle, $albumid, $albumtitle);
+        if($ret == true) {
+            $dataline = "---storyid---".$storyid."---albumid---{$albumid}\n";
+            $filepath	= dirname ( __FILE__ ).'/logs/saveAlbumToSearch'.date('Y-m-d').".log";
+            $fp = @fopen($filepath, 'a+');
+            @fwrite($fp, $dataline."\n");
+            @fclose($fp);
+        }
+        usleep(10000);
 	}
 
 	protected function checkLogPath() {}
