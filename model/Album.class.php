@@ -269,8 +269,14 @@ class Album extends ModelBase
     // 格式化成接口数据
     public function format_to_api($alubm_info = array())
     {
-        if (!$alubm_info['cover']) {
+        static $aliossobj = null;
+        if (!$aliossobj) {
+            $aliossobj = new AliOss();
+        }
+        if (empty($alubm_info['cover'])) {
             $alubm_info['cover'] = $alubm_info['s_cover'];
+        } else {
+            $alubm_info['cover'] = $aliossobj->getImageUrlNg($alubm_info['cover'], 200);
         }
         return $alubm_info;
     }
