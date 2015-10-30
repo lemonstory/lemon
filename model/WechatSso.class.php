@@ -95,8 +95,7 @@ class WechatSso extends Sso
         
         $NicknameMd5Obj = new NicknameMd5();
         if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
-            $this->setError(ErrorConf::nickNameIsExist());
-            return false;
+            $nickName = "xiaoningmeng_" . rand(1000, 9999) . time();
         }
         
         $wechatinfo = $this->getWechatInfo($accessToken, $openId);

@@ -113,8 +113,7 @@ class Sso extends ModelBase
         
         $NicknameMd5Obj = new NicknameMd5();
         if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
-            $this->setError(ErrorConf::nickNameIsExist());
-            return false;
+            $nickName = "xiaoningmeng_" . rand(1000, 9999) . time();
         }
         
         $qqUserInfo = $this->getQqInfo($qc);
