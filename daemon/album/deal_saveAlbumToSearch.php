@@ -32,13 +32,13 @@ class deal_saveAlbumToSearch extends DaemonBase {
         // add data to opensearch
         $searchobj = new OpenSearch();
         $ret = $searchobj->addAlbumToSearch($storyid, $storytitle, $albumid, $albumtitle);
-        if($ret == true) {
-            $dataline = "---storyid---".$storyid."---albumid---{$albumid}\n";
+        //if($ret == true) {
+            $dataline = "---storyid---".$storyid."---albumid---{$albumid}---ret---{$ret}\n";
             $filepath	= dirname ( __FILE__ ).'/logs/saveAlbumToSearch'.date('Y-m-d').".log";
             $fp = @fopen($filepath, 'a+');
             @fwrite($fp, $dataline."\n");
             @fclose($fp);
-        }
+        //}
         usleep(10000);
 	}
 
