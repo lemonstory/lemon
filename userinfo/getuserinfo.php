@@ -35,7 +35,7 @@ class getuserinfo extends controller
         $userextobj = new UserExtend();
         $addressinfo = current($userextobj->getUserAddressInfo($defaultaddressid));
         if (empty($addressinfo)) {
-            $data['addressinfo'] = array();
+            $data['addressinfo'] = (object)array();
         } else {
             $data['addressinfo'] = $addressinfo;
         }
