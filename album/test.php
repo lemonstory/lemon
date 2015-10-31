@@ -4,6 +4,14 @@ include_once '../controller.php';
 class test extends controller
 {
     function action() {
+        $album = new Album();
+        $album_list = $album->get_list("`id`>0");
+        $manageobj = new ManageSystem();
+        foreach ($album_list as $k => $v) {
+            $manageobj->addRecommendNewOnlineDb($v['id'], $v['age_type']);
+            echo "{$v['id']} 调用<br />\n";
+        }
+        exit;
         $story = new Story();
         $story_list = $story->get_list("`id`>0");
         foreach ($story_list as $k => $v) {
