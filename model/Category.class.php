@@ -107,7 +107,7 @@ class Category extends ModelBase
         if (!$field) {
             return array();
         }
-        $where = "`{$field}`='{$value}'";
+        $where = "`{$field}`='{$value}' and {$need_filed} !=''";
         $sql = "select * from {$this->table}  where {$where} limit 1";
 
         $db = DbConnecter::connectMysql('share_story');
