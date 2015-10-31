@@ -12,6 +12,13 @@ class story_info extends controller
 
         $story_info = $story->get_story_info($story_id);
 
+        $aliossobj = new AliOss();
+        if ($story_info['cover']) {
+            $story_info['cover'] = $aliossobj->getImageUrlNg($story_info['cover'], 200);
+        } else {
+            $story_info['cover'] = $story_info['s_cover'];
+        }
+
 		// 专辑收藏总数
 		$fav_list   = $fav->getAlbumFavCount($story_info['albumid']);
 		if ($fav_list) {

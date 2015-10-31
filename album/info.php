@@ -20,6 +20,14 @@ class info extends controller
         $album_id = $this->getRequest("albumid", "1");
         // 专辑信息
         $result['albuminfo']  = $album->get_album_info($album_id);
+
+        $aliossobj = new AliOss();
+        if ($result['albuminfo']['cover']) {
+            $result['albuminfo']['cover'] = $aliossobj->getImageUrlNg($result['albuminfo']['cover'], 200);
+        } else {
+            $result['albuminfo']['cover'] = $result['albuminfo']['s_cover'];
+        }
+
         // 获取播放信息
         // $useralbumlastloginfo = $useralbumlastlog->getInfo("`uimid`={$uid} and `albumid`={$album_id} ");
         // if ($useralbumlastloginfo) {

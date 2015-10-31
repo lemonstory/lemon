@@ -16,6 +16,15 @@ class all extends controller
 
         $albumlist = $album->getAlbumList($direction, $startid, $len);
 
+        $aliossobj = new AliOss();
+        foreach ($albumlist as $k => $v) {
+            if ($v['cover']) {
+                $albumlist[$k]['cover'] = $aliossobj->getImageUrlNg($v['cover'], 200);
+            } else {
+                $albumlist[$k]['cover'] = $v['s_cover'];
+            }
+        }
+
         $this->showSuccJson($albumlist);
     }
 }

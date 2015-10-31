@@ -273,16 +273,6 @@ class Story extends ModelBase
 	// 格式化成接口数据
 	public function format_to_api($story_info = array())
 	{
-        static $aliossobj = null;
-        if (!$aliossobj) {
-            $aliossobj = new AliOss();
-        }
-        if (empty($story_info['cover'])) {
-            $story_info['cover'] = $story_info['s_cover'];
-        } else {
-            $story_info['cover'] = $aliossobj->getImageUrlNg($story_info['cover'], 200);
-        }
-
 		if ($story_info['mediapath']) {
 			$story_info['mediapath'] = $aliossobj->getMediaUrl($story_info['mediapath']);
 		} else {
