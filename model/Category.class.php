@@ -77,10 +77,14 @@ class Category extends ModelBase
 	/**
 	 * 获取列表
 	 */
-	public function get_list($where = '', $filed = '')
+	public function get_list($where = '', $filed = '', $limit = '')
 	{
 		$db = DbConnecter::connectMysql('share_story');
-        $sql = "select * from {$this->table}  where {$where}";
+		if ($limit) {
+			$sql = "select * from {$this->table}  where {$where} limit {$limit}";
+		} else {
+			$sql = "select * from {$this->table}  where {$where} ";
+		}
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
         $r = $st->fetchAll();
@@ -94,4 +98,30 @@ class Category extends ModelBase
         	return $r;
         }
 	}
+
+    /**
+     * 获取某字段值
+     */
+    public function get_filed_value($field = 's_cover', $value = '', $need_filed = '')
+    {
+        if (!$field) {
+            return array();
+        }
+        $where = "`{$field}`='{$value}'";
+        $sql = "select * from {$this->table}  where {$where} limit 1";
+
+        $db = DbConnecter::connectMysql('share_story');
+        $st = $db->query( $sql );
+        if (!$st) {
+        	echo $sql;exit;
+        }
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r  = $st->fetchAll();
+        $r  = array_pop($r);
+        if (isset($r[$need_filed]) && $r[$need_filed]) {
+            return $r[$need_filed];
+        } else {
+            return '';
+        }
+    }
 }

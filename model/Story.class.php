@@ -207,6 +207,32 @@ class Story extends ModelBase
         return $this->format_to_api($r);
     }
 
+    /**
+     * 获取某字段值
+     */
+    public function get_filed_value($field = 's_cover', $value = '', $need_filed = '')
+    {
+        if (!$field) {
+            return array();
+        }
+        $where = "`{$field}`='{$value}'";
+        $sql = "select * from {$this->table}  where {$where} limit 1";
+
+        $db = DbConnecter::connectMysql('share_story');
+        $st = $db->query( $sql );
+        if (!$st) {
+            echo $sql;exit;
+        }
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r  = $st->fetchAll();
+        $r  = array_pop($r);
+        if (isset($r[$need_filed]) && $r[$need_filed]) {
+            return $r[$need_filed];
+        } else {
+            return '';
+        }
+    }
+
 	/**
      * 更新
      */
