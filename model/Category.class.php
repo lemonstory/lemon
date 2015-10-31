@@ -124,4 +124,27 @@ class Category extends ModelBase
             return '';
         }
     }
+
+    /**
+     * 更新
+     */
+    public function update($data, $where = '')
+    {
+        if (!$data) {
+            return false;
+        }
+
+        $tmp_data = array();
+        foreach ($data as $k => $v) {
+            $tmp_data[] = "`{$k}`='{$v}'";
+        }
+        $tmp_data = implode(",", $tmp_data);
+        $set_str  = "SET {$tmp_data} ";
+
+        $db = DbConnecter::connectMysql('share_story');
+        $sql = "UPDATE {$this->table} {$set_str} where {$where}";
+        $st = $db->query($sql);
+        unset($tmp_data);
+        return true;
+    }
 }
