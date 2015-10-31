@@ -4,6 +4,14 @@ include_once '../controller.php';
 class test extends controller
 {
     function action() {
+        $story = new Story();
+        $story_list = $story->get_list("`id`>0");
+        foreach ($story_list as $k => $v) {
+            MnsQueueManager::pushAlbumToSearchQueue($v['id']);
+            echo "{$v['id']} 调用<br />\n";
+        }
+        
+        exit;
         $useralbumlog = new UserAlbumLog();
         $r = $useralbumlog->getPlayInfoByAlbumIds(array(1,2,3));
         var_dump($r);
