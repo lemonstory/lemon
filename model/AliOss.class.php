@@ -171,6 +171,7 @@ class AliOss extends ModelBase
         $ext = $id3Info['fileformat'];
         if (!in_array($ext, $this->OSS_MEDIA_ENABLE)){
             $this->setError(ErrorConf::uploadMediaInvalidateType());
+            return array();
         }
         $times = ceil(@$id3Info['playtime_seconds']+0);
         $width = @$id3Info['video']['resolution_x']+0;
