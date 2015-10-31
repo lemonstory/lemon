@@ -12,6 +12,14 @@ class story_list extends controller
         $story = new Story();
 
         $storylist = $story->getStoryList($albumid, $direction, $startid, $len);
+        $aliossobj = new AliOss();
+        foreach ($storylist as $k => $v) {
+        	if ($storylist[$k]['cover']) {
+	            $storylist[$k]['cover'] = $aliossobj->getImageUrlNg($v['cover'], 200);
+	        } else {
+	            $storylist[$k]['cover'] = $v['s_cover'];
+	        }
+        }
 
         $this->showSuccJson($storylist);
     }
