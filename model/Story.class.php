@@ -220,17 +220,15 @@ class Story extends ModelBase
 
         $db = DbConnecter::connectMysql('share_story');
         $st = $db->query( $sql );
-        if (!$st) {
-            echo $sql;exit;
+        if ($st) {
+            $st->setFetchMode(PDO::FETCH_ASSOC);
+            $r  = $st->fetchAll();
+            $r  = array_pop($r);
+            if (isset($r[$need_filed]) && $r[$need_filed]) {
+                return $r[$need_filed];
+            }
         }
-        $st->setFetchMode(PDO::FETCH_ASSOC);
-        $r  = $st->fetchAll();
-        $r  = array_pop($r);
-        if (isset($r[$need_filed]) && $r[$need_filed]) {
-            return $r[$need_filed];
-        } else {
-            return '';
-        }
+        return '';
     }
 
 	/**
