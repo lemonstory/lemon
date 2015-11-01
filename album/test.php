@@ -4,6 +4,16 @@ include_once '../controller.php';
 class test extends controller
 {
     function action() {
+        // 修复故事数量脚本
+        $album = new Album();
+        $story = new Story();
+        $album_list = $album->get_list("`id`>0");
+        foreach ($album_list as $k => $v) {
+            $story_num = $story->get_total("`album_id`={$v['id']}");
+            $album->update(array('story_num' => $story_num), "`id`={$v['id']}");
+            echo "{$v['id']} 已经更新<br />\n";
+        }
+        exit;
         $album = new Album();
         $album_list = $album->get_list("`id`>0");
         $manageobj = new ManageSystem();
