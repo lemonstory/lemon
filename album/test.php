@@ -20,7 +20,7 @@ class test extends controller
         foreach ($story_list as $k => $v) {
             MnsQueueManager::pushAlbumToSearchQueue($v['id']);
         }
-        echo "{$page}, {$perpage} 完成 <br />\n";
+        echo "{$page} =>{$limit}, {$perpage} 完成 <br />\n";
         exit;
         // 修复故事数量脚本
         $album = new Album();
