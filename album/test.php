@@ -13,7 +13,7 @@ class test extends controller
         $perpage = 2000;
 
         $limit = ($page - 1) * $perpage;
-        $story_list = $story->get_list("`id`>0 and `id` <= 50000", "{$limit}, {$perpage}", '', "ORDER BY id ASC");
+        $story_list = $story->get_list("`id`>685 and `id` <= 50000", "{$limit}, {$perpage}", '', "ORDER BY id ASC");
         if (!$story_list) {
             break;
         }
