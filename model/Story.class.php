@@ -78,13 +78,13 @@ class Story extends ModelBase
 	/**
 	 * 获取列表
 	 */
-	public function get_list($where = '', $limit = '', $filed = '')
+	public function get_list($where = '', $limit = '', $filed = '', $orderby = '')
 	{
 		$db = DbConnecter::connectMysql('share_story');
 		if ($limit) {
-			$sql = "select * from {$this->table}  where {$where} limit {$limit}";
+			$sql = "select * from {$this->table}  where {$where} {$orderby} limit {$limit} ";
 		} else {
-			$sql = "select * from {$this->table}  where {$where}";
+			$sql = "select * from {$this->table}  where {$where} {$orderby} ";
 		}
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
