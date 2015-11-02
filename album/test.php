@@ -4,6 +4,7 @@ include_once '../controller.php';
 class test extends controller
 {
     function action() {
+        set_time_limit(0);
         $story = new Story();
         $page = $this->getRequest('page');
         if (!$page) {
