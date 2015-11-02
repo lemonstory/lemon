@@ -118,7 +118,7 @@ class Xmly extends Http
             $intro = htmlspecialchars_decode(Http::sub_data($content, 'data-text="', '"'));
             $intro = preg_replace('/<a[\s|\S].*?a>/', '', $intro);
             $cover = Http::sub_data($content, "background-image: url('", "')");
-            if ($title && $intro) {
+            if ($title && $source_audio_url) {
                 $n[$k]['title'] = $title;
                 $n[$k]['source_audio_url'] = $source_audio_url;
                 $n[$k]['times'] = $times;
