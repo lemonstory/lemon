@@ -183,7 +183,7 @@ class Listen extends ModelBase
 	 * @param I $albumid
 	 * @return array
 	 */
-	public function getUserListenStoryListByAlbumId($uimid, $albumids)
+	/* public function getUserListenStoryListByAlbumId($uimid, $albumids)
 	{
 	    if (empty($uimid) || empty($albumids)) {
 	        $this->setError(ErrorConf::paramError());
@@ -204,7 +204,7 @@ class Listen extends ModelBase
 	    } else {
 	        return $res;
 	    }
-	}
+	} */
 	
 	/**
 	 * 获取uid或设备收听的故事记录

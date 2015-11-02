@@ -24,11 +24,13 @@ class mystory extends controller
         }
         
         $aliossobj = new AliOss();
-        // 收听历史列表
-        $listenalbumlist = array();
-        $storylist = array();
         $listenobj = new Listen();
         $favobj = new Fav();
+        $storyobj = new Story();
+        
+        $listenalbumlist = array();
+        $storylist = array();
+        
         $listenalbumres = $listenobj->getUserAlbumListenList($uimid, $direction, $startalbumid, $len);
         if (!empty($listenalbumres)) {
             $albumids = array();
@@ -55,21 +57,14 @@ class mystory extends controller
                 $playloglist = $useralbumlogobj->getPlayInfoByAlbumIds($albumids);
                 
                 // 专辑下，uid或设备收听的故事列表
-                $listenstorylist = array();
-                $listenstoryres = $listenobj->getUserListenStoryListByAlbumId($uimid, $albumids);
-                $storyids = array();
-                if (!empty($listenstoryres)) {
-                    foreach ($listenstoryres as $value) {
-                        $storyids[] = $value['storyid'];
-                    }
-                    if (!empty($storyids)) {
-                        $storyids = array_unique($storyids);
-                        $storyobj = new Story();
-                        $storyres = $storyobj->getListByIds($storyids);
-                        foreach ($storyres as $storyinfo) {
-                            $albumid = $storyinfo['album_id'];
-                            $storylist[$albumid][] = $storyinfo;
-                        }
+                //$listenstorylist = array();
+                //$listenstoryres = $listenobj->getUserListenStoryListByAlbumId($uimid, $albumids);
+                $albumidstr = implode(",", $albumids);
+                $albumstoryres = $storyobj->get_list("`album_id` IN ({$albumidstr})");
+                if (!empty($albumstoryres)) {
+                    foreach ($albumstoryres as $storyinfo) {
+                        $albumid = $storyinfo['album_id'];
+                        $storylist[$albumid][] = $storyinfo;
                     }
                 }
             }
@@ -104,6 +99,8 @@ class mystory extends controller
                 if (!empty($albumcommentnum[$albumid])) {
                     $albuminfo['commentnum'] = $albumcommentnum[$albumid] + 0;
                 }
+                
+                $albuminfo['storylist'] = array();
                 if (!empty($storylist[$albumid])) {
                     $albuminfo['storylist'] = $storylist[$albumid];
                 }

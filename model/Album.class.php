@@ -293,9 +293,9 @@ class Album extends ModelBase
     // 格式化成接口数据
     public function format_to_api($alubm_info = array())
     {
-        if (empty($alubm_info['cover'])) {
+        /* if (empty($alubm_info['cover'])) {
             $alubm_info['cover'] = $alubm_info['s_cover'];
-        }
+        } */
         return $alubm_info;
     }
 }

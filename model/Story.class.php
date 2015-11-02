@@ -280,7 +280,7 @@ class Story extends ModelBase
 		if ($story_info['mediapath']) {
 			$story_info['mediapath'] = $aliossobj->getMediaUrl($story_info['mediapath']);
 		} else {
-			$story_info['mediapath'] = $story_info['source_audio_url'];
+			//$story_info['mediapath'] = $story_info['source_audio_url'];
 		}
 
 		return $story_info;
