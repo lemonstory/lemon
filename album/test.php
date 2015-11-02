@@ -5,21 +5,21 @@ class test extends controller
 {
     function action() {
         $story = new Story();
-        $page = 1;
-        $perpage = 2000;
-        while (true) {
-            $limit = ($page - 1) * $perpage;
-            $story_list = $story->get_list("`id`>0 and `id` <= 50000", "{$limit}, {$perpage}");
-            if (!$story_list) {
-                break;
-            }
-            foreach ($story_list as $k => $v) {
-                MnsQueueManager::pushAlbumToSearchQueue($v['id']);
-                echo "{$v['id']} 调用<br />\n";
-            }
-            $page ++;
-            echo "{$page}, {$perpage} 完成 <br />\n";
+        $page = $this->getRequest('page');
+        if (!$page) {
+            exit('params error !');
         }
+        $perpage = 2000;
+
+        $limit = ($page - 1) * $perpage;
+        $story_list = $story->get_list("`id`>0 and `id` <= 50000", "{$limit}, {$perpage}", '', "ORDER BY id ASC");
+        if (!$story_list) {
+            break;
+        }
+        foreach ($story_list as $k => $v) {
+            MnsQueueManager::pushAlbumToSearchQueue($v['id']);
+        }
+        echo "{$page}, {$perpage} 完成 <br />\n";
         exit;
         // 修复故事数量脚本
         $album = new Album();
