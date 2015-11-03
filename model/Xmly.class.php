@@ -111,7 +111,7 @@ class Xmly extends Http
         $n = array();
         foreach ($r as $k => $v) {
             $content = Http::get($v);
-            usleep(500);
+            sleep(1);
             $title = Http::sub_data($content, '<h1 class="name">', '</h1>');
             $source_audio_url = Http::sub_data($content, 'sound_url="', '"');
             $times = Http::sub_data($content, '<span class="time fr">', '</span>');
