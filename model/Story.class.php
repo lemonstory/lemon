@@ -305,6 +305,10 @@ class Story extends ModelBase
             foreach ($story_list as $k => $v) {
                 $new_list[] = $this->format_to_api($v);
             }
+            // 缓存
+            if ($new_list) {
+                $redisobj->set($key, json_encode($new_list));
+            }
         }
 		
 		return $new_list;
@@ -332,6 +336,7 @@ class Story extends ModelBase
         $storyIdKey = RedisKey::getStoryInfoKey($storyId);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $storyInfo = $redisobj->get($storyIdKey);
+        $storyInfo = json_decode($storyInfo, true);
         // 清除故事列表缓存
         if (isset($storyInfo['album_id']) && $storyInfo['album_id']) {
             $redisobj->delete(
