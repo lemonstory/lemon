@@ -19,17 +19,21 @@ class OpenSearch
      * @param I $len
      * @return array        专辑id列表
      */
-    public function searchAlbum($keyword, $len = 50)
+    public function searchAlbum($keyword, $page = 1, $len = 20)
     {
         if (empty($keyword)) {
             return array();
         }
+        if ($page < 1) {
+            $page = 1;
+        }
         if ($len < 1) {
-            $len = 50;
+            $len = 20;
         }
-        if ($len > 200) {
-            $len = 200;
+        if ($len > 100) {
+            $len = 100;
         }
+        $offset = ($page - 1) * $len;
         
         // 转化为分词
         $keywordpy = Pinyin($keyword);
@@ -56,7 +60,7 @@ class OpenSearch
         $search->addDistinct("albumid", 1, 1, false); // 每轮albumid中抽样取一个，只取一轮，实现items去重
         $search->setPair("duniqfield:albumid"); // 将totla数也去重
         $search->addSort('albumaddtime');
-        //$search->setStartHit($start);
+        $search->setStartHit($offset);
         $search->setHits($len);
         $search->setFormat('json');
         $data = json_decode($search->search(), true);
@@ -86,17 +90,21 @@ class OpenSearch
      * @param I $len
      * @return array        故事id列表
      */
-    public function searchStory($keyword, $len = 50)
+    public function searchStory($keyword, $page = 1, $len = 20)
     {
         if (empty($keyword)) {
             return array();
         }
+        if ($page < 1) {
+            $page = 1;
+        }
         if ($len < 1) {
-            $len = 50;
+            $len = 20;
         }
-        if ($len > 200) {
-            $len = 200;
+        if ($len > 100) {
+            $len = 100;
         }
+        $offset = ($page - 1) * $len;
     
         // 转化为分词
         $keywordpy = Pinyin($keyword);
@@ -119,7 +127,7 @@ class OpenSearch
         }
         $search->setQueryString($query);
         $search->addSort('storyaddtime');
-        //$search->setStartHit($start);
+        $search->setStartHit($offset);
         $search->setHits($len);
         $search->setFormat('json');
         $data = json_decode($search->search(), true);
@@ -207,6 +215,87 @@ class OpenSearch
         }
         return true;
     }
+    
+    /* public function exportstory($where)
+    {
+        set_time_limit(0);
+        $openstorylist = array();
+        $openalbumlist = array();
+        
+        $storyobj = new Story();
+        $storylist = $storyobj->get_list($where);
+        if (empty($storylist)) {
+            return false;
+        }
+        
+        $albumids = array();
+        $albumlist = array();
+        foreach ($storylist as $storyinfo) {
+            $albumids[] = $storyinfo['album_id'];
+        }
+        if (!empty($albumids)) {
+            $albumids = array_unique($albumids);
+            $albumobj = new Album();
+            $albumlist = $albumobj->getListByIds($albumids);
+        }
+        if (empty($albumlist)) {
+            return false;
+        }
+        
+        foreach ($storylist as $storyinfo) {
+            $storytitle = $storyinfo['title'];
+            // 转化为字母分词
+            $storytitlepy = Pinyin($storytitle);
+            $storytitlepytmp = "";
+            for($i = 0; $i < strlen($storytitlepy); $i++) {
+                $storytitlepytmp .= $storytitlepy[$i] . " ";
+            }
+            $storytitlepytmp = $storytitle . " " . $storytitlepytmp;
+            
+            $addtime = strtotime($storyinfo['add_time']);
+            $openstorylist[] = array(
+                    "fields" => array(
+                            "storyid" => $storyinfo['id'],
+                            "storytitle" => $storytitle,
+                            "storytitlepy" => $storytitlepytmp,
+                            "albumid" => $storyinfo['album_id'],
+                            "storyaddtime" => $addtime
+                            ),
+                    "cmd" => "UPDATE"
+                    );
+        }
+        $this->writeLog("story_{$where}", $openstorylist);
+        
+        foreach ($albumlist as $albuminfo) {
+            $albumtitle = $albuminfo['title'];
+            $albumtitlepy = Pinyin($albumtitle);
+            $albumtitlepytmp = "";
+            for($i = 0; $i < strlen($albumtitlepy); $i++) {
+                $albumtitlepytmp .= $albumtitlepy[$i] . " ";
+            }
+            $albumtitlepytmp = $albumtitle . " " . $albumtitlepytmp;
+            
+            $addtime = strtotime($albuminfo['add_time']);
+            $openalbumlist[] = array(
+                    'fields' => array(
+                            'albumid' => $albuminfo['id'],
+                            'albumtitle' => $albumtitle,
+                            'albumtitlepy' => $albumtitlepytmp,
+                            'albumaddtime' => $addtime
+                    ),
+                    "cmd" => "UPDATE"
+            );
+        }
+        $this->writeLog("album_{$where}", $openalbumlist);
+    }
+    
+    private function writeLog($file, $data) {
+        $data = json_encode($data);
+        $filepath = "/alidata1/www/htdocs/api.xiaoningmeng.net/daemon/album/logs/{$file}.log";
+        $fp = @fopen($filepath, 'a+');
+        @fwrite($fp, $data."\n");
+        @fclose($fp);
+    } */
     
     private function getClientinfo() {
         $client = new CloudsearchClient(

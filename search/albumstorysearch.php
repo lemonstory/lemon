@@ -5,20 +5,23 @@ class albumstorysearch extends controller
     public function action()
     {
         $searchcontent = $this->getRequest("searchcontent");
-        $len = $this->getRequest("len", 50);
+        $page = $this->getRequest("page", 1);
+        $len = $this->getRequest("len", 10);
         if (empty($searchcontent)) {
             $this->showErrorJson(ErrorConf::paramError());
         }
         
-        // add search count
-        $searchcountobj = new SearchCount();
-        $searchcountobj->addSearchContentCount($searchcontent);
+        if (empty($page) || $page == 1) {
+            // add search count
+            $searchcountobj = new SearchCount();
+            $searchcountobj->addSearchContentCount($searchcontent);
+        }
         
         $storyids = array();
         $storycount = 0;
         $searchobj = new OpenSearch();
         // 搜索故事
-        $storysearch = $searchobj->searchStory($searchcontent, $len);
+        $storysearch = $searchobj->searchStory($searchcontent, $page, $len);
         if (!empty($storysearch)) {
             $storyids = $storysearch['storyids'];
             $storycount = $storysearch['total'];
@@ -27,7 +30,7 @@ class albumstorysearch extends controller
         // 搜索专辑
         $albumids = array();
         $albumcount = 0;
-        $albumsearch = $searchobj->searchAlbum($searchcontent, $len);
+        $albumsearch = $searchobj->searchAlbum($searchcontent, $page, $len);
         if (!empty($albumsearch)) {
             $albumids = $albumsearch['albumids'];
             $albumcount = count($albumids);

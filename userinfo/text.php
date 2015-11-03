@@ -3,6 +3,8 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
+        //$openobj = new OpenSearch();
+        //$openobj->exportstory("id>=55000 and id<=60000");
         die();
         $type = $this->getRequest("type");
         if ($type == 1) {
