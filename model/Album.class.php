@@ -4,6 +4,7 @@ class Album extends ModelBase
 {
 
     private $table = 'album';
+    public $CACHE_INSTANCE = 'cache';
 
     /**
      * 检查是否存在
@@ -172,14 +173,18 @@ class Album extends ModelBase
      */
     public function getAlbumList( $direction = "down", $startid = 0, $len = 20, $uid = 0)
     {
-        // if (empty($uid)) {
-        //     $this->setError(ErrorConf::paramError());
-        //     return array();
-        // }
         if (empty($len)) {
             $len = 20;
         }
-        
+        // 读缓存
+        $key = RedisKey::getAlbumListKeys(func_get_args());
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->get($key);
+        if ($redisData) {
+            echo "命中\n";
+            return $redisData;
+        }
+
         $where = "`is_show`=1 AND `status` = '1'";
         if (!empty($startid)) {
             if ($direction == "up") {
@@ -188,7 +193,6 @@ class Album extends ModelBase
                 $where .= " AND `id` < '{$startid}' ";
             }
         }
-        // $where .= " `uid` = '{$uid}'";
         
         $db = DbConnecter::connectMysql('share_story');
         $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY `id` DESC LIMIT {$len}";
@@ -199,6 +203,8 @@ class Album extends ModelBase
         foreach ($res as $k => $v) {
             $albumlist[$k] = $this->format_to_api($v);
         }
+        // 缓存
+        $redisobj->setex($key, 300, $albumlist);
         return $albumlist;
     }
 

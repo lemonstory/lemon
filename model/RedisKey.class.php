@@ -102,5 +102,10 @@ class RedisKey
 	    }
 	    return $idarr;
 	}
+
+	public static function getAlbumListKeys($params)
+	{
+		return $params;
+	}
 	
 }
