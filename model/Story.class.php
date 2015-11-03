@@ -4,6 +4,7 @@ class Story extends ModelBase
 {
 
 	private $table = 'story';
+    public  $CACHE_INSTANCE = 'cache';
 
 	/**
 	 * 检查是否存在
@@ -115,18 +116,29 @@ class Story extends ModelBase
         } else {
             $idarr = array($id);
         }
+        // 连redis
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+
         $storylist = array();
-        $fav = new Fav();
         $db = DbConnecter::connectMysql('share_story');
         foreach($idarr as $k => $v) {
             if (isset($storylist[$v])) {
                 continue;
             }
-            $sql = "select * from {$this->table}  where `id`='{$v}' limit 1";
-            $st = $db->query( $sql );
-            $st->setFetchMode(PDO::FETCH_ASSOC);
-            $r  = $st->fetchAll();
-            $r  = array_pop($r);
+
+            $key = RedisKey::getStoryInfoKey($v);
+            $redisData = $redisobj->get($key);
+            if ($redisData) {
+                $r = json_decode($redisData, true);
+            } else {
+                $sql = "select * from {$this->table}  where `id`='{$v}' limit 1";
+                $st = $db->query( $sql );
+                $st->setFetchMode(PDO::FETCH_ASSOC);
+                $r  = $st->fetchAll();
+                $r  = array_pop($r);
+                // 写入缓存
+                $redisobj->get($key, json_encode($r));
+            }
             if ($r) {
                 $storylist[$r['id']] = $this->format_to_api($r);
             }
@@ -144,12 +156,16 @@ class Story extends ModelBase
      */
     public function getStoryList($albumid = 0, $direction = "down", $startid = 0, $len = 20, $uid = 0)
     {
-        // if (empty($uid)) {
-        //     $this->setError(ErrorConf::paramError());
-        //     return array();
-        // }
         if (empty($len)) {
             $len = 20;
+        }
+
+        // 读缓存
+        $key = RedisKey::getStoryListKey(func_get_args());
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->get($key);
+        if ($redisData) {
+            return json_decode($redisData, true);
         }
         
         $where .= " `status` = '1'";
@@ -177,6 +193,8 @@ class Story extends ModelBase
             foreach ($res as $k => $v) {
                 $storylist[$k] = $this->format_to_api($v);
             }
+            // 缓存
+            $redisobj->setex($key, 300, json_encode($storylist));
             return $storylist;
         }
     }
@@ -189,14 +207,27 @@ class Story extends ModelBase
         if (!$story_id) {
             return array();
         }
-        $where = "`id`={$story_id}";
-        $sql = "select * from {$this->table}  where {$where} limit 1";
+        $r = array();
+        // 读缓存
+        $key = RedisKey::getStoryInfoKey(func_get_args());
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->get($key);
+        if ($redisData) {
+            $r = json_decode($redisData, true);
+        } else {
+            $where = "`id`={$story_id}";
+            $sql = "select * from {$this->table}  where {$where} limit 1";
 
-        $db = DbConnecter::connectMysql('share_story');
-        $st = $db->query( $sql );
-        $st->setFetchMode(PDO::FETCH_ASSOC);
-        $r  = $st->fetchAll();
-        $r  = array_pop($r);;
+            $db = DbConnecter::connectMysql('share_story');
+            $st = $db->query( $sql );
+            $st->setFetchMode(PDO::FETCH_ASSOC);
+            $r  = $st->fetchAll();
+            $r  = array_pop($r);
+            // 缓存
+            $redisData = $redisobj->set($key, json_encode($r));
+        }
+
+        
         if ($filed) {
             if (isset($r[$filed])) {
                 return $r[$filed];
@@ -262,11 +293,20 @@ class Story extends ModelBase
 		if (!$album_id) {
 			return array();
 		}
-		$new_list   = array();
-		$story_list = $this->get_list("`album_id`={$album_id}");
-		foreach ($story_list as $k => $v) {
-			$new_list[] = $this->format_to_api($v);
-		}
+        $new_list   = array();
+        // 读缓存
+        $key = RedisKey::getAlbumStoryListKey($albumId);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->get($key);
+        if ($redisData) {
+            $new_list = json_decode($redisData, true);
+        } else {
+            $story_list = $this->get_list("`album_id`={$album_id}");
+            foreach ($story_list as $k => $v) {
+                $new_list[] = $this->format_to_api($v);
+            }
+        }
+		
 		return $new_list;
 	}
 
@@ -285,4 +325,20 @@ class Story extends ModelBase
 
 		return $story_info;
 	}
+
+    // 清故事缓存
+    public function clearStoryCache($storyId)
+    {
+        $storyIdKey = RedisKey::getStoryInfoKey($storyId);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $storyInfo = $redisobj->get($storyIdKey);
+        // 清除故事列表缓存
+        if (isset($storyInfo['album_id']) && $storyInfo['album_id']) {
+            $redisobj->delete(
+               RedisKey::getAlbumStoryListKey($storyInfo['album_id'])
+            );
+        }
+        $redisobj->delete($storyIdKey);
+        return true;
+    }
 }

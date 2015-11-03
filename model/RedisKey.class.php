@@ -112,5 +112,20 @@ class RedisKey
 	{
 		return 'album_info_'.$albumId;
 	}
+
+	public static function getStoryInfoKey($storyId)
+	{
+		return 'story_info_'.$storyId;
+	}
+
+	public static function getStoryListKey($params)
+	{
+		return serialize($params);
+	}
+
+	public static function getAlbumStoryListKey($albumId)
+	{
+		return 'album_story_list_'.$albumId;
+	}
 	
 }
