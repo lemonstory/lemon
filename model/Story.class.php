@@ -209,7 +209,7 @@ class Story extends ModelBase
         }
         $r = array();
         // 读缓存
-        $key = RedisKey::getStoryInfoKey(func_get_args());
+        $key = RedisKey::getStoryInfoKey($story_id);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisData = $redisobj->get($key);
         if ($redisData) {
