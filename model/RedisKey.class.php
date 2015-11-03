@@ -105,7 +105,7 @@ class RedisKey
 
 	public static function getAlbumListKeys($params)
 	{
-		return $params;
+		return serialize($params);
 	}
 	
 }

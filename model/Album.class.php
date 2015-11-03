@@ -181,8 +181,7 @@ class Album extends ModelBase
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisData = $redisobj->get($key);
         if ($redisData) {
-            echo "命中\n";
-            return $redisData;
+            return json_decode($redisData, true);
         }
 
         $where = "`is_show`=1 AND `status` = '1'";
@@ -204,7 +203,7 @@ class Album extends ModelBase
             $albumlist[$k] = $this->format_to_api($v);
         }
         // 缓存
-        $redisobj->setex($key, 300, $albumlist);
+        $redisobj->setex($key, 300, json_encode($albumlist));
         return $albumlist;
     }
 
