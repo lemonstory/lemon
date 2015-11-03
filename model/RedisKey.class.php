@@ -103,9 +103,14 @@ class RedisKey
 	    return $idarr;
 	}
 
-	public static function getAlbumListKeys($params)
+	public static function getAlbumListKey($params)
 	{
 		return serialize($params);
+	}
+
+	public static function getAlbumInfoKey($albumId)
+	{
+		return 'album_info_'.$albumId;
 	}
 	
 }

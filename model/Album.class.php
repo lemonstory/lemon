@@ -79,6 +79,11 @@ class Album extends ModelBase
         $sql = "UPDATE {$this->table} {$set_str} where {$where}";
         $st = $db->query($sql);
         unset($tmp_data);
+        // 清缓存
+        $arr = explode("=", $where);
+        if (isset($arr[1]) && $arr[1]) {
+            $this->clearAlbumCache(intval($arr[1]));
+        }
         return true;
     }
 
@@ -137,6 +142,9 @@ class Album extends ModelBase
         } else {
             $idarr = array($id);
         }
+        // 初始化Redis
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+
         $albumlist = array();
         $fav = new Fav();
         $db = DbConnecter::connectMysql('share_story');
@@ -144,11 +152,21 @@ class Album extends ModelBase
             if (isset($albumlist[$v])) {
                 continue;
             }
-            $sql = "select * from {$this->table}  where `id`='{$v}' limit 1";
-            $st = $db->query( $sql );
-            $st->setFetchMode(PDO::FETCH_ASSOC);
-            $r  = $st->fetchAll();
-            $r  = array_pop($r);
+            // 读缓存
+            $key = RedisKey::getAlbumInfoKey($v);
+            $redisData = $redisobj->get($key);
+            if ($redisData) {
+                $r = json_decode($r, true);
+            } else {
+                $sql = "select * from {$this->table}  where `id`='{$v}' limit 1";
+                $st = $db->query( $sql );
+                $st->setFetchMode(PDO::FETCH_ASSOC);
+                $r  = $st->fetchAll();
+                $r  = array_pop($r);
+                // 写入缓存
+                $redisobj->set($key, json_encode($r));
+            }
+
             if ($r) {
                 $r = $this->format_to_api($r);
                 $favinfo = $fav->getUserFavInfoByAlbumId($uid, $r['id']);
@@ -177,7 +195,7 @@ class Album extends ModelBase
             $len = 20;
         }
         // 读缓存
-        $key = RedisKey::getAlbumListKeys(func_get_args());
+        $key = RedisKey::getAlbumListKey(func_get_args());
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisData = $redisobj->get($key);
         if ($redisData) {
@@ -253,14 +271,25 @@ class Album extends ModelBase
         if (!$album_id) {
             return array();
         }
-        $where = "`id`={$album_id}";
-        $sql = "select * from {$this->table}  where {$where} limit 1";
+        // 读缓存
+        $key = RedisKey::getAlbumInfoKey($album_id);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->get($key);
+        // 是否读到
+        if ($redisData) {
+            $r = json_decode($redisData, true);
+        } else {
+            $where = "`id`={$album_id}";
+            $sql = "select * from {$this->table}  where {$where} limit 1";
 
-        $db = DbConnecter::connectMysql('share_story');
-        $st = $db->query( $sql );
-        $st->setFetchMode(PDO::FETCH_ASSOC);
-        $r  = $st->fetchAll();
-        $r  = array_pop($r);
+            $db = DbConnecter::connectMysql('share_story');
+            $st = $db->query( $sql );
+            $st->setFetchMode(PDO::FETCH_ASSOC);
+            $r  = $st->fetchAll();
+            $r  = array_pop($r);
+            $redisData = $redisobj->set($key, json_encode($r));
+        }
+        
         if ($filed) {
             if (isset($r[$filed])) {
                 return $r[$filed];
@@ -302,5 +331,13 @@ class Album extends ModelBase
             $alubm_info['cover'] = $alubm_info['s_cover'];
         } */
         return $alubm_info;
+    }
+
+    public function clearAlbumCache($albumId)
+    {
+        $uikey = RedisKey::getUserInfoKey($albumId);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisobj->delete($uikey);
+        return true;
     }
 }
