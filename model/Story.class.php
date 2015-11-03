@@ -282,6 +282,11 @@ class Story extends ModelBase
         $sql = "UPDATE {$this->table} {$set_str} where {$where}";
         $st = $db->query($sql);
         unset($tmp_data);
+        // 清缓存
+        $arr = explode("=", $where);
+        if (isset($arr[1]) && $arr[1]) {
+            $this->clearAlbumCache(intval($arr[1]));
+        }
         return true;
     }
 
