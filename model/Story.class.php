@@ -285,7 +285,7 @@ class Story extends ModelBase
         // 清缓存
         $arr = explode("=", $where);
         if (isset($arr[1]) && $arr[1]) {
-            $this->clearAlbumCache(intval($arr[1]));
+            $this->clearStoryCache(intval($arr[1]));
         }
         return true;
     }
