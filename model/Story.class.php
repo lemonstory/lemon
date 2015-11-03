@@ -300,7 +300,7 @@ class Story extends ModelBase
 		}
         $new_list   = array();
         // 读缓存
-        $key = RedisKey::getAlbumStoryListKey($albumId);
+        $key = RedisKey::getAlbumStoryListKey($album_id);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisData = $redisobj->get($key);
         if ($redisData) {
