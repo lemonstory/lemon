@@ -335,9 +335,9 @@ class Album extends ModelBase
 
     public function clearAlbumCache($albumId)
     {
-        $uikey = RedisKey::getUserInfoKey($albumId);
+        $albumIdKey = RedisKey::getAlbumInfoKey($albumId);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
-        $redisobj->delete($uikey);
+        $redisobj->delete($albumIdKey);
         return true;
     }
 }
