@@ -301,7 +301,7 @@ class Story extends ModelBase
         if ($redisData) {
             $new_list = json_decode($redisData, true);
         } else {
-            $story_list = $this->get_list("`album_id`={$album_id}");
+            $story_list = $this->get_list("`album_id`='{$album_id}' and status=1");
             foreach ($story_list as $k => $v) {
                 $new_list[] = $this->format_to_api($v);
             }

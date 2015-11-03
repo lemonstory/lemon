@@ -61,7 +61,7 @@ class info extends controller
             $result['albuminfo']['favnum'] = 0;
         }
 
-        $result['storylist'] = $story->get_list("`album_id`={$album_id}");
+        $result['storylist'] = $story->get_album_story_list($album_id);
         // 评论数量
         $result['albuminfo']['commentnum'] = (int)$comment->get_total("`albumid`={$album_id}");
         $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ");
