@@ -4,6 +4,7 @@ class Comment extends ModelBase
 {
 
     private $table = 'album_comment';
+    public  $CACHE_INSTANCE = 'cache';
 
     /**
      * 检查是否存在
@@ -71,6 +72,9 @@ class Comment extends ModelBase
                     {$tmp_filed}
                 ) VALUES({$tmp_value})";
         $st = $db->query($sql);
+        if (isset($data['albumid'])) {
+            $this->clearAlbumCommentListCache($data['albumid'])
+        }
         return $db->lastInsertId();
     }
 
@@ -123,6 +127,11 @@ class Comment extends ModelBase
         $sql = "UPDATE {$this->table} {$set_str} where {$where}";
         $st = $db->query($sql);
         unset($tmp_data);
+        // 清缓存
+        $arr = explode("=", $where);
+        if (isset($arr[1]) && $arr[1]) {
+            $this->clearCommentCache(intval($arr[1]));
+        }
         return true;
     }
 
@@ -168,21 +177,32 @@ class Comment extends ModelBase
     }
 
     /**
-     * 获取封面信息
+     * 获取评论信息
      */
-    public function get_comment_info($album_id = 0, $filed = '')
+    public function get_comment_info($comment_id = 0, $filed = '')
     {
-        if (!$album_id) {
+        if (!$comment_id) {
             return array();
         }
-        $where = "`id`={$album_id}";
-        $sql = "select * from {$this->table}  where {$where} limit 1";
 
-        $db = DbConnecter::connectMysql('share_comment');
-        $st = $db->query( $sql );
-        $st->setFetchMode(PDO::FETCH_ASSOC);
-        $r  = $st->fetchAll();
-        $r  = array_pop($r);;
+        // 读缓存
+        $key = RedisKey::getCommentInfoKey($comment_id);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->get($key);
+        if ($redisData) {
+            $r =  json_decode($redisData, true);
+        } else {
+            $where = "`id`={$comment_id}";
+            $sql = "select * from {$this->table}  where {$where} limit 1";
+
+            $db = DbConnecter::connectMysql('share_comment');
+            $st = $db->query( $sql );
+            $st->setFetchMode(PDO::FETCH_ASSOC);
+            $r  = $st->fetchAll();
+            $r  = array_pop($r);
+            $redisobj->set($key, json_encode($r));
+        }
+
         if ($filed) {
             if (isset($r[$filed])) {
                 return $r[$filed];
@@ -196,11 +216,29 @@ class Comment extends ModelBase
     // 获取评论列表
     public function get_comment_list($where = '', $order_by = '')
     {
+        $arr = explode('=', $where);
+        $albumid = 0;
+        if (is_numeric($arr[1])) {
+            $albumid = $arr[1];
+        }
+        // 读缓存
+        $key = RedisKey::getAlbumCommentListKey($albumid);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->get($key);
+        if ($redisData) {
+            return json_decode($redisData, true);
+        }
+
     	$newcommentlist = array();
+        $where .= " and `status`=1"
     	$commentlist = $this->get_list($where, '', $order_by);
     	foreach ($commentlist as $k => $v) {
     		$newcommentlist[] = $this->format_to_api($v);
     	}
+        // 写入缓存
+        if ($albumid) {
+            $redisobj->set($key, json_encode($newcommentlist));
+        }
     	return $newcommentlist;
     }
 
@@ -222,5 +260,21 @@ class Comment extends ModelBase
         $new_comment_info['addtime'] = $comment_info['addtime'];
         $new_comment_info['comment'] = $comment_info['content'];
         return $new_comment_info;
+    }
+
+    // 清除评论缓存
+    public function clearCommentCache($commentId = 0)
+    {
+        $commentIdKey = RedisKey::getCommentInfoKey($commentId);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisobj->delete($commentIdKey);
+        return true;
+    }
+
+    public function clearAlbumCommentListCache($albumId)
+    {
+        $commentListKey = RedisKey::getAlbumCommentListKey($albumId);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisobj->delete($commentListKey);
     }
 }

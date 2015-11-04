@@ -127,5 +127,15 @@ class RedisKey
 	{
 		return 'album_story_list_'.$albumId;
 	}
+
+	public static function getCommentInfoKey($commentId)
+	{
+		return 'comment_info_'.$commentId;
+	}
+
+	public static function getAlbumCommentListKey($albumId)
+	{
+		return 'album_comment_list_'.$albumId;
+	}
 	
 }
