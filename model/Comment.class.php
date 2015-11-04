@@ -132,6 +132,10 @@ class Comment extends ModelBase
         if (isset($arr[1]) && $arr[1]) {
             $this->clearCommentCache(intval($arr[1]));
         }
+        $commentinfo = $this->get_comment_info($arr[1]);
+        if ($commentinfo && $commentinfo['albumid']) {
+            $this->clearAlbumCommentListCache($commentinfo['albumid']);
+        }
         return true;
     }
 
