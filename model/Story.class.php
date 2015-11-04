@@ -137,7 +137,7 @@ class Story extends ModelBase
                 $r  = $st->fetchAll();
                 $r  = array_pop($r);
                 // 写入缓存
-                $redisobj->get($key, json_encode($r));
+                $redisobj->set($key, json_encode($r));
             }
             if ($r) {
                 $storylist[$r['id']] = $this->format_to_api($r);
