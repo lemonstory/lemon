@@ -156,7 +156,7 @@ class Album extends ModelBase
             $key = RedisKey::getAlbumInfoKey($v);
             $redisData = $redisobj->get($key);
             if ($redisData) {
-                $r = json_decode($r, true);
+                $r = json_decode($redisData, true);
             } else {
                 $sql = "select * from {$this->table}  where `id`='{$v}' limit 1";
                 $st = $db->query( $sql );
