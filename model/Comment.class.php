@@ -73,7 +73,7 @@ class Comment extends ModelBase
                 ) VALUES({$tmp_value})";
         $st = $db->query($sql);
         if (isset($data['albumid'])) {
-            $this->clearAlbumCommentListCache($data['albumid'])
+            $this->clearAlbumCommentListCache($data['albumid']);
         }
         return $db->lastInsertId();
     }
@@ -230,7 +230,7 @@ class Comment extends ModelBase
         }
 
     	$newcommentlist = array();
-        $where .= " and `status`=1"
+        $where .= " and `status`=1";
     	$commentlist = $this->get_list($where, '', $order_by);
     	foreach ($commentlist as $k => $v) {
     		$newcommentlist[] = $this->format_to_api($v);
