@@ -4,7 +4,7 @@ include_once '../controller.php';
 class test extends controller
 {
     function action() {
-        $this->middle_upload('http://fdfs.xmcdn.com/group2/M02/0A/04/wKgDr1GI6d7xh2RIAAWohUyGdp82513715_mobile_large', 47906, 2)
+        $this->middle_upload('http://fdfs.xmcdn.com/group2/M02/0A/04/wKgDr1GI6d7xh2RIAAWohUyGdp82513715_mobile_large', 47906, 2);
         exit;
         set_time_limit(0);
         $story = new Story();
