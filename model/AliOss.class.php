@@ -1,5 +1,5 @@
 <?php
-include SERVER_ROOT.'libs/getid3/getid3.php';
+//include SERVER_ROOT.'libs/getid3/getid3.php';
 
 class AliOss extends ModelBase
 {
@@ -160,14 +160,17 @@ class AliOss extends ModelBase
             $this->setError(ErrorConf::noUploadTmpfile());
             return array();
         }
+        if (!in_array($tmpfiletype, $this->OSS_MEDIA_ENABLE)) {
+            $this->setError(ErrorConf::uploadMediaInvalidateType());
+            return array();
+        }
         
         $obj = new alioss_sdk();
         $obj->set_debug_mode(false);
         $bucket = $this->OSS_BUCKET_MEDIA;
         
-        $getID3 = new getID3;
+        /* $getID3 = new getID3;
         $id3Info = $getID3->analyze($tmpFile);
-        
         if (empty($id3Info['fileformat'])) {
             // getid3 解析失败，将源文件上传
             if (!in_array($tmpfiletype, $this->OSS_MEDIA_ENABLE)) {
@@ -186,6 +189,21 @@ class AliOss extends ModelBase
             $ext = $id3Info['fileformat'];
             $times = ceil(@$id3Info['playtime_seconds']+0);
             $size = @$id3Info['filesize'];
+        } */
+        
+        $ext = $tmpfiletype;
+        $times = 0;
+        $size = 0;
+        $command = "mediainfo \"--Inform=General;%Duration% %FileSize%\" {$tmpFile}";
+        exec($command, $output);
+        if (!empty($output)) {
+            $mediainfo = explode(" ", $output[0]);
+            if (!empty($mediainfo[0])) {
+                $times = $mediainfo[0] + 0;
+            }
+            if (!empty($mediainfo[1])) {
+                $size = $mediainfo[1] + 0;
+            }
         }
         
         $to = $this->formatVideoFile($relationid, $ext);
