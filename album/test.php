@@ -4,7 +4,11 @@ include_once '../controller.php';
 class test extends controller
 {
     function action() {
-        $this->middle_upload('http://fdfs.xmcdn.com/group2/M02/0A/04/wKgDr1GI6d7xh2RIAAWohUyGdp82513715_mobile_large', 47906, 2);
+        $r = $this->middle_upload('http://fdfs.xmcdn.com/group2/M02/0A/04/wKgDr1GI6d7xh2RIAAWohUyGdp82513715_mobile_large', 47906, 2);
+        if ($r) {
+            $story = new Story();
+            $story->update(array('cover' => $r), " `id`= 47906");
+        }
         exit;
         set_time_limit(0);
         $story = new Story();
@@ -139,9 +143,9 @@ class test extends controller
 
         if(!in_array($ext, array('png', 'gif', 'jpg', 'jpeg', 'mp3', 'audio'))){
             if (strstr($url, 'mobile_large')) {
-                return false;
-            } else {
                 $ext = 'jpg';
+            } else {
+                return false;
             }
         }
 
