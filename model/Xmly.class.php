@@ -85,12 +85,17 @@ class Xmly extends Http
 
         $album_url = "http://m.ximalaya.com/album/more_tracks?url=%2Falbum%2Fmore_tracks&aid={$album_id}&page={$page}";
 
+
         Http::$referer = $album_url;
 
         if ($page == 1) {
             $content = Http::get($album_url);
         } else {
             $content = Http::ajax_get($album_url);
+        }
+        // 内不存在直接返回空
+        if (strstr($content, '您查看的内容不存在')) {
+            return array();
         }
 
         $content = json_decode($content, true);
