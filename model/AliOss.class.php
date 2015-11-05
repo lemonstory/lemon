@@ -199,7 +199,7 @@ class AliOss extends ModelBase
         if (!empty($output)) {
             $mediainfo = explode(" ", $output[0]);
             if (!empty($mediainfo[0])) {
-                $times = $mediainfo[0] + 0;
+                $times = floor($mediainfo[0] / 1000) + 0;
             }
             if (!empty($mediainfo[1])) {
                 $size = $mediainfo[1] + 0;
