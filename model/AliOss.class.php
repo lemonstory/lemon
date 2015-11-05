@@ -168,22 +168,30 @@ class AliOss extends ModelBase
         $getID3 = new getID3;
         $id3Info = $getID3->analyze($tmpFile);
         
-        $ext = $id3Info['fileformat'];
-        if (!in_array($ext, $this->OSS_MEDIA_ENABLE)){
-            $this->setError(ErrorConf::uploadMediaInvalidateType());
-            return array();
+        if (empty($id3Info['fileformat'])) {
+            // getid3 解析失败，将源文件上传
+            if (!in_array($tmpfiletype, $this->OSS_MEDIA_ENABLE)) {
+                $this->setError(ErrorConf::uploadMediaInvalidateType());
+                return array();
+            }
+            $ext = $tmpfiletype;
+            $times = 0;
+            $size = 0;
+        } else {
+            // 解析成功，转换成MP3,再上传
+            if (!in_array($id3Info['fileformat'], $this->OSS_MEDIA_ENABLE)) {
+                $this->setError(ErrorConf::uploadMediaInvalidateType());
+                return array();
+            }
+            $ext = $id3Info['fileformat'];
+            $times = ceil(@$id3Info['playtime_seconds']+0);
+            $size = @$id3Info['filesize'];
         }
-        $times = ceil(@$id3Info['playtime_seconds']+0);
-        $width = @$id3Info['video']['resolution_x']+0;
-        $height = @$id3Info['video']['resolution_y']+0;
-        $size = @$id3Info['filesize'];
         
         $to = $this->formatVideoFile($relationid, $ext);
         $responseObj = $obj->upload_file_by_file($bucket, $to, $tmpFile);
         if ($responseObj->status==200){
             $return['mediapath'] = $to;
-            $return['width'] = $width;
-            $return['height'] = $height;
             $return['size'] = $size;
             $return['times'] = $times;
             return $return;
