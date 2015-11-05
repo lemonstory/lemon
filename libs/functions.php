@@ -23,7 +23,7 @@ function getAgeFromBirthDay($birthday)
 	$cm=date('n');
 	$cd=date('j');
 	$age=date('Y')-$by-1;
-	if ($cm>$bm || $cm==$bm && $cd>$bd) 
+	if ($cm>$bm || $cm==$bm && $cd>=$bd) 
 	{
 		$age++;
 	}
