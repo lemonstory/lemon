@@ -338,6 +338,9 @@ class Story extends ModelBase
     // 清故事缓存
     public function clearStoryCache($storyId)
     {
+        if (!$storyId) {
+            return false;
+        }
         $storyIdKey = RedisKey::getStoryInfoKey($storyId);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $storyInfo = $redisobj->get($storyIdKey);
