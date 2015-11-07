@@ -307,9 +307,6 @@ class Story extends ModelBase
             $new_list = json_decode($redisData, true);
         } else {
             $story_list = $this->get_list("`album_id`='{$album_id}' and status=1", '', '', ' ORDER BY `id` DESC,`view_order` ASC ');
-            foreach ($story_list as $k => $v) {
-                $new_list[] = $this->format_to_api($v);
-            }
             // 缓存
             if ($new_list) {
                 $redisobj->set($key, json_encode($new_list));
