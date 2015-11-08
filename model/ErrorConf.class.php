@@ -182,6 +182,11 @@ class   ErrorConf
 	{
 	    return array('code'=>'100605','desc'=>'view_order-排序不正确');
 	}
+
+	public static function albumCoverExtError()
+	{
+		return array('code'=>'100606', 'desc' => 'cover-封面扩展名错误');
+	}
 	
 	// 故事
 	public static function storyInfoIsEmpty()
@@ -195,6 +200,11 @@ class   ErrorConf
 	public static function storyIntroNotEmpty()
 	{
 	    return array('code'=>'100703','desc'=>'intro-简介不能为空');
+	}
+
+	public static function StoryCoverExtError()
+	{
+		return array('code'=>'100704', 'desc' => 'cover-封面扩展名错误');
 	}
 	
 	// rank 排行榜

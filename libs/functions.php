@@ -82,3 +82,23 @@ function getImsi()
     }
     return $imsi;
 }
+
+function getFileExtByMime($mime = '')
+{
+	if (empty($mime)) {
+		return '';
+	}
+	$mime = strtolower($mime);
+	if ($mime == 'image/jpeg') {
+		return 'jpeg';
+	} else if ($mime == 'image/jpg') {
+		return 'jpg';
+	} else if ($mime == 'image/png') {
+		return 'png';
+	} else if ($mime == 'image/gif') {
+		return 'gif';
+	} else if ($mime == 'audio/mpeg') {
+		return 'mp3';
+	}
+	return '';
+}
