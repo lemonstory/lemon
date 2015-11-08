@@ -298,22 +298,22 @@ class Story extends ModelBase
 		if (!$album_id) {
 			return array();
 		}
-        $new_list   = array();
+        $story_list = array();
         // 读缓存
         $key = RedisKey::getAlbumStoryListKey($album_id);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisData = $redisobj->get($key);
         if ($redisData) {
-            $new_list = json_decode($redisData, true);
+            $story_list = json_decode($redisData, true);
         } else {
             $story_list = $this->get_list("`album_id`='{$album_id}' and status=1", '', '', ' ORDER BY `id` DESC,`view_order` ASC ');
             // 缓存
-            if ($new_list) {
-                $redisobj->set($key, json_encode($new_list));
+            if ($story_list) {
+                $redisobj->set($key, json_encode($story_list));
             }
         }
 		
-		return $new_list;
+		return $story_list;
 	}
 
 	// 格式化成接口数据
