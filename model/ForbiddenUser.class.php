@@ -25,7 +25,7 @@ class ForbiddenUser extends ModelBase
         $ossObj->deleteAvatarOss($uid);
         
         $userObj = new User();
-        $data = array('status'=>-2, 'avatartime'=>time());
+        $data = array('status'=>$this->OPTION_STATUS_FORBIDDEN, 'avatartime'=>time());
         $ret = $userObj->setUserinfo($uid, $data);
         if (empty($ret)){
             return false;

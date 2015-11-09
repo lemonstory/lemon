@@ -4,8 +4,7 @@ class newonlinelist extends controller
 {
     public function action() 
     {
-        $direction = $this->getRequest("direction", "down");
-        $startalbumid = $this->getRequest("startalbumid", 0);
+        $p = $this->getRequest("p", 1);
         $len = $this->getRequest("len", 20);
         
         $uid = $this->getUid();
@@ -25,7 +24,7 @@ class newonlinelist extends controller
         // 最新上架
         $listenobj = new Listen();
         $managesysobj = new ManageSystem();
-        $newonlineres = $managesysobj->getNewOnlineList($babyagetype, $direction, $startalbumid, $len);
+        $newonlineres = $managesysobj->getNewOnlineList($babyagetype, $p, $len);
         if (! empty($newonlineres)) {
             foreach ($newonlineres as $value) {
                 $albumids[] = $value['albumid'];

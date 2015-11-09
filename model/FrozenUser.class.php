@@ -29,7 +29,7 @@ class FrozenUser extends ModelBase
         $userObj = new User();
         $userinfo = current($userObj->getUserInfo($uid));
     
-        $data = array('status'=>-1);
+        $data = array('status'=>$this->OPTION_STATUS_FROZEN);
         $ret = $userObj->setUserinfo($uid, $data);
         if (empty($ret)){
             return false;

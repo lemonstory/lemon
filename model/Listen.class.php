@@ -14,16 +14,18 @@ class Listen extends ModelBase
 	 * 获取同龄在听的上线列表
 	 * 按照年龄段，以及用户收听次数最多的专辑排序
 	 * @param I $babyagetype
-	 * @param S $direction     up代表显示上边，down代表显示下边
-	 * @param I $startalbumid  从某个albumid开始,默认为0表示从第一页获取
+	 * @param I $currentpage   加载第几个,默认为1表示从第一页获取
 	 * @param I $len           获取长度
 	 * @return array
 	 */
-	public function getSameAgeListenList($babyagetype = 0, $direction = "down", $startalbumid = 0, $len = 20)
+	public function getSameAgeListenList($babyagetype = 0, $currentpage = 1, $len = 20)
 	{
 		if (!empty($babyagetype) && !in_array($babyagetype, $this->AGE_TYPE_LIST)) {
 			$this->setError(ErrorConf::paramError());
 			return array();
+		}
+		if ($currentpage < 1) {
+		    $currentpage = 1;
 		}
 		if (empty($len)) {
 			$len = 20;
@@ -33,13 +35,7 @@ class Listen extends ModelBase
 		}
 		
 		$where = "";
-		if (!empty($startalbumid)) {
-		    if ($direction == "up") {
-		        $where .= " `albumid` > '{$startalbumid}' AND";
-		    } else {
-		        $where .= " `albumid` < '{$startalbumid}' AND";
-		    }
-		}
+		$offset = ($currentpage - 1) * $len;
 		
 		$status = $this->RECOMMEND_STATUS_ONLIINE; // 已上线状态
 		$where .= " `status` = '{$status}'";
@@ -48,7 +44,7 @@ class Listen extends ModelBase
 			$where .= " AND (`agetype` = '{$babyagetype}' or `agetype` = '0')";
 		}
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		$sql = "SELECT * FROM {$this->RECOMMEND_SAME_AGE_TABLE_NAME} WHERE {$where} ORDER BY `ordernum` DESC LIMIT $len";
+		$sql = "SELECT * FROM {$this->RECOMMEND_SAME_AGE_TABLE_NAME} WHERE {$where} ORDER BY `ordernum` LIMIT $offset, $len";
 		$st = $db->prepare($sql);
 		$st->execute();
 		$list = $st->fetchAll(PDO::FETCH_ASSOC);

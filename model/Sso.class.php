@@ -237,7 +237,7 @@ class Sso extends ModelBase
         
         $UserObj = new User();
         $userinfo = current($UserObj->getUserInfo($uid, 1));
-        if (!empty($userinfo['status']) && $userinfo['status'] == '-2') {
+        if (!empty($userinfo['status']) && in_array($userinfo['status'], array($this->OPTION_STATUS_FORBIDDEN, $this->OPTION_STATUS_FROZEN))) {
             $this->showErrorJson(ErrorConf::userForbidenPost());
         }
         

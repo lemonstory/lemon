@@ -189,7 +189,7 @@ class Album extends ModelBase
      * @param I $len           获取长度
      * @return array
      */
-    public function getAlbumList( $direction = "down", $startid = 0, $len = 20, $uid = 0)
+    public function getAlbumList( $direction = "down", $startid = 0, $len = 20, $uid = 0, $order_by = '')
     {
         if (empty($len)) {
             $len = 20;
@@ -210,9 +210,12 @@ class Album extends ModelBase
                 $where .= " AND `id` < '{$startid}' ";
             }
         }
+        if (!$order_by) {
+            $order_by = 'ORDER BY `id` DESC';
+        }
         
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY `id` DESC LIMIT {$len}";
+        $sql = "SELECT * FROM {$this->table} WHERE {$where} {$order_by} LIMIT {$len}";
         $st = $db->prepare($sql);
         $st->execute();
         $res = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -335,6 +338,9 @@ class Album extends ModelBase
 
     public function clearAlbumCache($albumId)
     {
+        if (!$albumId) {
+            return false;
+        }
         $albumIdKey = RedisKey::getAlbumInfoKey($albumId);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisobj->delete($albumIdKey);
