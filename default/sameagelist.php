@@ -4,8 +4,7 @@ class sameagelist extends controller
 {
     public function action() 
     {
-        $direction = $this->getRequest("direction", "down");
-        $startalbumid = $this->getRequest("startalbumid", 0);
+        $p = $this->getRequest("p", 1);
         $len = $this->getRequest("len", 20);
         
         $uid = $this->getUid();
@@ -25,7 +24,7 @@ class sameagelist extends controller
         
         // 同龄在听
         $listenobj = new Listen();
-        $sameageres = $listenobj->getSameAgeListenList($babyagetype, $direction, $startalbumid, $len);
+        $sameageres = $listenobj->getSameAgeListenList($babyagetype, $p, $len);
         if (! empty($sameageres)) {
             foreach ($sameageres as $value) {
                 $albumids[] = $value['albumid'];

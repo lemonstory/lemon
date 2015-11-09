@@ -4,8 +4,7 @@ class hotrecommendlist extends controller
 {
     public function action() 
     {
-        $direction = $this->getRequest("direction", "down");
-        $startalbumid = $this->getRequest("startalbumid", 0);
+        $p = $this->getRequest("p", 1);
         $len = $this->getRequest("len", 20);
         
         $userinfo = array();
@@ -16,7 +15,7 @@ class hotrecommendlist extends controller
         $aliossobj = new AliOss();
         
         // 热门推荐
-        $hotrecommendres = $managesysobj->getRecommendHotList($direction, $startalbumid, $len);
+        $hotrecommendres = $managesysobj->getRecommendHotList($p, $len);
         if (! empty($hotrecommendres)) {
             foreach ($hotrecommendres as $value) {
                 $albumids[] = $value['albumid'];

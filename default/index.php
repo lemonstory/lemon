@@ -11,7 +11,7 @@ class index extends controller
 		$aliossobj = new AliOss();
 		
 		// 热门推荐
-		$hotrecommendres = $managesysobj->getRecommendHotList("", 0, 9);
+		$hotrecommendres = $managesysobj->getRecommendHotList(1, 9);
 		if (!empty($hotrecommendres)) {
 			foreach ($hotrecommendres as $value) {
 				$albumids[] = $value['albumid'];
@@ -30,7 +30,7 @@ class index extends controller
 		
 		// 同龄在听
 		$listenobj = new Listen();
-		$sameageres = $listenobj->getSameAgeListenList($babyagetype, "", 0, 9);
+		$sameageres = $listenobj->getSameAgeListenList($babyagetype, 1, 9);
 		if (!empty($sameageres)) {
 			foreach ($sameageres as $value) {
 				$albumids[] = $value['albumid'];
@@ -38,7 +38,7 @@ class index extends controller
 		}
 		
 		// 最新上架
-		$newonlineres = $managesysobj->getNewOnlineList($babyagetype, "", 0, 9);
+		$newonlineres = $managesysobj->getNewOnlineList($babyagetype, 1, 9);
 		if (!empty($newonlineres)) {
 			foreach ($newonlineres as $value) {
 				$albumids[] = $value['albumid'];
