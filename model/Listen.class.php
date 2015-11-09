@@ -35,9 +35,9 @@ class Listen extends ModelBase
 		$where = "";
 		if (!empty($startalbumid)) {
 		    if ($direction == "up") {
-		        $where .= " `albumid` > '{$startalbumid}' AND";
-		    } else {
 		        $where .= " `albumid` < '{$startalbumid}' AND";
+		    } else {
+		        $where .= " `albumid` > '{$startalbumid}' AND";
 		    }
 		}
 		
