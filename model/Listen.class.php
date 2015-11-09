@@ -43,8 +43,9 @@ class Listen extends ModelBase
 		
 		$status = $this->RECOMMEND_STATUS_ONLIINE; // 已上线状态
 		$where .= " `status` = '{$status}'";
+		
 		if (!empty($babyagetype)) {
-			$where .= " AND `agetype` = '{$babyagetype}'";
+			$where .= " AND (`agetype` = '{$babyagetype}' or `agetype` = '0')";
 		}
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
 		$sql = "SELECT * FROM {$this->RECOMMEND_SAME_AGE_TABLE_NAME} WHERE {$where} ORDER BY `ordernum` DESC LIMIT $len";
