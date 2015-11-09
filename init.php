@@ -16,7 +16,6 @@ include dirname(__FILE__)."/config/kvstoreconf.php";
 include dirname(__FILE__)."/config/httpcacheconf.php";
 include dirname(__FILE__)."/libs/functions.php";
 
-
 /**
  * autoload : SERVER_ROOT.[model/lib]
  * usage : new oss_sdk() => include('lib/oss/sdk.class.php');new oss_sdk();
