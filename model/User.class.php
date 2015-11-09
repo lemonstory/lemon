@@ -11,11 +11,6 @@ class User extends ModelBase
 	public $TYPE_PH = 3;
 	public $TYPE_SYS = 4;// 系统用户
 	
-	public $STATUS_NORMAL = 1;
-	public $STATUS_FORZEN = -1; // 冻结
-	public $STATUS_FORBITEN = -2; // 封号
-	public $STATUS_DELETE = -3; // 删除
-	
 	
 	public function getUserInfo($uids, $isgetbabay = 0)
 	{

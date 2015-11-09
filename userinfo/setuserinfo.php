@@ -20,11 +20,12 @@ class setuserinfo extends controller
         $defaultaddressid = $this->getRequest('defaultaddressid');
         
         $UserObj = new User();
+        $configvarobj = new ConfigVar();
         $userinfo = current($UserObj->getUserInfo($uid));
-        if (! empty($userinfo['status']) && $userinfo['status'] < 0) {
-            if ($userinfo['status'] == '-1') {
+        if (! empty($userinfo['status'])) {
+            if ($userinfo['status'] == $configvarobj->OPTION_STATUS_FROZEN) {
                 $this->showErrorJson(ErrorConf::userFreezePost($uid));
-            } elseif ($userinfo['status'] == '-2') {
+            } elseif ($userinfo['status'] == $configvarobj->OPTION_STATUS_FORBIDDEN) {
                 $this->showErrorJson(ErrorConf::userForbidenPost());
             }
         }
