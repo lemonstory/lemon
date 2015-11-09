@@ -1,6 +1,7 @@
 <?php
 class ConfigVar
 {
+    public $AGE_TYPE_All = 0; //全部 
     public $AGE_TYPE_FIRST = 1; // 0-2岁
     public $AGE_TYPE_SECOND = 2; // 3-6岁
     public $AGE_TYPE_THIRD = 3; // 7-10岁
