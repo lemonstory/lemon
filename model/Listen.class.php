@@ -47,7 +47,7 @@ class Listen extends ModelBase
 			$where .= " AND `agetype` = '{$babyagetype}'";
 		}
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		$sql = "SELECT * FROM {$this->RECOMMEND_SAME_AGE_TABLE_NAME} WHERE {$where} ORDER BY `ordernum` DESC LIMIT $len";
+		$sql = "SELECT * FROM {$this->RECOMMEND_SAME_AGE_TABLE_NAME} WHERE {$where} ORDER BY `ordernum` LIMIT $len";
 		$st = $db->prepare($sql);
 		$st->execute();
 		$list = $st->fetchAll(PDO::FETCH_ASSOC);
