@@ -5,7 +5,7 @@ class ConfigVar
     public $AGE_TYPE_FIRST = 1; // 0-2岁
     public $AGE_TYPE_SECOND = 2; // 3-6岁
     public $AGE_TYPE_THIRD = 3; // 7-10岁
-    public $AGE_TYPE_LIST = array(1, 2, 3);
+    public $AGE_TYPE_LIST = array(0, 1, 2, 3);
     public $AGE_TYPE_NAME_LIST = array(
             "0" => "全部",
             "1" => "0-2岁",
