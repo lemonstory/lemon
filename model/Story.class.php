@@ -182,7 +182,7 @@ class Story extends ModelBase
         // $where .= " `uid` = '{$uid}'";
         
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY `id` DESC LIMIT {$len}";
+        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY ' ORDER BY `view_order` ASC,`id` DESC ' DESC LIMIT {$len}";
         $st = $db->prepare($sql);
         $st->execute();
         $res = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -306,7 +306,7 @@ class Story extends ModelBase
         if ($redisData) {
             $story_list = json_decode($redisData, true);
         } else {
-            $story_list = $this->get_list("`album_id`='{$album_id}' and status=1", '', '', ' ORDER BY `id` DESC,`view_order` ASC ');
+            $story_list = $this->get_list("`album_id`='{$album_id}' and status=1", '', '', ' ORDER BY `view_order` ASC,`id` DESC ');
             // 缓存
             if ($story_list) {
                 $redisobj->set($key, json_encode($story_list));
