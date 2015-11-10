@@ -76,6 +76,62 @@ class Story extends ModelBase
         }
 	}
 
+    // 获取字段列表
+    public function get_filed_list($filed = '*', $where = '', $orderby = '', $limit = '')
+    {
+        $db = DbConnecter::connectMysql('share_story');
+        if ($where) {
+            $where = "where {$where}";
+        }
+        if ($limit) {
+            $limit = "limit {$limit}";
+        }
+        $sql = "select {$filed} from {$this->table} {$where} {$orderby} {$limit} ";
+        $st = $db->query( $sql );
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r = $st->fetchAll();
+        if ($r) {
+            return $r;
+        } else {
+            return array();
+        }
+    }
+
+    // 获取排序
+    public function get_view_order($title = '', $level = 1)
+    {
+        // 夜 首 集 
+        // $number_list = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+        // $big_number = array( '零', '一', '二', '三', '四', '五', '六', '七', '八', '九');
+        $title = str_replace(array('mp3', 'MP3'), array('', ''), $title);
+        $title = preg_replace('/&#\d+;/', '', $title);
+        $result = '';
+
+        if ($level == 1) {
+            $str_list = array('回', '集', '首', '夜', '个');
+            foreach ($str_list as $k => $v) {
+                $str = trim(Http::sub_data($title, '第', $v));
+                if (!empty($str) && is_numeric($str)) {
+                    $result = $str;
+                    break;
+                }
+            }
+        } else if ($level == 2) {
+            preg_match_all('/\d+/', $title, $r);
+            if (isset($r[0][0]) && count($r[0]) == 1 && is_numeric($r[0][0])) {
+                if (is_numeric($r[0][0])) {
+                    if ($r[0][0] >= 2147483647) {
+                        $result = substr($r[0][0], 4);
+                    } else {
+                        $result = $r[0][0];
+                    }
+                }
+            }
+        }
+
+        return $result;
+    }
+
 	/**
 	 * 获取列表
 	 */
