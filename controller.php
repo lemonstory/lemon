@@ -170,7 +170,6 @@ abstract class controller
             }
             $url = $hostInfo . $url;
         }
-        $this->endXhprof();
         header('Location: ' . $url, true, $statusCode);
     }
     
