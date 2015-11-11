@@ -13,6 +13,7 @@ class mystory extends controller
         $len = $this->getRequest("len", 0);
         
         $uid = $this->getUid();
+        $uid = 10110;
         if (empty($uid)) {
             // 未登录返回空数据
             $this->showSuccJson();

@@ -8,7 +8,7 @@ if (DIRECTORY_SEPARATOR == '/'){
 } else {
     define("MANAGE_ROOT", dirname(dirname(dirname(SERVER_ROOT)))."/www/manage.xiaoningmeng.net/");
 }
-define("HTTP_CACHE", false);
+define("HTTP_CACHE", true);
 
 include dirname(__FILE__)."/config/dbconf.php";
 include dirname(__FILE__)."/config/config.php";

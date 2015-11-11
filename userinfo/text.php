@@ -3,7 +3,8 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
-        
+        $userobj = new User();
+        $userobj->clearUserCache(10110);
         die();
         $type = $this->getRequest("type");
         if ($type == 1) {
