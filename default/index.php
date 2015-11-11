@@ -115,6 +115,7 @@ class index extends controller
 		    $aliossobj = new AliOss();
 		    foreach ($focusres as $value) {
 		        $focusinfo['cover'] = $aliossobj->getFocusUrl($value['picid'], 1);
+		        $focusinfo['linktype'] = $value['linktype'];
 		        $focusinfo['linkurl'] = $value['linkurl'];
 		        $focuspiclist[] = $focusinfo;
 		    }
