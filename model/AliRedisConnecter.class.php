@@ -24,7 +24,8 @@ class AliRedisConnecter
 			try {
 				if ($redisObj->connect($host, $port, self::$CONN_TIMEOUT)) {
 				    if ($database > 0) {
-				        $conn_sec = $redisObj->SELECT($database);
+				        //$conn_sec = $redisObj->SELECT($database);
+				        $conn_sec = TRUE;
 				    } else {
 				        $conn_sec = TRUE;
 				    }
