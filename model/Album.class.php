@@ -164,7 +164,7 @@ class Album extends ModelBase
                 $r  = $st->fetchAll();
                 $r  = array_pop($r);
                 // 写入缓存
-                $redisobj->set($key, json_encode($r));
+                $redisobj->setex($key, 604800, json_encode($r));
             }
 
             if ($r) {
@@ -290,7 +290,7 @@ class Album extends ModelBase
             $st->setFetchMode(PDO::FETCH_ASSOC);
             $r  = $st->fetchAll();
             $r  = array_pop($r);
-            $redisData = $redisobj->set($key, json_encode($r));
+            $redisobj->setex($key, 604800, json_encode($r));
         }
         
         if ($filed) {

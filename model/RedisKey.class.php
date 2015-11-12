@@ -105,7 +105,7 @@ class RedisKey
 
 	public static function getAlbumListKey($params)
 	{
-		return serialize($params);
+		return 'album_list_'.serialize($params);
 	}
 
 	public static function getAlbumInfoKey($albumId)
@@ -120,7 +120,7 @@ class RedisKey
 
 	public static function getStoryListKey($params)
 	{
-		return serialize($params);
+		return 'story_list_'.serialize($params);
 	}
 
 	public static function getAlbumStoryListKey($albumId)
