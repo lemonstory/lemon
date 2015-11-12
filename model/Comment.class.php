@@ -204,7 +204,7 @@ class Comment extends ModelBase
             $st->setFetchMode(PDO::FETCH_ASSOC);
             $r  = $st->fetchAll();
             $r  = array_pop($r);
-            $redisobj->set($key, json_encode($r));
+            $redisobj->setex($key, 86400, json_encode($r));
         }
 
         if ($filed) {
@@ -240,8 +240,8 @@ class Comment extends ModelBase
     		$newcommentlist[] = $this->format_to_api($v);
     	}
         // 写入缓存
-        if ($albumid) {
-            $redisobj->set($key, json_encode($newcommentlist));
+        if ($albumid && $newcommentlist) {
+            $redisobj->setex($key, 86400, json_encode($newcommentlist));
         }
     	return $newcommentlist;
     }
