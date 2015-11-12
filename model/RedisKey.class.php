@@ -29,8 +29,6 @@ class RedisKey
 	{
 	    return 'qqrecount_' . $openid;
 	}
-	
-	
 	/**
 	 * QQ联合登录关联信息key
 	 * @param I $uid
@@ -40,6 +38,26 @@ class RedisKey
 	{
 	    return 'qqrelation_' . $uid;
 	}
+	
+	/**
+	 * 微信联合登录，是否第一次授权的Key
+	 * @param S $openid
+	 * @return string
+	 */
+	public static function getWechatLoginFirstKey($openid)
+	{
+	    return 'wechatrecount_' . $openid;
+	}
+	/**
+	 * 微信联合登录关联信息key
+	 * @param I $uid
+	 * @return string
+	 */
+	public static function getWechatRelationInfoKey($uid)
+	{
+	    return 'wechatrelation_' . $uid;
+	}
+	
 	
 	/**
 	 * 用户信息key
@@ -86,6 +104,9 @@ class RedisKey
 	    return $uidarr;
 	}
 	
+	/**
+	 * 宝宝信息key
+	 */
 	public static function getBabyInfoKeys($babyids)
 	{
 	    $idarr = array();
@@ -94,6 +115,10 @@ class RedisKey
 	    }
 	    return $idarr;
 	}
+	
+	/**
+	 * 地址信息Key
+	 */
 	public static function getAddressInfoKeys($addressids)
 	{
 	    $idarr = array();
@@ -102,37 +127,58 @@ class RedisKey
 	    }
 	    return $idarr;
 	}
-
+    
+	/**
+	 * 专辑列表key
+	 */
 	public static function getAlbumListKey($params)
 	{
 		return 'album_list_'.serialize($params);
 	}
-
+    
+	/**
+	 * 专辑信息
+	 */
 	public static function getAlbumInfoKey($albumId)
 	{
 		return 'album_info_'.$albumId;
 	}
-
+    
+	/**
+	 * 故事信息
+	 */
 	public static function getStoryInfoKey($storyId)
 	{
 		return 'story_info_'.$storyId;
 	}
 
+	/**
+	 * 故事列表
+	 */
 	public static function getStoryListKey($params)
 	{
 		return 'story_list_'.serialize($params);
 	}
 
+	/**
+	 * 专辑的故事列表
+	 */
 	public static function getAlbumStoryListKey($albumId)
 	{
 		return 'album_story_list_'.$albumId;
 	}
-
+    
+	/**
+	 * 评论信息
+	 */
 	public static function getCommentInfoKey($commentId)
 	{
 		return 'comment_info_'.$commentId;
 	}
 
+	/**
+	 * 专辑的评论列表
+	 */
 	public static function getAlbumCommentListKey($albumId)
 	{
 		return 'album_comment_list_'.$albumId;
