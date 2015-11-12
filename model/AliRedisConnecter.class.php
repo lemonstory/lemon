@@ -23,13 +23,12 @@ class AliRedisConnecter
 			$tmp_count = $tmp_count + 1;
 			try {
 				if ($redisObj->connect($host, $port, self::$CONN_TIMEOUT)) {
+				    $redisObj->auth($user . ":" . $pwd);
 				    if ($database > 0) {
-				        //$conn_sec = $redisObj->SELECT($database);
-				        $conn_sec = TRUE;
+				        $conn_sec = $redisObj->SELECT($database);
 				    } else {
 				        $conn_sec = TRUE;
 				    }
-					$redisObj->auth($user . ":" . $pwd);
 				} else {
 					$conn_sec = FALSE;
 				}
