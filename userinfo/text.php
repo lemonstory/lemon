@@ -3,8 +3,7 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
-        $obj = new Listen();
-        $obj->getRankListUserListen(10);
+        
         die();
         $type = $this->getRequest("type");
         if ($type == 1) {

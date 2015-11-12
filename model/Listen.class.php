@@ -378,7 +378,7 @@ class Listen extends ModelBase
 		if (!empty($babyagetype)) {
     		// list: 更新某个年龄段的专辑收听次数排行队列
     		$listenalbumkey = RedisKey::getRankListenAlbumKey($babyagetype);
-    		$redisObj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+    		$redisObj = AliRedisConnecter::connRedis($this->RANK_INSTANCE);
     		$redisObj->zIncrBy($listenalbumkey, 1, $albumid);
 		}
 		
