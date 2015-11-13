@@ -219,7 +219,7 @@ class AliOss extends ModelBase
         }
     }
     
-    public function getImageUrlNg($file, $size='')
+    public function getImageUrlNg($file, $size = '', $covertime = 0)
     {
         if (strstr($file, "http")) {
             // @huqq 临时使用，允许加载外部域名的图片
@@ -236,6 +236,9 @@ class AliOss extends ModelBase
             $fileurl = $domain . $file . "@!{$size}x{$size}";
         } else {
             $fileurl = $domain . trim($file, "/");
+        }
+        if (!empty($covertime)) {
+            $fileurl .= "?v={$covertime}";
         }
         return $fileurl;
     }

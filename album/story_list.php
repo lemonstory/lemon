@@ -15,7 +15,7 @@ class story_list extends controller
         $aliossobj = new AliOss();
         foreach ($storylist as $k => $v) {
         	if ($storylist[$k]['cover']) {
-	            $storylist[$k]['cover'] = $aliossobj->getImageUrlNg($v['cover'], 200);
+	            $storylist[$k]['cover'] = $aliossobj->getImageUrlNg($v['cover'], 200, $v['cover_time']);
 	        } else {
 	            $storylist[$k]['cover'] = $v['s_cover'];
 	        }

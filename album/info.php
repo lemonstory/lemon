@@ -23,7 +23,7 @@ class info extends controller
 
         $aliossobj = new AliOss();
         if ($result['albuminfo']['cover']) {
-            $result['albuminfo']['cover'] = $aliossobj->getImageUrlNg($result['albuminfo']['cover'], 200);
+            $result['albuminfo']['cover'] = $aliossobj->getImageUrlNg($result['albuminfo']['cover'], 200, $result['albuminfo']['cover_time']);
         } else {
             $result['albuminfo']['cover'] = $result['albuminfo']['s_cover'];
         }
