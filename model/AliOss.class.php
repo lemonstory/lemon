@@ -100,6 +100,41 @@ class AliOss extends ModelBase
     
     
     /**
+     * 通过$_FILES方式上传pic图片到OSS
+     * @param S $file        $_FILES['xxx']的值
+     * @param I $relationid
+     */ 
+    public function uploadPicImageByFiles($file, $relationid)
+    {
+        if (empty($file) || empty($relationid)){
+            $this->setError(ErrorConf::paramError());
+            return "";
+        }
+        $obj = new alioss_sdk();
+        $obj->set_debug_mode(FALSE);
+        $bucket = $this->OSS_BUCKET_IMAGE;
+        $tmpFile = $file['tmp_name'];
+        
+        $ext = array_search($file['type'], MimeTypes::$mime_types);
+        if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
+            $ext = "jpg";
+        }
+        $from = $this->LOCAL_IMG_TMP_PATH . $relationid . '.' . $ext;
+        move_uploaded_file($tmpFile, $from);
+        
+        $to = $this->formatImageFile($relationid, $ext);
+        $responseObj = $obj->upload_file_by_file($bucket, $to, $from);
+        if ($responseObj->status==200){
+            $path = $to;
+            return $path;
+        } else {
+            $this->setError(ErrorConf::uploadImgfileFail());
+            return "";
+        }
+    }
+    
+    
+    /**
      * 上传抓取专辑图片
      * @param S $tmpfilename    临时目录文件名，如111
      * @param S $tmpfiletype    临时目录文件后缀，如png
