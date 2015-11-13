@@ -114,7 +114,7 @@ class index extends controller
 		if (!empty($focusres)) {
 		    $aliossobj = new AliOss();
 		    foreach ($focusres as $value) {
-		        $focusinfo['cover'] = $aliossobj->getFocusUrl($value['picid'], $value['covertime'], 1);
+		        $focusinfo['cover'] = $aliossobj->getFocusUrl($value['id'], $value['covertime'], 1);
 		        $focusinfo['linktype'] = $value['linktype'];
 		        $focusinfo['linkurl'] = $value['linkurl'];
 		        $focuspiclist[] = $focusinfo;
