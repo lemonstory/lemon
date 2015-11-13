@@ -13,6 +13,7 @@ class Upload extends ModelBase
 	}
 	
     /**
+     * 可用于上传专辑的封面
      * 上传临时目录下的封面图片，临时目录：/alidata1/tmppicfile/
      * @param S $tmpfilename    临时目录存储的图片文件名，如111
      * @param S $tmpfiletype    文件格式，如png
@@ -22,7 +23,37 @@ class Upload extends ModelBase
     public function uploadAlbumImage($tmpfilename, $tmpfiletype, $albumid)
     {
         $ossObj = new AliOss();
-        return $ossObj->uploadPicImage($tmpfilename, $tmpfiletype, $albumid);
+        return $ossObj->uploadPicImage($ossObj->IMAGE_TYPE_ALBUM, $tmpfilename, $tmpfiletype, $albumid);
+    }
+    
+    
+    /**
+     * 可用于上传故事的封面
+     * 上传临时目录下的封面图片，临时目录：/alidata1/tmppicfile/
+     * @param S $tmpfilename    临时目录存储的图片文件名，如111
+     * @param S $tmpfiletype    文件格式，如png
+     * @param I $storyid
+     * @return array            图片文件的信息
+     */
+    public function uploadStoryImage($tmpfilename, $tmpfiletype, $storyid)
+    {
+        $ossObj = new AliOss();
+        return $ossObj->uploadPicImage($ossObj->IMAGE_TYPE_STORY, $tmpfilename, $tmpfiletype, $storyid);
+    }
+    
+    
+    /**
+     * 可用于上传分类的封面
+     * 上传临时目录下的封面图片，临时目录：/alidata1/tmppicfile/
+     * @param S $tmpfilename    临时目录存储的图片文件名，如111
+     * @param S $tmpfiletype    文件格式，如png
+     * @param I $categoryid
+     * @return array            图片文件的信息
+     */
+    public function uploadCategoryImage($tmpfilename, $tmpfiletype, $categoryid)
+    {
+        $ossObj = new AliOss();
+        return $ossObj->uploadPicImage($ossObj->IMAGE_TYPE_CATEGORY, $tmpfilename, $tmpfiletype, $categoryid);
     }
     
     
@@ -47,7 +78,7 @@ class Upload extends ModelBase
      * @param I $uid
      * @return S         图片的oss文件目录及文件名称
      */
-    public function uploadAvatarImage($file, $uid)
+    public function uploadAvatarImageByPost($file, $uid)
     {
     	$ossObj = new AliOss();
     	return $ossObj->uploadAvatarImage($file, $uid);
@@ -59,7 +90,7 @@ class Upload extends ModelBase
 	 * @param I $focusid        焦点图id
 	 * @return S                图片的oss文件目录及文件名称
 	 */
-	public function uploadFocusImage($file, $focusid)
+	public function uploadFocusImageByPost($file, $focusid)
     {
     	$ossObj = new AliOss();
     	return $ossObj->uploadFocusImage($file, $focusid);
