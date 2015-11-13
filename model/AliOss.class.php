@@ -240,7 +240,7 @@ class AliOss extends ModelBase
         return $fileurl;
     }
     
-    public function getFocusUrl($focuspicid, $isthumb = 1)
+    public function getFocusUrl($focuspicid, $covertime = 0, $isthumb = 1)
     {
         $domains = $this->OSS_BUCKET_IMAGE_DOMAIN;
         $domainsCount = count($domains);
@@ -250,6 +250,9 @@ class AliOss extends ModelBase
             $fileurl = $domain . "focus/{$focuspicid}.png@!640x260";
         } else {
             $fileurl = $domain . "focus/{$focuspicid}.png";
+        }
+        if (!empty($covertime)) {
+            $fileurl .= "?v={$covertime}";
         }
         return $fileurl;
     }
