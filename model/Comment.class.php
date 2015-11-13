@@ -168,16 +168,7 @@ class Comment extends ModelBase
         }
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
-        $r = $st->fetchAll();
-        if ($filed) {
-            $arr = array();
-            foreach($r as $k => $v) {
-                $arr[] = $v[$filed];
-            }
-            return $arr;
-        } else {
-            return $r;
-        }
+        return $st->fetchAll();
     }
 
     /**
