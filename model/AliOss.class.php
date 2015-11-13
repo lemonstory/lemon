@@ -66,10 +66,10 @@ class AliOss extends ModelBase
     /**
      * 上传焦点图图片
      * @param S $file        $_FILES['xxx']的值
-     * @param I $focuspicid
+     * @param I $focusid
      * @return array
      */
-    public function uploadFocusImage($file, $focuspicid)
+    public function uploadFocusImage($file, $focusid)
     {
         if (empty($file)){
             $this->setError(ErrorConf::paramError());
@@ -84,10 +84,10 @@ class AliOss extends ModelBase
         if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
             $ext = "jpg";
         }
-        $from = $this->LOCAL_IMG_TMP_PATH . $focuspicid . '.' . $ext;
+        $from = $this->LOCAL_IMG_TMP_PATH . $focusid . '.' . $ext;
         move_uploaded_file($tmpFile, $from);
          
-        $to = "focus/" . $focuspicid . ".png";
+        $to = "focus/" . $focusid . ".png";
         $responseObj = $obj->upload_file_by_file($bucket,$to,$from);
         if ($responseObj->status==200){
             $path = $to;
