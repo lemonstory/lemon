@@ -6,7 +6,7 @@ class text extends controller
         $from = "2015/10/31/006f52e9102a8d3be2fe5614f42ba989.jpg";
         $to = "album/111/006f52e9102a8d3be2fe5614f42ba989.jpg";
         $aliossobj = new AliOss();
-        $aliossobj->copyImageOss($from, $to);
+        //$aliossobj->copyImageOss($from, $to);
         die();
         
         
