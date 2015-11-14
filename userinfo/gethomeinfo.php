@@ -67,7 +67,7 @@ class gethomeinfo extends controller
                 $value['listenalbumuptime'] = date("Y-m-d H:i:s", $value['uptime']);
                 $albuminfo = $albumlist[$albumid];
                 if (!empty($albuminfo['cover'])) {
-                    $albuminfo['cover'] = $aliossobj->getImageUrlNg($albuminfo['cover'], 100);
+                    $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 100, $albuminfo['cover_time']);
                 }
                 $albuminfo['listennum'] = 0;
                 if (!empty($albumlistennum[$albumid])) {

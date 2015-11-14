@@ -13,6 +13,7 @@ class Upload extends ModelBase
 	}
 	
     /**
+     * 可用于上传专辑的封面
      * 上传临时目录下的封面图片，临时目录：/alidata1/tmppicfile/
      * @param S $tmpfilename    临时目录存储的图片文件名，如111
      * @param S $tmpfiletype    文件格式，如png
@@ -22,15 +23,45 @@ class Upload extends ModelBase
     public function uploadAlbumImage($tmpfilename, $tmpfiletype, $albumid)
     {
         $ossObj = new AliOss();
-        return $ossObj->uploadPicImage($tmpfilename, $tmpfiletype, $albumid);
+        return $ossObj->uploadPicImage($ossObj->IMAGE_TYPE_ALBUM, $tmpfilename, $tmpfiletype, $albumid);
+    }
+    
+    
+    /**
+     * 可用于上传故事的封面
+     * 上传临时目录下的封面图片，临时目录：/alidata1/tmppicfile/
+     * @param S $tmpfilename    临时目录存储的图片文件名，如111
+     * @param S $tmpfiletype    文件格式，如png
+     * @param I $storyid
+     * @return array            图片文件的信息
+     */
+    public function uploadStoryImage($tmpfilename, $tmpfiletype, $storyid)
+    {
+        $ossObj = new AliOss();
+        return $ossObj->uploadPicImage($ossObj->IMAGE_TYPE_STORY, $tmpfilename, $tmpfiletype, $storyid);
+    }
+    
+    
+    /**
+     * 可用于上传分类的封面
+     * 上传临时目录下的封面图片，临时目录：/alidata1/tmppicfile/
+     * @param S $tmpfilename    临时目录存储的图片文件名，如111
+     * @param S $tmpfiletype    文件格式，如png
+     * @param I $categoryid
+     * @return array            图片文件的信息
+     */
+    public function uploadCategoryImage($tmpfilename, $tmpfiletype, $categoryid)
+    {
+        $ossObj = new AliOss();
+        return $ossObj->uploadPicImage($ossObj->IMAGE_TYPE_CATEGORY, $tmpfilename, $tmpfiletype, $categoryid);
     }
     
     
     /**
      * 上传临时目录下的音频文件， 临时目录：/alidata1/tmpmediafile/
-     * @param string $tmpfilepath    临时目录,存储的音频文件名，如222
+     * @param S $tmpfilepath    临时目录,存储的音频文件名，如222
      * @param S $tmpfiletype         文件格式，如mp3
-     * @param string $storyid
+     * @param S $storyid
      * @return array 音频文件的信息
      */
     public function uploadStoryMedia($tmpfilename, $tmpfiletype, $storyid)
@@ -43,25 +74,58 @@ class Upload extends ModelBase
     
     /**
      * Post上传用户头像图片
-     * @param S $file    如：$_FILES['avatarfile']
+     * @param A $file    如：$_FILES['avatarfile']
      * @param I $uid
      * @return S         图片的oss文件目录及文件名称
      */
-    public function uploadAvatarImage($file, $uid)
+    public function uploadAvatarImageByPost($file, $uid)
     {
     	$ossObj = new AliOss();
-    	return $ossObj->uploadAvatarImage($file, $uid);
+    	return $ossObj->uploadAvatarImageByFiles($file, $uid);
     }
     
 	/**
 	 * Post上传焦点图
-	 * @param S $file
-	 * @param I $focuspicid     焦点图picid
+	 * @param A $file
+	 * @param I $focusid        焦点图id
 	 * @return S                图片的oss文件目录及文件名称
 	 */
-	public function uploadFocusImage($file, $focuspicid)
+	public function uploadFocusImageByPost($file, $focusid)
     {
     	$ossObj = new AliOss();
-    	return $ossObj->uploadFocusImage($file, $focuspicid);
-    } 
+    	return $ossObj->uploadFocusImageByFiles($file, $focusid);
+    }
+    
+    /**
+     * Post上传专辑封面
+     * @param A $file
+     * @param I $albumid
+     */
+    public function uploadAlbumImageByPost($file, $albumid)
+    {
+        $ossObj = new AliOss();
+        $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_ALBUM, $file, $albumid);
+    }
+    
+    /**
+     * Post上传故事封面
+     * @param A $file
+     * @param I $storyid
+     */
+    public function uploadStoryImageByPost($file, $storyid)
+    {
+        $ossObj = new AliOss();
+        $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_STORY, $file, $storyid);
+    }
+    
+    /**
+     * Post上传分类封面
+     * @param A $file
+     * @param I $categoryid
+     */
+    public function uploadCategoryImageByPost($file, $categoryid)
+    {
+        $ossObj = new AliOss();
+        $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_CATEGORY, $file, $categoryid);
+    }
 }

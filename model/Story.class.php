@@ -193,7 +193,7 @@ class Story extends ModelBase
                 $r  = $st->fetchAll();
                 $r  = array_pop($r);
                 // 写入缓存
-                $redisobj->set($key, json_encode($r));
+                $redisobj->setex($key, 604800, json_encode($r));
             }
             if ($r) {
                 $storylist[$r['id']] = $this->format_to_api($r);
@@ -280,7 +280,7 @@ class Story extends ModelBase
             $r  = $st->fetchAll();
             $r  = array_pop($r);
             // 缓存
-            $redisData = $redisobj->set($key, json_encode($r));
+            $redisobj->setex($key, 604800, json_encode($r));
         }
 
         
@@ -365,7 +365,7 @@ class Story extends ModelBase
             $story_list = $this->get_list("`album_id`='{$album_id}' and status=1", '', '', ' ORDER BY `view_order` ASC,`id` DESC ');
             // 缓存
             if ($story_list) {
-                $redisobj->set($key, json_encode($story_list));
+                $redisobj->setex($key, 86400, json_encode($story_list));
             }
         }
 		

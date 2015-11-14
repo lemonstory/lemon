@@ -9,8 +9,9 @@ class WechatSso extends Sso
     
 	public function checkWechatLoginFirst($openId) 
     {
-        $key = 'wxrecount_' . $openId;
-        $cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $key);
+        $key = RedisKey::getWechatLoginFirstKey($openId);
+        $redisObj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $cacheData = $redisObj->get($key);
         if (empty($cacheData)) {
             $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
             $sql = "select count(1) from  {$this->WECHAT_RELATION_TABLE_NAME} where openid=?";
@@ -21,7 +22,7 @@ class WechatSso extends Sso
             $count = $st->fetch(PDO::FETCH_COLUMN);
             $db = null;
             if ($count == 1) {
-                CacheConnecter::set($this->CACHE_INSTANCE, $key, $count, 30 * 86400);
+                $redisObj->setex($key, 604800, 1);
                 return false;
             }
             return true;
@@ -39,8 +40,10 @@ class WechatSso extends Sso
         if (empty($uid)) {
             return array();
         }
-        $key = 'wxrelation_' . $uid;
-        $cacheData = CacheConnecter::get($this->CACHE_INSTANCE, $key);
+        
+        $key = RedisKey::getWechatRelationInfoKey($uid);
+        $redisObj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $cacheData = $redisObj->get($key);
         if (empty($cacheData)) {
             $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
             $sql = "select * from {$this->WECHAT_RELATION_TABLE_NAME} where uid = ?";
@@ -51,11 +54,11 @@ class WechatSso extends Sso
             $info = $st->fetch(PDO::FETCH_ASSOC);
             $db = null;
             if (! empty($info)) {
-                CacheConnecter::set($this->CACHE_INSTANCE, $key, $info, 86400);
+                $redisObj->setex($key, 86400, serialize($info));
             }
             return $info;
         } else {
-            return $cacheData;
+            return unserialize($cacheData);
         }
     }
     

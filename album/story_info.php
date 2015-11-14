@@ -14,7 +14,7 @@ class story_info extends controller
 
         $aliossobj = new AliOss();
         if ($story_info['cover']) {
-            $story_info['cover'] = $aliossobj->getImageUrlNg($story_info['cover'], 200);
+            $story_info['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $story_info['cover'], 200, $story_info['cover_time']);
         } else {
             $story_info['cover'] = $story_info['s_cover'];
         }

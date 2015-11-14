@@ -27,13 +27,17 @@ class AliOss extends ModelBase
     
     public $OSS_IMAGE_THUMB_SIZE_LIST = array(100, 200, 230, 460); // lemonpic图片缩略尺寸
     
+    public $IMAGE_TYPE_ALBUM = 'album';
+    public $IMAGE_TYPE_STORY = 'story';
+    public $IMAGE_TYPE_CATEGORY = 'category';
+    
     /**
      * 上传头像图片
      * @param S $file        $_FILES['xxx']的值
      * @param I $uid
      * @return array
      */
-    public function uploadAvatarImage($file, $uid)
+    public function uploadAvatarImageByFiles($file, $uid)
     {
         if (empty($file)){
             $this->setError(ErrorConf::paramError());
@@ -66,10 +70,10 @@ class AliOss extends ModelBase
     /**
      * 上传焦点图图片
      * @param S $file        $_FILES['xxx']的值
-     * @param I $focuspicid
+     * @param I $focusid
      * @return array
      */
-    public function uploadFocusImage($file, $focuspicid)
+    public function uploadFocusImageByFiles($file, $focusid)
     {
         if (empty($file)){
             $this->setError(ErrorConf::paramError());
@@ -84,11 +88,47 @@ class AliOss extends ModelBase
         if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
             $ext = "jpg";
         }
-        $from = $this->LOCAL_IMG_TMP_PATH . $focuspicid . '.' . $ext;
+        $from = $this->LOCAL_IMG_TMP_PATH . $focusid . '.' . $ext;
         move_uploaded_file($tmpFile, $from);
          
-        $to = "focus/" . $focuspicid . ".png";
+        $to = "focus/" . $focusid . ".png";
         $responseObj = $obj->upload_file_by_file($bucket,$to,$from);
+        if ($responseObj->status==200){
+            $path = $to;
+            return $path;
+        } else {
+            $this->setError(ErrorConf::uploadImgfileFail());
+            return "";
+        }
+    }
+    
+    
+    /**
+     * 通过$_FILES方式上传pic图片到OSS
+     * @param S $imagetype   图片类型：album/story/category
+     * @param S $file        $_FILES['xxx']的值
+     * @param I $relationid
+     */ 
+    public function uploadPicImageByFiles($imagetype, $file, $relationid)
+    {
+        if (empty($imagetype) || empty($file) || empty($relationid)){
+            $this->setError(ErrorConf::paramError());
+            return "";
+        }
+        $obj = new alioss_sdk();
+        $obj->set_debug_mode(FALSE);
+        $bucket = $this->OSS_BUCKET_IMAGE;
+        $tmpFile = $file['tmp_name'];
+        
+        $ext = array_search($file['type'], MimeTypes::$mime_types);
+        if (!in_array($ext, $this->OSS_IMAGE_ENABLE)){
+            $ext = "jpg";
+        }
+        $from = $this->LOCAL_IMG_TMP_PATH . $relationid . '.' . $ext;
+        move_uploaded_file($tmpFile, $from);
+        
+        $to = $this->formatImageFile($imagetype, $relationid, $ext);
+        $responseObj = $obj->upload_file_by_file($bucket, $to, $from);
         if ($responseObj->status==200){
             $path = $to;
             return $path;
@@ -106,9 +146,9 @@ class AliOss extends ModelBase
      * @param S $relationid
      * @return array()
      */
-    public function uploadPicImage($tmpfilename, $tmpfiletype, $relationid)
+    public function uploadPicImage($imagetype, $tmpfilename, $tmpfiletype, $relationid)
     {
-        if (empty($tmpfilename) || empty($tmpfiletype) || empty($relationid)){
+        if (empty($imagetype) || empty($tmpfilename) || empty($tmpfiletype) || empty($relationid)){
             $this->setError(ErrorConf::paramError());
             return array();
         }
@@ -127,7 +167,7 @@ class AliOss extends ModelBase
 	    	$ext = "jpg";
 	    }
 	    
-	    $to = $this->formatImageFile($relationid, $ext);
+	    $to = $this->formatImageFile($imagetype, $relationid, $ext);
     	$responseObj = $obj->upload_file_by_file($bucket, $to, $tmpFile);
     	if ($responseObj->status==200){
     	    list($width, $height, $type, $attr) = getimagesize($tmpFile);
@@ -219,7 +259,15 @@ class AliOss extends ModelBase
         }
     }
     
-    public function getImageUrlNg($file, $size='')
+    /**
+     * 获取lemonpic图片url
+     * @param S $imagetype      类型：album/story/category
+     * @param S $file           文件路径和文件名：2015/11/01/xxx.jpg
+     * @param S $size           缩略尺寸：如100
+     * @param I $covertime      封面最新更新时间戳，用于更新cdn缓存
+     * @return string           图片url
+     */
+    public function getImageUrlNg($imagetype, $file, $size = '', $covertime = 0)
     {
         if (strstr($file, "http")) {
             // @huqq 临时使用，允许加载外部域名的图片
@@ -229,27 +277,34 @@ class AliOss extends ModelBase
         $domainsCount = count($domains);
         $domainIndex = abs(crc32($file)%$domainsCount);
         $domain = $domains[$domainIndex];
+        $file = $this->getImageFile($imagetype, $file);
         if ($size > 0) {
             if (!in_array($size, $this->OSS_IMAGE_THUMB_SIZE_LIST)) {
-                $size = 200;
+                $size = 100;
             }
             $fileurl = $domain . $file . "@!{$size}x{$size}";
         } else {
             $fileurl = $domain . trim($file, "/");
         }
+        if (!empty($covertime)) {
+            $fileurl .= "?v={$covertime}";
+        }
         return $fileurl;
     }
     
-    public function getFocusUrl($focuspicid, $isthumb = 1)
+    public function getFocusUrl($focusid, $covertime = 0, $isthumb = 1)
     {
         $domains = $this->OSS_BUCKET_IMAGE_DOMAIN;
         $domainsCount = count($domains);
-        $domainIndex = abs(crc32($focuspicid)%$domainsCount);
+        $domainIndex = abs(crc32($focusid)%$domainsCount);
         $domain = $domains[$domainIndex];
         if ($isthumb == 1) {
-            $fileurl = $domain . "focus/{$focuspicid}.png@!640x260";
+            $fileurl = $domain . "focus/{$focusid}.png@!640x260";
         } else {
-            $fileurl = $domain . "focus/{$focuspicid}.png";
+            $fileurl = $domain . "focus/{$focusid}.png";
+        }
+        if (!empty($covertime)) {
+            $fileurl .= "?v={$covertime}";
         }
         return $fileurl;
     }
@@ -280,18 +335,18 @@ class AliOss extends ModelBase
      *  
      * @param unknown_type $file
      */
-    public function deleteImageOss($object)
+    /* public function deleteImageOss($object)
     {
         $obj = new alioss_sdk();
     	$bucket = $this->OSS_BUCKET_IMAGE;
     	$response = $obj->delete_object($bucket,$object);
     	if ($response->status==204){
-//     	    $cdnObj = new AliCdn();
-//     	    $cdnObj->clearFileCache($this->getImageUrl($object));
+    	    //$cdnObj = new AliCdn();
+    	    //$cdnObj->clearFileCache($this->getImageUrl($object));
     	    return true;
     	}
     	return false;
-    }
+    } */
     
     // 同bucket复制
     public function copyImageOss($from, $to)
@@ -305,15 +360,15 @@ class AliOss extends ModelBase
         return false;
     }
     
-    public function moveImageOss($from, $to)
+    /* public function moveImageOss($from, $to)
     {
         if ($this->copyImageOss($from, $to)){
             return $this->deleteImageOss($from);
         }
         return false;
-    }
+    } */
     
-    public function copyAvatarOss($from, $to)
+    /* public function copyAvatarOss($from, $to)
     {
         $obj = new alioss_sdk();
         $bucket = $this->OSS_BUCKET_AVATAR;
@@ -341,14 +396,36 @@ class AliOss extends ModelBase
     	    return true;
     	}
     	return false;
-    }
+    } */
     
-    public function formatImageFile($relationid, $ext)
+    private function getImageFile($imagetype, $file)
     {
-        return date("Y/m/d/").md5($relationid).".".$ext;
+        if (!in_array($imagetype, array($this->IMAGE_TYPE_ALBUM, $this->IMAGE_TYPE_STORY, $this->IMAGE_TYPE_CATEGORY))) {
+            return false;
+        }
+        return $imagetype . "/" . $file;
     }
     
-    public function formatVideoFile($relationid, $ext)
+    /**
+     * 图片pic的存储路径
+     * @param S $imagetype      类型：专辑、故事、分类的图片
+     * @param I $relationid     专辑ID/故事ID/分类ID
+     * @param S $ext            后缀
+     * @return string
+     */
+    private function formatImageFile($imagetype, $relationid, $ext)
+    {
+        if (empty($imagetype) || empty($relationid)) {
+            return false;
+        }
+        if (!in_array($imagetype, array($this->IMAGE_TYPE_ALBUM, $this->IMAGE_TYPE_STORY, $this->IMAGE_TYPE_CATEGORY))) {
+            return false;
+        }
+        
+        return $imagetype . "/" . date("Y/m/d/") . md5($relationid) . "." . $ext;
+    }
+    
+    private function formatVideoFile($relationid, $ext)
     {
         return date("Y/m/d/").md5($relationid).".".$ext;
     }

@@ -14,6 +14,7 @@ class AliRedisConnecter
 		$port = $conf['port'];
 		$user = $conf['user'];
 		$pwd  = $conf['passwd'];
+		$database = $conf['db'];
 	
 		$redisObj = new Redis();
 		$tmp_count = 0;
@@ -22,8 +23,12 @@ class AliRedisConnecter
 			$tmp_count = $tmp_count + 1;
 			try {
 				if ($redisObj->connect($host, $port, self::$CONN_TIMEOUT)) {
-					$conn_sec = TRUE;
-					$redisObj->auth($user . ":" . $pwd);
+				    $redisObj->auth($user . ":" . $pwd);
+				    if ($database > 0) {
+				        $conn_sec = $redisObj->SELECT($database);
+				    } else {
+				        $conn_sec = TRUE;
+				    }
 				} else {
 					$conn_sec = FALSE;
 				}

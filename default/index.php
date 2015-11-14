@@ -65,7 +65,7 @@ class index extends controller
 				if (!empty($albumlist[$albumid])) {
 				    $albuminfo = $albumlist[$albumid];
 				    if (!empty($albuminfo['cover'])) {
-				        $albuminfo['cover'] = $aliossobj->getImageUrlNg($albuminfo['cover'], 200);
+				        $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 200, $albuminfo['cover_time']);
 				    }
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
@@ -81,7 +81,7 @@ class index extends controller
 				if (!empty($albumlist[$albumid])) {
 				    $albuminfo = $albumlist[$albumid];
 				    if (!empty($albuminfo['cover'])) {
-				        $albuminfo['cover'] = $aliossobj->getImageUrlNg($albuminfo['cover'], 200);
+				        $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 200, $albuminfo['cover_time']);
 				    }
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
@@ -97,7 +97,7 @@ class index extends controller
 				if (!empty($albumlist[$albumid])) {
 				    $albuminfo = $albumlist[$albumid];
 				    if (!empty($albuminfo['cover'])) {
-				        $albuminfo['cover'] = $aliossobj->getImageUrlNg($albuminfo['cover'], 200);
+				        $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 200, $albuminfo['cover_time']);
 				    }
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
@@ -114,7 +114,7 @@ class index extends controller
 		if (!empty($focusres)) {
 		    $aliossobj = new AliOss();
 		    foreach ($focusres as $value) {
-		        $focusinfo['cover'] = $aliossobj->getFocusUrl($value['picid'], 1);
+		        $focusinfo['cover'] = $aliossobj->getFocusUrl($value['id'], $value['covertime'], 1);
 		        $focusinfo['linktype'] = $value['linktype'];
 		        $focusinfo['linkurl'] = $value['linkurl'];
 		        $focuspiclist[] = $focusinfo;

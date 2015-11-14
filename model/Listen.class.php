@@ -123,19 +123,18 @@ class Listen extends ModelBase
 		
 		$where = " `uimid` = '{$uimid}'";
 		if (!empty($startalbumid)) {
-		    $startalbuminfo = current($this->getUserListenAlbumInfo($uimid, $startalbumid));
+		    $startalbuminfo = $this->getUserListenAlbumInfo($uimid, $startalbumid);
 		    $startuptime = $startalbuminfo['uptime'];
 		    if (!empty($startuptime)) {
 		        if ($direction == "up") {
-		            $where .= " `uptime` > '{$startuptime}' AND";
+		            $where .= " AND `uptime` > '{$startuptime}'";
 		        } else {
-		            $where .= " `uptime` < '{$startuptime}' AND";
+		            $where .= " AND `uptime` < '{$startuptime}'";
 		        }
 		    }
 		}
 		
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		//$sql = "SELECT * FROM {$this->LISTEN_RECORD_TABLE_NAME} WHERE {$where} ORDER BY `uptime` DESC LIMIT {$len}";
 		$sql = "SELECT * FROM {$this->LISTEN_ALBUM_TABLE_NAME} WHERE {$where} ORDER BY `uptime` DESC LIMIT {$len}";
 		$st = $db->prepare($sql);
 		$st->execute();
@@ -379,7 +378,7 @@ class Listen extends ModelBase
 		if (!empty($babyagetype)) {
     		// list: 更新某个年龄段的专辑收听次数排行队列
     		$listenalbumkey = RedisKey::getRankListenAlbumKey($babyagetype);
-    		$redisObj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+    		$redisObj = AliRedisConnecter::connRedis($this->RANK_INSTANCE);
     		$redisObj->zIncrBy($listenalbumkey, 1, $albumid);
 		}
 		

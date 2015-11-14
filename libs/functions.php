@@ -90,7 +90,7 @@ function getFileExtByMime($mime = '')
 	}
 	$mime = strtolower($mime);
 	if ($mime == 'image/jpeg') {
-		return 'jpeg';
+		return 'jpg';
 	} else if ($mime == 'image/jpg') {
 		return 'jpg';
 	} else if ($mime == 'image/png') {

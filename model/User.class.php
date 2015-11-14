@@ -110,7 +110,7 @@ class User extends ModelBase
 		}
 		
 		$uploadobj = new Upload();
-		$uploadobj->uploadAvatarImage($file, $uid);
+		$uploadobj->uploadAvatarImageByPost($file, $uid);
 		
 		$avatartime = time();
 		$this->setUserinfo($uid, array('avatartime' => $avatartime));
