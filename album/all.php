@@ -19,7 +19,7 @@ class all extends controller
         $aliossobj = new AliOss();
         foreach ($albumlist as $k => $v) {
             if ($v['cover']) {
-                $albumlist[$k]['cover'] = $aliossobj->getImageUrlNg($v['cover'], 200, $v['cover_time']);
+                $albumlist[$k]['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $v['cover'], 200, $v['cover_time']);
             } else {
                 $albumlist[$k]['cover'] = $v['s_cover'];
             }

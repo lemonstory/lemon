@@ -48,7 +48,7 @@ class albumstorysearch extends controller
                 foreach ($storyres as $value) {
                     $info = $value;
                     if (!empty($value['cover'])) {
-                        $info['cover'] = $aliossobj->getImageUrlNg($value['cover'], 100, $value['cover_time']);
+                        $info['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $value['cover'], 100, $value['cover_time']);
                     } else {
                         $info['cover'] = "";
                     }
@@ -66,7 +66,7 @@ class albumstorysearch extends controller
                 foreach ($albumres as $value) {
                     $info = $value;
                     if (!empty($value['cover'])) {
-                        $info['cover'] = $aliossobj->getImageUrlNg($value['cover'], 100, $value['cover_time']);
+                        $info['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $value['cover'], 100, $value['cover_time']);
                     } else {
                         $info['cover'] = "";
                     }

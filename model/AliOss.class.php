@@ -280,7 +280,7 @@ class AliOss extends ModelBase
         $file = $this->getImageFile($imagetype, $file);
         if ($size > 0) {
             if (!in_array($size, $this->OSS_IMAGE_THUMB_SIZE_LIST)) {
-                $size = 200;
+                $size = 100;
             }
             $fileurl = $domain . $file . "@!{$size}x{$size}";
         } else {
