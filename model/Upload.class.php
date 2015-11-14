@@ -59,9 +59,9 @@ class Upload extends ModelBase
     
     /**
      * 上传临时目录下的音频文件， 临时目录：/alidata1/tmpmediafile/
-     * @param string $tmpfilepath    临时目录,存储的音频文件名，如222
+     * @param S $tmpfilepath    临时目录,存储的音频文件名，如222
      * @param S $tmpfiletype         文件格式，如mp3
-     * @param string $storyid
+     * @param S $storyid
      * @return array 音频文件的信息
      */
     public function uploadStoryMedia($tmpfilename, $tmpfiletype, $storyid)
@@ -74,25 +74,58 @@ class Upload extends ModelBase
     
     /**
      * Post上传用户头像图片
-     * @param S $file    如：$_FILES['avatarfile']
+     * @param A $file    如：$_FILES['avatarfile']
      * @param I $uid
      * @return S         图片的oss文件目录及文件名称
      */
     public function uploadAvatarImageByPost($file, $uid)
     {
     	$ossObj = new AliOss();
-    	return $ossObj->uploadAvatarImage($file, $uid);
+    	return $ossObj->uploadAvatarImageByFiles($file, $uid);
     }
     
 	/**
 	 * Post上传焦点图
-	 * @param S $file
+	 * @param A $file
 	 * @param I $focusid        焦点图id
 	 * @return S                图片的oss文件目录及文件名称
 	 */
 	public function uploadFocusImageByPost($file, $focusid)
     {
     	$ossObj = new AliOss();
-    	return $ossObj->uploadFocusImage($file, $focusid);
-    } 
+    	return $ossObj->uploadFocusImageByFiles($file, $focusid);
+    }
+    
+    /**
+     * Post上传专辑封面
+     * @param A $file
+     * @param I $albumid
+     */
+    public function uploadAlbumImageByPost($file, $albumid)
+    {
+        $ossObj = new AliOss();
+        $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_ALBUM, $file, $albumid);
+    }
+    
+    /**
+     * Post上传故事封面
+     * @param A $file
+     * @param I $storyid
+     */
+    public function uploadStoryImageByPost($file, $storyid)
+    {
+        $ossObj = new AliOss();
+        $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_STORY, $file, $storyid);
+    }
+    
+    /**
+     * Post上传分类封面
+     * @param A $file
+     * @param I $categoryid
+     */
+    public function uploadCategoryImageByPost($file, $categoryid)
+    {
+        $ossObj = new AliOss();
+        $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_CATEGORY, $file, $categoryid);
+    }
 }

@@ -37,7 +37,7 @@ class AliOss extends ModelBase
      * @param I $uid
      * @return array
      */
-    public function uploadAvatarImage($file, $uid)
+    public function uploadAvatarImageByFiles($file, $uid)
     {
         if (empty($file)){
             $this->setError(ErrorConf::paramError());
@@ -73,7 +73,7 @@ class AliOss extends ModelBase
      * @param I $focusid
      * @return array
      */
-    public function uploadFocusImage($file, $focusid)
+    public function uploadFocusImageByFiles($file, $focusid)
     {
         if (empty($file)){
             $this->setError(ErrorConf::paramError());
