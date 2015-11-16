@@ -104,7 +104,7 @@ class Upload extends ModelBase
     public function uploadAlbumImageByPost($file, $albumid)
     {
         $ossObj = new AliOss();
-        $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_ALBUM, $file, $albumid);
+        return $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_ALBUM, $file, $albumid);
     }
     
     /**
@@ -115,7 +115,7 @@ class Upload extends ModelBase
     public function uploadStoryImageByPost($file, $storyid)
     {
         $ossObj = new AliOss();
-        $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_STORY, $file, $storyid);
+        return $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_STORY, $file, $storyid);
     }
     
     /**
@@ -126,6 +126,6 @@ class Upload extends ModelBase
     public function uploadCategoryImageByPost($file, $categoryid)
     {
         $ossObj = new AliOss();
-        $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_CATEGORY, $file, $categoryid);
+        return $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_CATEGORY, $file, $categoryid);
     }
 }
