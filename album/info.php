@@ -66,8 +66,10 @@ class info extends controller
         $storyreslist = $story->get_album_story_list($album_id);
         if (!empty($storyreslist)) {
             foreach ($storyreslist as $value) {
+                $value['playcover'] = "";
                 if (!empty($value['cover'])) {
-                    $value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $value['cover'], 100, $value['cover_time']);
+                    //$value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $value['cover'], 100, $value['cover_time']);
+                    $value['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $value['cover'], 230, $value['cover_time']);
                     $storylist[] = $value;
                 }
             }

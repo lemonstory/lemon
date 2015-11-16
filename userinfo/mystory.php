@@ -64,8 +64,10 @@ class mystory extends controller
                 if (!empty($albumstoryres)) {
                     foreach ($albumstoryres as $storyinfo) {
                         $albumid = $storyinfo['album_id'];
+                        $storyinfo['playcover'] = "";
                         if (!empty($storyinfo['cover'])) {
-                            $storyinfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 100, $storyinfo['cover_time']);
+                            //$storyinfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 100, $storyinfo['cover_time']);
+                            $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 230, $storyinfo['cover_time']);
                         }
                         $storylist[$albumid][] = $storyinfo;
                     }
