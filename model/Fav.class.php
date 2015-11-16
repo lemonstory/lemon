@@ -28,11 +28,11 @@ class Fav extends ModelBase
 		}
 		
 		$where = "";
-		if (!empty($startid)) {
+		if (!empty($startfavid)) {
 		    if ($direction == "up") {
-		        $where .= " `id` > '{$startid}' AND";
+		        $where .= " `id` > '{$startfavid}' AND";
 		    } else {
-		        $where .= " `id` < '{$startid}' AND";
+		        $where .= " `id` < '{$startfavid}' AND";
 		    }
 		}
 		$where .= " `uid` = '{$uid}'";
