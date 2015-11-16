@@ -23,7 +23,7 @@ class info extends controller
 
         $aliossobj = new AliOss();
         if ($result['albuminfo']['cover']) {
-            $result['albuminfo']['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $result['albuminfo']['cover'], 230, $result['albuminfo']['cover_time']);
+            $result['albuminfo']['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $result['albuminfo']['cover'], 200, $result['albuminfo']['cover_time']);
         } else {
             $result['albuminfo']['cover'] = $result['albuminfo']['s_cover'];
         }
@@ -61,7 +61,19 @@ class info extends controller
             $result['albuminfo']['favnum'] = 0;
         }
 
-        $result['storylist'] = $story->get_album_story_list($album_id);
+        $storylist = array();
+        $aliossobj = new AliOss();
+        $storyreslist = $story->get_album_story_list($album_id);
+        if (!empty($storyreslist)) {
+            foreach ($storyreslist as $value) {
+                if (!empty($value['cover'])) {
+                    $value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $value['cover'], 100, $value['cover_time']);
+                    $storylist[] = $value;
+                }
+            }
+        }
+        $result['storylist'] = $storylist;
+        
         // 评论数量
         $result['albuminfo']['commentnum'] = (int)$comment->get_total("`albumid`={$album_id}");
         $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ");
