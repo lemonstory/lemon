@@ -4,9 +4,13 @@ class albumstorysearch extends controller
 {
     public function action()
     {
+        $searchtype = $this->getRequest("searchtype", "story");
         $searchcontent = $this->getRequest("searchcontent");
         $page = $this->getRequest("page", 1);
         $len = $this->getRequest("len", 10);
+        if (!in_array($searchtype, array("story", "album", "all"))) {
+            $this->showErrorJson(ErrorConf::paramError());
+        }
         if (empty($searchcontent)) {
             $this->showErrorJson(ErrorConf::paramError());
         }
@@ -21,21 +25,24 @@ class albumstorysearch extends controller
         $storycount = 0;
         $searchobj = new OpenSearch();
         // 搜索故事
-        $storysearch = $searchobj->searchStory($searchcontent, $page, $len);
-        if (!empty($storysearch)) {
-            $storyids = $storysearch['storyids'];
-            $storycount = $storysearch['total'];
+        if (in_array($searchtype, array("story", "all"))) {
+            $storysearch = $searchobj->searchStory($searchcontent, $page, $len);
+            if (!empty($storysearch)) {
+                $storyids = $storysearch['storyids'];
+                $storycount = $storysearch['total'];
+            }
         }
         
         // 搜索专辑
-        $albumids = array();
-        $albumcount = 0;
-        $albumsearch = $searchobj->searchAlbum($searchcontent, $page, $len);
-        if (!empty($albumsearch)) {
-            $albumids = $albumsearch['albumids'];
-            $albumcount = count($albumids);
+        if (in_array($searchtype, array("album", "all"))) {
+            $albumids = array();
+            $albumcount = 0;
+            $albumsearch = $searchobj->searchAlbum($searchcontent, $page, $len);
+            if (!empty($albumsearch)) {
+                $albumids = $albumsearch['albumids'];
+                $albumcount = count($albumids);
+            }
         }
-        
         
         $aliossobj = new AliOss();
         $searchlist = array();
