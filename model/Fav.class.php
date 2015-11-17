@@ -38,7 +38,7 @@ class Fav extends ModelBase
 		$where .= " `uid` = '{$uid}'";
 		
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		$sql = "SELECT * FROM {$this->FAV_TABLE_NAME} WHERE {$where} ORDER BY `addtime` DESC LIMIT {$len}";
+		$sql = "SELECT * FROM {$this->FAV_TABLE_NAME} WHERE {$where} ORDER BY `id` DESC LIMIT {$len}";
 		$st = $db->prepare($sql);
 		$st->execute();
 		$res = $st->fetchAll(PDO::FETCH_ASSOC);
