@@ -53,6 +53,9 @@ class albumstorysearch extends controller
             $storyres = $storyobj->getListByIds($storyids);
             if (!empty($storyres)) {
                 foreach ($storyres as $value) {
+                    if (empty($value['mediapath'])) {
+                        continue;
+                    }
                     $info = $value;
                     if (!empty($value['cover'])) {
                         $info['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $value['cover'], 100, $value['cover_time']);
