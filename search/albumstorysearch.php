@@ -4,11 +4,11 @@ class albumstorysearch extends controller
 {
     public function action()
     {
-        $searchtype = $this->getRequest("searchtype", "story");
+        $searchtype = $this->getRequest("searchtype", "");
         $searchcontent = $this->getRequest("searchcontent");
         $page = $this->getRequest("page", 1);
         $len = $this->getRequest("len", 10);
-        if (!in_array($searchtype, array("story", "album", "all"))) {
+        if (!empty($searchtype) && !in_array($searchtype, array("story", "album"))) {
             $this->showErrorJson(ErrorConf::paramError());
         }
         if (empty($searchcontent)) {
@@ -25,7 +25,7 @@ class albumstorysearch extends controller
         $storycount = 0;
         $searchobj = new OpenSearch();
         // 搜索故事
-        if (in_array($searchtype, array("story", "all"))) {
+        if (empty($searchtype) || $searchtype == 'story') {
             $storysearch = $searchobj->searchStory($searchcontent, $page, $len);
             if (!empty($storysearch)) {
                 $storyids = $storysearch['storyids'];
@@ -34,7 +34,7 @@ class albumstorysearch extends controller
         }
         
         // 搜索专辑
-        if (in_array($searchtype, array("album", "all"))) {
+        if (empty($searchtype) || $searchtype == 'album') {
             $albumids = array();
             $albumcount = 0;
             $albumsearch = $searchobj->searchAlbum($searchcontent, $page, $len);
