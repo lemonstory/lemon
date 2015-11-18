@@ -5,7 +5,7 @@ class Http
 	public static $is_ajax    = false;
 	public static $cookie     = '';
 	public static $user_agent = 'User-Agent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.124 Safari/537.36';
-	public static $referer    = 'http://www.baidu.com';
+	public static $referer    = 'http://www.baidu.com/';
 
 	// ajax请求
 	public static function ajax_get($url, $data = array())
@@ -46,7 +46,7 @@ class Http
         }
 
         if (self::$referer) {
-        	curl_setopt($ch, CURLOPT_REFERER, self::$referer);
+        	// curl_setopt($ch, CURLOPT_REFERER, self::$referer);
         }
 
         $output = curl_exec($ch);

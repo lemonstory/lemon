@@ -173,8 +173,8 @@ class Kdgs extends Http
             $title = http::remove_n($title);
             $source_audio_url = http::sub_data($audio_list[$k], "src='", "'");
             if ($title && $source_audio_url) {
-                $r[$k]['title'] = $title;
-                $r[$k]['intro'] = $intro;
+                $r[$k]['title'] = addslashes(str_replace('&#39;', "'", $title));
+                $r[$k]['intro'] = addslashes(str_replace('&#39;', "'", $intro));
                 $r[$k]['cover'] = $cover;
                 $r[$k]['source_audio_url'] = $source_audio_url;
             }
