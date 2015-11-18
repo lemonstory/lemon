@@ -327,6 +327,19 @@ class Album extends ModelBase
         return '';
     }
 
+    /**
+     * 更新故事数量
+     */
+    public function update_story_num($album_id = 0)
+    {
+        if (!$album_id) {
+            return false;
+        }
+        $story = new Story();
+        $story_num = $story->get_total(" `album_id`={$album_id} and `status` = 1 ");
+        $this->update(array('story_num' => $story_num), " `id`={$album_id} ");
+    }
+
     // 格式化成接口数据
     public function format_to_api($alubm_info = array())
     {
