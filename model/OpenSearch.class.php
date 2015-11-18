@@ -57,7 +57,7 @@ class OpenSearch
         $search->setQueryString($query);
         
         //$search->addAggregate("albumid", "count()");
-        $search->addDistinct("albumid", 1, 1, false); // 每轮albumid中抽样取一个，只取一轮，实现items去重
+        $search->addDistinct("albumid", 1, 1, "false"); // 每轮albumid中抽样取一个，只取一轮，实现items去重
         $search->setPair("duniqfield:albumid"); // 将totla数也去重
         $search->addSort('albumaddtime');
         $search->setStartHit($offset);
