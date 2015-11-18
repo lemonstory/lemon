@@ -8,6 +8,7 @@ class albumstorysearch extends controller
         $searchcontent = $this->getRequest("searchcontent");
         $page = $this->getRequest("page", 1);
         $len = $this->getRequest("len", 10);
+        $len = 50;
         if (!empty($searchtype) && !in_array($searchtype, array("story", "album"))) {
             $this->showErrorJson(ErrorConf::paramError());
         }
@@ -71,18 +72,26 @@ class albumstorysearch extends controller
         
         $albumlist = array();
         if (!empty($albumids)) {
-            // 专辑列表
-            $albumobj = new Album();
-            $albumres = $albumobj->getListByIds($albumids);
-            if (!empty($albumres)) {
-                foreach ($albumres as $value) {
-                    $info = $value;
-                    if (!empty($value['cover'])) {
-                        $info['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $value['cover'], 100, $value['cover_time']);
-                    } else {
-                        $info['cover'] = "";
+            // 过滤掉没有音频的故事，所属的专辑
+            $havemediaalbumids = array();
+            $albumidstr = implode(",", $albumids);
+            $storyobj = new Story();
+            $havemediaalbumids = $storyobj->get_list("album_id IN ($albumidstr) and mediapath != ''", "", "album_id");
+            if (!empty($havemediaalbumids)) {
+                $havemediaalbumids = array_unique($havemediaalbumids);
+                // 专辑列表
+                $albumobj = new Album();
+                $albumres = $albumobj->getListByIds($havemediaalbumids);
+                if (!empty($albumres)) {
+                    foreach ($albumres as $value) {
+                        $info = $value;
+                        if (!empty($value['cover'])) {
+                            $info['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $value['cover'], 100, $value['cover_time']);
+                        } else {
+                            $info['cover'] = "";
+                        }
+                        $albumlist[] = $info;
                     }
-                    $albumlist[] = $info;
                 }
             }
         }
