@@ -5,17 +5,33 @@ class test extends controller
 {
     function action() {
         // 修复封面
+        $album = new Story();
+        $db = DbConnecter::connectMysql('share_story');
+        $sql = "SELECT id,`cover`,`update_time` FROM `album` WHERE `id` >=6988 and cover != '' order by id asc ";
+        $st = $db->query( $sql );
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $album_list = $st->fetchAll();
+        foreach ($album_list as $k => $v) {
+            $cover = str_replace("album/", '', $v['cover']);
+            $cover_time = strtotime($v['update_time']);
+            if ($cover) {
+                $album->update(array('cover' => $cover, 'cover_time' => $cover_time), "`id`={$v['id']}");
+                echo "{$v['id']} 更新成功<br />";
+            }
+        }
+        exit;
+        // 修复封面
         $story = new Story();
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT id,`cover` FROM `story` WHERE `id` >=112316 and cover != '' order by id asc ";
+        $sql = "SELECT id,`cover`,`upate_time` FROM `story` WHERE `id` >=112316 and cover != '' order by id asc ";
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
         $story_list = $st->fetchAll();
         foreach ($story_list as $k => $v) {
             $cover = str_replace("story/", '', $v['cover']);
-            $cover_time = strtotime($v['update_time']);
+            $cover_time = strtotime($v['upate_time']);
             if ($cover) {
-                $story->update(array('cover' => $cover, 'cover_time' => $cover_time) "`id`={$v['id']}");
+                $story->update(array('cover' => $cover, 'cover_time' => $cover_time), "`id`={$v['id']}");
                 echo "{$v['id']} 更新成功<br />";
             }
         }
