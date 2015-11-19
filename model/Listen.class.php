@@ -92,7 +92,14 @@ class Listen extends ModelBase
 	    if (!empty($uid)) {
 	        $rankkey = RedisKey::getRankListenUserKey();
 	        $redisobj = AliRedisConnecter::connRedis($this->RANK_INSTANCE);
-	        $userranknum = $redisobj->zRevRank($rankkey, $uid) + 1;
+	        $userranknum = $redisobj->zRevRank($rankkey, $uid);
+	        if ($userranknum === false) {
+	            // 不在排行榜内
+	            $userranknum = 0;
+	        } else {
+	            // 索引从0开始，排名数自增1
+	            $userranknum += 1;
+	        }
 	    }
 	    $userrankuptime = date("Y-m-d H:i:s");
 	    
