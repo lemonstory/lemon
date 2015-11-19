@@ -6,6 +6,7 @@ class test extends controller
     function action() {
         // 修复封面
         $story = new Story();
+        $db = DbConnecter::connectMysql('share_story');
         $sql = "SELECT id,`cover` FROM `story` WHERE `id` >=112316 and cover != '' order by id asc ";
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
