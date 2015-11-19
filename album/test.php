@@ -4,6 +4,21 @@ include_once '../controller.php';
 class test extends controller
 {
     function action() {
+        // 修复封面
+        $story = new Story();
+        $sql = "SELECT id,`cover` FROM `story` WHERE `id` >=112316 and cover != '' order by id asc ";
+        $st = $db->query( $sql );
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $story_list = $st->fetchAll();
+        foreach ($story_list as $k => $v) {
+            $cover = str_replace("story/", '', $v['cover']);
+            $cover_time = strtotime($v['update_time']);
+            if ($cover) {
+                $story->update(array('cover' => $cover, 'cover_time' => $cover_time) "`id`={$v['id']}");
+                echo "{$v['id']} 更新成功<br />";
+            }
+        }
+        exit;
         $r = $this->middle_upload('http://fdfs.xmcdn.com/group2/M02/0A/04/wKgDr1GI6d7xh2RIAAWohUyGdp82513715_mobile_large', 47906, 2);
         if ($r) {
             $story = new Story();
