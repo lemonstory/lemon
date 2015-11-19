@@ -4,8 +4,9 @@ include_once '../controller.php';
 class test extends controller
 {
     function action() {
+        exit;
         // 修复封面
-        $album = new Story();
+        $album = new Album();
         $db = DbConnecter::connectMysql('share_story');
         $sql = "SELECT id,`cover`,`update_time` FROM `album` WHERE `id` >=6988 and cover != '' order by id asc ";
         $st = $db->query( $sql );
