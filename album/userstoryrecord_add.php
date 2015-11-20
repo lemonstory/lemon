@@ -40,10 +40,8 @@ class userstoryrecord_add extends controller
                 ));
             }
 
-            if (!empty($lastid)) {
-                // 添加收听处理队列
-                MnsQueueManager::pushListenStoryQueue($uimid, $v['storyid']);
-            }
+            // 添加收听处理队列
+            MnsQueueManager::pushListenStoryQueue($uimid, $v['storyid']);
         }
 
         $this->showSuccJson();
