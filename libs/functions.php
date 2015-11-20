@@ -77,7 +77,8 @@ function getImsi()
     }
     // 设备唯一标识imsi
     $imsi = $agentArr[1];
-    if (strlen($imsi) != 15) {
+    //Mi 3C imsi只有14位
+    if (strlen($imsi) != 15 && strlen($imsi) != 14) {
         return '';
     }
     return $imsi;
