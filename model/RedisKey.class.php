@@ -184,4 +184,35 @@ class RedisKey
 		return 'album_comment_list_'.$albumId;
 	}
 	
+	/**
+	 * 用户的收藏专辑信息
+	 */
+	public static function getUserFavInfoByAlbumIdKey($uid, $albumid)
+	{
+	    return 'fav_ufi_' . $uid . '_' . $albumid;
+	}
+	
+	/*
+	 * 专辑被收藏的总数
+	 */
+	public static function getAlbumFavCountKey($albumid)
+	{
+	    return 'fav_afc_' . $albumid;
+	}
+	public static function getAlbumFavCountKeys($albumids)
+	{
+	    $albumidarr = array();
+	    foreach ($albumids as $albumid) {
+	        $albumidarr[] = self::getAlbumFavCountKey($albumid);
+	    }
+	    return $albumidarr;
+	}
+	
+	/*
+	 * 用户收藏的总数
+	 */
+	public static function getUserFavCountKey($uid)
+	{
+	    return 'fav_ufc_' . $uid;
+	}
 }

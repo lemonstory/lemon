@@ -3,10 +3,16 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
-        $from = "2015/10/31/006f52e9102a8d3be2fe5614f42ba989.jpg";
-        $to = "album/111/006f52e9102a8d3be2fe5614f42ba989.jpg";
-        $aliossobj = new AliOss();
-        //$aliossobj->copyImageOss($from, $to);
+        $uid = 10001;
+        $albumid = 3329;
+        $favobj = new Fav();
+        //$res = $favobj->getUserFavInfoByAlbumId($uid, $albumid);
+        //$res = $favobj->clearUserFavInfoByAlbumIdCache($uid, $albumid);
+        //$res = $favobj->getAlbumFavCount($albumid);
+        //$res = $favobj->clearAlbumFavCountCache($albumid);
+        //$res = $favobj->getUserFavCount($uid);
+        //$res = $favobj->clearUserFavCountCache($uid);
+        var_dump($res);
         die();
         
         

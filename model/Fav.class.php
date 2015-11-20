@@ -67,15 +67,24 @@ class Fav extends ModelBase
 	        return array();
 	    }
 	    
-	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-	    $sql = "SELECT * FROM {$this->FAV_TABLE_NAME} WHERE `uid` = ? and `albumid` = ?";
-	    $st = $db->prepare($sql);
-	    $st->execute(array($uid, $albumid));
-	    $res = $st->fetch(PDO::FETCH_ASSOC);
-	    if (empty($res)) {
-	        return array();
+	    $key = RedisKey::getUserFavInfoByAlbumIdKey($uid, $albumid);
+	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+	    $redisData = $redisobj->get($key);
+	    if (empty($redisData)) {
+    	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+    	    $sql = "SELECT * FROM {$this->FAV_TABLE_NAME} WHERE `uid` = ? and `albumid` = ?";
+    	    $st = $db->prepare($sql);
+    	    $st->execute(array($uid, $albumid));
+    	    $dbData = $st->fetch(PDO::FETCH_ASSOC);
+    	    $db = null;
+    	    if (empty($dbData)) {
+    	        return array();
+    	    }
+    	    
+    	    $redisobj->setex($key, 86400, serialize($dbData));
+    	    return $dbData;
 	    } else {
-	        return $res;
+	        return unserialize($redisData);
 	    }
 	}
 	
@@ -93,22 +102,56 @@ class Fav extends ModelBase
 	    if (!is_array($albumids)) {
 	        $albumids = array($albumids);
 	    }
-	     
-	    $albumidstr = implode(",", $albumids);
-	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-	    $sql = "SELECT * FROM {$this->FAV_ALBUM_COUNT_TABLE_NAME} WHERE `albumid` IN ($albumidstr)";
-	    $st = $db->prepare($sql);
-	    $st->execute();
-	    $res = $st->fetchAll(PDO::FETCH_ASSOC);
-	    if (empty($res)) {
-	        return array();
-	    } else {
-	        $list = array();
-	        foreach ($res as $value) {
-	            $list[$value['albumid']] = $value;
+	    
+	    $keys = RedisKey::getAlbumFavCountKeys($albumids);
+	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+	    $redisData = $redisobj->mget($keys);
+	    
+	    $cacheData = array();
+	    $cacheIds = array();
+	    if (is_array($redisData)){
+	        foreach ($redisData as $oneredisdata){
+	            if (empty($oneredisdata)) {
+	                continue;
+	            }
+	            $oneredisdata = unserialize($oneredisdata);
+	            $cacheIds[] = $oneredisdata['albumid'];
+	            $cacheData[$oneredisdata['albumid']] = $oneredisdata;
 	        }
-	        return $list;
+	    } else {
+	        $redisData = array();
 	    }
+	    
+	    $dbIds = array_diff($albumids, $cacheIds);
+	    $dbData = array();
+	    
+	    if(!empty($dbIds)) {
+    	    $albumidstr = implode(",", $albumids);
+    	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+    	    $sql = "SELECT * FROM {$this->FAV_ALBUM_COUNT_TABLE_NAME} WHERE `albumid` IN ($albumidstr)";
+    	    $st = $db->prepare($sql);
+    	    $st->execute();
+    	    $tmpDbData = $st->fetchAll(PDO::FETCH_ASSOC);
+    	    $db = null;
+    	    if (!empty($tmpDbData)) {
+    	        foreach ($tmpDbData as $onedbdata){
+                    $dbData[$onedbdata['albumid']] = $onedbdata;
+                    $onekey = RedisKey::getAlbumFavCountKey($onedbdata['albumid']);
+                    $redisobj->setex($onekey, 86400, serialize($onedbdata));
+    	        }
+    	    }
+	    }
+	    
+	    $data = array();
+	    foreach($albumids as $albumid) {
+	        if(in_array($albumid, $dbIds)) {
+	            $data[$albumid] = @$dbData[$albumid];
+	        } else {
+	            $data[$albumid] = $cacheData[$albumid];
+	        }
+	    }
+	    
+	    return $data;
 	}
 	
 	/**
@@ -122,15 +165,24 @@ class Fav extends ModelBase
 	        return 0;
 	    }
 	    
-	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-	    $sql = "SELECT COUNT(*) FROM {$this->FAV_TABLE_NAME} WHERE `uid` = ?";
-	    $st = $db->prepare($sql);
-	    $st->execute(array($uid));
-	    $res = $st->fetch(PDO::FETCH_COLUMN);
-	    if (empty($res)) {
-	        return 0;
+	    $key = RedisKey::getUserFavCountKey($uid);
+	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+	    $redisData = $redisobj->get($key);
+	    if (empty($redisData)) {
+    	    $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+    	    $sql = "SELECT COUNT(*) FROM {$this->FAV_TABLE_NAME} WHERE `uid` = ?";
+    	    $st = $db->prepare($sql);
+    	    $st->execute(array($uid));
+    	    $dbData = $st->fetch(PDO::FETCH_COLUMN);
+    	    $db = null;
+    	    if (empty($dbData)) {
+	            return 0;
+	        }
+	        
+	        $redisobj->setex($key, 86400, $dbData);
+	        return $dbData;
 	    } else {
-	        return $res;
+	        return $redisData;
 	    }
 	}
 	
@@ -149,9 +201,7 @@ class Fav extends ModelBase
 		}
 		$addtime = date("Y-m-d H:i:s");
 		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		$sql = "INSERT INTO {$this->FAV_TABLE_NAME} 
-			(`uid`, `albumid`, `addtime`) 
-			VALUES (?, ?, ?)";
+		$sql = "INSERT INTO {$this->FAV_TABLE_NAME} (`uid`, `albumid`, `addtime`) VALUES (?, ?, ?)";
 		$st = $db->prepare($sql);
 		$res = $st->execute(array($uid, $albumid, $addtime));
 		if (empty($res)) {
@@ -159,7 +209,9 @@ class Fav extends ModelBase
 		}
 		
 		// 更新专辑的收藏总数
-		$this->addAlbumFavNum($albumid);
+		$this->addAlbumFavNumDb($albumid);
+		$this->clearUserFavCountCache($uid);
+		$this->clearAlbumFavCountCache($albumid);
 		
 		// 收藏行为log
 		$actionlogobj = new ActionLog();
@@ -186,16 +238,42 @@ class Fav extends ModelBase
 	    $sql = "DELETE FROM {$this->FAV_TABLE_NAME} WHERE `uid` = ? AND `albumid` = ?";
 	    $st = $db->prepare($sql);
 	    $res = $st->execute(array($uid, $albumid));
+	    
+	    $this->clearUserFavCountCache($uid);
+	    $this->clearAlbumFavCountCache($albumid);
+	    $this->clearUserFavInfoByAlbumIdCache($uid, $albumid);
 	    return $res;
 	}
 	
+	
+	// 删除用户收藏总数cache
+	public function clearUserFavCountCache($uid)
+	{
+	    $key = RedisKey::getUserFavCountKey($uid);
+	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+	    return $redisobj->delete($key);
+	}
+	// 删除用户收藏的指定专辑信息cache
+	public function clearUserFavInfoByAlbumIdCache($uid, $albumid)
+	{
+	    $key = RedisKey::getUserFavInfoByAlbumIdKey($uid, $albumid);
+	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+	    return $redisobj->delete($key);
+	}
+	// 删除专辑被收藏总数cache
+	public function clearAlbumFavCountCache($albumid)
+	{
+	    $key = RedisKey::getAlbumFavCountKey($albumid);
+	    $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+	    return $redisobj->delete($key);
+	}
 	
 	/**
 	 * 统计，专辑的收藏总数
 	 * @param I $albumid
 	 * @return boolean
 	 */
-	private function addAlbumFavNum($albumid)
+	private function addAlbumFavNumDb($albumid)
 	{
 	    if (empty($albumid)) {
 	        $this->setError(ErrorConf::paramError());
@@ -219,4 +297,5 @@ class Fav extends ModelBase
 	    }
 	    return true;
 	}
+	
 }
