@@ -3,15 +3,14 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
-        $uid = 10001;
+        $uimid = 1;
         $albumid = 3329;
-        $favobj = new Fav();
-        //$res = $favobj->getUserFavInfoByAlbumId($uid, $albumid);
-        //$res = $favobj->clearUserFavInfoByAlbumIdCache($uid, $albumid);
-        //$res = $favobj->getAlbumFavCount($albumid);
-        //$res = $favobj->clearAlbumFavCountCache($albumid);
-        //$res = $favobj->getUserFavCount($uid);
-        //$res = $favobj->clearUserFavCountCache($uid);
+        $storyid = 121164;
+        $listenobj = new Listen();
+        //$res = $listenobj->getUserListenAlbumInfo($uimid, $albumid);
+        //$res = $listenobj->clearUserListenAlbumInfoCache($uimid, $albumid);
+        //$res = $listenobj->getAlbumListenNum($albumid);
+        //$res = $listenobj->clearAlbumListenCountCache($albumid);
         var_dump($res);
         die();
         

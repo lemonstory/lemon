@@ -215,4 +215,28 @@ class RedisKey
 	{
 	    return 'fav_ufc_' . $uid;
 	}
+	
+	// 用户收听的专辑信息
+	public static function getUserListenAlbumInfoKey($uimid, $albumid)
+	{
+	    return 'listen_ulai_' . $uimid . '_' . $albumid;
+	}
+	// 用户收听的故事信息
+	public static function getUserListenStoryInfoKey($uimid, $storyid)
+	{
+	    return 'listen_ulsi_' . $uimid . '_' . $storyid;
+	}
+	// 专辑收听总数
+	public static function getAlbumListenCountKey($albumid)
+	{
+	    return 'listen_alc_' . $albumid;
+	}
+	public static function getAlbumListenCountKeys($albumids)
+	{
+	    $albumidarr = array();
+	    foreach ($albumids as $albumid) {
+	        $albumidarr[] = self::getAlbumListenCountKey($albumid);
+	    }
+	    return $albumidarr;
+	}
 }
