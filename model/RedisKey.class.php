@@ -239,4 +239,15 @@ class RedisKey
 	    }
 	    return $albumidarr;
 	}
+	
+	// 热门搜索关键词列表
+	public static function getHotSearchContentListKey()
+	{
+	    return 'search_hscl';
+	}
+	// 搜索内容信息记录
+	public static function getSearchContentCountInfoKey($searchcontent)
+	{
+	    return 'search_scci' . urlencode($searchcontent);
+	}
 }
