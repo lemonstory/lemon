@@ -2,13 +2,13 @@
 /**
  * 使用实例：
  *     // 设置model为AnTaskStat，指定key的列表cache
- *     Yii::app()->FzCacheWrapper->setListCache('AnTaskStat', 'huqq', array(0 => array('id' => 1), 1 => array('id' => 2)));
+ *     setListCache('AnTaskStat', 'huqq', array(0 => array('id' => 1), 1 => array('id' => 2)));
  *     
  *     // 获取model为AnTaskStat,指定key的列表cache
- *     Yii::app()->FzCacheWrapper->getListCache('AnTaskStat', 'huqq');
+ *     getListCache('AnTaskStat', 'huqq');
  *     
  *     // 删除model为AnTaskStat的列表cache
- *     Yii::app()->FzCacheWrapper->deleteNSCache('AnTaskStat');
+ *     deleteNSCache('AnTaskStat');
  *     
  * @author Huqq
  */
