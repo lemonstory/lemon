@@ -250,4 +250,14 @@ class RedisKey
 	{
 	    return 'search_scci' . urlencode($searchcontent);
 	}
+	
+	// 用户id与设备关联信息
+	public static function getUserImsiInfoKey($resid, $restype)
+	{
+	    return 'imsi_uii_' . $resid . '_' . $restype;
+	}
+	public static function getUserImsiInfoByUimidKey($uimid)
+	{
+	    return 'imsi_uii_uimid_' . $uimid;
+	}
 }

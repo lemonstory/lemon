@@ -7,6 +7,9 @@ class UserImsi extends ModelBase
     public $USER_IMSI_INFO_RESTYPE_UID = 1;
     public $USER_IMSI_INFO_RESTYPE_IMSI = 2;
     
+    public $CACHE_INSTANCE = 'cache';
+    public $CACHE_EXPIRE = 604800;
+    
     /**
      * 获取uid或者设备号的uimid
      * @param I $uid        获取指定uid的uimid，为空则获取当前登录用户的uimid
@@ -24,7 +27,7 @@ class UserImsi extends ModelBase
             if (empty($imsi)) {
                 return 0;
             }
-    
+            
             $uiminfo = $this->getUserImsiInfo($imsi, $this->USER_IMSI_INFO_RESTYPE_IMSI);
             if (empty($uiminfo)) {
                 $uimid = $this->addUserImsiInfo($imsi, $this->USER_IMSI_INFO_RESTYPE_IMSI);
@@ -44,26 +47,42 @@ class UserImsi extends ModelBase
     }
     
     
+    /**
+     * 通过uimid获取设备关联信息
+     * @param I $uimid    用户uid与设备关联id
+     * @return array
+     */
     public function getUserImsiInfoByUimid($uimid)
     {
         if (empty($uimid)) {
             return array();
         }
-        $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-        $sql = "select * from {$this->USER_IMSI_INFO_TABLE_NAME} where `uimid` = ?";
-        $st = $db->prepare ( $sql );
-        $st->execute (array($uimid));
-        $list = $st->fetch( PDO::FETCH_ASSOC );
-        if (empty($list)) {
-            return array();
+        
+        $key = RedisKey::getUserImsiInfoByUimidKey($uimid);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->get($key);
+        if (empty($redisData)) {
+            $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+            $sql = "select * from {$this->USER_IMSI_INFO_TABLE_NAME} where `uimid` = ?";
+            $st = $db->prepare ( $sql );
+            $st->execute (array($uimid));
+            $dbData = $st->fetch(PDO::FETCH_ASSOC);
+            $db = null;
+            if (empty($dbData)) {
+                return array();
+            }
+            
+            $redisobj->setex($key, $this->CACHE_EXPIRE, serialize($dbData));
+            return $dbData;
+        } else {
+            return unserialize($redisData);
         }
-        return $list;
     }
     
     
     /**
      * 获取指定imsi的最近登录账户的关联记录
-     * @param S $resid
+     * @param S $resid      用户uid或imsi编号
      * @param I $restype    1为uid, 2为imsi
      * @return array
      */
@@ -72,16 +91,26 @@ class UserImsi extends ModelBase
         if (empty($resid) || !in_array($restype, array($this->USER_IMSI_INFO_RESTYPE_UID, $this->USER_IMSI_INFO_RESTYPE_IMSI))) {
             return array();
         }
-         
-        $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-        $sql = "select * from {$this->USER_IMSI_INFO_TABLE_NAME} where `resid` = ? and `restype` = ?";
-        $st = $db->prepare ( $sql );
-        $st->execute (array($resid, $restype));
-        $list = $st->fetch( PDO::FETCH_ASSOC );
-        if (empty($list)) {
-            return array();
+        
+        $key = RedisKey::getUserImsiInfoKey($resid, $restype);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->get($key);
+        if (empty($redisData)) {
+            $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+            $sql = "select * from {$this->USER_IMSI_INFO_TABLE_NAME} where `resid` = ? and `restype` = ?";
+            $st = $db->prepare ( $sql );
+            $st->execute (array($resid, $restype));
+            $dbData = $st->fetch(PDO::FETCH_ASSOC);
+            $db = null;
+            if (empty($dbData)) {
+                return array();
+            }
+            
+            $redisobj->setex($key, $this->CACHE_EXPIRE, serialize($dbData));
+            return $dbData;
+        } else {
+            return unserialize($redisData);
         }
-        return $list;
     }
     
     
