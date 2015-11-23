@@ -35,9 +35,9 @@ class albumstorysearch extends controller
         }
         
         // 搜索专辑
+        $albumcount = 0;
         if (empty($searchtype) || $searchtype == 'album') {
             $albumids = array();
-            $albumcount = 0;
             $albumsearch = $searchobj->searchAlbum($searchcontent, $page, $len);
             if (!empty($albumsearch)) {
                 $albumids = $albumsearch['albumids'];
@@ -47,7 +47,6 @@ class albumstorysearch extends controller
         
         $aliossobj = new AliOss();
         $searchlist = array();
-        
         $storylist = array();
         if (!empty($storyids)) {
             $storyobj = new Story();
