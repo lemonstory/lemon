@@ -5,55 +5,10 @@ class Listen extends ModelBase
 	public $LISTEN_RECORD_TABLE_NAME = 'listen_story';    // 用户收听故事记录
 	public $LISTEN_ALBUM_TABLE_NAME = 'listen_album';     // 用户收听的故事，所属的专辑列表
 	public $LISTEN_ALBUM_COUNT_TABLE_NAME = 'listen_album_count';  // 专辑被收听总数
-	public $RECOMMEND_SAME_AGE_TABLE_NAME = 'recommend_same_age';  // 同龄在听推荐表
 	
 	public $CACHE_INSTANCE = 'cache';
 	public $CACHE_EXPIRE = 604800;
 	public $RANK_INSTANCE = 'rank';
-	
-	/**
-	 * 获取同龄在听的上线列表
-	 * 按照年龄段，以及用户收听次数最多的专辑排序
-	 * @param I $babyagetype
-	 * @param I $currentpage   加载第几个,默认为1表示从第一页获取
-	 * @param I $len           获取长度
-	 * @return array
-	 */
-	public function getSameAgeListenList($babyagetype = 0, $currentpage = 1, $len = 20)
-	{
-		if (!empty($babyagetype) && !in_array($babyagetype, $this->AGE_TYPE_LIST)) {
-			$this->setError(ErrorConf::paramError());
-			return array();
-		}
-		if ($currentpage < 1) {
-		    $currentpage = 1;
-		}
-		if (empty($len)) {
-			$len = 20;
-		}
-		if ($len > 50) {
-		    $len = 50;
-		}
-		
-		$where = "";
-		$offset = ($currentpage - 1) * $len;
-		
-		$status = $this->RECOMMEND_STATUS_ONLIINE; // 已上线状态
-		$where .= " `status` = '{$status}'";
-		
-		if (!empty($babyagetype)) {
-			$where .= " AND (`agetype` = '{$babyagetype}' or `agetype` = '{$this->AGE_TYPE_All}')";
-		}
-		$db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-		$sql = "SELECT * FROM {$this->RECOMMEND_SAME_AGE_TABLE_NAME} WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
-		$st = $db->prepare($sql);
-		$st->execute();
-		$list = $st->fetchAll(PDO::FETCH_ASSOC);
-		if (empty($list)) {
-			return array();
-		}
-		return $list;
-	}
 	
 	
 	/**

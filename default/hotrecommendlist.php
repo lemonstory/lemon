@@ -11,11 +11,11 @@ class hotrecommendlist extends controller
         $albumids = array();
         $albumlist = array();
         $listenobj = new Listen();
-        $managesysobj = new ManageSystem();
+        $recommendobj = new Recommend();
         $aliossobj = new AliOss();
         
         // 热门推荐
-        $hotrecommendres = $managesysobj->getRecommendHotList($p, $len);
+        $hotrecommendres = $recommendobj->getRecommendHotList($p, $len);
         if (! empty($hotrecommendres)) {
             foreach ($hotrecommendres as $value) {
                 $albumids[] = $value['albumid'];

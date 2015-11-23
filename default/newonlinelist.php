@@ -23,8 +23,8 @@ class newonlinelist extends controller
         
         // 最新上架
         $listenobj = new Listen();
-        $managesysobj = new ManageSystem();
-        $newonlineres = $managesysobj->getNewOnlineList($babyagetype, $p, $len);
+        $recommendobj = new Recommend();
+        $newonlineres = $recommendobj->getNewOnlineList($babyagetype, $p, $len);
         if (! empty($newonlineres)) {
             foreach ($newonlineres as $value) {
                 $albumids[] = $value['albumid'];

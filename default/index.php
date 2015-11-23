@@ -7,11 +7,11 @@ class index extends controller
 		$uid = $this->getUid();
 		$userinfo = array();
 		$albumids = array();
-		$managesysobj = new ManageSystem();
+		$recommendobj = new Recommend();
 		$aliossobj = new AliOss();
 		
 		// 热门推荐
-		$hotrecommendres = $managesysobj->getRecommendHotList(1, 9);
+		$hotrecommendres = $recommendobj->getRecommendHotList(1, 9);
 		if (!empty($hotrecommendres)) {
 			foreach ($hotrecommendres as $value) {
 				$albumids[] = $value['albumid'];
@@ -29,8 +29,7 @@ class index extends controller
 		}
 		
 		// 同龄在听
-		$listenobj = new Listen();
-		$sameageres = $listenobj->getSameAgeListenList($babyagetype, 1, 9);
+		$sameageres = $recommendobj->getSameAgeListenList($babyagetype, 1, 9);
 		if (!empty($sameageres)) {
 			foreach ($sameageres as $value) {
 				$albumids[] = $value['albumid'];
@@ -38,7 +37,7 @@ class index extends controller
 		}
 		
 		// 最新上架
-		$newonlineres = $managesysobj->getNewOnlineList($babyagetype, 1, 9);
+		$newonlineres = $recommendobj->getNewOnlineList($babyagetype, 1, 9);
 		if (!empty($newonlineres)) {
 			foreach ($newonlineres as $value) {
 				$albumids[] = $value['albumid'];
@@ -52,6 +51,7 @@ class index extends controller
 			$albumobj = new Album();
 			$albumlist = $albumobj->getListByIds($albumids);
 			// 专辑收听数
+			$listenobj = new Listen();
 			$albumlistennum = $listenobj->getAlbumListenNum($albumids);
 		}
 		
@@ -110,7 +110,7 @@ class index extends controller
 		
 		// 推广位
 		$focuspiclist = array();
-		$focusres = $managesysobj->getFocusList(6);
+		$focusres = $recommendobj->getFocusList(6);
 		if (!empty($focusres)) {
 		    $aliossobj = new AliOss();
 		    foreach ($focusres as $value) {

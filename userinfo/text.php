@@ -6,12 +6,8 @@ class text extends controller
         $uimid = 1;
         $albumid = 3329;
         $storyid = 121164;
-        $listenobj = new Listen();
-        //$res = $listenobj->getUserListenAlbumInfo($uimid, $albumid);
-        //$res = $listenobj->clearUserListenAlbumInfoCache($uimid, $albumid);
-        //$res = $listenobj->getAlbumListenNum($albumid);
-        //$res = $listenobj->clearAlbumListenCountCache($albumid);
-        var_dump($res);
+        
+        
         die();
         
         

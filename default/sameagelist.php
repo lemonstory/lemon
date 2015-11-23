@@ -23,8 +23,8 @@ class sameagelist extends controller
         }
         
         // 同龄在听
-        $listenobj = new Listen();
-        $sameageres = $listenobj->getSameAgeListenList($babyagetype, $p, $len);
+        $recommendobj = new Recommend();
+        $sameageres = $recommendobj->getSameAgeListenList($babyagetype, $p, $len);
         if (! empty($sameageres)) {
             foreach ($sameageres as $value) {
                 $albumids[] = $value['albumid'];
@@ -38,6 +38,7 @@ class sameagelist extends controller
             $albumobj = new Album();
             $albumlist = $albumobj->getListByIds($albumids);
             // 专辑收听数
+            $listenobj = new Listen();
             $albumlistennum = $listenobj->getAlbumListenNum($albumids);
             // 专辑收藏数
             $favobj = new Fav();
