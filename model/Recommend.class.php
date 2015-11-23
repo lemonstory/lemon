@@ -25,16 +25,29 @@ class Recommend extends ModelBase
             $len = 50;
         }
         
-        $where = "";
-        $offset = ($currentpage - 1) * $len;
-        $where .= " `status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
-        
-        $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-        $sql = "SELECT * FROM `{$this->RECOMMEND_HOT_TABLE_NAME}` WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
-        $st = $db->prepare($sql);
-        $st->execute();
-        $list = $st->fetchAll(PDO::FETCH_ASSOC);
-        return $list;
+        $key = $currentpage . "_" . $len;
+        $cacheobj = new CacheWrapper();
+        $redisData = $cacheobj->getListCache($this->RECOMMEND_HOT_TABLE_NAME, $key);
+        if (empty($redisData)) {
+            $where = "";
+            $offset = ($currentpage - 1) * $len;
+            $where .= " `status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
+            
+            $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+            $sql = "SELECT * FROM `{$this->RECOMMEND_HOT_TABLE_NAME}` WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+            $st = $db->prepare($sql);
+            $st->execute();
+            $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (empty($dbData)) {
+                return array();
+            }
+            
+            $cacheobj->setListCache($this->RECOMMEND_HOT_TABLE_NAME, $key, $dbData);
+            return $dbData;
+        } else {
+            return $redisData;
+        }
     }
     
     
@@ -62,23 +75,33 @@ class Recommend extends ModelBase
             $len = 50;
         }
         
-        $where = "";
-        $offset = ($currentpage - 1) * $len;
-        
-        $status = $this->RECOMMEND_STATUS_ONLIINE; // 已上线状态
-        $where .= "`status` = '{$status}'";
-        if (!empty($babyagetype)) {
-            $where .= " AND (`agetype` = '{$babyagetype}' or `agetype` = '{$this->AGE_TYPE_All}')";
+        $key = $babyagetype . '_' . $currentpage . "_" . $len;
+        $cacheobj = new CacheWrapper();
+        $redisData = $cacheobj->getListCache($this->RECOMMEND_NEW_ONLINE_TABLE_NAME, $key);
+        if (empty($redisData)) {
+            $where = "";
+            $offset = ($currentpage - 1) * $len;
+            
+            $status = $this->RECOMMEND_STATUS_ONLIINE; // 已上线状态
+            $where .= "`status` = '{$status}'";
+            if (!empty($babyagetype)) {
+                $where .= " AND (`agetype` = '{$babyagetype}' or `agetype` = '{$this->AGE_TYPE_All}')";
+            }
+            $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+            $sql = "SELECT * FROM `{$this->RECOMMEND_NEW_ONLINE_TABLE_NAME}` WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+            $st = $db->prepare($sql);
+            $st->execute();
+            $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (empty($dbData)) {
+                return array();
+            }
+            
+            $cacheobj->setListCache($this->RECOMMEND_NEW_ONLINE_TABLE_NAME, $key, $dbData);
+            return $dbData;
+        } else {
+            return $redisData;
         }
-        $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-        $sql = "SELECT * FROM `{$this->RECOMMEND_NEW_ONLINE_TABLE_NAME}` WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
-        $st = $db->prepare($sql);
-        $st->execute();
-        $list = $st->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($list)) {
-            return array();
-        }
-        return $list;
     }
     
     
@@ -106,24 +129,34 @@ class Recommend extends ModelBase
             $len = 50;
         }
         
-        $where = "";
-        $offset = ($currentpage - 1) * $len;
-        
-        $status = $this->RECOMMEND_STATUS_ONLIINE; // 已上线状态
-        $where .= " `status` = '{$status}'";
-        
-        if (!empty($babyagetype)) {
-            $where .= " AND (`agetype` = '{$babyagetype}' or `agetype` = '{$this->AGE_TYPE_All}')";
+        $key = $babyagetype . '_' . $currentpage . "_" . $len;
+        $cacheobj = new CacheWrapper();
+        $redisData = $cacheobj->getListCache($this->RECOMMEND_SAME_AGE_TABLE_NAME, $key);
+        if (empty($redisData)) {
+            $where = "";
+            $offset = ($currentpage - 1) * $len;
+            
+            $status = $this->RECOMMEND_STATUS_ONLIINE; // 已上线状态
+            $where .= " `status` = '{$status}'";
+            
+            if (!empty($babyagetype)) {
+                $where .= " AND (`agetype` = '{$babyagetype}' or `agetype` = '{$this->AGE_TYPE_All}')";
+            }
+            $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+            $sql = "SELECT * FROM {$this->RECOMMEND_SAME_AGE_TABLE_NAME} WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+            $st = $db->prepare($sql);
+            $st->execute();
+            $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (empty($dbData)) {
+                return array();
+            }
+            
+            $cacheobj->setListCache($this->RECOMMEND_SAME_AGE_TABLE_NAME, $key, $dbData);
+            return $dbData;
+        } else {
+            return $redisData;
         }
-        $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-        $sql = "SELECT * FROM {$this->RECOMMEND_SAME_AGE_TABLE_NAME} WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
-        $st = $db->prepare($sql);
-        $st->execute();
-        $list = $st->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($list)) {
-            return array();
-        }
-        return $list;
     }
     
     
@@ -138,11 +171,24 @@ class Recommend extends ModelBase
             $len = 5;
         }
         
-        $db = DbConnecter::connectMysql('share_manage');
-        $sql = "SELECT * FROM `{$this->FOCUS_TABLE_NAME}` WHERE `status` = '{$this->RECOMMEND_STATUS_ONLIINE}' ORDER BY `ordernum` LIMIT $len";
-        $st = $db->prepare($sql);
-        $st->execute();
-        $list = $st->fetchAll(PDO::FETCH_ASSOC);
-        return $list;
+        $key = $len;
+        $cacheobj = new CacheWrapper();
+        $redisData = $cacheobj->getListCache($this->FOCUS_TABLE_NAME, $key);
+        if (empty($redisData)) {
+            $db = DbConnecter::connectMysql('share_manage');
+            $sql = "SELECT * FROM `{$this->FOCUS_TABLE_NAME}` WHERE `status` = '{$this->RECOMMEND_STATUS_ONLIINE}' ORDER BY `ordernum` LIMIT $len";
+            $st = $db->prepare($sql);
+            $st->execute();
+            $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (empty($dbData)) {
+                return array();
+            }
+            
+            $cacheobj->setListCache($this->FOCUS_TABLE_NAME, $key, $dbData);
+            return $dbData;
+        } else {
+            return $redisData;
+        }
     }
 }

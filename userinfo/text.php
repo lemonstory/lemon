@@ -7,7 +7,12 @@ class text extends controller
         $albumid = 3329;
         $storyid = 121164;
         
-        
+        $recommendobj = new Recommend();
+        //$res = $recommendobj->getRecommendHotList(3, 9);
+        //$res = $recommendobj->getSameAgeListenList(1, 1, 9);
+        //$res = $recommendobj->getNewOnlineList(1, 1, 9);
+        //$res = $recommendobj->getFocusList(6);
+        var_dump($res);
         die();
         
         
