@@ -28,6 +28,10 @@ class MnsQueueManager
      */
     public static function pushListenStoryQueue($uimid, $storyid)
     {
+        $filepath = "/alidata1/listen.log";
+        $fp = @fopen($filepath, 'a+');
+        @fwrite($fp, "uimid={$uimid}##storyid={$storyid}\n");
+        @fclose($fp);
         $res = self::doPush("lemon-userlistenstoryqueue", $uimid . "@@" . $storyid);
         return true;
     }
