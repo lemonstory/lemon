@@ -230,7 +230,28 @@ class   ErrorConf
 	{
 	    return array('code'=>'101002','desc'=>'评论星级错误');
 	}
-	
+	// 评论采集
+	public static function CollectionAlbumEmpty()
+	{
+		return array('code'=>'101003','desc'=>'album_id-请选择专辑');
+	}
+
+    public static function CollectionDangUrlEmpty()
+	{
+		return array('code'=>'101004','desc'=>'source_url-请填写页面地址');
+	}
+	public static function CollectionCommentNumError()
+	{
+		return array('code'=>'101005','desc'=>'count-请填写正确的评论数量');
+	}
+	public static function CollectionDangUrlError()
+	{
+		return array('code'=>'101006','desc'=>'source_url-页面地址不正确');
+	}
+	public static function CollectionDangUrlExists()
+	{
+		return array('code'=>'101007','desc'=>'source_url-该评论已经采集');
+	}
 	
 	// 请求检测
 	public static function requestCsrfValidateError()
