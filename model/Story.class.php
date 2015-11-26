@@ -396,15 +396,19 @@ class Story extends ModelBase
         }
         $storyIdKey = RedisKey::getStoryInfoKey($storyId);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
-        $storyInfo = $redisobj->get($storyIdKey);
-        $storyInfo = json_decode($storyInfo, true);
+        $storyInfo = $this->get_story_info($storyId);
         // 清除故事列表缓存
         if (isset($storyInfo['album_id']) && $storyInfo['album_id']) {
-            $redisobj->delete(
-               RedisKey::getAlbumStoryListKey($storyInfo['album_id'])
-            );
+            $this->clearAlbumStoryListCache($storyInfo['album_id']);
         }
         $redisobj->delete($storyIdKey);
         return true;
+    }
+
+    // 清除故事列表缓存
+    public function clearAlbumStoryListCache($album_id)
+    {
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisobj->delete(RedisKey::getAlbumStoryListKey($album_id));
     }
 }
