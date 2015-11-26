@@ -26,7 +26,7 @@ class SearchCount extends ModelBase
         $redisData = $redisobj->get($key);
         if (empty($redisData)) {
             $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-            $selectsql = "SELECT * FROM `{$this->SEARCH_COUNT_TABLE_NAME}` WHERE `status` = ? ORDER BY `count` DESC LIMIT {$len}";
+            $selectsql = "SELECT * FROM `{$this->SEARCH_COUNT_TABLE_NAME}` WHERE `status` = ? ORDER BY `count` DESC, `id` ASC LIMIT {$len}";
             $selectst = $db->prepare($selectsql);
             $selectst->execute(array($this->STATUS_ONLINE));
             $dbData = $selectst->fetchAll(PDO::FETCH_ASSOC);
