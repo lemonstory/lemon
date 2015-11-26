@@ -235,8 +235,6 @@ class Story extends ModelBase
         if ($albumid) {
         	$where .= " AND `album_id` = {$albumid} ";
         }
-        // 过虑掉音频为空的
-        $where .= " AND `mediapath` != '' ";
         
         $db = DbConnecter::connectMysql('share_story');
         $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY ' ORDER BY `view_order` ASC,`id` DESC ' DESC LIMIT {$len}";
@@ -363,7 +361,7 @@ class Story extends ModelBase
         if ($redisData) {
             $story_list = json_decode($redisData, true);
         } else {
-            $story_list = $this->get_list("`album_id`='{$album_id}' and status=1", '', '', ' ORDER BY `view_order` ASC,`id` DESC ');
+            $story_list = $this->get_list("`album_id`='{$album_id}' and status=1 and `mediapath` != '' ", '', '', ' ORDER BY `view_order` ASC,`id` DESC ');
             // 缓存
             if ($story_list) {
                 $redisobj->setex($key, 86400, json_encode($story_list));
