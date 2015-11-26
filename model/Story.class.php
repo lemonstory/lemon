@@ -235,7 +235,8 @@ class Story extends ModelBase
         if ($albumid) {
         	$where .= " AND `album_id` = {$albumid} ";
         }
-        // $where .= " `uid` = '{$uid}'";
+        // 过虑掉音频为空的
+        $where .= " AND `mediapath` != '' ";
         
         $db = DbConnecter::connectMysql('share_story');
         $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY ' ORDER BY `view_order` ASC,`id` DESC ' DESC LIMIT {$len}";
