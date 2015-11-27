@@ -252,6 +252,11 @@ class   ErrorConf
 	{
 		return array('code'=>'101007','desc'=>'source_url-该评论已经采集');
 	}
+
+	public static function AnonymousEmpty()
+	{
+		return array('code'=>'101008','desc'=>'source_url-匿名用户为空');
+	}
 	
 	// 请求检测
 	public static function requestCsrfValidateError()
