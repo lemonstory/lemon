@@ -3,6 +3,18 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
+        $uid = 10118;
+        $uimid = 2621;
+        $storyid = 80853;
+        $albumid = 6819;
+        
+        $listenid = $uimid . "_" . $storyid;
+        $addtime = date("Y-m-d H:i:s");
+        $alislsobj = new AliSlsUserActionLog();
+        $res = $alislsobj->addListenStoryActionLog($uimid, $uid, $listenid, $storyid, $albumid, getClientIp(), $addtime);
+        var_dump($res);
+        die();
+        
         $uimid = 1;
         $albumid = 3329;
         $storyid = 121164;
