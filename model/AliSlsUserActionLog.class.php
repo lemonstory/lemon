@@ -6,52 +6,41 @@
 class AliSlsUserActionLog extends AliSls
 {
     // project name
-    public $PROJECT_USER_ACTION_LOG = 'tutu-user-action-log';
+    public $PROJECT_ACTION_LOG = 'lemon-action-log';
     // logstore name
     public $LOGSTORE_ACTION = 'action-log';
+    
     // action fields
+    public $ACTION_COMMENT_ALBUM = 'commentalbum';
+    public $ACTION_FAV_ALBUM = 'favalbum';
+    public $ACTION_DOWNLOAD_STORY = 'downloadstory';
+    public $ACTION_LISTEN_STORY = 'listenstory';
+    
     public $ACTION_LIST = array(
-            "comment", "topic", "message", "liketopic", "register", "follow"
+            "commentalbum", "favalbum", "downloadstory", "listenstory"
             );
     
     public function __construct()
     {
-        parent::__construct($this->PROJECT_USER_ACTION_LOG);
+        parent::__construct($this->PROJECT_ACTION_LOG);
     }
     
     
     /**
-     * 统计单小时评论发布量
+     * 统计单小时收藏量
      * @param S $day    "2015-01-01"
      * @param S $hour   "03"
      */
-    public function commentHourPublishNum($day, $hour)
+    public function favAlbumNumHour($day, $hour)
     {
         $starttime = strtotime("{$day} {$hour}:00:00");
         $endtime = strtotime("{$day} {$hour}:59:59");
         $topic = "";
-        $query = "action:comment";
+        $query = "action:{$this->ACTION_FAV_ALBUM}";
         $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
         return $res;
     }
-    public function likeTopicHourPublishNum($day, $hour)
-    {
-        $starttime = strtotime("{$day} {$hour}:00:00");
-        $endtime = strtotime("{$day} {$hour}:59:59");
-        $topic = "";
-        $query = "action:liketopic";
-        $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
-        return $res;
-    }
-    public function topicHourPublishNum($day, $hour)
-    {
-        $starttime = strtotime("{$day} {$hour}:00:00");
-        $endtime = strtotime("{$day} {$hour}:59:59");
-        $topic = "";
-        $query = "action:topic";
-        $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
-        return $res;
-    }
+    
     
     
     /**
@@ -59,13 +48,13 @@ class AliSlsUserActionLog extends AliSls
      * @param S $day
      * @return array    
      */
-    public function commentDayToUserTopicCount($day)
+    /* public function commentDayToUserTopicCount($day)
     {
         set_time_limit(0);
         $starttime = strtotime("{$day} 00:00:00");
         $endtime = strtotime("{$day} 23:59:59");
         $topic = "";
-        $query = "action:comment";
+        $query = "action:{$this->ACTION_COMMENT_ALBUM}";
         $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
         
         $topiccount = 0;
@@ -93,98 +82,30 @@ class AliSlsUserActionLog extends AliSls
             }
         }
         return array("commentcount" => $count, "topiccount" => $topiccount, "usercount" => $usercount);
-    }
+    } */
     
-    /**
-     * 统计单日赞主题总量、赞人数、被赞主题数
-     */
-    public function likeTopicDayToUserTopicCount($day)
+    
+    // 添加评论专辑log
+    public function addCommentAlbumActionLog($uid, $commentid, $albumid, $content, $ip, $addtime)
     {
-        set_time_limit(0);
-        $starttime = strtotime("{$day} 00:00:00");
-        $endtime = strtotime("{$day} 23:59:59");
-        $topic = "";
-        $query = "action:liketopic";
-        $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
-        
-        $topiccount = 0;
-        $list = array();
-        $actionuids = array();
-        $topicids = array();
-        if (!empty($count)) {
-            $line = 100;
-            for ($offset = 0; $offset <= $count; $offset += $line) {
-                $list = $this->getActionLogList($starttime, $endtime, $topic, $query, $line, $offset);
-                if (!empty($list)) {
-                    foreach ($list as $value) {
-                        $actionuids[] = $value['contents']['actionuid'];
-                        $topicids[] = $value['contents']['beactionid'];
-                    }
-                    $actionuids = array_unique($actionuids);
-                    $topicids = array_unique($topicids);
-                }
-            }
-            if (!empty($actionuids)) {
-                $usercount = count($actionuids);
-            }
-            if (!empty($topicids)) {
-                $topiccount = count($topicids);
-            }
-        }
-        return array("likecount" => $count, "topiccount" => $topiccount, "usercount" => $usercount);
+        return $this->putActionLog($uid, $this->ACTION_COMMENT_ALBUM, $commentid, $albumid, "", $content, $ip, $addtime);
     }
-    
-    /**
-     * 统计单日主题发布量、发布主题人数
-     */
-    public function topicDayToUserCount($day)
+    // 添加收藏专辑log
+    public function addFavAlbumActionLog($uid, $favid, $albumid, $ip, $addtime)
     {
-        set_time_limit(0);
-        $starttime = strtotime("{$day} 00:00:00");
-        $endtime = strtotime("{$day} 23:59:59");
-        $topic = "";
-        $query = "action:topic";
-        $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
-        
-        $topiccount = 0;
-        $list = array();
-        $actionuids = array();
-        if (!empty($count)) {
-            $line = 100;
-            for ($offset = 0; $offset <= $count; $offset += $line) {
-                $list = $this->getActionLogList($starttime, $endtime, $topic, $query, $line, $offset);
-                if (!empty($list)) {
-                    foreach ($list as $value) {
-                        $actionuids[] = $value['contents']['actionuid'];
-                    }
-                    $actionuids = array_unique($actionuids);
-                }
-            }
-            if (!empty($actionuids)) {
-                $usercount = count($actionuids);
-            }
-        }
-        return array("topiccount" => $count, "usercount" => $usercount);
+        return $this->putActionLog($uid, $this->ACTION_FAV_ALBUM, $favid, $albumid, "", "", $ip, $addtime);
     }
-    
-    
-    
-    
-    // 添加主题发布log
-    public function addTopicActionLog($uid, $topicid, $content, $ip, $addtime)
+    // 添加收听故事Log
+    public function addListenStoryActionLog($uid, $listenid, $storyid, $albumid, $ip, $addtime)
     {
-        return $this->putActionLog($uid, "topic", $topicid, "", "", $content, $ip, $addtime);
+        return $this->putActionLog($uid, $this->ACTION_LISTEN_STORY, $listenid, $storyid, $albumid, "", $ip, $addtime);
     }
-    // 添加评论log
-    public function addCommentActionLog($uid, $commentid, $topicid, $replycommentid, $content, $ip, $addtime)
+    // 添加下载故事Log
+    public function addDownloadStoryActionLog($uid, $downloadid, $storyid, $albumid, $ip, $addtime)
     {
-        return $this->putActionLog($uid, "comment", $commentid, $topicid, $replycommentid, $content, $ip, $addtime);
+        return $this->putActionLog($uid, $this->ACTION_DOWNLOAD_STORY, $downloadid, $storyid, $albumid, "", $ip, $addtime);
     }
-    // 添加赞主题log
-    public function addDiggActionLog($uid, $topicid, $topicuid, $ip, $addtime)
-    {
-        return $this->putActionLog($uid, "liketopic", "", $topicid, $topicuid, "", $ip, $addtime);
-    }
+    
     
     /**
      * 写入action-log
@@ -201,19 +122,14 @@ class AliSlsUserActionLog extends AliSls
      *     ext2
      *     ext3
      *     
-     * comment:
-     *     value: uid|comment|commentid|topicid|replycommentid|content|ip|addtime
-     * topic:
-     *     value: uid|topic|topicid|empty|empty|imgcontent|ip|addtime
-     * message:
-     *     value: uid|message|messageid|touid|relationid|content|ip|addtime
-     * liketopic:
-     *     value: uid|liketopic|empty|topicid|empty|empty|ip|addtime
-     * register:
-     *     value: uid|regiter|uid|empty|empty|regtime|ip|addtime
-     * follow:
-     *     value: uid|follow|empty|followuid|empty|empty|ip|addtime
-     * 
+     * commentalbum:
+     *     value: uid|commentalbum|commentid|albumid|empty|content|ip|addtime
+     * favalbum:
+     *     value: uid|favalbum|favid|albumid|empty|empty|ip|addtime
+     * listenstory
+     *     value: uid|listenstory|listenid|storyid|albumid|empty|ip|addtime
+     * downloadstory
+     *     value: uid|downloadstory|downloadid|storyid|albumid|empty|ip|addtime
      * 
      */
     private function putActionLog(
