@@ -143,6 +143,9 @@ class AliSlsUserActionLog extends AliSls
         if (empty($action) || !in_array($action, $this->ACTION_LIST)) {
             return false;
         }
+        if (empty($ip)) {
+            $ip = getClientIp();
+        }
         
         $logcontents = array(
                 "actionuimid" => $actionuimid,

@@ -51,7 +51,10 @@ class syncdown extends controller
         
         $downloadobj = new DownLoad();
         $actionlogobj = new ActionLog();
+        $alislsobj = new AliSlsUserActionLog();
         $successdata = array();
+        $addtime = date("Y-m-d H:i:s");
+        $ip = getClientIp();
         foreach ($data as $value) {
         	$tmplist = array('clientid' => $value['clientid'], 'result' => false);
         	if (empty($value['clientid']) || empty($value['albumid']) || empty($value['storyid']) || empty($value['status'])) {
@@ -60,10 +63,13 @@ class syncdown extends controller
         	if (empty($albumlist[$value['albumid']]) || empty($storylist[$value['storyid']])) {
         		continue;
         	}
-        	$res = $downloadobj->addDownLoadStoryInfo($uimid, $value['albumid'], $value['storyid'], $value['status']);
-        	if ($res == true) {
+        	$lastdownloadid = $downloadobj->addDownLoadStoryInfo($uimid, $value['albumid'], $value['storyid'], $value['status']);
+        	if ($lastdownloadid == true) {
         		$tmplist = array('clientid' => $value['clientid'], 'result' => true);
 		        MnsQueueManager::pushActionLogQueue($uimid, $value['storyid'], $actionlogobj->ACTION_TYPE_DOWNLOAD_STORY);
+		        
+		        // add sls log
+		        $alislsobj->addDownloadStoryActionLog($uimid, $uid, $lastdownloadid, $value['storyid'], $value['albumid'], $ip, $addtime);
         	}
         	
         	$successdata[] = $tmplist;

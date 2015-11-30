@@ -40,7 +40,7 @@ class DownLoad extends ModelBase
 	 * @param I $uimid
 	 * @param I $albumid    专辑Id
 	 * @param I $storyid    故事id
-	 * @return boolean
+	 * @return int
 	 */
 	public function addDownLoadStoryInfo($uimid, $albumid, $storyid, $status)
 	{
@@ -59,7 +59,7 @@ class DownLoad extends ModelBase
 		if (empty($res)) {
 			return false;
 		}
-		return true;
+		return $db->lastInsertId();
 	}
 	
 }
