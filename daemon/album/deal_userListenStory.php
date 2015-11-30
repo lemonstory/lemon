@@ -58,6 +58,12 @@ class deal_userListenStory extends DaemonBase {
 	    // 收听故事行为log
 	    $actionlogobj = new ActionLog();
 	    MnsQueueManager::pushActionLogQueue($uimid, $storyid, $actionlogobj->ACTION_TYPE_LISTEN_STORY);
+	    
+	    // add sls log
+	    $listenid = $uimid . "_" . $storyid;
+	    $addtime = date("Y-m-d H:i:s");
+	    $alislsobj = new AliSlsUserActionLog();
+	    $alislsobj->addListenStoryActionLog($uimid, $uid, $listenid, $storyid, $albumid, getClientIp(), $addtime);
 	}
 
 	protected function checkLogPath() {}
