@@ -98,7 +98,12 @@ class AliSlsUserActionLog extends AliSls
     // 添加收听故事Log
     public function addListenStoryActionLog($uimid, $uid, $listenid, $storyid, $albumid, $ip, $addtime)
     {
-        return $this->putActionLog($uimid, $uid, $this->ACTION_LISTEN_STORY, $listenid, $storyid, $albumid, "", $ip, $addtime);
+        $res = $this->putActionLog($uimid, $uid, $this->ACTION_LISTEN_STORY, $listenid, $storyid, $albumid, "", $ip, $addtime);
+        $filepath = '/alidata1/www/logs/listenstorysls.log';
+        $fp = @fopen($filepath, 'a+');
+        @fwrite($fp, "uimid=>{$uimid}##uid=>{$uid}##listenid={$listenid}##storyid={$storyid}##albumid={$albumid}##ip={$ip}##addtime={$addtime}##res={$res}\n");
+        @fclose($fp);
+        return $res;
     }
     // 添加下载故事Log
     public function addDownloadStoryActionLog($uimid, $uid, $downloadid, $storyid, $albumid, $ip, $addtime)
