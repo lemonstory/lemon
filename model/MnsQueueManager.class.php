@@ -26,13 +26,9 @@ class MnsQueueManager
     /**
      * 收听播放故事队列
      */
-    public static function pushListenStoryQueue($uimid, $storyid)
+    public static function pushListenStoryQueue($uimid, $storyid, $ip)
     {
-        $filepath = "/alidata1/listen.log";
-        $fp = @fopen($filepath, 'a+');
-        @fwrite($fp, "uimid={$uimid}##storyid={$storyid}\n");
-        @fclose($fp);
-        $res = self::doPush("lemon-userlistenstoryqueue", $uimid . "@@" . $storyid);
+        $res = self::doPush("lemon-userlistenstoryqueue", $uimid . "@@" . $storyid . "@@" . $ip);
         return true;
     }
     public static function popListenStoryQueue()

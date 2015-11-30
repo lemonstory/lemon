@@ -41,7 +41,7 @@ class userstoryrecord_add extends controller
             }
 
             // 添加收听处理队列
-            MnsQueueManager::pushListenStoryQueue($uimid, $v['storyid']);
+            MnsQueueManager::pushListenStoryQueue($uimid, $v['storyid'], getClientIp());
         }
 
         $this->showSuccJson();

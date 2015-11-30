@@ -14,6 +14,7 @@ class deal_userListenStory extends DaemonBase {
 	    $queuearr = explode("@@", $queuevalue);
 	    $uimid = $queuearr[0];
 	    $storyid = $queuearr[1];
+	    $ip = $queuearr[2];
 	    if (empty($uimid) || empty($storyid)) {
 	        return true;
 	    }
@@ -63,7 +64,7 @@ class deal_userListenStory extends DaemonBase {
 	    $listenid = $uimid . "_" . $storyid;
 	    $addtime = date("Y-m-d H:i:s");
 	    $alislsobj = new AliSlsUserActionLog();
-	    $alislsobj->addListenStoryActionLog($uimid, $uid, $listenid, $storyid, $albumid, getClientIp(), $addtime);
+	    $alislsobj->addListenStoryActionLog($uimid, $uid, $listenid, $storyid, $albumid, $ip, $addtime);
 	}
 
 	protected function checkLogPath() {}

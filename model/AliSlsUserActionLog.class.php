@@ -101,7 +101,7 @@ class AliSlsUserActionLog extends AliSls
         $res = $this->putActionLog($uimid, $uid, $this->ACTION_LISTEN_STORY, $listenid, $storyid, $albumid, "", $ip, $addtime);
         $filepath = '/alidata1/www/logs/listenstorysls.log';
         $fp = @fopen($filepath, 'a+');
-        @fwrite($fp, "uimid=>{$uimid}##uid=>{$uid}##listenid={$listenid}##storyid={$storyid}##albumid={$albumid}##ip={$ip}##addtime={$addtime}##res={$res}\n");
+        @fwrite($fp, "uimid=>{$uimid}##uid=>{$uid}##listenid={$listenid}##storyid={$storyid}##albumid={$albumid}##ip={$ip}##addtime={$addtime}##res=" . serialize($res) . "\n");
         @fclose($fp);
         return $res;
     }
@@ -147,9 +147,6 @@ class AliSlsUserActionLog extends AliSls
         }
         if (empty($action) || !in_array($action, $this->ACTION_LIST)) {
             return false;
-        }
-        if (empty($ip)) {
-            $ip = getClientIp();
         }
         
         $logcontents = array(
