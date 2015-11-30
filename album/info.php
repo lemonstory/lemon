@@ -5,6 +5,29 @@ class info extends controller
 {
     function action() {
     	$result  = array();
+        $album_id      = $this->getRequest("albumid", "1");
+        $iscommentpage = $this->getRequest('iscommentpage', 0);
+        // 评论分页
+        if ($iscommentpage == 1) {
+            $direction = $this->getRequest("direction", "down");
+            $startid = $this->getRequest("startid", 0);
+            $albumid = $this->getRequest("albumid", 0);
+            $len = $this->getRequest("len", 0);
+            // 长度限制
+            if ($len > 50) {
+                $len = 50;
+            }
+            // 评论列表
+            $result['commentlist'] = $comment->get_comment_list(
+                                         "`albumid`={$album_id}",
+                                         "ORDER BY `id` DESC ",
+                                         $direction,
+                                         $startid,
+                                         $len
+                                     );
+            $this->showSuccJson($result);
+        }
+        // 获取专辑信息参数
         $album            = new Album();
         $story            = new Story();
         $comment          = new Comment();
@@ -13,11 +36,7 @@ class info extends controller
         $fav              = new Fav();
         $listenobj        = new Listen();
 
-
-
         $uid = $this->getUid();
-
-        $album_id = $this->getRequest("albumid", "1");
         // 专辑信息
         $result['albuminfo']  = $album->get_album_info($album_id);
 
@@ -28,15 +47,6 @@ class info extends controller
             $result['albuminfo']['cover'] = $result['albuminfo']['s_cover'];
         }
 
-        // 获取播放信息
-        // $useralbumlastloginfo = $useralbumlastlog->getInfo("`uimid`={$uid} and `albumid`={$album_id} ");
-        // if ($useralbumlastloginfo) {
-        //     $useralbumloginfo = $useralbumlog->getInfo("`logid`={$useralbumlastloginfo['lastlogid']}");
-        //     $playinfo = $useralbumlog->format_to_api($useralbumloginfo);
-        // } else {
-        //     $playinfo = array();
-        // }
-        // $result['playinfo'] = $playinfo;
         // 是否收藏
         $favinfo = $fav->getUserFavInfoByAlbumId($uid, $album_id);
         if ($favinfo) {
@@ -78,6 +88,8 @@ class info extends controller
         
         // 评论数量
         $result['albuminfo']['commentnum'] = (int)$comment->get_total("`albumid`={$album_id} and `status`=1");
+
+        // 评论列表
         $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ");
 
         // 返回成功json

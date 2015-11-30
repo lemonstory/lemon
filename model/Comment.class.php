@@ -209,7 +209,7 @@ class Comment extends ModelBase
     }
 
     // 获取评论列表
-    public function get_comment_list($where = '', $order_by = '')
+    public function get_comment_list($where = '', $order_by = '', , $direction = "down", $startid = 0, $len = 20)
     {
         $arr = explode('=', $where);
         $albumid = 0;
@@ -226,7 +226,14 @@ class Comment extends ModelBase
 
     	$newcommentlist = array();
         $where .= " and `status`=1";
-    	$commentlist = $this->get_list($where, '', $order_by);
+        if (!empty($startid)) {
+            if ($direction == "up") {
+                $where .= " AND `id` > '{$startid}'";
+            } else {
+                $where .= " AND `id` < '{$startid}'";
+            }
+        }
+    	$commentlist = $this->get_list($where, $len, $order_by);
     	foreach ($commentlist as $k => $v) {
     		$newcommentlist[] = $this->format_to_api($v);
     	}
