@@ -3,7 +3,6 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
-        
         die();
         
         $uimid = 1;
