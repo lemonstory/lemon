@@ -117,7 +117,7 @@ class AliSlsUserActionLog extends AliSls
      *     routeid      行为被操作对象的所属对象id
      *     content      行为内容
      *     ip           客户端ip
-     *     addtime      行为发生的时间
+     *     addtime      行为发生的时间datetime
      *     ext1
      *     ext2
      *     ext3

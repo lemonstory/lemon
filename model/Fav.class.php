@@ -207,6 +207,7 @@ class Fav extends ModelBase
 		if (empty($res)) {
 		    return false;
 		}
+		$favid = $db->lastInsertId();
 		
 		// 更新专辑的收藏总数
 		$this->addAlbumFavNumDb($albumid);
@@ -218,7 +219,11 @@ class Fav extends ModelBase
         $userimsiobj = new UserImsi();
         $uimid = $userimsiobj->getUimid($uid);
         MnsQueueManager::pushActionLogQueue($uimid, $albumid, $actionlogobj->ACTION_TYPE_FAV_ALBUM);
-		return $res;
+        
+        // add sls log
+        $alislsobj = new AliSlsUserActionLog();
+        $alislsobj->addFavAlbumActionLog($uid, $favid, $albumid, getClientIp(), $addtime);
+		return true;
 	}
 	
 	
