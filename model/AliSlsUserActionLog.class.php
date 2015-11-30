@@ -86,30 +86,31 @@ class AliSlsUserActionLog extends AliSls
     
     
     // 添加评论专辑log
-    public function addCommentAlbumActionLog($uid, $commentid, $albumid, $content, $ip, $addtime)
+    public function addCommentAlbumActionLog($uimid, $uid, $commentid, $albumid, $content, $ip, $addtime)
     {
-        return $this->putActionLog($uid, $this->ACTION_COMMENT_ALBUM, $commentid, $albumid, "", $content, $ip, $addtime);
+        return $this->putActionLog($uimid, $uid, $this->ACTION_COMMENT_ALBUM, $commentid, $albumid, "", $content, $ip, $addtime);
     }
     // 添加收藏专辑log
-    public function addFavAlbumActionLog($uid, $favid, $albumid, $ip, $addtime)
+    public function addFavAlbumActionLog($uimid, $uid, $favid, $albumid, $ip, $addtime)
     {
-        return $this->putActionLog($uid, $this->ACTION_FAV_ALBUM, $favid, $albumid, "", "", $ip, $addtime);
+        return $this->putActionLog($uimid, $uid, $this->ACTION_FAV_ALBUM, $favid, $albumid, "", "", $ip, $addtime);
     }
     // 添加收听故事Log
-    public function addListenStoryActionLog($uid, $listenid, $storyid, $albumid, $ip, $addtime)
+    public function addListenStoryActionLog($uimid, $uid, $listenid, $storyid, $albumid, $ip, $addtime)
     {
-        return $this->putActionLog($uid, $this->ACTION_LISTEN_STORY, $listenid, $storyid, $albumid, "", $ip, $addtime);
+        return $this->putActionLog($uimid, $uid, $this->ACTION_LISTEN_STORY, $listenid, $storyid, $albumid, "", $ip, $addtime);
     }
     // 添加下载故事Log
-    public function addDownloadStoryActionLog($uid, $downloadid, $storyid, $albumid, $ip, $addtime)
+    public function addDownloadStoryActionLog($uimid, $uid, $downloadid, $storyid, $albumid, $ip, $addtime)
     {
-        return $this->putActionLog($uid, $this->ACTION_DOWNLOAD_STORY, $downloadid, $storyid, $albumid, "", $ip, $addtime);
+        return $this->putActionLog($uimid, $uid, $this->ACTION_DOWNLOAD_STORY, $downloadid, $storyid, $albumid, "", $ip, $addtime);
     }
     
     
     /**
      * 写入action-log
      * column
+     *     actionuimid  行为uid与设备关联id
      *     actionuid    行为发起者uid
      *     action       行为类型：如comment
      *     actionid     行为产生的自增id
@@ -123,27 +124,28 @@ class AliSlsUserActionLog extends AliSls
      *     ext3
      *     
      * commentalbum:
-     *     value: uid|commentalbum|commentid|albumid|empty|content|ip|addtime
+     *     value: empty|uid|commentalbum|commentid|albumid|empty|content|ip|addtime
      * favalbum:
-     *     value: uid|favalbum|favid|albumid|empty|empty|ip|addtime
+     *     value: empty|uid|favalbum|favid|albumid|empty|empty|ip|addtime
      * listenstory
-     *     value: uid|listenstory|listenid|storyid|albumid|empty|ip|addtime
+     *     value: uimid|uid|listenstory|listenid|storyid|albumid|empty|ip|addtime
      * downloadstory
-     *     value: uid|downloadstory|downloadid|storyid|albumid|empty|ip|addtime
+     *     value: uimid|uid|downloadstory|downloadid|storyid|albumid|empty|ip|addtime
      * 
      */
     private function putActionLog(
-            $actionuid, $action, $actionid = "", $beactionid = "", $routeid = "", $content = "", $ip = "", $addtime = "",
+            $actionuimid = "", $actionuid = "", $action, $actionid = "", $beactionid = "", $routeid = "", $content = "", $ip = "", $addtime = "",
             $ext1 = "", $ext2 = "", $ext3 = "")
     {
-        if (empty($actionuid) || empty($action)) {
+        if (empty($actionuimid) && empty($actionuid)) {
             return false;
         }
-        if (!in_array($action, $this->ACTION_LIST)) {
+        if (empty($action) || !in_array($action, $this->ACTION_LIST)) {
             return false;
         }
         
         $logcontents = array(
+                "actionuimid" => $actionuimid,
                 "actionuid" => $actionuid,
                 "action" => $action,
                 "actionid" => $actionid,

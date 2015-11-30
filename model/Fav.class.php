@@ -222,7 +222,7 @@ class Fav extends ModelBase
         
         // add sls log
         $alislsobj = new AliSlsUserActionLog();
-        $alislsobj->addFavAlbumActionLog($uid, $favid, $albumid, getClientIp(), $addtime);
+        $alislsobj->addFavAlbumActionLog($uimid, $uid, $favid, $albumid, getClientIp(), $addtime);
 		return true;
 	}
 	
