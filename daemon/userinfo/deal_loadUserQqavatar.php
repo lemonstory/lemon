@@ -45,11 +45,11 @@ class deal_loadUserQqavatar extends DaemonBase
             }
         }
         
-        $dataline = $uid . "---" . $avatarfile . "\n";
+        /* $dataline = $uid . "---" . $avatarfile . "\n";
         $filepath = '/alidata1/www/logs/loadqqavatar' . date('Y-m-d') . ".log";
         $fp = @fopen($filepath, 'a+');
         @fwrite($fp, $dataline . "\n");
-        @fclose($fp);
+        @fclose($fp); */
     
     }
     
