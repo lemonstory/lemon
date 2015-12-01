@@ -15,9 +15,10 @@ class AliSlsUserActionLog extends AliSls
     public $ACTION_FAV_ALBUM = 'favalbum';
     public $ACTION_DOWNLOAD_STORY = 'downloadstory';
     public $ACTION_LISTEN_STORY = 'listenstory';
+    public $ACTION_REGISTER = 'register';
     
     public $ACTION_LIST = array(
-            "commentalbum", "favalbum", "downloadstory", "listenstory"
+            "commentalbum", "favalbum", "downloadstory", "listenstory", "register"
             );
     
     public function __construct()
@@ -31,7 +32,7 @@ class AliSlsUserActionLog extends AliSls
      * @param S $day    "2015-01-01"
      * @param S $hour   "03"
      */
-    public function favAlbumNumHour($day, $hour)
+    public function favAlbumCountHour($day, $hour)
     {
         $starttime = strtotime("{$day} {$hour}:00:00");
         $endtime = strtotime("{$day} {$hour}:59:59");
@@ -40,27 +41,60 @@ class AliSlsUserActionLog extends AliSls
         $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
         return $res;
     }
-    
+    public function listenStoryCountHour($day, $hour)
+    {
+        $starttime = strtotime("{$day} {$hour}:00:00");
+        $endtime = strtotime("{$day} {$hour}:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_LISTEN_STORY}";
+        $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        return $res;
+    }
+    public function downloadStoryCountHour($day, $hour)
+    {
+        $starttime = strtotime("{$day} {$hour}:00:00");
+        $endtime = strtotime("{$day} {$hour}:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_DOWNLOAD_STORY}";
+        $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        return $res;
+    }
+    public function commentAlbumCountHour($day, $hour)
+    {
+        /* $starttime = strtotime("{$day} {$hour}:00:00");
+        $endtime = strtotime("{$day} {$hour}:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_COMMENT_ALBUM}";
+        $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        return $res; */
+    }
+    public function registerCountHour($day, $hour)
+    {
+        $starttime = strtotime("{$day} {$hour}:00:00");
+        $endtime = strtotime("{$day} {$hour}:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_REGISTER}";
+        $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        return $res;
+    }
     
     
     /**
-     * 统计单日评论总量、被评论主题数、评论人数
-     * @param S $day
-     * @return array    
+     * 统计一天的收藏量、
+     * @param S $day    "2015-01-01"
      */
-    /* public function commentDayToUserTopicCount($day)
+    public function favAlbumCountDay($day)
     {
         set_time_limit(0);
         $starttime = strtotime("{$day} 00:00:00");
         $endtime = strtotime("{$day} 23:59:59");
         $topic = "";
-        $query = "action:{$this->ACTION_COMMENT_ALBUM}";
+        $query = "action:{$this->ACTION_FAV_ALBUM}";
         $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
         
-        $topiccount = 0;
+        $usercount = 0;
         $list = array();
         $actionuids = array();
-        $topicids = array();
         if (!empty($count)) {
             $line = 100;
             for ($offset = 0; $offset <= $count; $offset += $line) {
@@ -68,21 +102,33 @@ class AliSlsUserActionLog extends AliSls
                 if (!empty($list)) {
                     foreach ($list as $value) {
                         $actionuids[] = $value['contents']['actionuid'];
-                        $topicids[] = $value['contents']['beactionid'];
+                        $albumids[] = $value['contents']['beactionid'];
                     }
                     $actionuids = array_unique($actionuids);
-                    $topicids = array_unique($topicids);
                 }
             }
             if (!empty($actionuids)) {
                 $usercount = count($actionuids);
             }
-            if (!empty($topicids)) {
-                $topiccount = count($topicids);
-            }
         }
-        return array("commentcount" => $count, "topiccount" => $topiccount, "usercount" => $usercount);
-    } */
+        return array("favcount" => $count, "usercount" => $usercount);
+    }
+    public function listenStoryCountDay($day)
+    {
+    
+    }
+    public function downloadStoryCountDay($day)
+    {
+    
+    }
+    public function commentAlbumCountDay($day)
+    {
+        
+    }
+    public function registerCountDay($day)
+    {
+    
+    }
     
     
     // 添加评论专辑log
