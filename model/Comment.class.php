@@ -209,7 +209,7 @@ class Comment extends ModelBase
     }
 
     // 获取评论列表
-    public function get_comment_list($where = '', $order_by = '', , $direction = "down", $startid = 0, $len = 20)
+    public function get_comment_list($where = '', $order_by = '', $direction = "down", $startid = 0, $len = 20)
     {
         $arr = explode('=', $where);
         $albumid = 0;
