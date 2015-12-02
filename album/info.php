@@ -5,18 +5,19 @@ class info extends controller
 {
     function action() {
     	$result  = array();
-        $album_id      = $this->getRequest("albumid", "1");
+        $album_id      = $this->getRequest("albumid", "0");
+        $albumid       = $this->getRequest("albumid", 0);
         $iscommentpage = $this->getRequest('iscommentpage', 0);
+        $len           = $this->getRequest("len", 10);
+        // 长度限制
+        if ($len > 50) {
+            $len = 50;
+        }
         // 评论分页
         if ($iscommentpage == 1) {
             $direction = $this->getRequest("direction", "down");
             $startid = $this->getRequest("startid", 0);
-            $albumid = $this->getRequest("albumid", 0);
-            $len = $this->getRequest("len", 10);
-            // 长度限制
-            if ($len > 50) {
-                $len = 50;
-            }
+            
             // 评论列表
             $result['commentlist'] = $comment->get_comment_list(
                                          "`albumid`={$album_id}",
