@@ -12,8 +12,9 @@ class downstory extends controller
             $this->showErrorJson(ErrorConf::paramError());
         }
         
-    	$userimsiobj = new UserImsi();
-        $uimid = $userimsiobj->getUimid();
+        $uid = $this->getUid();
+        $userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid($uid);
         if (empty($uimid)) {
             $this->showErrorJson(ErrorConf::userImsiIdError());
         }

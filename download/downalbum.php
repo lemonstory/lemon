@@ -11,9 +11,9 @@ class downalbum extends controller
         if (empty($albumid)) {
             $this->showErrorJson(ErrorConf::paramError());
         }
-    	
+        $uid = $this->getUid();
         $userimsiobj = new UserImsi();
-        $uimid = $userimsiobj->getUimid();
+        $uimid = $userimsiobj->getUimid($uid);
         if (empty($uimid)) {
             $this->showErrorJson(ErrorConf::userImsiIdError());
         }
