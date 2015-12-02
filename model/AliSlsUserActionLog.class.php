@@ -80,7 +80,7 @@ class AliSlsUserActionLog extends AliSls
     
     
     /**
-     * 统计一天的收藏量、
+     * 统计一天的收藏量、收藏人数
      * @param S $day    "2015-01-01"
      */
     public function favAlbumCountDay($day)
@@ -102,7 +102,6 @@ class AliSlsUserActionLog extends AliSls
                 if (!empty($list)) {
                     foreach ($list as $value) {
                         $actionuids[] = $value['contents']['actionuid'];
-                        $albumids[] = $value['contents']['beactionid'];
                     }
                     $actionuids = array_unique($actionuids);
                 }
@@ -117,9 +116,42 @@ class AliSlsUserActionLog extends AliSls
     {
     
     }
+    // 统计一天的下载故事量、下载人数、下载专辑数
     public function downloadStoryCountDay($day)
     {
-    
+        set_time_limit(0);
+        $starttime = strtotime("{$day} 00:00:00");
+        $endtime = strtotime("{$day} 23:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_DOWNLOAD_STORY}";
+        $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        
+        $usercount = 0;
+        $albumcount = 0;
+        $list = array();
+        $actionuids = array();
+        $albumids = array();
+        if (!empty($count)) {
+            $line = 100;
+            for ($offset = 0; $offset <= $count; $offset += $line) {
+                $list = $this->getActionLogList($starttime, $endtime, $topic, $query, $line, $offset);
+                if (!empty($list)) {
+                    foreach ($list as $value) {
+                        $actionuids[] = $value['contents']['actionuid'];
+                        $albumids[] = $value['contents']['beactionid'];
+                    }
+                    $actionuids = array_unique($actionuids);
+                    $albumids = array_unique($albumids);
+                }
+            }
+            if (!empty($actionuids)) {
+                $usercount = count($actionuids);
+            }
+            if (!empty($albumids)) {
+                $albumcount = count($albumids);
+            }
+        }
+        return array("downloadcount" => $count, "usercount" => $usercount, "albumcount" => $albumcount);
     }
     public function commentAlbumCountDay($day)
     {
