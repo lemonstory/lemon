@@ -148,8 +148,9 @@ class WechatSso extends Sso
         $loginlogobj = new UserLoginLog();
         $loginlogobj->addUserLoginLog($uid, getImsi());
         
+        $content = "wechatregister";
         $alislsobj = new AliSlsUserActionLog();
-        $alislsobj->addRegisterActionLog($uimid, $uid, getClientIp(), $addtime);
+        $alislsobj->addRegisterActionLog($uimid, $uid, $content, getClientIp(), $addtime);
         
         $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         return $return;

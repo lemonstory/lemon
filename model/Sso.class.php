@@ -169,8 +169,9 @@ class Sso extends ModelBase
         $loginlogobj = new UserLoginLog();
         $loginlogobj->addUserLoginLog($uid, getImsi());
         
+        $content = "qqregister";
         $alislsobj = new AliSlsUserActionLog();
-        $alislsobj->addRegisterActionLog($uimid, $uid, getClientIp(), $addtime);
+        $alislsobj->addRegisterActionLog($uimid, $uid, $content, getClientIp(), $addtime);
         
         $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         return $return;

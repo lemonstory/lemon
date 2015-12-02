@@ -157,9 +157,9 @@ class AliSlsUserActionLog extends AliSls
         return $this->putActionLog($uimid, $uid, $this->ACTION_DOWNLOAD_STORY, $downloadid, $storyid, $albumid, "", $ip, $addtime);
     }
     // 添加用户注册log
-    public function addRegisterActionLog($uimid, $uid, $ip, $addtime)
+    public function addRegisterActionLog($uimid, $uid, $content, $ip, $addtime)
     {
-        return $this->putActionLog($uimid, $uid, $this->ACTION_REGISTER, $uid, "", "", "", $ip, $addtime);
+        return $this->putActionLog($uimid, $uid, $this->ACTION_REGISTER, $uid, "", "", $content, $ip, $addtime);
     }
     
     
