@@ -148,7 +148,7 @@ class AliSlsUserActionLog extends AliSls
                 $albumcount = count($albumids);
             }
         }
-        return array("favcount" => $count, "usercount" => $usercount, "albumcount" => $albumcount);
+        return array("listencount" => $count, "usercount" => $usercount, "albumcount" => $albumcount);
     }
     
     // 统计一天的下载故事量、下载人数、下载专辑数
