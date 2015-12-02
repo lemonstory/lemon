@@ -126,7 +126,7 @@ class AliSlsUserActionLog extends AliSls
         $usercount = 0;
         $albumcount = 0;
         $list = array();
-        $actionuids = array();
+        $actionuimids = array();
         $albumids = array();
         if (!empty($count)) {
             $line = 100;
@@ -134,15 +134,15 @@ class AliSlsUserActionLog extends AliSls
                 $list = $this->getActionLogList($starttime, $endtime, $topic, $query, $line, $offset);
                 if (!empty($list)) {
                     foreach ($list as $value) {
-                        $actionuids[] = $value['contents']['actionuid'];
+                        $actionuimids[] = $value['contents']['actionuimid'];
                         $albumids[] = $value['contents']['beactionid'];
                     }
-                    $actionuids = array_unique($actionuids);
+                    $actionuimids = array_unique($actionuimids);
                     $albumids = array_unique($albumids);
                 }
             }
-            if (!empty($actionuids)) {
-                $usercount = count($actionuids);
+            if (!empty($actionuimids)) {
+                $usercount = count($actionuimids);
             }
             if (!empty($albumids)) {
                 $albumcount = count($albumids);
@@ -159,6 +159,44 @@ class AliSlsUserActionLog extends AliSls
         $endtime = strtotime("{$day} 23:59:59");
         $topic = "";
         $query = "action:{$this->ACTION_DOWNLOAD_STORY}";
+        $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        
+        $usercount = 0;
+        $albumcount = 0;
+        $list = array();
+        $actionuimids = array();
+        $albumids = array();
+        if (!empty($count)) {
+            $line = 100;
+            for ($offset = 0; $offset <= $count; $offset += $line) {
+                $list = $this->getActionLogList($starttime, $endtime, $topic, $query, $line, $offset);
+                if (!empty($list)) {
+                    foreach ($list as $value) {
+                        $actionuimids[] = $value['contents']['actionuimid'];
+                        $albumids[] = $value['contents']['beactionid'];
+                    }
+                    $actionuimids = array_unique($actionuimids);
+                    $albumids = array_unique($albumids);
+                }
+            }
+            if (!empty($actionuimids)) {
+                $usercount = count($actionuimids);
+            }
+            if (!empty($albumids)) {
+                $albumcount = count($albumids);
+            }
+        }
+        return array("downloadcount" => $count, "usercount" => $usercount, "albumcount" => $albumcount);
+    }
+    
+    // 统计一天的评论数、评论人数、被评论的专辑数
+    public function commentAlbumCountDay($day)
+    {
+        set_time_limit(0);
+        $starttime = strtotime("{$day} 00:00:00");
+        $endtime = strtotime("{$day} 23:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_COMMENT_ALBUM}";
         $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
         
         $usercount = 0;
@@ -186,12 +224,10 @@ class AliSlsUserActionLog extends AliSls
                 $albumcount = count($albumids);
             }
         }
-        return array("downloadcount" => $count, "usercount" => $usercount, "albumcount" => $albumcount);
+        return array("commentcount" => $count, "usercount" => $usercount, "albumcount" => $albumcount);
     }
-    public function commentAlbumCountDay($day)
-    {
-        
-    }
+    
+    
     public function registerCountDay($day)
     {
     
