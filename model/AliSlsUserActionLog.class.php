@@ -112,10 +112,45 @@ class AliSlsUserActionLog extends AliSls
         }
         return array("favcount" => $count, "usercount" => $usercount);
     }
+    
+    // 统计一天的收听故事量、收听人数、收听专辑数
     public function listenStoryCountDay($day)
     {
-    
+        set_time_limit(0);
+        $starttime = strtotime("{$day} 00:00:00");
+        $endtime = strtotime("{$day} 23:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_LISTEN_STORY}";
+        $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        
+        $usercount = 0;
+        $albumcount = 0;
+        $list = array();
+        $actionuids = array();
+        $albumids = array();
+        if (!empty($count)) {
+            $line = 100;
+            for ($offset = 0; $offset <= $count; $offset += $line) {
+                $list = $this->getActionLogList($starttime, $endtime, $topic, $query, $line, $offset);
+                if (!empty($list)) {
+                    foreach ($list as $value) {
+                        $actionuids[] = $value['contents']['actionuid'];
+                        $albumids[] = $value['contents']['beactionid'];
+                    }
+                    $actionuids = array_unique($actionuids);
+                    $albumids = array_unique($albumids);
+                }
+            }
+            if (!empty($actionuids)) {
+                $usercount = count($actionuids);
+            }
+            if (!empty($albumids)) {
+                $albumcount = count($albumids);
+            }
+        }
+        return array("favcount" => $count, "usercount" => $usercount, "albumcount" => $albumcount);
     }
+    
     // 统计一天的下载故事量、下载人数、下载专辑数
     public function downloadStoryCountDay($day)
     {
