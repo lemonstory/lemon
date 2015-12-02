@@ -61,12 +61,12 @@ class AliSlsUserActionLog extends AliSls
     }
     public function commentAlbumCountHour($day, $hour)
     {
-        /* $starttime = strtotime("{$day} {$hour}:00:00");
+        $starttime = strtotime("{$day} {$hour}:00:00");
         $endtime = strtotime("{$day} {$hour}:59:59");
         $topic = "";
         $query = "action:{$this->ACTION_COMMENT_ALBUM}";
         $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
-        return $res; */
+        return $res;
     }
     public function registerCountHour($day, $hour)
     {
@@ -199,9 +199,9 @@ class AliSlsUserActionLog extends AliSls
     
     
     // 添加评论专辑log
-    public function addCommentAlbumActionLog($uimid, $uid, $commentid, $albumid, $content, $ip, $addtime)
+    public function addCommentAlbumActionLog($uimid, $uid, $commentid, $albumid, $content, $ip, $addtime, $starlevel)
     {
-        return $this->putActionLog($uimid, $uid, $this->ACTION_COMMENT_ALBUM, $commentid, $albumid, "", $content, $ip, $addtime);
+        return $this->putActionLog($uimid, $uid, $this->ACTION_COMMENT_ALBUM, $commentid, $albumid, "", $content, $ip, $addtime, $starlevel);
     }
     // 添加收藏专辑log
     public function addFavAlbumActionLog($uimid, $uid, $favid, $albumid, $ip, $addtime)
@@ -247,7 +247,7 @@ class AliSlsUserActionLog extends AliSls
      *     ext3
      *     
      * commentalbum:
-     *     value: empty|uid|commentalbum|commentid|albumid|empty|content|ip|addtime
+     *     value: empty|uid|commentalbum|commentid|albumid|empty|content|ip|addtime|starlevel
      * favalbum:
      *     value: empty|uid|favalbum|favid|albumid|empty|empty|ip|addtime
      * listenstory
