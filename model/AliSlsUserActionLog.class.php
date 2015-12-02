@@ -156,6 +156,11 @@ class AliSlsUserActionLog extends AliSls
     {
         return $this->putActionLog($uimid, $uid, $this->ACTION_DOWNLOAD_STORY, $downloadid, $storyid, $albumid, "", $ip, $addtime);
     }
+    // 添加用户注册log
+    public function addRegisterActionLog($uimid, $uid, $ip, $addtime)
+    {
+        return $this->putActionLog($uimid, $uid, $this->ACTION_REGISTER, $uid, "", "", "", $ip, $addtime);
+    }
     
     
     /**
@@ -182,7 +187,8 @@ class AliSlsUserActionLog extends AliSls
      *     value: uimid|uid|listenstory|listenid|storyid|albumid|empty|ip|addtime
      * downloadstory
      *     value: uimid|uid|downloadstory|downloadid|storyid|albumid|empty|ip|addtime
-     * 
+     * register
+     *     value: uimid|uid|register|uid|empty|empty|empty|ip|addtime
      */
     private function putActionLog(
             $actionuimid = "", $actionuid = "", $action, $actionid = "", $beactionid = "", $routeid = "", $content = "", $ip = "", $addtime = "",

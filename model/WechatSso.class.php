@@ -98,7 +98,7 @@ class WechatSso extends Sso
         
         $NicknameMd5Obj = new NicknameMd5();
         if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
-            $nickName = "xiaoningmeng_" . rand(1000, 9999) . time();
+            $nickName = "xnm_" . rand(100, 999) . time();
         }
         
         $wechatinfo = $this->getWechatInfo($accessToken, $openId);
@@ -147,6 +147,9 @@ class WechatSso extends Sso
         // add login log
         $loginlogobj = new UserLoginLog();
         $loginlogobj->addUserLoginLog($uid, getImsi());
+        
+        $alislsobj = new AliSlsUserActionLog();
+        $alislsobj->addRegisterActionLog($uimid, $uid, getClientIp(), $addtime);
         
         $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         return $return;
