@@ -12,7 +12,7 @@ class info extends controller
             $direction = $this->getRequest("direction", "down");
             $startid = $this->getRequest("startid", 0);
             $albumid = $this->getRequest("albumid", 0);
-            $len = $this->getRequest("len", 0);
+            $len = $this->getRequest("len", 10);
             // 长度限制
             if ($len > 50) {
                 $len = 50;
@@ -90,7 +90,7 @@ class info extends controller
         $result['albuminfo']['commentnum'] = (int)$comment->get_total("`albumid`={$album_id} and `status`=1");
 
         // 评论列表
-        $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ");
+        $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ", 'up', 0, $len);
 
         // 返回成功json
         $this->showSuccJson($result);
