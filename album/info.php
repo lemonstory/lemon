@@ -6,9 +6,9 @@ class info extends controller
     function action() {
     	$result  = array();
         $album_id      = $this->getRequest("albumid", "0");
-        $albumid       = $this->getRequest("albumid", 0);
         $iscommentpage = $this->getRequest('iscommentpage', 0);
         $len           = $this->getRequest("len", 10);
+        $comment       = new Comment();
         // 长度限制
         if ($len > 50) {
             $len = 50;
