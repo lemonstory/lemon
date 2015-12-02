@@ -162,7 +162,7 @@ class Sso extends ModelBase
         // 登录后的处理
         $actionlogobj = new ActionLog();
         $userimsiobj = new UserImsi();
-        $uimid = $userimsiobj->getUimid();
+        $uimid = $userimsiobj->getUimid($uid);
         MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_LOGIN);
         
         // add login log
