@@ -90,7 +90,12 @@ class info extends controller
         $result['albuminfo']['commentnum'] = (int)$comment->get_total("`albumid`={$album_id} and `status`=1");
 
         // 评论列表
-        $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ", 'up', 0, $len);
+        if ($_SERVER['visitorappversion'] < "120000") {
+            // 1.2版本以前的老版本，展示200条评论
+            $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ", 'up', 0, 200);
+        } else {
+            $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ", 'up', 0, $len);
+        }
 
         // 返回成功json
         $this->showSuccJson($result);
