@@ -87,5 +87,5 @@ function _U2_Utf8_Gb($_C){
 		$_String .= chr(0x80 | $_C>>6 & 0x3F);
 		$_String .= chr(0x80 | $_C & 0x3F);
 	}
-	return iconv('UTF-8', 'GB2312', $_String);
+	return iconv("UTF-8", "GB2312//IGNORE", $_String);
 }
