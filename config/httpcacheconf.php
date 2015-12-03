@@ -15,11 +15,16 @@ $_SERVER['http_cache_conf'] = array(
                 "cachetime" => 600,
                 "params" => array()
         ),
-        
         // 热门推荐
         "default_hotrecommendlist" => array(
                 "action" => "default_hotrecommendlist",
-                "cachetime" => 60,
+                "cachetime" => 600,
+                "params" => array("p", "len")
+        ),
+        // 同龄在听
+        "default_sameagelist" => array(
+                "action" => "default_sameagelist",
+                "cachetime" => 600,
                 "params" => array("p", "len")
         ),
         
