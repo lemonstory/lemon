@@ -119,6 +119,7 @@ class HttpCache
         if (empty($modifiedTime)){
             if (!empty($expire)){
                 $this->setModifiedTime($key, $nowtime, $expire);
+                return $nowtime;
             }
         }
         return $modifiedTime;
