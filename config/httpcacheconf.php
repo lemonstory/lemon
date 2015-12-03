@@ -27,6 +27,12 @@ $_SERVER['http_cache_conf'] = array(
                 "cachetime" => 600,
                 "params" => array("p", "len")
         ),
+        // 最新上架
+        "default_newonlinelist" => array(
+                "action" => "default_newonlinelist",
+                "cachetime" => 600,
+                "params" => array("p", "len")
+        ),
         
         // listen
         /* "liste_getlistenlist" => array(
