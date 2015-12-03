@@ -28,11 +28,11 @@ class HttpCache
         }
         
         // @huqq
-        /* $logFile = '/alidata1/rc.log';
+        $logFile = '/alidata1/rc.log';
         $fp = @fopen($logFile, 'a+');
         $logContent = '';
         $now = time();
-        $a = strtotime(@$_SERVER['HTTP_IF_MODIFIED_SINCE']); */
+        $a = strtotime(@$_SERVER['HTTP_IF_MODIFIED_SINCE']);
         
         $cacheKey = $this->getKey($cacheConf['action'], $cacheConf['params']);
         $modifiedTime = $this->getModifiedTime($cacheKey, $cacheConf);
@@ -40,13 +40,13 @@ class HttpCache
         if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && 
             (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $modifiedTime))
         {
-            //@fwrite($fp, "304 => action=>{$cacheConf['action']}##serverTime=>{$modifiedTime}##clienttime_{$a} => now_$now \n");
+            @fwrite($fp, "304 => action=>{$cacheConf['action']}##serverTime=>{$modifiedTime}##clienttime_{$a} => now_$now \n");
             // Client's cache IS current, so we just respond '304 Not Modified'.
             header('Cache-Control: '.'max-age='.@$cacheConf['cachetime'].', public', true);
             header('Last-Modified: '.gmdate('D, d M Y H:i:s', $modifiedTime).' GMT', true, 304);
             exit;
         } else {
-            //@fwrite($fp, "200 => action=>{$cacheConf['action']}##serverTime=>{$modifiedTime}##clienttime_{$a} => now_$now \n");
+            @fwrite($fp, "200 => action=>{$cacheConf['action']}##serverTime=>{$modifiedTime}##clienttime_{$a} => now_$now \n");
             // Image not cached or cache outdated, we respond '200 OK' and output the image.
             header('Cache-Control: '.'max-age='.@$cacheConf['cachetime'].', public', true);
             header('Last-Modified: '.gmdate('D, d M Y H:i:s', $modifiedTime).' GMT', true, 200);
