@@ -85,6 +85,7 @@ class HttpCache
         // 所有url请求都需要携带visituid=当前访问Uid, 未登录为空
         //array_unshift($cacheConf['params'], "visituid");
         
+        $actionParams = array();
         foreach ($cacheConf['params'] as $value){
             $actionParams[$value] = @$actionData['params'][$value];
         }
