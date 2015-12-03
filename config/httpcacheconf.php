@@ -12,14 +12,14 @@ $_SERVER['http_cache_conf'] = array(
         // 首页
         "default_index" => array(
                 "action" => "default_index",
-                "cachetime" => 60,
+                "cachetime" => 600,
                 "params" => array()
         ),
         
         // listen
-        "liste_getlistenlist" => array(
+        /* "liste_getlistenlist" => array(
                 "action" => "liste_getlistenlist",
                 "cachetime" => 60,
                 "params" => array("direction", "startid", "len")
-        ),
+        ), */
 );
