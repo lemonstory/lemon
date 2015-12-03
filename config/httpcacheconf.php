@@ -16,6 +16,13 @@ $_SERVER['http_cache_conf'] = array(
                 "params" => array()
         ),
         
+        // 热门推荐
+        "default_hotrecommendlist" => array(
+                "action" => "default_hotrecommendlist",
+                "cachetime" => 60,
+                "params" => array("p", "len")
+        ),
+        
         // listen
         /* "liste_getlistenlist" => array(
                 "action" => "liste_getlistenlist",
