@@ -3,18 +3,8 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
-        die();
-        
-        $uimid = 1;
-        $albumid = 3329;
-        $storyid = 121164;
-        
-        $recommendobj = new Recommend();
-        //$res = $recommendobj->getRecommendHotList(3, 9);
-        //$res = $recommendobj->getSameAgeListenList(1, 1, 9);
-        //$res = $recommendobj->getNewOnlineList(1, 1, 9);
-        //$res = $recommendobj->getFocusList(6);
-        var_dump($res);
+        $uphttpobj = new UpdateHttpCache();
+        $uphttpobj->updateDefaultIndexModified();
         die();
         
         

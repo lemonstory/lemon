@@ -40,11 +40,11 @@ $_SERVER['http_cache_conf'] = array(
 
         ######################详情############################
         // 故事辑详情
-        "album_info" => array(
+        /* "album_info" => array(
                 "action" => "album_info",
                 "cachetime" => 1800,
                 "params" => array("albumid", "iscommentpage", "len", "direction", "startid")
-        ),
+        ), */
         
         
         ######################详情End############################
