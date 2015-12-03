@@ -35,6 +35,12 @@ $_SERVER['http_cache_conf'] = array(
                 "cachetime" => 3600,
                 "params" => array("p", "len")
         ),
+        // 学霸排行榜
+        "userinfo_ranklistenuserlist" => array(
+                "action" => "userinfo_ranklistenuserlist",
+                "cachetime" => 3600,
+                "params" => array("len")
+        ),
         
         ######################列表END############################
 
