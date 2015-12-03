@@ -217,7 +217,7 @@ class Comment extends ModelBase
             $albumid = $arr[1];
         }
         // 读缓存
-        $key = RedisKey::getAlbumCommentListKey($albumid);
+        $key = RedisKey::getAlbumCommentListKey(func_get_args());
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisData = $redisobj->get($key);
         if ($redisData) {

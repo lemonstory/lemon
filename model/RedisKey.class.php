@@ -179,9 +179,9 @@ class RedisKey
 	/**
 	 * 专辑的评论列表
 	 */
-	public static function getAlbumCommentListKey($albumId)
+	public static function getAlbumCommentListKey($params)
 	{
-		return 'album_comment_list_'.$albumId;
+		return 'album_comment_list_'.serialize($params);
 	}
 	
 	/**
