@@ -26,6 +26,7 @@ class HttpCache
         if (empty($cacheConf)) {
             return false;
         }
+        
         // @huqq
         $logFile = '/alidata1/rc.log';
         $fp = @fopen($logFile, 'a+');
@@ -37,7 +38,7 @@ class HttpCache
         $modifiedTime = $this->getModifiedTime($cacheKey, $cacheConf);
         
         if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && 
-            (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) == $modifiedTime))
+            (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $modifiedTime))
         {
             @fwrite($fp, "304 => modifiedTime=>{$modifiedTime}##httptime_{$a} => now_$now \n");
             // Client's cache IS current, so we just respond '304 Not Modified'.
