@@ -12,26 +12,40 @@ $_SERVER['http_cache_conf'] = array(
         // 首页
         "default_index" => array(
                 "action" => "default_index",
-                "cachetime" => 86400,
+                "cachetime" => 3600,
                 "params" => array()
         ),
+        
+        ######################列表############################
         // 热门推荐
         "default_hotrecommendlist" => array(
                 "action" => "default_hotrecommendlist",
-                "cachetime" => 86400,
+                "cachetime" => 3600,
                 "params" => array("p", "len")
         ),
         // 同龄在听
         "default_sameagelist" => array(
                 "action" => "default_sameagelist",
-                "cachetime" => 86400,
+                "cachetime" => 3600,
                 "params" => array("p", "len")
         ),
         // 最新上架
         "default_newonlinelist" => array(
                 "action" => "default_newonlinelist",
-                "cachetime" => 86400,
+                "cachetime" => 3600,
                 "params" => array("p", "len")
         ),
         
+        ######################列表END############################
+
+        ######################详情############################
+        // 故事辑详情
+        "album_info" => array(
+                "action" => "album_info",
+                "cachetime" => 1800,
+                "params" => array("albumid", "iscommentpage", "len", "direction", "startid")
+        ),
+        
+        
+        ######################详情End############################
 );
