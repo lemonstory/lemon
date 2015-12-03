@@ -102,9 +102,9 @@ class HttpCache
      */
     protected function getModifiedTime($key, $cacheConf)
     {
-        $modifiedtime = time();
+        $nowtime = time();
         if (empty($key)){
-            return $modifiedtime;
+            return $nowtime;
         }
         
         $expire = 0;
@@ -118,7 +118,7 @@ class HttpCache
         $modifiedTime = $redisobj->get($key);
         if (empty($modifiedTime)){
             if (!empty($expire)){
-                $this->setModifiedTime($key, $modifiedtime, $expire);
+                $this->setModifiedTime($key, $nowtime, $expire);
             }
         }
         return $modifiedTime;
