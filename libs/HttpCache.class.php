@@ -31,10 +31,11 @@ class HttpCache
         $fp = @fopen($logFile, 'a+');
         $logContent = '';
         $now = time();
-        $a = strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']);
+        $a = strtotime(@$_SERVER['HTTP_IF_MODIFIED_SINCE']);
         
         $cacheKey = $this->getKey($cacheConf['action'], $cacheConf['params']);
         $modifiedTime = $this->getModifiedTime($cacheKey, $cacheConf);
+        @fwrite($fp, "modifiedTime=>{$modifiedTime} \n");
         
         if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && 
             (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) == $modifiedTime))
