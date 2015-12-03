@@ -86,7 +86,7 @@ class HttpCache
         //array_unshift($cacheConf['params'], "visituid");
         
         foreach ($cacheConf['params'] as $value){
-            $actionParams[$value] = $actionData['params'][$value];
+            $actionParams[$value] = @$actionData['params'][$value];
         }
         $cacheConf['params'] = $actionParams;
         

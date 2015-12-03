@@ -10,6 +10,7 @@ class UpdateHttpCache extends HttpCache
         $cacheConf = $_SERVER['http_cache_conf'][$httpCacheName];
         $action = $cacheConf['action'];
         $cachetime = $cacheConf['cachetime'];
+        $params = $cacheConf['params'];
         
         $key = $this->getKey($action, $params);
         $this->setModifiedTime($key, time(), $cachetime);
@@ -24,6 +25,7 @@ class UpdateHttpCache extends HttpCache
         $cacheConf = $_SERVER['http_cache_conf'][$httpCacheName];
         $action = $cacheConf['action'];
         $cachetime = $cacheConf['cachetime'];
+        $params = $cacheConf['params'];
         
         $key = $this->getKey($action, $params);
         $this->setModifiedTime($key, time(), $cachetime);
@@ -38,7 +40,8 @@ class UpdateHttpCache extends HttpCache
         $cacheConf = $_SERVER['http_cache_conf'][$httpCacheName];
         $action = $cacheConf['action'];
         $cachetime = $cacheConf['cachetime'];
-    
+        $params = $cacheConf['params'];
+        
         $key = $this->getKey($action, $params);
         $this->setModifiedTime($key, time(), $cachetime);
     }
@@ -52,24 +55,8 @@ class UpdateHttpCache extends HttpCache
         $cacheConf = $_SERVER['http_cache_conf'][$httpCacheName];
         $action = $cacheConf['action'];
         $cachetime = $cacheConf['cachetime'];
-    
-        $key = $this->getKey($action, $params);
-        $this->setModifiedTime($key, time(), $cachetime);
-    }
-    
-    /**
-     * 更新收听列表的http cache
-     */
-    public function updateGetListenListModified($direction, $startid, $len)
-    {
-        $httpCacheName = "listen_getlistenlist";
-        $cacheConf = $_SERVER['http_cache_conf'][$httpCacheName];
-        $action = $cacheConf['action'];
-        $cachetime = $cacheConf['cachetime'];
+        $params = $cacheConf['params'];
         
-        $params['direction'] = $direction;
-        $params['startid'] = $startid;
-        $params['len'] = $len;
         $key = $this->getKey($action, $params);
         $this->setModifiedTime($key, time(), $cachetime);
     }
