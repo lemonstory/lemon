@@ -12,32 +12,26 @@ $_SERVER['http_cache_conf'] = array(
         // 首页
         "default_index" => array(
                 "action" => "default_index",
-                "cachetime" => 600,
+                "cachetime" => 86400,
                 "params" => array()
         ),
         // 热门推荐
         "default_hotrecommendlist" => array(
                 "action" => "default_hotrecommendlist",
-                "cachetime" => 600,
+                "cachetime" => 86400,
                 "params" => array("p", "len")
         ),
         // 同龄在听
         "default_sameagelist" => array(
                 "action" => "default_sameagelist",
-                "cachetime" => 600,
+                "cachetime" => 86400,
                 "params" => array("p", "len")
         ),
         // 最新上架
         "default_newonlinelist" => array(
                 "action" => "default_newonlinelist",
-                "cachetime" => 600,
+                "cachetime" => 86400,
                 "params" => array("p", "len")
         ),
         
-        // listen
-        /* "liste_getlistenlist" => array(
-                "action" => "liste_getlistenlist",
-                "cachetime" => 60,
-                "params" => array("direction", "startid", "len")
-        ), */
 );
