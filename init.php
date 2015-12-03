@@ -11,10 +11,10 @@ if (DIRECTORY_SEPARATOR == '/'){
 }
 define("HTTP_CACHE", true);
 
-include dirname(__FILE__)."/config2/dbconf.php";
-include dirname(__FILE__)."/config2/config.php";
-include dirname(__FILE__)."/config2/kvstoreconf.php";
-include dirname(__FILE__)."/config2/httpcacheconf.php";
+include dirname(__FILE__)."/config/dbconf.php";
+include dirname(__FILE__)."/config/config.php";
+include dirname(__FILE__)."/config/kvstoreconf.php";
+include dirname(__FILE__)."/config/httpcacheconf.php";
 include dirname(__FILE__)."/libs/functions.php";
 
 /**
