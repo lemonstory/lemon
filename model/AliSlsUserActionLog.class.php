@@ -227,10 +227,16 @@ class AliSlsUserActionLog extends AliSls
         return array("commentcount" => $count, "usercount" => $usercount, "albumcount" => $albumcount);
     }
     
-    
+    // 统计一天的注册人数
     public function registerCountDay($day)
     {
-    
+        set_time_limit(0);
+        $starttime = strtotime("{$day} 00:00:00");
+        $endtime = strtotime("{$day} 23:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_REGISTER}";
+        $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        return array("regcount" => $count);
     }
     
     
