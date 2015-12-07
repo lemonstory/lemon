@@ -211,7 +211,7 @@ class Sso extends ModelBase
     
     
     /**
-     * 用于报警规则测试
+     * 手机号登陆，同时用于报警规则测试
      * @param S $username
      * @param S $password
      * @return boolean|mixed
@@ -249,6 +249,41 @@ class Sso extends ModelBase
         $ssoobj->setSsoCookie($passportdata, $userinfo);
         
         return $userinfo;
+    }
+    
+    // 后台手机号注册
+    public function phonereg($username, $nickname, $password)
+    {
+        if (empty($username) || empty($nickname) || empty($password)) {
+            $this->setError(ErrorConf::paramError());
+            return false;
+        }
+        
+        $NicknameMd5Obj = new NicknameMd5();
+        if ($NicknameMd5Obj->checkNameIsExist($nickname)) {
+            $nickname = "xnm_" . rand(100, 999) . time();
+        }
+        
+        $addtime = date('Y-m-d H:i:s');
+        $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+        
+        $username = "PL" . $username;
+        $password = md5($password . strrev(strtotime($addtime)));
+        $sql = "insert into `{$this->PASSPORT_TABLE_NAME}` (username, password, addtime) values (?, ?, ?)";
+        $st = $db->prepare($sql);
+        $st->execute(array($username, $password, $addtime));
+        $uid = $db->lastInsertId() + 0;
+        if ($uid == 0) {
+            return false;
+        }
+        
+        $avatartime = 0;
+        $birthday = date("Y-m-d");
+        $UserObj = new User();
+        $type = $UserObj->TYPE_PH;
+        $UserObj->initUser($uid, $nickname, $avatartime, $birthday, 0, "", "", $type, $addtime);
+        
+        return $uid;
     }
     
     
