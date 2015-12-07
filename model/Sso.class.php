@@ -267,7 +267,6 @@ class Sso extends ModelBase
         $addtime = date('Y-m-d H:i:s');
         $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
         
-        $username = "PL" . $username;
         $password = md5($password . strrev(strtotime($addtime)));
         $sql = "insert into `{$this->PASSPORT_TABLE_NAME}` (username, password, addtime) values (?, ?, ?)";
         $st = $db->prepare($sql);
