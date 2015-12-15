@@ -78,8 +78,8 @@ function getImsi()
     // 设备唯一标识imsi
     $imsi = $agentArr[1];
     $imsilen = strlen($imsi);
-    //Mi 3C imsi只有14位, ios 32位，其余15位
-    if (!in_array($imsilen, array(14, 15, 32))) {
+    //Mi 3C imsi只有14位, ios 36位，其余15位
+    if (!in_array($imsilen, array(14, 15, 36))) {
         return '';
     }
     return $imsi;
