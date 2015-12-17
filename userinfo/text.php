@@ -3,8 +3,9 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
-        $uphttpobj = new UpdateHttpCache();
-        $uphttpobj->updateDefaultIndexModified();
+        /* $key = RedisKey::getQqLoginFirstKey("12533DC7E4738C7649395DB191903F2E");
+        $redisObj = AliRedisConnecter::connRedis('cache');
+        $cacheData = $redisObj->delete($key); */
         die();
         
         
