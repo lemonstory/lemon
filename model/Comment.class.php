@@ -84,7 +84,7 @@ class Comment extends ModelBase
     public function getStarLevel($albumid)
     {
         $db = DbConnecter::connectMysql('share_comment');
-        $sql = "SELECT sum(star_level) as star_sum from {$this->table} where `albumid`={$albumid}";
+        $sql = "SELECT sum(star_level) as star_sum from {$this->table} where `albumid`={$albumid} and status=1";
         $st = $db->query($sql);
         $st->setFetchMode(PDO::FETCH_ASSOC);
         $r  = $st->fetchAll();
