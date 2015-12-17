@@ -111,11 +111,6 @@ class Sso extends ModelBase
             return false;
         }
         
-        $NicknameMd5Obj = new NicknameMd5();
-        if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
-            $nickName = "xnm_" . rand(100, 999) . time();
-        }
-        
         $qqUserInfo = $this->getQqInfo($qc);
         if (empty($qqUserInfo)) {
             return false;
@@ -141,6 +136,11 @@ class Sso extends ModelBase
         $uid = $db->lastInsertId() + 0;
         if ($uid == 0) {
             return false;
+        }
+        
+        $NicknameMd5Obj = new NicknameMd5();
+        if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
+            $nickName .= "_" . $uid;
         }
         
         $sql = "insert into {$this->QQ_RELATION_TABLE_NAME} (openid,uid,accesstoken,addtime) values (?,?,?,?)";
@@ -259,11 +259,6 @@ class Sso extends ModelBase
             return false;
         }
         
-        $NicknameMd5Obj = new NicknameMd5();
-        if ($NicknameMd5Obj->checkNameIsExist($nickname)) {
-            $nickname = "xnm_" . rand(100, 999) . time();
-        }
-        
         $addtime = date('Y-m-d H:i:s');
         $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
         
@@ -274,6 +269,11 @@ class Sso extends ModelBase
         $uid = $db->lastInsertId() + 0;
         if ($uid == 0) {
             return false;
+        }
+        
+        $NicknameMd5Obj = new NicknameMd5();
+        if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
+            $nickName .= "_" . $uid;
         }
         
         $avatartime = 0;

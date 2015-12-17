@@ -96,11 +96,6 @@ class WechatSso extends Sso
             return false;
         }
         
-        $NicknameMd5Obj = new NicknameMd5();
-        if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
-            $nickName = "xnm_" . rand(100, 999) . time();
-        }
-        
         $wechatinfo = $this->getWechatInfo($accessToken, $openId);
         if (empty($wechatinfo)) {
             return false;
@@ -120,6 +115,11 @@ class WechatSso extends Sso
         $uid = $db->lastInsertId() + 0;
         if ($uid == 0) {
             return false;
+        }
+        
+        $NicknameMd5Obj = new NicknameMd5();
+        if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
+            $nickName .= "_" . $uid;
         }
         
         $sql = "insert into {$this->WECHAT_RELATION_TABLE_NAME} (openid,uid,accesstoken,addtime) values (?,?,?,?)";
