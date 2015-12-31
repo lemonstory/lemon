@@ -2,7 +2,7 @@
 
 class Tag extends ModelBase
 {
-    private $dbname = "share_story";
+    private $dbname = "share_comment";
     private $table = 'album_tag';
 
     /**
