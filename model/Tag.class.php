@@ -2,7 +2,7 @@
 
 class Tag extends ModelBase
 {
-
+    private $dbname = "share_story";
     private $table = 'album_tag';
 
     /**
@@ -25,7 +25,7 @@ class Tag extends ModelBase
      */
     public function get_total($where = '')
     {
-        $db = DbConnecter::connectMysql('share_comment');
+        $db = DbConnecter::connectMysql($this->dbname);
         $sql = "select count(*) as count from {$this->table}  where {$where}";
         $st = $db->query( $sql );
         $r = $st->fetchAll();
@@ -49,7 +49,7 @@ class Tag extends ModelBase
         $tmp_filed = implode(",", $tmp_filed);
         $tmp_value = implode(",", $tmp_value);
 
-        $db = DbConnecter::connectMysql('share_comment');
+        $db = DbConnecter::connectMysql($this->dbname);
         $sql = "INSERT INTO {$this->table}(
                     {$tmp_filed}
                 ) VALUES({$tmp_value})";
@@ -74,7 +74,7 @@ class Tag extends ModelBase
         $tmp_data = implode(",", $tmp_data);
         $set_str  = "SET {$tmp_data} ";
 
-        $db = DbConnecter::connectMysql('share_comment');
+        $db = DbConnecter::connectMysql($this->dbname);
         $sql = "UPDATE {$this->table} {$set_str} where {$where}";
         $st = $db->query($sql);
         unset($tmp_data);
@@ -86,7 +86,7 @@ class Tag extends ModelBase
      */
     public function get_filed($where = '', $filed = '')
     {
-        $db = DbConnecter::connectMysql('share_comment');
+        $db = DbConnecter::connectMysql($this->dbname);
         $sql = "select * from {$this->table}  where {$where}";
         $st = $db->query( $sql );
         $r = $st->fetchAll();
@@ -102,7 +102,7 @@ class Tag extends ModelBase
      */
     public function get_list($where = '', $limit = '', $filed = '')
     {
-        $db = DbConnecter::connectMysql('share_comment');
+        $db = DbConnecter::connectMysql($this->dbname);
         if ($limit) {
             $sql = "select * from {$this->table}  where {$where} limit {$limit}";
         } else {
@@ -134,7 +134,7 @@ class Tag extends ModelBase
         $where = "`id`={$tag_id}";
         $sql = "select * from {$this->table}  where {$where} limit 1";
 
-        $db = DbConnecter::connectMysql('share_comment');
+        $db = DbConnecter::connectMysql($this->dbname);
         $st = $db->query( $sql );
         $st->setFetchMode(PDO::FETCH_ASSOC);
         $r  = $st->fetchAll();
