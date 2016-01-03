@@ -88,6 +88,28 @@ class TagNew extends ModelBase
     
     
     /**
+     * 添加标签
+     * @param S $name
+     * @param I $pid    若存在父级标签，则pid=父级标签ID
+     * @return I
+     */
+    public function addTag($name, $pid = 0)
+    {
+        if (empty($name)) {
+            $this->setError(ErrorConf::paramError());
+            return false;
+        }
+        $taginfo = $this->getTagInfoByName($name);
+        if (empty($taginfo)) {
+            $tagid = $this->addTagDb($pid, $name);
+            return $tagid;
+        } else {
+            return false;
+        }
+    }
+    
+    
+    /**
      * 添加标签记录
      * @param I $pid    是否有父级标签id
      * @param S $name   标签名称
