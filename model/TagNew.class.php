@@ -9,7 +9,41 @@ class TagNew extends ModelBase
     // 故事标签关联
     public $STORY_TAG_RELATION_TABLE = 'story_tag_relation';
     // CACHE
-    //public $CACHE_INSTANCE = 'cache';
+    public $CACHE_INSTANCE = 'cache';
+    
+    
+    /**
+     * 获取一级标签列表
+     * @param I $len
+     * @return array
+     */
+    public function getFirstTagList($len)
+    {
+        if (empty($len) || $len < 0) {
+            $len = 10;
+        }
+        
+        $key = $len;
+        $cacheobj = new CacheWrapper();
+        $redisData = $cacheobj->getListCache($this->TAG_INFO_TABLE, $key);
+        $redisData = array();
+        if (empty($redisData)) {
+            $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+            $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `pid` = ? AND `status` = ? ORDER BY `ordernum` ASC, `id` ASC LIMIT {$len}";
+            $selectst = $db->prepare($selectsql);
+            $selectst->execute(array(0, $this->RECOMMEND_STATUS_ONLIINE));
+            $dbdata = $selectst->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (empty($dbdata)) {
+                return array();
+            }
+            
+            $cacheobj->setListCache($this->TAG_INFO_TABLE, $key, $dbdata);
+            return $dbdata;
+        } else {
+            return $redisData;
+        }
+    }
     
     
     /**
@@ -127,9 +161,9 @@ class TagNew extends ModelBase
         $md5name = md5($name);
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $sql = "INSERT INTO `{$this->TAG_INFO_TABLE}` (`pid`, `name`, `md5name`) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO `{$this->TAG_INFO_TABLE}` (`pid`, `name`, `md5name`, `status`) VALUES (?, ?, ?, ?)";
         $st = $db->prepare($sql);
-        $res = $st->execute(array($pid, $name, $md5name));
+        $res = $st->execute(array($pid, $name, $md5name, $this->RECOMMEND_STATUS_OFFLINE));
         if (empty($res)) {
             return false;
         }
