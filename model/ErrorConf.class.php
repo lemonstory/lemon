@@ -258,6 +258,16 @@ class   ErrorConf
 		return array('code'=>'101008','desc'=>'source_url-匿名用户为空');
 	}
 	
+	// 标签
+	public static function TagInfoIsEmpty()
+	{
+	    return array('code'=>'101101','desc'=>'标签不存在');
+	}
+	public static function SecondTagListIsEmpty()
+	{
+	    return array('code'=>'101102','desc'=>'子级标签不存在');
+	}
+	
 	// 请求检测
 	public static function requestCsrfValidateError()
 	{

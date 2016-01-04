@@ -26,7 +26,6 @@ class TagNew extends ModelBase
         $key = $len;
         $cacheobj = new CacheWrapper();
         $redisData = $cacheobj->getListCache($this->TAG_INFO_TABLE, $key);
-        $redisData = array();
         if (empty($redisData)) {
             $db = DbConnecter::connectMysql($this->DB_INSTANCE);
             $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `pid` = ? AND `status` = ? ORDER BY `ordernum` ASC, `id` ASC LIMIT {$len}";
@@ -38,6 +37,43 @@ class TagNew extends ModelBase
                 return array();
             }
             
+            $cacheobj->setListCache($this->TAG_INFO_TABLE, $key, $dbdata);
+            return $dbdata;
+        } else {
+            return $redisData;
+        }
+    }
+    
+    
+    /**
+     * 获取二级标签列表
+     * @param I $pid        父级标签id
+     * @param I $len
+     */
+    public function getSecondTagList($pid, $len)
+    {
+        if (empty($pid)) {
+            $this->setError(ErrorConf::paramError());
+            return array();
+        }
+        if (empty($len) || $len < 0) {
+            $len = 10;
+        }
+        
+        $key = $pid . "_" . $len;
+        $cacheobj = new CacheWrapper();
+        $redisData = $cacheobj->getListCache($this->TAG_INFO_TABLE, $key);
+        if (empty($redisData)) {
+            $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+            $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `pid` = ? AND `status` = ? ORDER BY `ordernum` ASC, `id` ASC LIMIT {$len}";
+            $selectst = $db->prepare($selectsql);
+            $selectst->execute(array($pid, $this->RECOMMEND_STATUS_ONLIINE));
+            $dbdata = $selectst->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (empty($dbdata)) {
+                return array();
+            }
+        
             $cacheobj->setListCache($this->TAG_INFO_TABLE, $key, $dbdata);
             return $dbdata;
         } else {
@@ -113,6 +149,52 @@ class TagNew extends ModelBase
             return array();
         }
         return $info;
+    }
+    
+    
+    /**
+     * 获取指定标签下的专辑列表
+     * @param A $tagids   指定标签id数组
+     * @param I $len
+     */
+    public function getAlbumTagRelationList($tagids, $len)
+    {
+        if (empty($tagids)) {
+            return array();
+        }
+        if (!is_array($tagids)) {
+            $tagids = array($tagids);
+        }
+        if (empty($len) || $len < 0) {
+            $len = 10;
+        }
+        
+        $key = implode("_", $tagids) . "_" . $len;
+        $cacheobj = new CacheWrapper();
+        $redisData = $cacheobj->getListCache($this->TAG_INFO_TABLE, $key);
+        if (empty($redisData)) {
+            $tagidstr = "";
+            foreach ($tagids as $tagid) {
+                $tagidstr .= "'{$tagid}',";
+            }
+            $tagidstr = rtrim($tagidstr, ",");
+            
+            $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+            $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `tagid` IN ($tagidstr) LIMIT {$len}";
+            $selectst = $db->prepare($selectsql);
+            $selectst->execute();
+            $dbdata = $selectst->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (empty($dbdata)) {
+                return array();
+            }
+            
+            $cacheobj->setListCache($this->TAG_INFO_TABLE, $key, $dbdata);
+            return $dbdata;
+        } else {
+            return $redisData;
+        }
+        
     }
     
     
