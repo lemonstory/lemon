@@ -47,6 +47,29 @@ class TagNew extends ModelBase
     
     
     /**
+     * 获取标签信息
+     * @param I $tagid
+     * @return array
+     */
+    public function getTagInfoById($tagid)
+    {
+        if (empty($tagid)) {
+            return array();
+        }
+    
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `id` = ?";
+        $selectst = $db->prepare($selectsql);
+        $selectst->execute(array($tagid));
+        $info = $selectst->fetch(PDO::FETCH_ASSOC);
+        if (empty($info)) {
+            return array();
+        }
+        return $info;
+    }
+    
+    
+    /**
      * 根据标签名，获取标签信息
      * @param S $name
      * @return array
