@@ -15,6 +15,7 @@ class gettagalbumlist extends controller
         if (empty($currenttagid)) {
             // 默认选取第一个一级标签
             $currenttaginfo = current($firsttaglist);
+            $currenttagid = $currenttaginfo['id'];
         } else {
             $currenttaginfo = $tagnewobj->getTagInfoById($currenttagid);
         }
