@@ -5,38 +5,46 @@ class gettagalbumlist extends controller
     public function action()
     {
         $currenttagid = $this->getRequest("currenttagid", 0);
-        $secondtagnum = 10;
-        $albumnum = 8;
-        
-        // 获取一级标签
-        $tagnewobj = new TagNew();
-        $firsttaglist = $tagnewobj->getFirstTagList(8);
-        
+        $isgettag = $this->getRequest("isgettag", 1);
+        $direction = $this->getRequest("direction", "down");
+        $startalbumid = $this->getRequest("startalbumid", 0);
+        $len = $this->getRequest("len", 20);
         if (empty($currenttagid)) {
-            // 默认选取第一个一级标签
-            $currenttaginfo = current($firsttaglist);
-            $currenttagid = $currenttaginfo['id'];
-        } else {
-            $currenttaginfo = $tagnewobj->getTagInfoById($currenttagid);
+            $this->showErrorJson(ErrorConf::paramError());
         }
+        
+        $firsttagnum = 8;
+        $secondtagnum = 10;
+        $selectfirsttagid = 0; // 当前选中的一级标签id
+        $selectsecondtagid = 0; // 当前选中的二级标签id
+        $firsttaglist = array(); // 一级标签列表
+        $secondtaglist = array(); // 二级标签列表
+        
+        $tagnewobj = new TagNew();
+        if ($isgettag == 1) {
+            // 获取一级标签列表
+            $firsttaglist = $tagnewobj->getFirstTagList($firsttagnum);
+        }
+        
+        $currenttaginfo = $tagnewobj->getTagInfoById($currenttagid);
         if (empty($currenttaginfo)) {
             $this->showErrorJson(ErrorConf::TagInfoIsEmpty());
         }
         $currentpid = $currenttaginfo['pid'];
-        
-        $selectfirsttagid = 0; // 当前选中的一级标签id
-        $selectsecondtagid = 0; // 当前选中的二级标签id
-        $secondtaglist = array();
         if ($currentpid == 0) {
             // 当前选中的currenttagid为一级标签，获取该标签下的二级标签列表
             $selectfirsttagid = $currenttagid;
             $selectsecondtagid = 0; // 表示二级标签选中全部
-            $secondtaglist = $tagnewobj->getSecondTagList($selectfirsttagid, $secondtagnum);
+            if ($isgettag == 1) {
+                $secondtaglist = $tagnewobj->getSecondTagList($selectfirsttagid, $secondtagnum);
+            }
         } else {
             // 当前选中的currenttagid为二级标签，获取该标签的父级下的所有二级标签列表
             $selectfirsttagid = $currentpid;
             $selectsecondtagid = $currenttagid;
-            $secondtaglist = $tagnewobj->getSecondTagList($selectfirsttagid, $secondtagnum);
+            if ($isgettag == 1) {
+                $secondtaglist = $tagnewobj->getSecondTagList($selectfirsttagid, $secondtagnum);
+            }
         }
         
         $tagids = array();
@@ -57,7 +65,7 @@ class gettagalbumlist extends controller
         
         $tagalbumlist = array();
         // 获取指定二级标签下，指定长度的专辑与标签关联列表
-        $albumrelationlist = $tagnewobj->getAlbumTagRelationList($tagids, $albumnum);
+        $albumrelationlist = $tagnewobj->getAlbumTagRelationList($tagids, $direction, $startalbumid, $len);
         if (!empty($albumrelationlist)) {
             $albumids = array();
             foreach ($albumrelationlist as $relationinfo) {

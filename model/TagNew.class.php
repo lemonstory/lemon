@@ -154,10 +154,12 @@ class TagNew extends ModelBase
     
     /**
      * 获取指定标签下的专辑列表
-     * @param A $tagids   指定标签id数组
+     * @param A $tagids       指定标签id数组
+     * @param S $direction    
+     * @param I $startalbumid 
      * @param I $len
      */
-    public function getAlbumTagRelationList($tagids, $len)
+    public function getAlbumTagRelationList($tagids, $direction, $startalbumid, $len)
     {
         if (empty($tagids)) {
             return array();
@@ -165,36 +167,36 @@ class TagNew extends ModelBase
         if (!is_array($tagids)) {
             $tagids = array($tagids);
         }
-        if (empty($len) || $len < 0) {
-            $len = 10;
+        if (empty($len) || $len < 0 || $len > 100) {
+            $len = 20;
         }
         
-        $key = implode("_", $tagids) . "_" . $len;
-        $cacheobj = new CacheWrapper();
-        $redisData = $cacheobj->getListCache($this->TAG_INFO_TABLE, $key);
-        if (empty($redisData)) {
-            $tagidstr = "";
-            foreach ($tagids as $tagid) {
-                $tagidstr .= "'{$tagid}',";
-            }
-            $tagidstr = rtrim($tagidstr, ",");
-            
-            $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-            $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `tagid` IN ($tagidstr) LIMIT {$len}";
-            $selectst = $db->prepare($selectsql);
-            $selectst->execute();
-            $dbdata = $selectst->fetchAll(PDO::FETCH_ASSOC);
-            $db = null;
-            if (empty($dbdata)) {
-                return array();
-            }
-            
-            $cacheobj->setListCache($this->TAG_INFO_TABLE, $key, $dbdata);
-            return $dbdata;
-        } else {
-            return $redisData;
+        $tagidstr = "";
+        foreach ($tagids as $tagid) {
+            $tagidstr .= "'{$tagid}',";
         }
+        $tagidstr = rtrim($tagidstr, ",");
         
+        $where = "";
+        if (!empty($startalbumid)) {
+            if ($direction == "up") {
+                $where .= "`albumid` > '{$startalbumid}' AND ";
+            } else {
+                $where .= "`albumid` < '{$startalbumid}' AND ";
+            }
+        }
+        $where .= "`tagid` IN ($tagidstr)";
+        
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} ORDER BY `albumid` DESC LIMIT {$len}";
+        $selectst = $db->prepare($selectsql);
+        $selectst->execute();
+        $dbdata = $selectst->fetchAll(PDO::FETCH_ASSOC);
+        $db = null;
+        if (empty($dbdata)) {
+            return array();
+        }
+        return $dbdata;
     }
     
     
