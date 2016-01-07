@@ -5,6 +5,9 @@ class gettagalbumlist extends controller
     public function action()
     {
         $currenttagid = $this->getRequest("currenttagid", 0);
+        $hotrecommend = $this->getRequest("hotrecommend", 0); // 是否为最热门
+        $goodcomment = $this->getRequest("goodcomment", 0); // 是否为好评榜
+        
         $isgettag = $this->getRequest("isgettag", 1);
         $direction = $this->getRequest("direction", "down");
         $startalbumid = $this->getRequest("startalbumid", 0);
@@ -34,7 +37,13 @@ class gettagalbumlist extends controller
         if ($currentpid == 0) {
             // 当前选中的currenttagid为一级标签，获取该标签下的二级标签列表
             $selectfirsttagid = $currenttagid;
-            $selectsecondtagid = 0; // 表示二级标签选中全部
+            if ($hotrecommend == 1) {
+                $selectsecondtagid = "hotrecommend";// 表示二级标签选中最热门
+            } elseif ($goodcomment == 1) {
+                $selectsecondtagid = "goodcomment"; // 表示二级标签选中好评榜
+            } else {
+                $selectsecondtagid = 0; // 表示二级标签选中全部
+            }
             if ($isgettag == 1) {
                 $secondtaglist = $tagnewobj->getSecondTagList($selectfirsttagid, $secondtagnum);
             }
