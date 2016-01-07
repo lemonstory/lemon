@@ -201,6 +201,72 @@ class TagNew extends ModelBase
     
     
     /**
+     * 获取热门推荐、最新上架、同龄在听列表
+     * @param I $tagids        指定标签下的热门推荐列表，若为"全部"时,tagids是所有一级标签数组
+     * @param I $ishot         是否热门推荐列表
+     * @param I $issameage     是否同龄在听推荐列表
+     * @param I $isnewonline   是否最新上架推荐列表
+     * @param I $currentpage   加载第几个,默认为1表示从第一页获取
+     * @param I $len           获取长度
+     * @return array
+     */
+    public function getRecommendAlbumTagRelationList($tagids, $ishot = 0, $issameage = 0, $isnewonline = 0, $currentpage = 1, $len = 20)
+    {
+        if (empty($ishot) && empty($issameage) && empty($isnewonline)) {
+            return array();
+        }
+        if ($currentpage < 1) {
+            $currentpage = 1;
+        }
+        if (empty($len)) {
+            $len = 20;
+        }
+        if ($len > 50) {
+            $len = 50;
+        }
+        
+        /* $key = $currentpage . "_" . $len;
+        $cacheobj = new CacheWrapper();
+        $redisData = $cacheobj->getListCache($this->ALBUM_TAG_RELATION_TABLE, $key); */
+        $redisData = array();
+        if (empty($redisData)) {
+            $where = "";
+            if (!empty($tagids)) {
+                $tagidstr = "";
+                foreach ($tagids as $tagid) {
+                    $tagidstr .= "'{$tagid}',";
+                }
+                $tagidstr = rtrim($tagidstr, ",");
+                $where .= "`tagid` IN ($tagidstr) AND ";
+            }
+            if ($ishot == 1) {
+                $where .= "`ishot` = 1";
+            } elseif ($issameage == 1) {
+                $where .= "`issameage` = 1";
+            } elseif ($isnewonline == 1) {
+                $where .= "`isnewonline` = 1";
+            }
+            $offset = ($currentpage - 1) * $len;
+            
+            $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+            $sql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} ORDER BY `uptime` DESC LIMIT $offset, $len";
+            $st = $db->prepare($sql);
+            $st->execute();
+            $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (empty($dbData)) {
+                return array();
+            }
+            
+            //$cacheobj->setListCache($this->ALBUM_TAG_RELATION_TABLE, $key, $dbData);
+            return $dbData;
+        } else {
+            return $redisData;
+        }
+    }
+    
+    
+    /**
      * 添加专辑标签
      * @param I $albumid    专辑ID
      * @param S $name       标签名称

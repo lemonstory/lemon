@@ -122,12 +122,15 @@ class index extends controller
 		
 		// 一级标签列表
 		$firsttaglist = array();
-		$tagnewobj = new TagNew();
-		$firsttagres = $tagnewobj->getFirstTagList(8);
-		if (!empty($firsttagres)) {
-		    foreach ($firsttagres as $value) {
-		        $firsttaglist[] = $value;
-		    }
+		if ($_SERVER['visitorappversion'] >= "130000") {
+    		$tagnewobj = new TagNew();
+    		$firsttagres = $tagnewobj->getFirstTagList(8);
+    		if (!empty($firsttagres)) {
+    		    foreach ($firsttagres as $value) {
+    		        $value['cover'] = "";
+    		        $firsttaglist[] = $value;
+    		    }
+    		}
 		}
 		
 		// 私人订制
