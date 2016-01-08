@@ -356,10 +356,12 @@ class TagNew extends ModelBase
             $this->setError(ErrorConf::paramError());
             return false;
         }
+        $nowtime = time();
+        $addtime = date("Y-m-d H:i:s", $nowtime);
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $sql = "INSERT INTO `{$this->ALBUM_TAG_RELATION_TABLE}` (`tagid`, `albumid`) VALUES (?, ?)";
+        $sql = "INSERT INTO `{$this->ALBUM_TAG_RELATION_TABLE}` (`tagid`, `albumid`, `uptime`, `addtime`) VALUES (?, ?, ?, ?)";
         $st = $db->prepare($sql);
-        $res = $st->execute(array($tagid, $albumid));
+        $res = $st->execute(array($tagid, $albumid, $nowtime, $addtime));
         if (empty($res)) {
             return false;
         }
