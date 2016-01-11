@@ -89,12 +89,17 @@ class gettagalbumlist extends controller
             }
         }
         
+        $specialtaglist = array(
+                array("name" => "最热门", "paramkey" => "hotrecommend", "paramvalue" => 1),
+                array("name" => "好评榜", "paramkey" => "goodcomment", "paramvalue" => 1),
+                );
         $data = array(
             "selectfirsttagid" => $selectfirsttagid,
             "selectsecondtagid" => $selectsecondtagid,
             "firsttaglist" => $firsttaglist,
             "secondtaglist" => $secondtaglist,
-            "tagalbumlist" => $tagalbumlist
+            "tagalbumlist" => $tagalbumlist,
+            "specialtaglist" => $specialtaglist
         );
         $this->showSuccJson($data);
     }
