@@ -155,11 +155,12 @@ class TagNew extends ModelBase
     /**
      * 获取指定标签下的专辑列表
      * @param A $tagids       指定标签id数组
+     * @param I $isrecommend  是否为一级标签下，推荐的专辑
      * @param S $direction    
      * @param I $startalbumid 
      * @param I $len
      */
-    public function getAlbumTagRelationList($tagids, $direction, $startalbumid, $len)
+    public function getAlbumTagRelationList($tagids, $isrecommend = 0, $direction = "down", $startalbumid = 0, $len = 20)
     {
         if (empty($tagids)) {
             return array();
@@ -187,6 +188,10 @@ class TagNew extends ModelBase
         }
         $where .= "`tagid` IN ($tagidstr)";
         
+        if ($isrecommend == 1) {
+            $where .= " AND `isrecommend` = 1";
+        }
+        
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
         $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} ORDER BY `albumid` DESC LIMIT {$len}";
         $selectst = $db->prepare($selectsql);
@@ -203,16 +208,16 @@ class TagNew extends ModelBase
     /**
      * 获取热门推荐、最新上架、同龄在听列表
      * @param I $tagids        指定标签下的热门推荐列表，若为"全部"时,tagids是所有一级标签数组
-     * @param I $ishot         是否热门推荐列表
+     * @param I $isrecommend   是否热门推荐列表
      * @param I $issameage     是否同龄在听推荐列表
      * @param I $isnewonline   是否最新上架推荐列表
      * @param I $currentpage   加载第几个,默认为1表示从第一页获取
      * @param I $len           获取长度
      * @return array
      */
-    public function getRecommendAlbumTagRelationList($tagids, $ishot = 0, $issameage = 0, $isnewonline = 0, $currentpage = 1, $len = 20)
+    public function getRecommendAlbumTagRelationList($tagids, $isrecommend = 0, $issameage = 0, $isnewonline = 0, $currentpage = 1, $len = 20)
     {
-        if (empty($ishot) && empty($issameage) && empty($isnewonline)) {
+        if (empty($isrecommend) && empty($issameage) && empty($isnewonline)) {
             return array();
         }
         if ($currentpage < 1) {
@@ -239,8 +244,8 @@ class TagNew extends ModelBase
                 $tagidstr = rtrim($tagidstr, ",");
                 $where .= "`tagid` IN ($tagidstr) AND ";
             }
-            if ($ishot == 1) {
-                $where .= "`ishot` = 1";
+            if ($isrecommend == 1) {
+                $where .= "`isrecommend` = 1";
             } elseif ($issameage == 1) {
                 $where .= "`issameage` = 1";
             } elseif ($isnewonline == 1) {
