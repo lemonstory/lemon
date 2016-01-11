@@ -90,7 +90,8 @@ class gettagalbumlist extends controller
         }
         
         $specialtaglist = array(
-                array("name" => "最热门", "paramkey" => "hotrecommend", "paramvalue" => 1),
+                array("name" => "推荐", "paramkey" => "recommend", "paramvalue" => 1),
+                array("name" => "最热门", "paramkey" => "hot", "paramvalue" => 1),
                 array("name" => "好评榜", "paramkey" => "goodcomment", "paramvalue" => 1),
                 );
         $data = array(
