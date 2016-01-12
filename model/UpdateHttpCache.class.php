@@ -4,32 +4,59 @@ class UpdateHttpCache extends HttpCache
     /**
      * 更新首页的http cache
      */
-    public function updateDefaultIndexModified($visituid)
+    public function updateDefaultIndexModified()
     {
         $httpCacheName = "default_index";
         $cacheConf = $_SERVER['http_cache_conf'][$httpCacheName];
         $action = $cacheConf['action'];
         $cachetime = $cacheConf['cachetime'];
+        $params = $cacheConf['params'];
         
-        $params['visituid'] = $visituid;
         $key = $this->getKey($action, $params);
         $this->setModifiedTime($key, time(), $cachetime);
     }
     
     /**
-     * 更新收听列表的http cache
+     * 更新热门推荐列表的http cache
      */
-    public function updateGetListenListModified($visituid, $direction, $startid, $len)
+    public function updateDefaultHotRecommendListModified()
     {
-        $httpCacheName = "listen_getlistenlist";
+        $httpCacheName = "default_hotrecommendlist";
         $cacheConf = $_SERVER['http_cache_conf'][$httpCacheName];
         $action = $cacheConf['action'];
         $cachetime = $cacheConf['cachetime'];
+        $params = $cacheConf['params'];
         
-        $params['visituid'] = $visituid;
-        $params['direction'] = $direction;
-        $params['startid'] = $startid;
-        $params['len'] = $len;
+        $key = $this->getKey($action, $params);
+        $this->setModifiedTime($key, time(), $cachetime);
+    }
+    
+    /**
+     * 更新同龄在听列表的http cache
+     */
+    public function updateDefaultSameAgeListModified()
+    {
+        $httpCacheName = "default_sameagelist";
+        $cacheConf = $_SERVER['http_cache_conf'][$httpCacheName];
+        $action = $cacheConf['action'];
+        $cachetime = $cacheConf['cachetime'];
+        $params = $cacheConf['params'];
+        
+        $key = $this->getKey($action, $params);
+        $this->setModifiedTime($key, time(), $cachetime);
+    }
+    
+    /**
+     * 更新最新上架列表的http cache
+     */
+    public function updateDefaultNewOnlineListModified()
+    {
+        $httpCacheName = "default_newonlinelist";
+        $cacheConf = $_SERVER['http_cache_conf'][$httpCacheName];
+        $action = $cacheConf['action'];
+        $cachetime = $cacheConf['cachetime'];
+        $params = $cacheConf['params'];
+        
         $key = $this->getKey($action, $params);
         $this->setModifiedTime($key, time(), $cachetime);
     }

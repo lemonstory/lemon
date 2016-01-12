@@ -111,11 +111,6 @@ class Sso extends ModelBase
             return false;
         }
         
-        $NicknameMd5Obj = new NicknameMd5();
-        if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
-            $nickName = "xiaoningmeng_" . rand(1000, 9999) . time();
-        }
-        
         $qqUserInfo = $this->getQqInfo($qc);
         if (empty($qqUserInfo)) {
             return false;
@@ -143,6 +138,11 @@ class Sso extends ModelBase
             return false;
         }
         
+        $NicknameMd5Obj = new NicknameMd5();
+        if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
+            $nickName .= "_" . $uid;
+        }
+        
         $sql = "insert into {$this->QQ_RELATION_TABLE_NAME} (openid,uid,accesstoken,addtime) values (?,?,?,?)";
         $st = $db->prepare($sql);
         $st->execute(array($openId, $uid, $accessToken, $addtime ));
@@ -162,12 +162,16 @@ class Sso extends ModelBase
         // 登录后的处理
         $actionlogobj = new ActionLog();
         $userimsiobj = new UserImsi();
-        $uimid = $userimsiobj->getUimid();
+        $uimid = $userimsiobj->getUimid($uid);
         MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_LOGIN);
         
         // add login log
         $loginlogobj = new UserLoginLog();
         $loginlogobj->addUserLoginLog($uid, getImsi());
+        
+        $content = "qqregister";
+        $alislsobj = new AliSlsUserActionLog();
+        $alislsobj->addRegisterActionLog($uimid, $uid, $content, getClientIp(), $addtime);
         
         $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         return $return;
@@ -195,7 +199,7 @@ class Sso extends ModelBase
         // 登录后的处理
         $actionlogobj = new ActionLog();
         $userimsiobj = new UserImsi();
-        $uimid = $userimsiobj->getUimid();
+        $uimid = $userimsiobj->getUimid($uid);
         MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_LOGIN);
         
         // add login log
@@ -207,7 +211,7 @@ class Sso extends ModelBase
     
     
     /**
-     * 用于报警规则测试
+     * 手机号登陆，同时用于报警规则测试
      * @param S $username
      * @param S $password
      * @return boolean|mixed
@@ -245,6 +249,40 @@ class Sso extends ModelBase
         $ssoobj->setSsoCookie($passportdata, $userinfo);
         
         return $userinfo;
+    }
+    
+    // 后台手机号注册
+    public function phonereg($username, $nickname, $password)
+    {
+        if (empty($username) || empty($nickname) || empty($password)) {
+            $this->setError(ErrorConf::paramError());
+            return false;
+        }
+        
+        $addtime = date('Y-m-d H:i:s');
+        $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+        
+        $password = md5($password . strrev(strtotime($addtime)));
+        $sql = "insert into `{$this->PASSPORT_TABLE_NAME}` (username, password, addtime) values (?, ?, ?)";
+        $st = $db->prepare($sql);
+        $st->execute(array($username, $password, $addtime));
+        $uid = $db->lastInsertId() + 0;
+        if ($uid == 0) {
+            return false;
+        }
+        
+        $NicknameMd5Obj = new NicknameMd5();
+        if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
+            $nickName .= "_" . $uid;
+        }
+        
+        $avatartime = 0;
+        $birthday = date("Y-m-d");
+        $UserObj = new User();
+        $type = $UserObj->TYPE_PH;
+        $UserObj->initUser($uid, $nickname, $avatartime, $birthday, 0, "", "", $type, $addtime);
+        
+        return $uid;
     }
     
     

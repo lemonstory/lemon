@@ -9,7 +9,7 @@ function Aliyun_Sls_PHP_Client_Autoload($className) {
     if ($classPath[0] == 'Aliyun') {
         if(count($classPath)>4)
             $classPath = array_slice($classPath, 0, 3);
-        $filePath = dirname(__FILE__) . '/' . implode('/', $classPath) . '.php';
+        $filePath = API_LEMON_ROOT . '/libs/alisls/' . implode('/', $classPath) . '.php';
         if (file_exists($filePath))
             require_once($filePath);
     }

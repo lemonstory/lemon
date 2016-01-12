@@ -36,6 +36,7 @@ class mystory extends controller
             $albumids = array();
             $albumlist = array();
             $playloglist = array();
+            $playstoryids = array();
             foreach ($listenalbumres as $value) {
                 $albumids[] = $value['albumid'];
             }
@@ -44,32 +45,51 @@ class mystory extends controller
                 // 专辑列表
                 $albumobj = new Album();
                 $albumlist = $albumobj->getListByIds($albumids);
-                // 专辑收听总数
-                $albumlistennum = $listenobj->getAlbumListenNum($albumids);
-                // 专辑收藏总数
-                $albumfavnum = $favobj->getAlbumFavCount($albumids);
-                // 专辑评论总数
-                $commentobj = new Comment();
-                $albumcommentnum = $commentobj->countAlbumComment($albumids);
                 
                 // 专辑下最近播放的故事记录
                 $useralbumlogobj = new UserAlbumLog();
                 $playloglist = $useralbumlogobj->getPlayInfoByAlbumIds($albumids);
                 
-                // 专辑下，uid或设备收听的故事列表
-                //$listenstorylist = array();
-                //$listenstoryres = $listenobj->getUserListenStoryListByAlbumId($uimid, $albumids);
-                $albumidstr = implode(",", $albumids);
-                $albumstoryres = $storyobj->get_list("`album_id` IN ({$albumidstr})");
-                if (!empty($albumstoryres)) {
-                    foreach ($albumstoryres as $storyinfo) {
-                        $albumid = $storyinfo['album_id'];
-                        $storyinfo['playcover'] = "";
-                        if (!empty($storyinfo['cover'])) {
-                            //$storyinfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 100, $storyinfo['cover_time']);
-                            $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 230, $storyinfo['cover_time']);
+                if ($_SERVER['visitorappversion'] < "130000") {
+                    // 专辑收听总数
+                    $albumlistennum = $listenobj->getAlbumListenNum($albumids);
+                    // 专辑收藏总数
+                    $albumfavnum = $favobj->getAlbumFavCount($albumids);
+                    // 专辑评论总数
+                    $commentobj = new Comment();
+                    $albumcommentnum = $commentobj->countAlbumComment($albumids);
+                    
+                    // 专辑下，uid或设备收听的故事列表
+                    $albumidstr = implode(",", $albumids);
+                    $albumstoryres = $storyobj->get_list("`album_id` IN ({$albumidstr})");
+                    if (!empty($albumstoryres)) {
+                        foreach ($albumstoryres as $storyinfo) {
+                            $albumid = $storyinfo['album_id'];
+                            $storyinfo['playcover'] = "";
+                            if (!empty($storyinfo['cover'])) {
+                                $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 230, $storyinfo['cover_time']);
+                            }
+                            $storylist[$albumid][] = $storyinfo;
                         }
-                        $storylist[$albumid][] = $storyinfo;
+                    }
+                } else {
+                    if (!empty($playloglist)) {
+                        foreach ($playloglist as $value) {
+                            $playstoryids[] = $value['storyid'];
+                        }
+                        $playstoryids = array_unique($playstoryids);
+                        $playstoryidstr = implode(",", $playstoryids);
+                        $albumstoryres = $storyobj->get_list("`id` IN ({$playstoryidstr})");
+                        if (!empty($albumstoryres)) {
+                            foreach ($albumstoryres as $storyinfo) {
+                                $albumid = $storyinfo['album_id'];
+                                $storyinfo['playcover'] = "";
+                                if (!empty($storyinfo['cover'])) {
+                                    $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 230, $storyinfo['cover_time']);
+                                }
+                                $storylist[$albumid] = $storyinfo;
+                            }
+                        }
                     }
                 }
             }
@@ -81,7 +101,7 @@ class mystory extends controller
                 }
                 // 专辑收听历史更新时间
                 $value['listenalbumuptime'] = date("Y-m-d H:i:s", $value['uptime']);
-                $value['playstoryid'] = 0;
+                $value['playstoryid'] = $value['playtimes'] = 0;
                 if (!empty($playloglist[$albumid])) {
                     $value['playstoryid'] = $playloglist[$albumid]['storyid'] + 0;
                     $value['playtimes'] = $playloglist[$albumid]['playtimes'] + 0;
@@ -92,22 +112,28 @@ class mystory extends controller
                     $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 100, $albuminfo['cover_time']);
                 }
                 
-                $albuminfo['listennum'] = 0;
-                if (!empty($albumlistennum[$albumid])) {
-                    $albuminfo['listennum'] = $albumlistennum[$albumid]['num'] + 0;
-                }
-                $albuminfo['favnum'] = 0;
-                if (!empty($albumfavnum[$albumid])) {
-                    $albuminfo['favnum'] = $albumfavnum[$albumid]['num'] + 0;
-                }
-                $albuminfo['commentnum'] = 0;
-                if (!empty($albumcommentnum[$albumid])) {
-                    $albuminfo['commentnum'] = $albumcommentnum[$albumid] + 0;
-                }
-                
-                $albuminfo['storylist'] = array();
-                if (!empty($storylist[$albumid])) {
-                    $albuminfo['storylist'] = $storylist[$albumid];
+                if ($_SERVER['visitorappversion'] < "130000") {
+                    $albuminfo['listennum'] = 0;
+                    if (!empty($albumlistennum[$albumid])) {
+                        $albuminfo['listennum'] = $albumlistennum[$albumid]['num'] + 0;
+                    }
+                    $albuminfo['favnum'] = 0;
+                    if (!empty($albumfavnum[$albumid])) {
+                        $albuminfo['favnum'] = $albumfavnum[$albumid]['num'] + 0;
+                    }
+                    $albuminfo['commentnum'] = 0;
+                    if (!empty($albumcommentnum[$albumid])) {
+                        $albuminfo['commentnum'] = $albumcommentnum[$albumid] + 0;
+                    }
+                    $albuminfo['storylist'] = array();
+                    if (!empty($storylist[$albumid])) {
+                        $albuminfo['storylist'] = $storylist[$albumid];
+                    }
+                } else {
+                    $albuminfo['storyinfo'] = array();
+                    if (!empty($storylist[$albumid])) {
+                        $albuminfo['storyinfo'] = $storylist[$albumid];
+                    }
                 }
                 
                 $value['albuminfo'] = $albuminfo;

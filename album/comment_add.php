@@ -39,20 +39,27 @@ class comment_add extends controller
         if (!$albuminfo) {
         	return $this->showErrorJson(ErrorConf::albumInfoIsEmpty());
         }
+        $addtime = date('Y-m-d H:i:s');
 
         $comment = new Comment();
-        $res = $comment->insert(array(
+        $commentid = $comment->insert(array(
         	'userid'     => $uid,
         	'albumid'    => $albumid,
             'content'    => $content,
         	'star_level' => $star_level,
-        	'addtime'    => date('Y-m-d H:i:s'),
+        	'addtime'    => $addtime,
         ));
         // 更新星级
         $star_level = $comment->getStarLevel($albumid);
         $album = new Album();
         $album->update(array('star_level' => $star_level), " `id`={$albumid} ");
 
+        // add sls comment log
+        $userimsiobj = new UserImsi();
+        $uimid = $userimsiobj->getUimid($uid);
+        $alislsobj = new AliSlsUserActionLog();
+        $alislsobj->addCommentAlbumActionLog($uimid, $uid, $commentid, $albumid, $content, getClientIp(), $addtime, $star_level);
+        
         $this->showSuccJson();
     }
 }

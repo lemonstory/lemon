@@ -15,9 +15,10 @@ class AliSlsUserActionLog extends AliSls
     public $ACTION_FAV_ALBUM = 'favalbum';
     public $ACTION_DOWNLOAD_STORY = 'downloadstory';
     public $ACTION_LISTEN_STORY = 'listenstory';
+    public $ACTION_REGISTER = 'register';
     
     public $ACTION_LIST = array(
-            "commentalbum", "favalbum", "downloadstory", "listenstory"
+            "commentalbum", "favalbum", "downloadstory", "listenstory", "register"
             );
     
     public function __construct()
@@ -31,7 +32,7 @@ class AliSlsUserActionLog extends AliSls
      * @param S $day    "2015-01-01"
      * @param S $hour   "03"
      */
-    public function favAlbumNumHour($day, $hour)
+    public function favAlbumCountHour($day, $hour)
     {
         $starttime = strtotime("{$day} {$hour}:00:00");
         $endtime = strtotime("{$day} {$hour}:59:59");
@@ -40,15 +41,156 @@ class AliSlsUserActionLog extends AliSls
         $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
         return $res;
     }
-    
+    public function listenStoryCountHour($day, $hour)
+    {
+        $starttime = strtotime("{$day} {$hour}:00:00");
+        $endtime = strtotime("{$day} {$hour}:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_LISTEN_STORY}";
+        $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        return $res;
+    }
+    public function downloadStoryCountHour($day, $hour)
+    {
+        $starttime = strtotime("{$day} {$hour}:00:00");
+        $endtime = strtotime("{$day} {$hour}:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_DOWNLOAD_STORY}";
+        $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        return $res;
+    }
+    public function commentAlbumCountHour($day, $hour)
+    {
+        $starttime = strtotime("{$day} {$hour}:00:00");
+        $endtime = strtotime("{$day} {$hour}:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_COMMENT_ALBUM}";
+        $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        return $res;
+    }
+    public function registerCountHour($day, $hour)
+    {
+        $starttime = strtotime("{$day} {$hour}:00:00");
+        $endtime = strtotime("{$day} {$hour}:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_REGISTER}";
+        $res = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        return $res;
+    }
     
     
     /**
-     * 统计单日评论总量、被评论主题数、评论人数
-     * @param S $day
-     * @return array    
+     * 统计一天的收藏量、收藏人数
+     * @param S $day    "2015-01-01"
      */
-    /* public function commentDayToUserTopicCount($day)
+    public function favAlbumCountDay($day)
+    {
+        set_time_limit(0);
+        $starttime = strtotime("{$day} 00:00:00");
+        $endtime = strtotime("{$day} 23:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_FAV_ALBUM}";
+        $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        
+        $usercount = 0;
+        $list = array();
+        $actionuids = array();
+        if (!empty($count)) {
+            $line = 100;
+            for ($offset = 0; $offset <= $count; $offset += $line) {
+                $list = $this->getActionLogList($starttime, $endtime, $topic, $query, $line, $offset);
+                if (!empty($list)) {
+                    foreach ($list as $value) {
+                        $actionuids[] = $value['contents']['actionuid'];
+                    }
+                    $actionuids = array_unique($actionuids);
+                }
+            }
+            if (!empty($actionuids)) {
+                $usercount = count($actionuids);
+            }
+        }
+        return array("favcount" => $count, "usercount" => $usercount);
+    }
+    
+    // 统计一天的收听故事量、收听人数、收听专辑数
+    public function listenStoryCountDay($day)
+    {
+        set_time_limit(0);
+        $starttime = strtotime("{$day} 00:00:00");
+        $endtime = strtotime("{$day} 23:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_LISTEN_STORY}";
+        $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        
+        $usercount = 0;
+        $albumcount = 0;
+        $list = array();
+        $actionuimids = array();
+        $albumids = array();
+        if (!empty($count)) {
+            $line = 100;
+            for ($offset = 0; $offset <= $count; $offset += $line) {
+                $list = $this->getActionLogList($starttime, $endtime, $topic, $query, $line, $offset);
+                if (!empty($list)) {
+                    foreach ($list as $value) {
+                        $actionuimids[] = $value['contents']['actionuimid'];
+                        $albumids[] = $value['contents']['beactionid'];
+                    }
+                    $actionuimids = array_unique($actionuimids);
+                    $albumids = array_unique($albumids);
+                }
+            }
+            if (!empty($actionuimids)) {
+                $usercount = count($actionuimids);
+            }
+            if (!empty($albumids)) {
+                $albumcount = count($albumids);
+            }
+        }
+        return array("listencount" => $count, "usercount" => $usercount, "albumcount" => $albumcount);
+    }
+    
+    // 统计一天的下载故事量、下载人数、下载专辑数
+    public function downloadStoryCountDay($day)
+    {
+        set_time_limit(0);
+        $starttime = strtotime("{$day} 00:00:00");
+        $endtime = strtotime("{$day} 23:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_DOWNLOAD_STORY}";
+        $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        
+        $usercount = 0;
+        $albumcount = 0;
+        $list = array();
+        $actionuimids = array();
+        $albumids = array();
+        if (!empty($count)) {
+            $line = 100;
+            for ($offset = 0; $offset <= $count; $offset += $line) {
+                $list = $this->getActionLogList($starttime, $endtime, $topic, $query, $line, $offset);
+                if (!empty($list)) {
+                    foreach ($list as $value) {
+                        $actionuimids[] = $value['contents']['actionuimid'];
+                        $albumids[] = $value['contents']['beactionid'];
+                    }
+                    $actionuimids = array_unique($actionuimids);
+                    $albumids = array_unique($albumids);
+                }
+            }
+            if (!empty($actionuimids)) {
+                $usercount = count($actionuimids);
+            }
+            if (!empty($albumids)) {
+                $albumcount = count($albumids);
+            }
+        }
+        return array("downloadcount" => $count, "usercount" => $usercount, "albumcount" => $albumcount);
+    }
+    
+    // 统计一天的评论数、评论人数、被评论的专辑数
+    public function commentAlbumCountDay($day)
     {
         set_time_limit(0);
         $starttime = strtotime("{$day} 00:00:00");
@@ -57,10 +199,11 @@ class AliSlsUserActionLog extends AliSls
         $query = "action:{$this->ACTION_COMMENT_ALBUM}";
         $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
         
-        $topiccount = 0;
+        $usercount = 0;
+        $albumcount = 0;
         $list = array();
         $actionuids = array();
-        $topicids = array();
+        $albumids = array();
         if (!empty($count)) {
             $line = 100;
             for ($offset = 0; $offset <= $count; $offset += $line) {
@@ -68,27 +211,39 @@ class AliSlsUserActionLog extends AliSls
                 if (!empty($list)) {
                     foreach ($list as $value) {
                         $actionuids[] = $value['contents']['actionuid'];
-                        $topicids[] = $value['contents']['beactionid'];
+                        $albumids[] = $value['contents']['beactionid'];
                     }
                     $actionuids = array_unique($actionuids);
-                    $topicids = array_unique($topicids);
+                    $albumids = array_unique($albumids);
                 }
             }
             if (!empty($actionuids)) {
                 $usercount = count($actionuids);
             }
-            if (!empty($topicids)) {
-                $topiccount = count($topicids);
+            if (!empty($albumids)) {
+                $albumcount = count($albumids);
             }
         }
-        return array("commentcount" => $count, "topiccount" => $topiccount, "usercount" => $usercount);
-    } */
+        return array("commentcount" => $count, "usercount" => $usercount, "albumcount" => $albumcount);
+    }
+    
+    // 统计一天的注册人数
+    public function registerCountDay($day)
+    {
+        set_time_limit(0);
+        $starttime = strtotime("{$day} 00:00:00");
+        $endtime = strtotime("{$day} 23:59:59");
+        $topic = "";
+        $query = "action:{$this->ACTION_REGISTER}";
+        $count = $this->getActionLogCount($starttime, $endtime, $topic, $query);
+        return array("regcount" => $count);
+    }
     
     
     // 添加评论专辑log
-    public function addCommentAlbumActionLog($uimid, $uid, $commentid, $albumid, $content, $ip, $addtime)
+    public function addCommentAlbumActionLog($uimid, $uid, $commentid, $albumid, $content, $ip, $addtime, $starlevel)
     {
-        return $this->putActionLog($uimid, $uid, $this->ACTION_COMMENT_ALBUM, $commentid, $albumid, "", $content, $ip, $addtime);
+        return $this->putActionLog($uimid, $uid, $this->ACTION_COMMENT_ALBUM, $commentid, $albumid, "", $content, $ip, $addtime, $starlevel);
     }
     // 添加收藏专辑log
     public function addFavAlbumActionLog($uimid, $uid, $favid, $albumid, $ip, $addtime)
@@ -110,6 +265,11 @@ class AliSlsUserActionLog extends AliSls
     {
         return $this->putActionLog($uimid, $uid, $this->ACTION_DOWNLOAD_STORY, $downloadid, $storyid, $albumid, "", $ip, $addtime);
     }
+    // 添加用户注册log
+    public function addRegisterActionLog($uimid, $uid, $content, $ip, $addtime)
+    {
+        return $this->putActionLog($uimid, $uid, $this->ACTION_REGISTER, $uid, "", "", $content, $ip, $addtime);
+    }
     
     
     /**
@@ -129,14 +289,15 @@ class AliSlsUserActionLog extends AliSls
      *     ext3
      *     
      * commentalbum:
-     *     value: empty|uid|commentalbum|commentid|albumid|empty|content|ip|addtime
+     *     value: empty|uid|commentalbum|commentid|albumid|empty|content|ip|addtime|starlevel
      * favalbum:
      *     value: empty|uid|favalbum|favid|albumid|empty|empty|ip|addtime
      * listenstory
      *     value: uimid|uid|listenstory|listenid|storyid|albumid|empty|ip|addtime
      * downloadstory
      *     value: uimid|uid|downloadstory|downloadid|storyid|albumid|empty|ip|addtime
-     * 
+     * register
+     *     value: uimid|uid|register|uid|empty|empty|empty|ip|addtime
      */
     private function putActionLog(
             $actionuimid = "", $actionuid = "", $action, $actionid = "", $beactionid = "", $routeid = "", $content = "", $ip = "", $addtime = "",

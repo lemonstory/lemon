@@ -84,7 +84,7 @@ class Comment extends ModelBase
     public function getStarLevel($albumid)
     {
         $db = DbConnecter::connectMysql('share_comment');
-        $sql = "SELECT sum(star_level) as star_sum from {$this->table} where `albumid`={$albumid}";
+        $sql = "SELECT sum(star_level) as star_sum from {$this->table} where `albumid`={$albumid} and status=1";
         $st = $db->query($sql);
         $st->setFetchMode(PDO::FETCH_ASSOC);
         $r  = $st->fetchAll();
@@ -209,7 +209,7 @@ class Comment extends ModelBase
     }
 
     // 获取评论列表
-    public function get_comment_list($where = '', $order_by = '', , $direction = "down", $startid = 0, $len = 20)
+    public function get_comment_list($where = '', $order_by = '', $direction = "down", $startid = 0, $len = 20)
     {
         $arr = explode('=', $where);
         $albumid = 0;
@@ -217,7 +217,7 @@ class Comment extends ModelBase
             $albumid = $arr[1];
         }
         // 读缓存
-        $key = RedisKey::getAlbumCommentListKey($albumid);
+        $key = RedisKey::getAlbumCommentListKey(func_get_args());
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisData = $redisobj->get($key);
         if ($redisData) {
@@ -258,7 +258,12 @@ class Comment extends ModelBase
             $new_comment_info['uname'] = '匿名用户';
             $new_comment_info['avatartime'] = 0;
         }
-        $new_comment_info['start_level'] = $comment_info['star_level'];
+        // 星级如果大于5显示5
+        if ($comment_info['star_level'] > 5) {
+            $new_comment_info['start_level'] = 5;
+        } else {
+            $new_comment_info['start_level'] = $comment_info['star_level'];
+        }
         $new_comment_info['addtime'] = $comment_info['addtime'];
         $new_comment_info['comment'] = $comment_info['content'];
         return $new_comment_info;

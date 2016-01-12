@@ -28,7 +28,7 @@ class Cron extends ModelBase
         
         foreach ($this->AGE_TYPE_LIST as $babyagetype) {
             $albumkey = RedisKey::getRankListenAlbumKey($babyagetype);
-            $albumidlist = $redisobj->zRevRange($albumkey, $start, $len - 1);
+            $albumidlist = $redisobj->zRevRange($albumkey, $start, $start + $len - 1);
             if (empty($albumidlist)) {
                 continue;
             }

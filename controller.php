@@ -18,7 +18,7 @@ abstract class controller
         $this->checkImsiInfo();
         $this->getActionData();
         $this->checkFilters();
-        //$this->getAppVertion();
+        $this->getAppVertion();
         $this->action();
     }
     
@@ -42,35 +42,28 @@ abstract class controller
     
     protected function getAppVertion()
     {
-    	$userAgent = @$_SERVER['HTTP_USER_AGENT'];
-    	if($userAgent!="")
-    	{
-	    	$agentArr = explode('/', $userAgent);
-	    	$version = str_pad(str_replace('.', '', @$agentArr[1]),9,0)+0;
-	    	if($version==0)
-	    	{
-	    		$version=1610000;
-	    	}
-	    	if($version>0)
-	    	{
-	    		$_SERVER['visitorappversion'] = $version;
-	    	}
-    	}
-    	if(isset($_GET['visitorappversion']))
-    	{
-    		$version = str_pad(str_replace('.', '', @$_GET['visitorappversion']),9,0)+0;
-    		$_SERVER['visitorappversion'] = $version;
-    	}
+        $userAgent = @$_SERVER['HTTP_USER_AGENT'];
+        if ($userAgent != "") {
+            $agentArr = explode('/', $userAgent);
+            $version = str_pad(str_replace('.', '', @$agentArr[1]), 6, 0) + 0;
+            if ($version > 0) {
+                $_SERVER['visitorappversion'] = $version;
+            }
+        }
+        if (isset($_GET['visitorappversion'])) {
+            $version = str_pad(str_replace('.', '', @$_GET['visitorappversion']), 6, 0) + 0;
+            $_SERVER['visitorappversion'] = $version;
+        }
     }
     
     
     protected function getSmartyObj()
     {
-        include_once SERVER_ROOT.'libs/smarty/Smarty.class.php';
-        $smarty					 	= new Smarty();
-        $smarty->template_dir   	= SERVER_ROOT."view/html/";
-        $smarty->compile_dir 		= SERVER_ROOT."view/templates_c/";
-        $smarty->cache_dir   		= SERVER_ROOT."view/cache/";
+        include_once SERVER_ROOT . 'libs/smarty/Smarty.class.php';
+        $smarty = new Smarty();
+        $smarty->template_dir = SERVER_ROOT . "view/html/";
+        $smarty->compile_dir = SERVER_ROOT . "view/templates_c/";
+        $smarty->cache_dir = SERVER_ROOT . "view/cache/";
         return $smarty;
     }
     
@@ -101,12 +94,10 @@ abstract class controller
         $params = array();
         if (!empty($querys)){
             $queryParts = explode('&', $querys);
-            foreach ($queryParts as $param)
-            {
-            	if($param=="")
-            	{
-            		continue;
-            	}
+            foreach ($queryParts as $param) {
+                if ($param == "") {
+                    continue;
+                }
                 $item = explode('=', $param);
                 $params[$item[0]] = $item[1];
             }
@@ -181,21 +172,21 @@ abstract class controller
     
     public function commonHumanTime($time)
     {
-		$dur = time() - $time;
-		if ($dur < 60) {
-			return $dur.$_SERVER['morelanguage']['sec'];
-		} elseif ($dur < 3600) {
-			return floor ( $dur / 60 ) . $_SERVER['morelanguage']['mins'];
-		} elseif ($time > mktime ( 0, 0, 0 )) {
-			return $_SERVER['morelanguage']['today'] . date ( 'H:i', $time );
-		} elseif ($time > mktime ( 0, 0, 0 )-86400) {
-			return $_SERVER['morelanguage']['yesterday'] . date ( 'H:i', $time );
-		} elseif ($time > mktime ( 0, 0, 0 )-172800 ){
-			return $_SERVER['morelanguage']['tfyesterday'] . date ( 'H:i', $time );
-		}elseif ($time > mktime ( 0, 0, 0)-86400*365){
-			return date ( 'm-d H:i', $time );
-		}else {
-			return date ( 'Y-m-d', $time );
-		}
+        $dur = time() - $time;
+        if ($dur < 60) {
+            return $dur . $_SERVER['morelanguage']['sec'];
+        } elseif ($dur < 3600) {
+            return floor($dur / 60) . $_SERVER['morelanguage']['mins'];
+        } elseif ($time > mktime(0, 0, 0)) {
+            return $_SERVER['morelanguage']['today'] . date('H:i', $time);
+        } elseif ($time > mktime(0, 0, 0) - 86400) {
+            return $_SERVER['morelanguage']['yesterday'] . date('H:i', $time);
+        } elseif ($time > mktime(0, 0, 0) - 172800) {
+            return $_SERVER['morelanguage']['tfyesterday'] . date('H:i', $time);
+        } elseif ($time > mktime(0, 0, 0) - 86400 * 365) {
+            return date('m-d H:i', $time);
+        } else {
+            return date('Y-m-d', $time);
+        }
     }
 }

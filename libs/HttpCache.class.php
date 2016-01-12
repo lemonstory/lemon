@@ -26,26 +26,27 @@ class HttpCache
         if (empty($cacheConf)) {
             return false;
         }
+        
         // @huqq
-        $logFile = '/alidata1/rc.log';
+        /* $logFile = '/alidata1/rc.log';
         $fp = @fopen($logFile, 'a+');
         $logContent = '';
         $now = time();
-        $a = strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']);
+        $a = strtotime(@$_SERVER['HTTP_IF_MODIFIED_SINCE']); */
         
         $cacheKey = $this->getKey($cacheConf['action'], $cacheConf['params']);
         $modifiedTime = $this->getModifiedTime($cacheKey, $cacheConf);
         
         if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && 
-            (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) == $modifiedTime))
+            (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $modifiedTime))
         {
-            @fwrite($fp, "304 => httptime_{$a} => now_$now \n");
+            //@fwrite($fp, "304 => action=>{$cacheConf['action']}##serverTime=>{$modifiedTime}##clienttime_{$a} => now_$now \n");
             // Client's cache IS current, so we just respond '304 Not Modified'.
             header('Cache-Control: '.'max-age='.@$cacheConf['cachetime'].', public', true);
             header('Last-Modified: '.gmdate('D, d M Y H:i:s', $modifiedTime).' GMT', true, 304);
             exit;
         } else {
-            @fwrite($fp, "200 => httptime_{$a} => now_$now \n");
+            //@fwrite($fp, "200 => action=>{$cacheConf['action']}##serverTime=>{$modifiedTime}##clienttime_{$a} => now_$now \n");
             // Image not cached or cache outdated, we respond '200 OK' and output the image.
             header('Cache-Control: '.'max-age='.@$cacheConf['cachetime'].', public', true);
             header('Last-Modified: '.gmdate('D, d M Y H:i:s', $modifiedTime).' GMT', true, 200);
@@ -82,10 +83,11 @@ class HttpCache
         }
         
         // 所有url请求都需要携带visituid=当前访问Uid, 未登录为空
-        array_unshift($cacheConf['params'], "visituid");
+        //array_unshift($cacheConf['params'], "visituid");
         
+        $actionParams = array();
         foreach ($cacheConf['params'] as $value){
-            $actionParams[$value] = $actionData['params'][$value];
+            $actionParams[$value] = @$actionData['params'][$value];
         }
         $cacheConf['params'] = $actionParams;
         
@@ -101,9 +103,9 @@ class HttpCache
      */
     protected function getModifiedTime($key, $cacheConf)
     {
-        $modifiedtime = time();
+        $nowtime = time();
         if (empty($key)){
-            return $modifiedtime;
+            return $nowtime;
         }
         
         $expire = 0;
@@ -117,7 +119,8 @@ class HttpCache
         $modifiedTime = $redisobj->get($key);
         if (empty($modifiedTime)){
             if (!empty($expire)){
-                $this->setModifiedTime($key, $modifiedtime, $expire);
+                $this->setModifiedTime($key, $nowtime, $expire);
+                return $nowtime;
             }
         }
         return $modifiedTime;

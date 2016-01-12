@@ -96,11 +96,6 @@ class WechatSso extends Sso
             return false;
         }
         
-        $NicknameMd5Obj = new NicknameMd5();
-        if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
-            $nickName = "xiaoningmeng_" . rand(1000, 9999) . time();
-        }
-        
         $wechatinfo = $this->getWechatInfo($accessToken, $openId);
         if (empty($wechatinfo)) {
             return false;
@@ -122,6 +117,11 @@ class WechatSso extends Sso
             return false;
         }
         
+        $NicknameMd5Obj = new NicknameMd5();
+        if ($NicknameMd5Obj->checkNameIsExist($nickName)) {
+            $nickName .= "_" . $uid;
+        }
+        
         $sql = "insert into {$this->WECHAT_RELATION_TABLE_NAME} (openid,uid,accesstoken,addtime) values (?,?,?,?)";
         $st = $db->prepare($sql);
         $st->execute(array($openId, $uid, $accessToken, $addtime ));
@@ -141,12 +141,16 @@ class WechatSso extends Sso
         // 登录后的处理
         $actionlogobj = new ActionLog();
         $userimsiobj = new UserImsi();
-        $uimid = $userimsiobj->getUimid();
+        $uimid = $userimsiobj->getUimid($uid);
         MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_LOGIN);
         
         // add login log
         $loginlogobj = new UserLoginLog();
         $loginlogobj->addUserLoginLog($uid, getImsi());
+        
+        $content = "wechatregister";
+        $alislsobj = new AliSlsUserActionLog();
+        $alislsobj->addRegisterActionLog($uimid, $uid, $content, getClientIp(), $addtime);
         
         $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         return $return;
@@ -174,7 +178,7 @@ class WechatSso extends Sso
         // 登录后的处理
         $actionlogobj = new ActionLog();
         $userimsiobj = new UserImsi();
-        $uimid = $userimsiobj->getUimid();
+        $uimid = $userimsiobj->getUimid($uid);
         MnsQueueManager::pushActionLogQueue($uimid, $uid, $actionlogobj->ACTION_TYPE_LOGIN);
         
         // add login log

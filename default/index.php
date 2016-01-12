@@ -112,13 +112,25 @@ class index extends controller
 		$focuspiclist = array();
 		$focusres = $recommendobj->getFocusList(6);
 		if (!empty($focusres)) {
-		    $aliossobj = new AliOss();
 		    foreach ($focusres as $value) {
 		        $focusinfo['cover'] = $aliossobj->getFocusUrl($value['id'], $value['covertime'], 1);
 		        $focusinfo['linktype'] = $value['linktype'];
 		        $focusinfo['linkurl'] = $value['linkurl'];
 		        $focuspiclist[] = $focusinfo;
 		    }
+		}
+		
+		// 一级标签列表
+		$firsttaglist = array();
+		if ($_SERVER['visitorappversion'] >= "130000") {
+    		$tagnewobj = new TagNew();
+    		$firsttagres = $tagnewobj->getFirstTagList(8);
+    		if (!empty($firsttagres)) {
+    		    foreach ($firsttagres as $value) {
+    		        $value['cover'] = "";
+    		        $firsttaglist[] = $value;
+    		    }
+    		}
 		}
 		
 		// 私人订制
@@ -129,6 +141,7 @@ class index extends controller
 			"hotrecommend" => $hotrecommendlist,
 			"samgeage" => $sameagealbumlist,
 			"newalbum" => $newalbumlist,
+	        "firsttag" => $firsttaglist
 		);
 		$this->showSuccJson($data);
 	}

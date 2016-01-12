@@ -2,8 +2,8 @@
 /*
  * 日志服务
  */
-require_once SERVER_ROOT . "libs/alisls/config.php";
-require_once SERVER_ROOT . "libs/alisls/Sls_Autoload.php";
+require_once API_LEMON_ROOT . "libs/alisls/config.php";
+require_once API_LEMON_ROOT . "libs/alisls/Sls_Autoload.php";
 
 class AliSls
 {

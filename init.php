@@ -3,6 +3,7 @@ header("Content-type: text/html; charset=utf-8");
 //error_reporting(E_ALL ^ E_NOTICE);
 date_default_timezone_set('PRC');
 define("SERVER_ROOT", dirname(__FILE__)."/");
+define("API_LEMON_ROOT", dirname(__FILE__)."/");
 if (DIRECTORY_SEPARATOR == '/'){
     define("MANAGE_ROOT", dirname(SERVER_ROOT)."/manage.xiaoningmeng.net/");
 } else {
