@@ -148,6 +148,9 @@ class Sso extends ModelBase
         $st->execute(array($openId, $uid, $accessToken, $addtime ));
         
         $NicknameMd5Obj->addOne($nickName, $uid);
+
+        //ucenter注册
+        $this->uCenterReg($uid,$nickName,$qquserpasword);
         
         $avatartime = 0;
         $UserObj = new User();
@@ -157,6 +160,12 @@ class Sso extends ModelBase
         
         if ($qqavatar != "") {
             MnsQueueManager::pushLoadUserQqavatar($uid, $qqavatar);
+        }
+
+        //uc各个app同步登录
+        $ucsynlogin = uc_user_synlogin($uid);
+        if(empty($ucsynlogin)) {
+            //TODO:记录错误日志
         }
         
         // 登录后的处理
@@ -193,8 +202,18 @@ class Sso extends ModelBase
         $passportdata = $this->getInfoWithUid($uid);
         $UserObj = new User();
         $userinfo = current($UserObj->getUserInfo($uid, 1));
-        
+        //ucenter登录
+        $isuid = 1;
+        list($status, $username, $password, $email, $merge) = uc_user_login($uid,$passportdata['password'],$isuid);
+        if($status < 0 ) {
+            //TODO:记录错误日志
+        }
         $this->setSsoCookie($passportdata, $userinfo);
+        //uc各个app同步登录
+        $ucsynlogin = uc_user_synlogin($uid);
+        if(empty($ucsynlogin)) {
+            //TODO:记录错误日志
+        }
         
         // 登录后的处理
         $actionlogobj = new ActionLog();
@@ -294,6 +313,13 @@ class Sso extends ModelBase
         unset($this->cookies['al']);
         setcookie('us', '', time() - 86400, '/', $domain);
         setcookie('al', '', time() - 86400, '/', $domain);
+        //TODO:cookie名称待确定
+        setcookie('Example_auth', '', time() - 86400, '/', $domain);
+        //uc各个app同步退出
+        $ucsynlogout = uc_user_synlogout();
+        if(empty($ucsynlogout)) {
+            //TODO:记录错误日志
+        }
         return true;
     }
     
@@ -451,6 +477,10 @@ class Sso extends ModelBase
         setcookie('us', $this->makeCookie($R, 'us'), time() + 60 * 86400, '/', $domain, false, true);
         setcookie('ui', $this->makeCookie($R, 'ui'), time() + 60 * 86400, '/', $domain, false, false);
         setcookie('al', $this->makeCookie($R, 'al'), time() + 60 * 86400, '/', $domain, false, true);
+
+        //ucenter,cookie设置
+        //TODO:cookie名称待确定
+        setcookie('Example_auth', uc_authcode($passportdata['uid']."\t".$userinfo['nickname'], 'ENCODE'), time() + 60 * 86400, '/', $domain, false, true);
     }
     
     public function setCsrfCookie($csrftoken)
@@ -561,6 +591,25 @@ class Sso extends ModelBase
             }
         } else {
             return $keyc . str_replace('=', '', base64_encode($result));
+        }
+    }
+
+    /**
+     * 集成ucenter用户注册
+     * @param $uid
+     * @param $username
+     * @param $password
+     */
+    public function uCenterReg($uid,$username,$password) {
+
+        $uc_uid = -1;
+        $isuid = 1;
+        if(!uc_get_user($uid,$isuid)) {
+            $uc_user = uc_user_register($uid,$username, $password);
+        }
+        if($uc_uid < 0) {
+
+            //TODO:记录错误日志
         }
     }
 }

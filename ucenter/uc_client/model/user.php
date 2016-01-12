@@ -85,7 +85,7 @@ class usermodel {
 	}
 
 	function check_usernameexists($username) {
-		$data = $this->db->result_first("SELECT username FROM ".UC_DBTABLEPRE."members WHERE username='$username'");
+		$data = $this->db->result_first("SELECT usernameadd_user FROM ".UC_DBTABLEPRE."members WHERE username='$username'");
 		return $data;
 	}
 
