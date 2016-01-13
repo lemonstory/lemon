@@ -6,6 +6,9 @@ class text extends controller
         /* $key = RedisKey::getQqLoginFirstKey("12533DC7E4738C7649395DB191903F2E");
         $redisObj = AliRedisConnecter::connRedis('cache');
         $cacheData = $redisObj->delete($key); */
+        $tagobj = new TagNew();
+        $list = $tagobj->getFirstTagList(10);
+        var_dump($list);
         die();
         
         

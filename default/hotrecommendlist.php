@@ -38,7 +38,7 @@ class hotrecommendlist extends controller
                     $secondtagids = array_unique($secondtagids);
                 }
             }
-            $hotrecommendres = $tagnewobj->getRecommendAlbumTagRelationList($secondtagids, 1, 0, 0, $p, $len);
+            $hotrecommendres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 1, 0, 0, $p, $len);
         }
         
         if (! empty($hotrecommendres)) {

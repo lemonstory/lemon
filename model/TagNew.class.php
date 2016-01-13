@@ -153,14 +153,16 @@ class TagNew extends ModelBase
     
     
     /**
-     * 获取指定标签下的专辑列表
-     * @param A $tagids       指定标签id数组
-     * @param I $isrecommend  是否为一级标签下，推荐的专辑
+     * 标签专辑列表：获取指定标签下的专辑列表
+     * @param A $tagids        指定标签id数组
+     * @param I $isrecommend   是否为一级标签下的推荐标签
+     * @param I $ishot         是否为一级标签下的热门标签
+     * @param I $isgoodcomment 是否为一级标签下的好评榜标签
      * @param S $direction    
      * @param I $startalbumid 
      * @param I $len
      */
-    public function getAlbumTagRelationList($tagids, $isrecommend = 0, $direction = "down", $startalbumid = 0, $len = 20)
+    public function getAlbumTagRelationListFromTag($tagids, $isrecommend = 0, $ishot = 0, $isgoodcomment = 0, $direction = "down", $startalbumid = 0, $len = 20)
     {
         if (empty($tagids)) {
             return array();
@@ -188,12 +190,18 @@ class TagNew extends ModelBase
         }
         $where .= "`tagid` IN ($tagidstr)";
         
+        $orderby = "";
         if ($isrecommend == 1) {
             $where .= " AND `isrecommend` = 1";
+            $orderby = "ORDER BY `uptime` DESC";
+        } elseif ($ishot == 1) {
+            $orderby = "ORDER BY `albumlistennum` DESC";
+        } elseif ($isgoodcomment == 1) {
+            $orderby = "ORDER BY `albumcommentnum` DESC";
         }
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} ORDER BY `albumid` DESC LIMIT {$len}";
+        $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} $orderby LIMIT {$len}";
         $selectst = $db->prepare($selectsql);
         $selectst->execute();
         $dbdata = $selectst->fetchAll(PDO::FETCH_ASSOC);
@@ -206,16 +214,16 @@ class TagNew extends ModelBase
     
     
     /**
-     * 获取热门推荐、最新上架、同龄在听列表
+     * 获取热门推荐、最新上架、同龄在听，指定标签的专辑列表
      * @param I $tagids        指定标签下的热门推荐列表，若为"全部"时,tagids是所有一级标签数组
-     * @param I $isrecommend   是否热门推荐列表
-     * @param I $issameage     是否同龄在听推荐列表
-     * @param I $isnewonline   是否最新上架推荐列表
+     * @param I $isrecommend   是否热门推荐
+     * @param I $issameage     是否同龄在听
+     * @param I $isnewonline   是否最新上架
      * @param I $currentpage   加载第几个,默认为1表示从第一页获取
      * @param I $len           获取长度
      * @return array
      */
-    public function getRecommendAlbumTagRelationList($tagids, $isrecommend = 0, $issameage = 0, $isnewonline = 0, $currentpage = 1, $len = 20)
+    public function getAlbumTagRelationListFromRecommend($tagids, $isrecommend = 0, $issameage = 0, $isnewonline = 0, $currentpage = 1, $len = 20)
     {
         if (empty($isrecommend) && empty($issameage) && empty($isnewonline)) {
             return array();
