@@ -215,7 +215,7 @@ class TagNew extends ModelBase
     
     /**
      * 获取热门推荐、最新上架、同龄在听，指定标签的专辑列表
-     * @param I $tagids        指定标签下的热门推荐列表，若为"全部"时,tagids是所有一级标签数组
+     * @param I $tagids        指定标签下的热门推荐列表，若为"全部"时,tagids为空
      * @param I $isrecommend   是否热门推荐
      * @param I $issameage     是否同龄在听
      * @param I $isnewonline   是否最新上架

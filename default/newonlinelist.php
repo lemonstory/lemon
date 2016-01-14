@@ -4,14 +4,21 @@ class newonlinelist extends controller
 {
     public function action() 
     {
+        $currentfirsttagid = $this->getRequest("currentfirsttagid", 0);
+        $isgettag = $this->getRequest("isgettag", 1);
         $p = $this->getRequest("p", 1);
         $len = $this->getRequest("len", 20);
         
         $uid = $this->getUid();
         $albumids = array();
+        $albumlist = array();
+        $firsttaglist = array();
+        $secondtagids = array();
+        $listenobj = new Listen();
         $aliossobj = new AliOss();
-        
+        $tagnewobj = new TagNew();
         $babyagetype = 0;
+        
         if (!empty($uid)) {
             $userobj = new User();
             $userinfo = current($userobj->getUserInfo($uid, 1));
@@ -22,9 +29,27 @@ class newonlinelist extends controller
         }
         
         // 最新上架
-        $listenobj = new Listen();
-        $recommendobj = new Recommend();
-        $newonlineres = $recommendobj->getNewOnlineList($babyagetype, $p, $len);
+        if ($_SERVER['visitorappversion'] < "130000") {
+            $recommendobj = new Recommend();
+            $newonlineres = $recommendobj->getNewOnlineList($babyagetype, $p, $len);
+        } else {
+            if ($isgettag == 1) {
+                // 一级标签
+                $firsttaglist = $tagnewobj->getFirstTagList(8);
+            }
+            
+            if (!empty($currentfirsttagid)) {
+                // 获取当前一级标签下，前50个二级标签
+                $secondtaglist = $tagnewobj->getSecondTagList($currentfirsttagid, 50);
+                if (!empty($secondtaglist)) {
+                    foreach ($secondtaglist as $value) {
+                        $secondtagids[] = $value['id'];
+                    }
+                    $secondtagids = array_unique($secondtagids);
+                }
+            }
+            $newonlineres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 0, 0, 1, $p, $len);
+        }
         if (! empty($newonlineres)) {
             foreach ($newonlineres as $value) {
                 $albumids[] = $value['albumid'];
@@ -39,12 +64,14 @@ class newonlinelist extends controller
             $albumlist = $albumobj->getListByIds($albumids);
             // 专辑收听数
             $albumlistennum = $listenobj->getAlbumListenNum($albumids);
-            // 专辑收藏数
-            $favobj = new Fav();
-            $albumfavnum = $favobj->getAlbumFavCount($albumids);
-            // 专辑评论总数
-            $commentobj = new Comment();
-            $albumcommentnum = $commentobj->countAlbumComment($albumids);
+            if ($_SERVER['visitorappversion'] < "130000") {
+                // 专辑收藏数
+                $favobj = new Fav();
+                $albumfavnum = $favobj->getAlbumFavCount($albumids);
+                // 专辑评论总数
+                $commentobj = new Comment();
+                $albumcommentnum = $commentobj->countAlbumComment($albumids);
+            }
         }
         
         $newalbumlist = array();
@@ -60,20 +87,30 @@ class newonlinelist extends controller
                     if (! empty($albumlistennum[$albumid])) {
                         $albuminfo['listennum'] = $albumlistennum[$albumid]['num'] + 0;
                     }
-                    $albuminfo['favnum'] = 0;
-                    if (!empty($albumfavnum[$albumid])) {
-                        $albuminfo['favnum'] = $albumfavnum[$albumid]['num'] + 0;
-                    }
-                    $albuminfo['commentnum'] = 0;
-                    if (!empty($albumcommentnum[$albumid])) {
-                        $albuminfo['commentnum'] = $albumcommentnum[$albumid] + 0;
+                    if ($_SERVER['visitorappversion'] < "130000") {
+                        $albuminfo['favnum'] = 0;
+                        if (!empty($albumfavnum[$albumid])) {
+                            $albuminfo['favnum'] = $albumfavnum[$albumid]['num'] + 0;
+                        }
+                        $albuminfo['commentnum'] = 0;
+                        if (!empty($albumcommentnum[$albumid])) {
+                            $albuminfo['commentnum'] = $albumcommentnum[$albumid] + 0;
+                        }
                     }
                     $newalbumlist[] = $albuminfo;
                 }
             }
         }
         
-        $this->showSuccJson($newalbumlist);
+        if ($_SERVER['visitorappversion'] < "130000") {
+            $this->showSuccJson($newalbumlist);
+        } else {
+            $data = array(
+                "newonlinelist" => $newalbumlist,
+                "firsttaglist" => $firsttaglist
+            );
+            $this->showSuccJson($data);
+        }
     }
 }
 new newonlinelist();
