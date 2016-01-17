@@ -53,6 +53,9 @@ class comment_add extends controller
         $star_level = $comment->getStarLevel($albumid);
         $album = new Album();
         $album->update(array('star_level' => $star_level), " `id`={$albumid} ");
+        // 更新album_tag_relation的评论星级
+        $tagnewobj = new TagNew();
+        $tagnewobj->updateAlbumTagRelationCommentStarLevel($albumid, $star_level);
 
         // add sls comment log
         $userimsiobj = new UserImsi();
