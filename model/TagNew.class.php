@@ -197,7 +197,7 @@ class TagNew extends ModelBase
         } elseif ($ishot == 1) {
             $orderby = "ORDER BY `albumlistennum` DESC";
         } elseif ($isgoodcomment == 1) {
-            $orderby = "ORDER BY `albumcommentnum` DESC";
+            $orderby = "ORDER BY `commentstarlevel` DESC";
         }
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
@@ -332,17 +332,18 @@ class TagNew extends ModelBase
     /**
      * 更新所有标签中，指定专辑的收听总数
      * @param I $albumid
+     * @param I $num
      * @return boolean
      */
-    public function updateAlbumTagRelationListenNum($albumid)
+    public function updateAlbumTagRelationListenNum($albumid, $num)
     {
-        if (empty($albumid)) {
+        if (empty($albumid) || empty($num)) {
             $this->setError(ErrorConf::paramError());
             return false;
         }
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "UPDATE `{$this->ALBUM_TAG_RELATION_TABLE}` SET `albumlistennum` = `albumlistennum` + 1 WHERE `albumid` = ?";
+        $selectsql = "UPDATE `{$this->ALBUM_TAG_RELATION_TABLE}` SET `albumlistennum` = `albumlistennum` + $num WHERE `albumid` = ?";
         $selectst = $db->prepare($selectsql);
         $updateres = $selectst->execute(array($albumid));
         if (empty($updateres)) {

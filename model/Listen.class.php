@@ -302,7 +302,7 @@ class Listen extends ModelBase
 	    
 	    // 更新专辑在album_tag_relation的收听次数
 	    $tagnewobj = new TagNew();
-	    $tagnewobj->updateAlbumTagRelationListenNum($albumid);
+	    $tagnewobj->updateAlbumTagRelationListenNum($albumid, 1);
 	    
 	    if (!empty($babyagetype)) {
 	        // list: 更新某个年龄段的专辑收听次数排行队列
