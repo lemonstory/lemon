@@ -330,6 +330,31 @@ class TagNew extends ModelBase
     
     
     /**
+     * 更新所有标签中，指定专辑的收听总数
+     * @param I $albumid
+     * @return boolean
+     */
+    public function updateAlbumTagRelationListenNum($albumid)
+    {
+        if (empty($albumid)) {
+            $this->setError(ErrorConf::paramError());
+            return false;
+        }
+        
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "UPDATE `{$this->ALBUM_TAG_RELATION_TABLE}` SET `albumlistennum` = `albumlistennum` + 1 WHERE `albumid` = ?";
+        $selectst = $db->prepare($selectsql);
+        $updateres = $selectst->execute(array($albumid));
+        if (empty($updateres)) {
+            return false;
+        }
+        // clear cache
+        
+        return true;
+    }
+    
+    
+    /**
      * 添加标签记录
      * @param I $pid    是否有父级标签id
      * @param S $name   标签名称
