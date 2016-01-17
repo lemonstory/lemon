@@ -30,7 +30,7 @@ class gettagalbumlist extends controller
             $firsttaglist = $tagnewobj->getFirstTagList($firsttagnum);
         }
         
-        $currenttaginfo = $tagnewobj->getTagInfoById($currenttagid);
+        $currenttaginfo = current($tagnewobj->getTagInfoByIds($currenttagid));
         if (empty($currenttaginfo)) {
             $this->showErrorJson(ErrorConf::TagInfoIsEmpty());
         }

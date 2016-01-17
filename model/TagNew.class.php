@@ -87,21 +87,29 @@ class TagNew extends ModelBase
      * @param I $tagid
      * @return array
      */
-    public function getTagInfoById($tagid)
+    public function getTagInfoByIds($tagids)
     {
-        if (empty($tagid)) {
+        if (empty($tagids)) {
             return array();
         }
-    
+        if (!is_array($tagids)) {
+            $tagids = array($tagids);
+        }
+        $tagidstr = implode(",", $tagids);
+        
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `id` = ?";
+        $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `id` IN ($tagidstr)";
         $selectst = $db->prepare($selectsql);
-        $selectst->execute(array($tagid));
-        $info = $selectst->fetch(PDO::FETCH_ASSOC);
-        if (empty($info)) {
+        $selectst->execute();
+        $reslist = $selectst->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($reslist)) {
             return array();
         }
-        return $info;
+        $list = array();
+        foreach ($reslist as $value) {
+            $list[$value['id']] = $value;
+        }
+        return $list;
     }
     
     
@@ -275,6 +283,37 @@ class TagNew extends ModelBase
             return $dbData;
         } else {
             return $redisData;
+        }
+    }
+    
+    
+    /**
+     * 获取指定专辑下的所有标签
+     * @param I $albumid
+     * @return array
+     */
+    public function getAlbumTagRelationListByAlbumId($albumid)
+    {
+        if (empty($albumid)) {
+            return array();
+        }
+        
+        $key = RedisKey::getAlbumTagRelationKeyByAlbumId($albumid);
+        $redisObj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $cacheData = $redisObj->get($key);
+        if (empty($cacheData)) {
+            $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+            $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `albumid` = ?";
+            $selectst = $db->prepare($selectsql);
+            $selectst->execute(array($albumid));
+            $list = $selectst->fetchAll(PDO::FETCH_ASSOC);
+            if (empty($list)) {
+                return array();
+            }
+            //$redisObj->setex($key, 604800, json_encode($list));
+            return $list;
+        } else {
+            return json_decode($list, true);
         }
     }
     

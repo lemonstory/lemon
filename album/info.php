@@ -96,6 +96,24 @@ class info extends controller
         } else {
             $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ", 'up', 0, $len);
         }
+        
+        if ($_SERVER['visitorappversion'] >= "130000") {
+            // 获取专辑标签列表
+            $tagnewobj = new TagNew();
+            $relationreslist = $tagnewobj->getAlbumTagRelationListByAlbumId($album_id);
+            $taglist = array();
+            if (!empty($relationreslist)) {
+                $tagids = array();
+                foreach ($relationreslist as $value) {
+                    $tagids[] = $value['tagid'];
+                }
+                $taglist = $tagnewobj->getTagInfoByIds($tagids);
+                if (!empty($taglist)) {
+                    $taglist = array_values($taglist);
+                }
+            }
+            $result['taglist'] = $taglist;
+        }
 
         // 返回成功json
         $this->showSuccJson($result);

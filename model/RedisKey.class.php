@@ -260,4 +260,15 @@ class RedisKey
 	{
 	    return 'imsi_uii_uimid_' . $uimid;
 	}
+	
+	// 专辑与标签关联：某个专辑的所有标签key
+	public static function getAlbumTagRelationKeyByAlbumId($albumid)
+	{
+	    return 'atrelation_albumid_' . $albumid;
+	}
+	// 专辑与标签关联：某个专辑，某个标签的key
+	public static function getAlbumTagRelationKey($albumid, $tagid)
+	{
+	    //return "atrelation_{$albumid}_{$tagid}";
+	}
 }
