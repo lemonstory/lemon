@@ -358,12 +358,12 @@ class TagNew extends ModelBase
     /**
      * 更新所有标签中，指定专辑的评论星级
      * @param I $albumid
-     * @param I $num
+     * @param I $commentstarlevel
      * @return boolean
      */
-    public function updateAlbumTagRelationCommentStarLevel($albumid, $num)
+    public function updateAlbumTagRelationCommentStarLevel($albumid, $commentstarlevel)
     {
-        if (empty($albumid) || empty($num)) {
+        if (empty($albumid) || empty($commentstarlevel)) {
             $this->setError(ErrorConf::paramError());
             return false;
         }
@@ -371,7 +371,7 @@ class TagNew extends ModelBase
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
         $selectsql = "UPDATE `{$this->ALBUM_TAG_RELATION_TABLE}` SET `commentstarlevel` = ? WHERE `albumid` = ?";
         $selectst = $db->prepare($selectsql);
-        $updateres = $selectst->execute(array($num, $albumid));
+        $updateres = $selectst->execute(array($commentstarlevel, $albumid));
         if (empty($updateres)) {
             return false;
         }
