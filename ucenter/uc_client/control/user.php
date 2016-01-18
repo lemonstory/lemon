@@ -70,9 +70,10 @@ class usercontrol extends base {
         $answer = $this->input('answer');
         $regip = $this->input('regip');
 
-        if(($status = $this->_check_username($username)) < 0) {
-            return $status;
-        }
+        //在小柠檬app的passport层已经做了用户名的处理,所以此处的业务去掉
+//        if(($status = $this->_check_username($username)) < 0) {
+//            return $status;
+//        }
         //注册时去掉email检查
         //if(($status = $this->_check_email($email)) < 0) {
         //   return $status;
@@ -105,6 +106,7 @@ class usercontrol extends base {
     }
 
     function onlogin() {
+
         $this->init_input();
         $isuid = $this->input('isuid');
         $username = $this->input('username');
