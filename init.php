@@ -16,6 +16,9 @@ include dirname(__FILE__)."/config/config.php";
 include dirname(__FILE__)."/config/kvstoreconf.php";
 include dirname(__FILE__)."/config/httpcacheconf.php";
 include dirname(__FILE__)."/libs/functions.php";
+include dirname(__FILE__)."/ucenter/config.inc.php";
+include dirname(__FILE__)."/ucenter/uc_client/client.php";
+
 
 /**
  * autoload : SERVER_ROOT.[model/lib]
