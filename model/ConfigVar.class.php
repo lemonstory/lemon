@@ -1,6 +1,14 @@
 <?php
 class ConfigVar
 {
+    public $STORY_DB_INSTANCE = 'share_story';
+    public $MAIN_DB_INSTANCE = 'share_main';
+    public $COMMENT_DB_INSTANCE = 'share_comment';
+    public $ANALYTICS_DB_INSTANCE = 'share_analytics';
+    public $MANAGE_DB_INSTANCE = 'share_manage';
+    
+    public $CACHE_REDIS_INSTANCE = 'cache';
+    
     public $AGE_TYPE_All = 0; //全部 
     public $AGE_TYPE_FIRST = 1; // 0-2岁
     public $AGE_TYPE_SECOND = 2; // 3-6岁

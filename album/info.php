@@ -102,17 +102,50 @@ class info extends controller
             $tagnewobj = new TagNew();
             $relationreslist = $tagnewobj->getAlbumTagRelationListByAlbumId($album_id);
             $taglist = array();
+            $recommendalbumlist = array();
             if (!empty($relationreslist)) {
                 $tagids = array();
                 foreach ($relationreslist as $value) {
                     $tagids[] = $value['tagid'];
                 }
-                $taglist = $tagnewobj->getTagInfoByIds($tagids);
-                if (!empty($taglist)) {
-                    $taglist = array_values($taglist);
+                if (!empty($tagids)) {
+                    $tagids = array_unique($tagids);
+                    $taglist = $tagnewobj->getTagInfoByIds($tagids);
+                    if (!empty($taglist)) {
+                        $taglist = array_values($taglist);
+                    }
+                    
+                    // 相关推荐专辑
+                    $tagrelationalbumids = array();
+                    $tagrelationalbumlist = array();
+                    $recommendalbumlist = array();
+                    
+                    $dataanalyticsobj = new DataAnalytics();
+                    $tagrelationlist = $dataanalyticsobj->getRecommendAlbumTagRelationListByAlbumTagIds($tagids, 6);
+                    foreach ($tagrelationlist as $value) {
+                        $tagrelationalbumids[] = $value['albumid'];
+                    }
+                    if (!empty($tagrelationalbumids)) {
+                        $tagrelationalbumids = array_unique($tagrelationalbumids);
+                        $tagrelationalbumlist = $album->getListByIds($tagrelationalbumids);
+                    }
+                    if (!empty($tagrelationalbumlist)) {
+                        foreach ($tagrelationalbumlist as $value) {
+                            if (!empty($value['cover'])) {
+                                $value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $value['cover'], 100, $value['cover_time']);
+                            }
+                            $value['listennum'] = 0;
+                            if (!empty($tagrelationlist[$value['id']])) {
+                                $value['listennum'] = $tagrelationlist[$value['id']]['albumlistennum'] + 0;
+                            }
+                            $recommendalbumlist[] = $value;
+                        }
+                    }
                 }
             }
+            
             $result['taglist'] = $taglist;
+            $result['recommendalbumlist'] = $recommendalbumlist;
         }
 
         // 返回成功json
@@ -120,4 +153,3 @@ class info extends controller
     }
 }
 new info();
-
