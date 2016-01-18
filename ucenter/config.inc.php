@@ -13,3 +13,6 @@ define('UC_CHARSET', 'utf-8');
 define('UC_IP', '');
 define('UC_APPID', '2');
 define('UC_PPP', '20');
+
+//错误日志记录
+define('UC_ERROR_FILE',"/alidata1/www/logs/uc_login_error.log");
