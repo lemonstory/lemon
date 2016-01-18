@@ -165,7 +165,7 @@ class Sso extends ModelBase
         //uc各个app同步登录
         $ucsynlogin = uc_user_synlogin($uid);
         if(empty($ucsynlogin)) {
-            //TODO:记录错误日志
+            errorLog("ucenter注册用户失败,ucsynloginuid = {$ucsynlogin}",E_USER_ERROR);
         }
         
         // 登录后的处理
@@ -185,20 +185,18 @@ class Sso extends ModelBase
         $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
         return $return;
     }
-    
-    public function qqlogin($accessToken, $openId) 
+
+    public function qqlogin($accessToken, $openId)
     {
         $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
         $sql = "update {$this->QQ_RELATION_TABLE_NAME} set accesstoken=? where openid=?";
         $st = $db->prepare($sql);
         $st->execute(array($accessToken, $openId));
-        
         $sql = "select * from {$this->QQ_RELATION_TABLE_NAME} where openid=?";
         $st = $db->prepare($sql);
         $st->execute(array($openId));
         $ar = $st->fetch(PDO::FETCH_ASSOC);
         $uid = $ar['uid'];
-        
         $passportdata = $this->getInfoWithUid($uid);
         $UserObj = new User();
         $userinfo = current($UserObj->getUserInfo($uid, 1));
@@ -206,15 +204,34 @@ class Sso extends ModelBase
         $isuid = 1;
         list($status, $username, $password, $email, $merge) = uc_user_login($uid,$passportdata['password'],$isuid);
         if($status < 0 ) {
-            //TODO:记录错误日志
+            if($status === -1) {
+
+                //用户不存在向ucenter注册一次
+                //TUOD:上面200行$passportdata = $this->getInfoWithUid($uid),并没用得到password,先增加下面取passport的业务
+                $sql = "select * from {$this->PASSPORT_TABLE_NAME} where uid=?";
+                $st = $db->prepare($sql);
+                $st->execute(array($uid));
+                $data = $st->fetch(PDO::FETCH_ASSOC);
+                $this->uCenterReg($uid,$userinfo['nickname'],$data['password']);
+
+            }
         }
         $this->setSsoCookie($passportdata, $userinfo);
         //uc各个app同步登录
         $ucsynlogin = uc_user_synlogin($uid);
+
         if(empty($ucsynlogin)) {
-            //TODO:记录错误日志
+
+            errorLog("ucenter注册用户失败,ucsynlogin = {$ucsynlogin}");
         }
-        
+
+        //uc返回的是多个<script>代码,这里只有一个小柠檬app所以只匹配1个做处理
+        if(preg_match('/<\s*script\s+[^>]*?src\s*=\s*(\'|\")(.*?)\\1[^>]*?\/?\s*>/i',$ucsynlogin,$match)) {
+            uc_fopen($match[2]);
+        }
+
+        $userinfo['uc_callback'] = $match[2];
+
         // 登录后的处理
         $actionlogobj = new ActionLog();
         $userimsiobj = new UserImsi();
@@ -224,7 +241,7 @@ class Sso extends ModelBase
         // add login log
         $loginlogobj = new UserLoginLog();
         $loginlogobj->addUserLoginLog($uid, getImsi());
-        
+        $db = null;
         return $userinfo;
     }
     
@@ -271,9 +288,9 @@ class Sso extends ModelBase
     }
     
     // 后台手机号注册
-    public function phonereg($username, $nickname, $password)
+    public function phonereg($username, $nickName, $password)
     {
-        if (empty($username) || empty($nickname) || empty($password)) {
+        if (empty($username) || empty($nickName) || empty($password)) {
             $this->setError(ErrorConf::paramError());
             return false;
         }
@@ -284,7 +301,7 @@ class Sso extends ModelBase
         $password = md5($password . strrev(strtotime($addtime)));
         $sql = "insert into `{$this->PASSPORT_TABLE_NAME}` (username, password, addtime) values (?, ?, ?)";
         $st = $db->prepare($sql);
-        $st->execute(array($username, $password, $addtime));
+        $st->execute(array($nickName, $password, $addtime));
         $uid = $db->lastInsertId() + 0;
         if ($uid == 0) {
             return false;
@@ -299,7 +316,7 @@ class Sso extends ModelBase
         $birthday = date("Y-m-d");
         $UserObj = new User();
         $type = $UserObj->TYPE_PH;
-        $UserObj->initUser($uid, $nickname, $avatartime, $birthday, 0, "", "", $type, $addtime);
+        $UserObj->initUser($uid, $nickName, $avatartime, $birthday, 0, "", "", $type, $addtime);
         
         return $uid;
     }
@@ -313,13 +330,15 @@ class Sso extends ModelBase
         unset($this->cookies['al']);
         setcookie('us', '', time() - 86400, '/', $domain);
         setcookie('al', '', time() - 86400, '/', $domain);
-        //TODO:cookie名称待确定
-        setcookie('Example_auth', '', time() - 86400, '/', $domain);
-        //uc各个app同步退出
-        $ucsynlogout = uc_user_synlogout();
-        if(empty($ucsynlogout)) {
-            //TODO:记录错误日志
-        }
+
+        //uc各个app同步退出,既是调用个个app的uc.php然后执行setcookie.在此次一并处理
+//        $ucsynlogout = uc_user_synlogout();
+//        if(empty($ucsynlogout)) {
+//
+//        }
+        header('P3P: CP="CURa ADMa DEVa PSAo PSDo OUR BUS UNI PUR INT DEM STA PRE COM NAV OTC NOI DSP COR"');
+        setcookie('xnm_auth', '', -86400 * 365);
+
         return true;
     }
     
@@ -479,8 +498,7 @@ class Sso extends ModelBase
         setcookie('al', $this->makeCookie($R, 'al'), time() + 60 * 86400, '/', $domain, false, true);
 
         //ucenter,cookie设置
-        //TODO:cookie名称待确定
-        setcookie('Example_auth', uc_authcode($passportdata['uid']."\t".$userinfo['nickname'], 'ENCODE'), time() + 60 * 86400, '/', $domain, false, true);
+        setcookie('xnm_auth', uc_authcode($passportdata['uid']."\t".$userinfo['nickname'], 'ENCODE'), time() + 60 * 86400, '/', $domain, false, true);
     }
     
     public function setCsrfCookie($csrftoken)
@@ -602,14 +620,16 @@ class Sso extends ModelBase
      */
     public function uCenterReg($uid,$username,$password) {
 
-        $uc_uid = -1;
         $isuid = 1;
-        if(!uc_get_user($uid,$isuid)) {
-            $uc_user = uc_user_register($uid,$username, $password);
+        $data = uc_get_user($uid,$isuid);
+        if(!empty($data)) {
+            list($uc_uid,$username,$email) = $data;
+        }else {
+            $uc_uid = uc_user_register($uid,$username,$password);
         }
         if($uc_uid < 0) {
-
-            //TODO:记录错误日志
+            errorLog("ucenter注册用户失败,uc_uid = {$uc_uid}");
         }
+        return $uc_uid;
     }
 }
