@@ -122,3 +122,10 @@ function getClientIp()
     }
     return $onlineip;
 }
+
+function errorLog($error_msg) {
+
+	$error_msg = __FILE__." : ".__LINE__." ".$error_msg."\r\n\r\n";
+	//测试使用
+	//error_log($error_msg, 3, UC_ERROR_FILE);
+}
