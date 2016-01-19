@@ -312,14 +312,20 @@ class TagNew extends ModelBase
                     continue;
                 }
                 $listredisdata = json_decode($listredisdata, true);
-                foreach ($listredisdata as $oneredisdata) {
-                    $cacheIds[] = $oneredisdata['albumid'];
-                    $cacheData[$oneredisdata['albumid']] = $listredisdata;
+                foreach ($listredisdata as $albumidkey => $listredisdata) {
+                    foreach ($listredisdata as $oneredisdata) {
+                        $cacheIds[] = $oneredisdata['albumid'];
+                        if ($albumidkey == $oneredisdata['albumid']) {
+                            $cacheData[$oneredisdata['albumid']][] = $oneredisdata;
+                        }
+                    }
                 }
             }
         } else {
             $redisData = array();
         }
+        // @huqq
+        //$cacheIds = array();
         $dbIds = array_diff($albumids, $cacheIds);
         $dbData = array();
         
@@ -336,7 +342,7 @@ class TagNew extends ModelBase
                     $list[] = $onedbdata;
                     $dbData[$onedbdata['albumid']] = $list;
                     $relationkey = RedisKey::getAlbumTagRelationKeyByAlbumId($onedbdata['albumid']);
-                    $redisobj->setex($relationkey, 604800, json_encode($list));
+                    $redisobj->setex($relationkey, 604800, json_encode($dbData));
                 }
             }
         }
