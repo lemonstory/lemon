@@ -297,10 +297,25 @@ function uc_friend_ls($uid, $page = 1, $pagesize = 10, $totalnum = 10, $directio
 	return UC_CONNECT == 'mysql' ? $return : uc_unserialize($return);
 }
 
-//增加uid
-function uc_user_register($uid,$username, $password, $email, $questionid = '', $answer = '', $regip = ''){ 
-	return call_user_func(UC_API_FUNC, 'user', 'register', array('uid'=>$uid,'username'=>$username, 'password'=>$password, 'email'=>$email, 'questionid'=>$questionid, 'answer'=>$answer, 'regip' => $regip));
- }
+//TODO: FastCGI sent in stderr: "PHP message: PHP Parse error:  syntax error, unexpected 'return' (T_RETURN) in /alidata1/www/htdocs/dev.xiaoningmeng.net/ucenter/uc_client/client.php on line 302" while reading response header from upstream, client: 1.84.176.156, server: dev.xiaoningmeng.net, request: "GET /sso/logout.php HTTP/1.1", upstream: "fastcgi://127.0.0.1:9000", host: "dev.xiaoningmeng.net"
+//遇到这这样的一个问题,特别诡异,解决办法竟然是我把下面函数代码复制了一份改了下函数的名字和参数及里面的内容就解决了
+function uc_user_register($uid,$username, $password, $email, $questionid = '', $answer = '', $regip = '') {
+
+	return call_user_func(
+		UC_API_FUNC,
+		'user',
+		'register',
+		array(
+			'uid' => $uid,
+			'username' => $username,
+			'password' => $password,
+			'email' => $email,
+			'questionid' => $questionid,
+			'answer' => $answer,
+			'regip' => $regip
+		)
+	);
+}
 
 function uc_user_login($username, $password, $isuid = 0, $checkques = 0, $questionid = '', $answer = '') {
 	$isuid = intval($isuid);
