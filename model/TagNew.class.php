@@ -324,8 +324,7 @@ class TagNew extends ModelBase
         } else {
             $redisData = array();
         }
-        // @huqq
-        //$cacheIds = array();
+        
         $dbIds = array_diff($albumids, $cacheIds);
         $dbData = array();
         
