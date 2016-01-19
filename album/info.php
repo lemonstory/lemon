@@ -100,7 +100,7 @@ class info extends controller
         if ($_SERVER['visitorappversion'] >= "130000") {
             // 获取专辑标签列表
             $tagnewobj = new TagNew();
-            $relationreslist = $tagnewobj->getAlbumTagRelationListByAlbumId($album_id);
+            $relationreslist = current($tagnewobj->getAlbumTagRelationListByAlbumIds($album_id));
             $taglist = array();
             $recommendalbumlist = array();
             if (!empty($relationreslist)) {

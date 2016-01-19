@@ -288,33 +288,68 @@ class TagNew extends ModelBase
     
     
     /**
-     * 获取指定专辑下的所有标签
-     * @param I $albumid
+     * 获取单个或多个专辑下的所有关联列表
+     * @param I $albumids
      * @return array
      */
-    public function getAlbumTagRelationListByAlbumId($albumid)
+    public function getAlbumTagRelationListByAlbumIds($albumids)
     {
-        if (empty($albumid)) {
+        if (empty($albumids)) {
             return array();
         }
-        
-        $key = RedisKey::getAlbumTagRelationKeyByAlbumId($albumid);
-        $redisObj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
-        $cacheData = $redisObj->get($key);
-        if (empty($cacheData)) {
-            $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-            $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `albumid` = ?";
-            $selectst = $db->prepare($selectsql);
-            $selectst->execute(array($albumid));
-            $list = $selectst->fetchAll(PDO::FETCH_ASSOC);
-            if (empty($list)) {
-                return array();
-            }
-            //$redisObj->setex($key, 604800, json_encode($list));
-            return $list;
-        } else {
-            return json_decode($list, true);
+        if (!is_array($albumids)) {
+            $albumids = array($albumids);
         }
+        $keys = RedisKey::getAlbumTagRelationKeyByAlbumIds($albumids);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->mget($keys);
+        
+        $cacheData = array();
+        $cacheIds = array();
+        if (is_array($redisData)){
+            foreach ($redisData as $listredisdata){
+                if (empty($listredisdata)) {
+                    continue;
+                }
+                $listredisdata = json_decode($listredisdata, true);
+                foreach ($listredisdata as $oneredisdata) {
+                    $cacheIds[] = $oneredisdata['albumid'];
+                    $cacheData[$oneredisdata['albumid']] = $listredisdata;
+                }
+            }
+        } else {
+            $redisData = array();
+        }
+        $dbIds = array_diff($albumids, $cacheIds);
+        $dbData = array();
+        
+        if(!empty($dbIds)) {
+            $idlist = implode(',', $dbIds);
+            $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+            $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `albumid` IN ($idlist)";
+            $selectst = $db->prepare($selectsql);
+            $selectst->execute();
+            $tmpDbData = $selectst->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (!empty($tmpDbData)) {
+                foreach ($tmpDbData as $onedbdata){
+                    $list[] = $onedbdata;
+                    $dbData[$onedbdata['albumid']] = $list;
+                    $relationkey = RedisKey::getAlbumTagRelationKeyByAlbumId($onedbdata['albumid']);
+                    $redisobj->setex($relationkey, 604800, json_encode($list));
+                }
+            }
+        }
+        
+        foreach($albumids as $albumid) {
+            if(in_array($albumid, $dbIds)) {
+                $data[$albumid] = @$dbData[$albumid];
+            } else {
+                $data[$albumid] = $cacheData[$albumid];
+            }
+        }
+        
+        return $data;
     }
     
     
