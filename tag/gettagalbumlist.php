@@ -17,7 +17,6 @@ class gettagalbumlist extends controller
             $this->showErrorJson(ErrorConf::paramError());
         }
         
-        $isrecommend = 0;
         $firsttagnum = 8;
         $secondtagnum = 10;
         $selectfirsttagid = 0; // 当前选中的一级标签id
@@ -31,7 +30,7 @@ class gettagalbumlist extends controller
             $firsttaglist = $tagnewobj->getFirstTagList($firsttagnum);
         }
         
-        $currenttaginfo = $tagnewobj->getTagInfoById($currenttagid);
+        $currenttaginfo = current($tagnewobj->getTagInfoByIds($currenttagid));
         if (empty($currenttaginfo)) {
             $this->showErrorJson(ErrorConf::TagInfoIsEmpty());
         }
@@ -41,7 +40,6 @@ class gettagalbumlist extends controller
             $selectfirsttagid = $currenttagid;
             if ($recommend == 1) {
                 $selectsecondtagid = "recommend"; // 推荐
-                $isrecommend = 1;
             } elseif ($hot == 1) {
                 $selectsecondtagid = "hot";// 表示二级标签选中最热门
             } elseif ($goodcomment == 1) {
@@ -82,7 +80,7 @@ class gettagalbumlist extends controller
         $tagalbumlist = array();
         $aliossobj = new AliOss();
         // 获取指定二级标签下，指定长度的专辑与标签关联列表
-        $albumrelationlist = $tagnewobj->getAlbumTagRelationList($tagids, $isrecommend, $direction, $startalbumid, $len);
+        $albumrelationlist = $tagnewobj->getAlbumTagRelationListFromTag($tagids, $recommend, $hot, $goodcomment, $direction, $startalbumid, $len);
         if (!empty($albumrelationlist)) {
             $albumids = array();
             foreach ($albumrelationlist as $relationinfo) {
@@ -101,10 +99,6 @@ class gettagalbumlist extends controller
                     }
                 }
             }
-            
-            // 最热门，将按播放量倒序
-            
-            // 好评榜，将按好评倒序
         }
         
         $specialtaglist = array(

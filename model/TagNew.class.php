@@ -87,21 +87,29 @@ class TagNew extends ModelBase
      * @param I $tagid
      * @return array
      */
-    public function getTagInfoById($tagid)
+    public function getTagInfoByIds($tagids)
     {
-        if (empty($tagid)) {
+        if (empty($tagids)) {
             return array();
         }
-    
+        if (!is_array($tagids)) {
+            $tagids = array($tagids);
+        }
+        $tagidstr = implode(",", $tagids);
+        
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `id` = ?";
+        $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `id` IN ($tagidstr)";
         $selectst = $db->prepare($selectsql);
-        $selectst->execute(array($tagid));
-        $info = $selectst->fetch(PDO::FETCH_ASSOC);
-        if (empty($info)) {
+        $selectst->execute();
+        $reslist = $selectst->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($reslist)) {
             return array();
         }
-        return $info;
+        $list = array();
+        foreach ($reslist as $value) {
+            $list[$value['id']] = $value;
+        }
+        return $list;
     }
     
     
@@ -153,14 +161,16 @@ class TagNew extends ModelBase
     
     
     /**
-     * 获取指定标签下的专辑列表
-     * @param A $tagids       指定标签id数组
-     * @param I $isrecommend  是否为一级标签下，推荐的专辑
+     * 标签专辑列表：获取指定标签下的专辑列表
+     * @param A $tagids        指定标签id数组
+     * @param I $isrecommend   是否为一级标签下的推荐标签
+     * @param I $ishot         是否为一级标签下的热门标签
+     * @param I $isgoodcomment 是否为一级标签下的好评榜标签
      * @param S $direction    
      * @param I $startalbumid 
      * @param I $len
      */
-    public function getAlbumTagRelationList($tagids, $isrecommend = 0, $direction = "down", $startalbumid = 0, $len = 20)
+    public function getAlbumTagRelationListFromTag($tagids, $isrecommend = 0, $ishot = 0, $isgoodcomment = 0, $direction = "down", $startalbumid = 0, $len = 20)
     {
         if (empty($tagids)) {
             return array();
@@ -188,12 +198,18 @@ class TagNew extends ModelBase
         }
         $where .= "`tagid` IN ($tagidstr)";
         
+        $orderby = "";
         if ($isrecommend == 1) {
             $where .= " AND `isrecommend` = 1";
+            $orderby = "ORDER BY `uptime` DESC";
+        } elseif ($ishot == 1) {
+            $orderby = "ORDER BY `albumlistennum` DESC";
+        } elseif ($isgoodcomment == 1) {
+            $orderby = "ORDER BY `commentstarlevel` DESC";
         }
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} ORDER BY `albumid` DESC LIMIT {$len}";
+        $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} $orderby LIMIT {$len}";
         $selectst = $db->prepare($selectsql);
         $selectst->execute();
         $dbdata = $selectst->fetchAll(PDO::FETCH_ASSOC);
@@ -206,16 +222,16 @@ class TagNew extends ModelBase
     
     
     /**
-     * 获取热门推荐、最新上架、同龄在听列表
-     * @param I $tagids        指定标签下的热门推荐列表，若为"全部"时,tagids是所有一级标签数组
-     * @param I $isrecommend   是否热门推荐列表
-     * @param I $issameage     是否同龄在听推荐列表
-     * @param I $isnewonline   是否最新上架推荐列表
+     * 获取热门推荐、最新上架、同龄在听，指定标签的专辑列表
+     * @param I $tagids        指定标签下的热门推荐列表，若为"全部"时,tagids为空
+     * @param I $isrecommend   是否热门推荐
+     * @param I $issameage     是否同龄在听
+     * @param I $isnewonline   是否最新上架
      * @param I $currentpage   加载第几个,默认为1表示从第一页获取
      * @param I $len           获取长度
      * @return array
      */
-    public function getRecommendAlbumTagRelationList($tagids, $isrecommend = 0, $issameage = 0, $isnewonline = 0, $currentpage = 1, $len = 20)
+    public function getAlbumTagRelationListFromRecommend($tagids, $isrecommend = 0, $issameage = 0, $isnewonline = 0, $currentpage = 1, $len = 20)
     {
         if (empty($isrecommend) && empty($issameage) && empty($isnewonline)) {
             return array();
@@ -272,6 +288,77 @@ class TagNew extends ModelBase
     
     
     /**
+     * 获取单个或多个专辑下的所有关联列表
+     * @param I $albumids
+     * @return array
+     */
+    public function getAlbumTagRelationListByAlbumIds($albumids)
+    {
+        if (empty($albumids)) {
+            return array();
+        }
+        if (!is_array($albumids)) {
+            $albumids = array($albumids);
+        }
+        $keys = RedisKey::getAlbumTagRelationKeyByAlbumIds($albumids);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->mget($keys);
+        
+        $cacheData = array();
+        $cacheIds = array();
+        if (is_array($redisData)){
+            foreach ($redisData as $listredisdata){
+                if (empty($listredisdata)) {
+                    continue;
+                }
+                $listredisdata = json_decode($listredisdata, true);
+                foreach ($listredisdata as $albumidkey => $listredisdata) {
+                    foreach ($listredisdata as $oneredisdata) {
+                        $cacheIds[] = $oneredisdata['albumid'];
+                        if ($albumidkey == $oneredisdata['albumid']) {
+                            $cacheData[$oneredisdata['albumid']][$oneredisdata['tagid']] = $oneredisdata;
+                        }
+                    }
+                }
+            }
+        } else {
+            $redisData = array();
+        }
+        // @huqq
+        $cacheIds = array();
+        $dbIds = array_diff($albumids, $cacheIds);
+        $dbData = array();
+        
+        if(!empty($dbIds)) {
+            $idlist = implode(',', $dbIds);
+            $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+            $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `albumid` IN ($idlist)";
+            $selectst = $db->prepare($selectsql);
+            $selectst->execute();
+            $tmpDbData = $selectst->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (!empty($tmpDbData)) {
+                foreach ($tmpDbData as $onedbdata){
+                    $dbData[$onedbdata['albumid']][$onedbdata['tagid']] = $onedbdata;
+                    $relationkey = RedisKey::getAlbumTagRelationKeyByAlbumId($onedbdata['albumid']);
+                    $redisobj->setex($relationkey, 604800, json_encode($dbData));
+                }
+            }
+        }
+        
+        foreach($albumids as $albumid) {
+            if(in_array($albumid, $dbIds)) {
+                $data[$albumid] = @$dbData[$albumid];
+            } else {
+                $data[$albumid] = $cacheData[$albumid];
+            }
+        }
+        
+        return $data;
+    }
+    
+    
+    /**
      * 添加专辑标签
      * @param I $albumid    专辑ID
      * @param S $name       标签名称
@@ -318,6 +405,58 @@ class TagNew extends ModelBase
         } else {
             return false;
         }
+    }
+    
+    
+    /**
+     * 累加所有标签中，指定专辑的收听总数
+     * @param I $albumid
+     * @param I $num
+     * @return boolean
+     */
+    public function updateAlbumTagRelationListenNum($albumid, $num)
+    {
+        if (empty($albumid) || empty($num)) {
+            $this->setError(ErrorConf::paramError());
+            return false;
+        }
+        
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "UPDATE `{$this->ALBUM_TAG_RELATION_TABLE}` SET `albumlistennum` = `albumlistennum` + $num WHERE `albumid` = ?";
+        $selectst = $db->prepare($selectsql);
+        $updateres = $selectst->execute(array($albumid));
+        if (empty($updateres)) {
+            return false;
+        }
+        // clear cache
+        
+        return true;
+    }
+    
+    
+    /**
+     * 更新所有标签中，指定专辑的评论星级
+     * @param I $albumid
+     * @param I $commentstarlevel
+     * @return boolean
+     */
+    public function updateAlbumTagRelationCommentStarLevel($albumid, $commentstarlevel)
+    {
+        if (empty($albumid) || empty($commentstarlevel)) {
+            $this->setError(ErrorConf::paramError());
+            return false;
+        }
+    
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "UPDATE `{$this->ALBUM_TAG_RELATION_TABLE}` SET `commentstarlevel` = ? WHERE `albumid` = ?";
+        $selectst = $db->prepare($selectsql);
+        $updateres = $selectst->execute(array($commentstarlevel, $albumid));
+        if (empty($updateres)) {
+            return false;
+        }
+        // clear cache
+        
+        return true;
     }
     
     

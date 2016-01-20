@@ -240,6 +240,7 @@ class RedisKey
 	    return $albumidarr;
 	}
 	
+	
 	// 热门搜索关键词列表
 	public static function getHotSearchContentListKey()
 	{
@@ -251,6 +252,7 @@ class RedisKey
 	    return 'search_scci' . urlencode($searchcontent);
 	}
 	
+	
 	// 用户id与设备关联信息
 	public static function getUserImsiInfoKey($resid, $restype)
 	{
@@ -259,5 +261,26 @@ class RedisKey
 	public static function getUserImsiInfoByUimidKey($uimid)
 	{
 	    return 'imsi_uii_uimid_' . $uimid;
+	}
+	
+	
+	// 专辑与标签关联：某个专辑的所有标签列表key
+	public static function getAlbumTagRelationKeyByAlbumId($albumid)
+	{
+	    return 'atr_albumid_' . $albumid;
+	}
+	// 专辑与标签关联：批量获取多个专辑的所有标签列表key
+	public static function getAlbumTagRelationKeyByAlbumIds($albumids)
+	{
+	    $albumidarr = array();
+	    foreach ($albumids as $albumid) {
+	        $albumidarr[] = self::getAlbumTagRelationKeyByAlbumId($albumid);
+	    }
+	    return $albumidarr;
+	}
+	// 专辑与标签关联：某个专辑，某个标签的key
+	public static function getAlbumTagRelationKey($albumid, $tagid)
+	{
+	    //return "atrelation_{$albumid}_{$tagid}";
 	}
 }
