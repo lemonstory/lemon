@@ -13,6 +13,9 @@ class RecommendDesc extends ModelBase
         if (empty($albumids)) {
             return array();
         }
+        if (!is_array($albumids)) {
+            $albumids = array($albumids);
+        }
         $albumidstr = implode(",", $albumids);
         $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
         $sql = "SELECT * FROM {$this->ALBUM_RECOMMEND_DESC_TABLE} WHERE `albumid` IN ($albumidstr)";
