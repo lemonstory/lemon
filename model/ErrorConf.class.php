@@ -267,6 +267,10 @@ class   ErrorConf
 	{
 	    return array('code'=>'101102','desc'=>'子级标签不存在');
 	}
+	public static function TagInfoIsExist()
+	{
+	    return array('code'=>'101103','desc'=>'标签已经存在');
+	}
 	
 	// 请求检测
 	public static function requestCsrfValidateError()

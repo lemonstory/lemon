@@ -403,6 +403,7 @@ class TagNew extends ModelBase
             $tagid = $this->addTagDb($pid, $name);
             return $tagid;
         } else {
+            $this->setError(ErrorConf::TagInfoIsExist());
             return false;
         }
     }
