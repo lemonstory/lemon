@@ -387,6 +387,27 @@ class TagNew extends ModelBase
     
     
     /**
+     * 添加专辑与标签的关联记录
+     * @param I $albumid
+     * @param I $tagid
+     * @return boolean
+     */
+    public function addAlbumTagRelationInfo($albumid, $tagid)
+    {
+        if (empty($albumid) || empty($tagid)) {
+            $this->setError(ErrorConf::paramError());
+            return false;
+        }
+        
+        $albumtagrelation = $this->getAlbumTagRelationInfo($albumid, $tagid);
+        if (empty($albumtagrelation)) {
+            $this->addAlbumTagRelationDb($albumid, $tagid);
+        }
+        return true;
+    }
+    
+    
+    /**
      * 添加标签
      * @param S $name
      * @param I $pid    若存在父级标签，则pid=父级标签ID
