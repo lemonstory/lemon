@@ -410,6 +410,37 @@ class TagNew extends ModelBase
     
     
     /**
+     * 更新标签信息
+     * @param U $tagid
+     * @param A $updatedata
+     * @return boolean
+     */
+    public function updateTagInfo($tagid, $updatedata)
+    {
+        if (empty($tagid) || empty($updatedata)) {
+            return false;
+        }
+        $updatestr = "";
+        foreach ($updatedata as $key => $value) {
+            $updatestr .= "`{$key}` = '{$value}',";
+        }
+        $updatestr = rtrim($updatestr, ",");
+        
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "UPDATE `{$this->TAG_INFO_TABLE}` SET {$updatestr} WHERE `tagid` = ?";
+        $selectst = $db->prepare($selectsql);
+        $updateres = $selectst->execute(array($tagid));
+        if (empty($updateres)) {
+            return false;
+        }
+        
+        // clear cache
+        
+        return true;
+    }
+    
+    
+    /**
      * 累加所有标签中，指定专辑的收听总数
      * @param I $albumid
      * @param I $num

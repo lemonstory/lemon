@@ -128,4 +128,15 @@ class Upload extends ModelBase
         $ossObj = new AliOss();
         return $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_CATEGORY, $file, $categoryid);
     }
+    
+    /**
+     * Post上传标签封面
+     * @param A $file
+     * @param I $tagid
+     */
+    public function uploadTagImageByPost($file, $tagid)
+    {
+        $ossObj = new AliOss();
+        return $ossObj->uploadPicImageByFiles($ossObj->IMAGE_TYPE_TAG, $file, $tagid);
+    }
 }

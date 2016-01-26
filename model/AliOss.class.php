@@ -30,6 +30,8 @@ class AliOss extends ModelBase
     public $IMAGE_TYPE_ALBUM = 'album';
     public $IMAGE_TYPE_STORY = 'story';
     public $IMAGE_TYPE_CATEGORY = 'category';
+    public $IMAGE_TYPE_TAG = 'tag';
+    public $IMAGE_TYPE_LIST = array("album", "story", "category", "tag");
     
     /**
      * 上传头像图片
@@ -105,7 +107,7 @@ class AliOss extends ModelBase
     
     /**
      * 通过$_FILES方式上传pic图片到OSS
-     * @param S $imagetype   图片类型：album/story/category
+     * @param S $imagetype   图片类型：album/story/category/tag
      * @param S $file        $_FILES['xxx']的值
      * @param I $relationid
      */ 
@@ -261,7 +263,7 @@ class AliOss extends ModelBase
     
     /**
      * 获取lemonpic图片url
-     * @param S $imagetype      类型：album/story/category
+     * @param S $imagetype      类型：album/story/category/tag
      * @param S $file           文件路径和文件名：2015/11/01/xxx.jpg
      * @param S $size           缩略尺寸：如100
      * @param I $covertime      封面最新更新时间戳，用于更新cdn缓存
@@ -400,7 +402,7 @@ class AliOss extends ModelBase
     
     private function getImageFile($imagetype, $file)
     {
-        if (!in_array($imagetype, array($this->IMAGE_TYPE_ALBUM, $this->IMAGE_TYPE_STORY, $this->IMAGE_TYPE_CATEGORY))) {
+        if (!in_array($imagetype, $this->IMAGE_TYPE_LIST)) {
             return false;
         }
         return $imagetype . "/" . $file;
@@ -408,7 +410,7 @@ class AliOss extends ModelBase
     
     /**
      * 图片pic的存储路径
-     * @param S $imagetype      类型：专辑、故事、分类的图片
+     * @param S $imagetype      类型：专辑、故事、分类、标签的图片
      * @param I $relationid     专辑ID/故事ID/分类ID
      * @param S $ext            后缀
      * @return string
@@ -418,7 +420,7 @@ class AliOss extends ModelBase
         if (empty($imagetype) || empty($relationid)) {
             return false;
         }
-        if (!in_array($imagetype, array($this->IMAGE_TYPE_ALBUM, $this->IMAGE_TYPE_STORY, $this->IMAGE_TYPE_CATEGORY))) {
+        if (!in_array($imagetype, $this->IMAGE_TYPE_LIST)) {
             return false;
         }
         
