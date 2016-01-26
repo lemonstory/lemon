@@ -127,7 +127,9 @@ class index extends controller
     		$firsttagres = $tagnewobj->getFirstTagList(8);
     		if (!empty($firsttagres)) {
     		    foreach ($firsttagres as $value) {
-    		        $value['cover'] = "";
+    		        if (!empty($value['cover'])) {
+    		            $value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_TAG, $value['cover'], 135, $value['covertime']);
+    		        }
     		        $firsttaglist[] = $value;
     		    }
     		}
