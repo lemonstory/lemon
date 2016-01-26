@@ -519,8 +519,8 @@ class TagNew extends ModelBase
      * @param I $tagid
      * @return boolean
      */
-    public function deleteAlbumTag($albumid, $tagid)
-    {
+    public function deleteAlbumTagRelationByAlbumIdTagId($albumid, $tagid)
+    { 
         if (empty($albumid) || empty($tagid)) {
             $this->setError(ErrorConf::paramError());
             return false;
@@ -531,6 +531,55 @@ class TagNew extends ModelBase
         $selectst = $db->prepare($selectsql);
         $updateres = $selectst->execute(array($albumid, $tagid));
         if (empty($updateres)) {
+            return false;
+        }
+        // clear cache
+        
+        return true;
+    }
+    
+    
+    /**
+     * 删除指定标签的，所有专辑标签关联记录
+     * @param I $tagid
+     * @return boolean
+     */
+    public function deleteAlbumTagRelationByTagId($tagid)
+    {
+        if (empty($tagid)) {
+            $this->setError(ErrorConf::paramError());
+            return false;
+        }
+        
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "DELETE FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `tagid` = ?";
+        $selectst = $db->prepare($selectsql);
+        $updateres = $selectst->execute(array($tagid));
+        if (empty($updateres)) {
+            return false;
+        }
+        // clear cache
+        
+        return true;
+    }
+    
+    
+    /**
+     * 删除指定标签信息
+     * @param I $tagid
+     * @return boolean
+     */
+    public function deleteTagInfo($tagid)
+    {
+        if (empty($tagid)) {
+            return false;
+        }
+        
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "DELETE FROM `{$this->TAG_INFO_TABLE}` WHERE `tagid` = ?";
+        $selectst = $db->prepare($selectsql);
+        $res = $selectst->execute(array($tagid));
+        if (empty($res)) {
             return false;
         }
         // clear cache
