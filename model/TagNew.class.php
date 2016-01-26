@@ -493,6 +493,32 @@ class TagNew extends ModelBase
     
     
     /**
+     * 删除专辑的某个标签
+     * @param I $albumid
+     * @param I $tagid
+     * @return boolean
+     */
+    public function deleteAlbumTag($albumid, $tagid)
+    {
+        if (empty($albumid) || empty($tagid)) {
+            $this->setError(ErrorConf::paramError());
+            return false;
+        }
+        
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "DELETE FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `albumid` = ? AND `tagid` = ?";
+        $selectst = $db->prepare($selectsql);
+        $updateres = $selectst->execute(array($albumid, $tagid));
+        if (empty($updateres)) {
+            return false;
+        }
+        // clear cache
+        
+        return true;
+    }
+    
+    
+    /**
      * 添加标签记录
      * @param I $pid    是否有父级标签id
      * @param S $name   标签名称
