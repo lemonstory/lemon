@@ -94,7 +94,7 @@ class gettagalbumlist extends controller
                 $tagalbumres = $albumobj->get_list("id IN ($albumidstr)");
                 if (!empty($tagalbumres)) {
                     foreach ($tagalbumres as $albuminfo) {
-                        $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 200, $albuminfo['cover_time']);
+                        $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
                         $tagalbumlist[] = $albuminfo;
                     }
                 }
