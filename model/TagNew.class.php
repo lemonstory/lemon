@@ -427,7 +427,7 @@ class TagNew extends ModelBase
         $updatestr = rtrim($updatestr, ",");
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "UPDATE `{$this->TAG_INFO_TABLE}` SET {$updatestr} WHERE `tagid` = ?";
+        $selectsql = "UPDATE `{$this->TAG_INFO_TABLE}` SET {$updatestr} WHERE `id` = ?";
         $selectst = $db->prepare($selectsql);
         $updateres = $selectst->execute(array($tagid));
         if (empty($updateres)) {
