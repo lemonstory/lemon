@@ -576,7 +576,7 @@ class TagNew extends ModelBase
         }
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "DELETE FROM `{$this->TAG_INFO_TABLE}` WHERE `tagid` = ?";
+        $selectsql = "DELETE FROM `{$this->TAG_INFO_TABLE}` WHERE `id` = ?";
         $selectst = $db->prepare($selectsql);
         $res = $selectst->execute(array($tagid));
         if (empty($res)) {
