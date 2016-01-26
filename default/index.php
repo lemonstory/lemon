@@ -45,6 +45,7 @@ class index extends controller
 		}
 		
 		$albumlist = array();
+		$recommenddesclist = array();
 		if (!empty($albumids)) {
 			$albumids = array_unique($albumids);
 			// 专辑信息
@@ -53,6 +54,12 @@ class index extends controller
 			// 专辑收听数
 			$listenobj = new Listen();
 			$albumlistennum = $listenobj->getAlbumListenNum($albumids);
+			
+			if ($_SERVER['visitorappversion'] >= "130000") {
+			    // 获取推荐语
+			    $recommenddescobj = new RecommendDesc();
+			    $recommenddesclist = $recommenddescobj->getAlbumRecommendDescList($albumids);
+			}
 		}
 		
 		
@@ -71,6 +78,10 @@ class index extends controller
 				    if (!empty($albumlistennum[$albumid])) {
 				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;
 				    }
+				    $albuminfo['recommenddesc'] = "";
+				    if (!empty($recommenddesclist[$albumid])) {
+				        $albuminfo['recommenddesc'] = $recommenddesclist[$albumid]['desc'];
+				    }
 					$hotrecommendlist[] = $albuminfo;
 				}
 			}
@@ -87,6 +98,10 @@ class index extends controller
 				    if (!empty($albumlistennum[$albumid])) {
 				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;
 				    }
+				    $albuminfo['recommenddesc'] = "";
+				    if (!empty($recommenddesclist[$albumid])) {
+				        $albuminfo['recommenddesc'] = $recommenddesclist[$albumid]['desc'];
+				    }
 					$sameagealbumlist[] = $albuminfo;
 				}
 			}
@@ -102,6 +117,10 @@ class index extends controller
 				    $albuminfo['listennum'] = 0;
 				    if (!empty($albumlistennum[$albumid])) {
 				        $albuminfo['listennum'] = $albumlistennum[$albumid]['num']+0;
+				    }
+				    $albuminfo['recommenddesc'] = "";
+				    if (!empty($recommenddesclist[$albumid])) {
+				        $albuminfo['recommenddesc'] = $recommenddesclist[$albumid]['desc'];
 				    }
 					$newalbumlist[] = $albuminfo;
 				}
