@@ -25,7 +25,7 @@ class AliOss extends ModelBase
     public $LOCAL_IMG_TMP_PATH = '/alidata1/tmppicfile/';
     public $LOCAL_MEDIA_TMP_PATH = '/alidata1/tmpmediafile/';
     
-    public $OSS_IMAGE_THUMB_SIZE_LIST = array(100, 200, 230, 460); // lemonpic图片缩略尺寸
+    public $OSS_IMAGE_THUMB_SIZE_LIST = array(100, 135, 200, 230, 460); // lemonpic图片缩略尺寸
     
     public $IMAGE_TYPE_ALBUM = 'album';
     public $IMAGE_TYPE_STORY = 'story';
