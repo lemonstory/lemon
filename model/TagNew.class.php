@@ -200,12 +200,18 @@ class TagNew extends ModelBase
         
         $orderby = "";
         if ($isrecommend == 1) {
-            $where .= " AND `isrecommend` = 1";
+            // 推荐
+            $where .= " AND `isrecommend` = 1 AND `recommendstatus` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
             $orderby = "ORDER BY `uptime` DESC";
         } elseif ($ishot == 1) {
+            // 最热门
             $orderby = "ORDER BY `albumlistennum` DESC";
         } elseif ($isgoodcomment == 1) {
+            // 好评榜
             $orderby = "ORDER BY `commentstarlevel` DESC";
+        } else {
+            // 全部、其他标签
+            $orderby = "ORDER BY `uptime` DESC";
         }
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
@@ -258,19 +264,22 @@ class TagNew extends ModelBase
                     $tagidstr .= "'{$tagid}',";
                 }
                 $tagidstr = rtrim($tagidstr, ",");
-                $where .= "`tagid` IN ($tagidstr) AND ";
+                $where .= "`tagid` IN ($tagidstr)";
             }
+            
+            $onlinestatus = $this->RECOMMEND_STATUS_ONLIINE;
             if ($isrecommend == 1) {
-                $where .= "`isrecommend` = 1";
+                $where .= " AND `isrecommend` = 1 AND `recommendstatus` = $onlinestatus";
             } elseif ($issameage == 1) {
-                $where .= "`issameage` = 1";
+                $where .= " AND `issameage` = 1 AND `sameagestatus` = $onlinestatus";
             } elseif ($isnewonline == 1) {
-                $where .= "`isnewonline` = 1";
+                $where .= " AND `isnewonline` = 1 AND `newonlinestatus` = $onlinestatus";
             }
+            $orderby = "ORDER BY `uptime` DESC";
             $offset = ($currentpage - 1) * $len;
             
             $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-            $sql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} ORDER BY `uptime` DESC LIMIT $offset, $len";
+            $sql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} {$orderby} LIMIT $offset, $len";
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -341,7 +350,7 @@ class TagNew extends ModelBase
                 foreach ($tmpDbData as $onedbdata){
                     $dbData[$onedbdata['albumid']][$onedbdata['tagid']] = $onedbdata;
                     $relationkey = RedisKey::getAlbumTagRelationKeyByAlbumId($onedbdata['albumid']);
-                    $redisobj->setex($relationkey, 604800, json_encode($dbData));
+                    //$redisobj->setex($relationkey, 604800, json_encode($dbData));
                 }
             }
         }
