@@ -159,6 +159,23 @@ class TagNew extends ModelBase
         return $info;
     }
     
+    // 获取指定id的专辑、标签的关联信息
+    public function getAlbumTagRelationInfoByRelationId($albumtagrelationid)
+    {
+        if (empty($albumtagrelationid)) {
+            return array();
+        }
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `id` = ?";
+        $selectst = $db->prepare($selectsql);
+        $selectst->execute(array($albumtagrelationid));
+        $info = $selectst->fetch(PDO::FETCH_ASSOC);
+        if (empty($info)) {
+            return array();
+        }
+        return $info;
+    }
+    
     
     /**
      * 标签专辑列表：获取指定标签下的专辑列表
@@ -167,10 +184,10 @@ class TagNew extends ModelBase
      * @param I $ishot         是否为一级标签下的热门标签
      * @param I $isgoodcomment 是否为一级标签下的好评榜标签
      * @param S $direction    
-     * @param I $startalbumid 
+     * @param I $startrelationid   获取更多时，album_tag_relation的id
      * @param I $len
      */
-    public function getAlbumTagRelationListFromTag($tagids, $isrecommend = 0, $ishot = 0, $isgoodcomment = 0, $direction = "down", $startalbumid = 0, $len = 20)
+    public function getAlbumTagRelationListFromTag($tagids, $isrecommend = 0, $ishot = 0, $isgoodcomment = 0, $direction = "down", $startrelationid = 0, $len = 20)
     {
         if (empty($tagids)) {
             return array();
@@ -187,31 +204,88 @@ class TagNew extends ModelBase
             $tagidstr .= "'{$tagid}',";
         }
         $tagidstr = rtrim($tagidstr, ",");
+        $where = "`tagid` IN ($tagidstr)";
         
-        $where = "";
-        if (!empty($startalbumid)) {
-            if ($direction == "up") {
-                $where .= "`albumid` > '{$startalbumid}' AND ";
-            } else {
-                $where .= "`albumid` < '{$startalbumid}' AND ";
-            }
+        $albumtagrelationinfo = array();
+        if (!empty($startrelationid)) {
+            $albumtagrelationinfo = $this->getAlbumTagRelationInfoByRelationId($startrelationid);
         }
-        $where .= "`tagid` IN ($tagidstr)";
         
         $orderby = "";
         if ($isrecommend == 1) {
             // 推荐
             $where .= " AND `isrecommend` = 1 AND `recommendstatus` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
-            $orderby = "ORDER BY `uptime` DESC";
+            if (!empty($albumtagrelationinfo)) {
+                if (!empty($albumtagrelationinfo['uptime'])) {
+                    if ($direction == "up") {
+                        $where .= " AND `uptime` >= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
+                    } else {
+                        $where .= " AND `uptime` <= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
+                    }
+                } else {
+                    if ($direction == "up") {
+                        $where .= " AND `id` > '{$startrelationid}'";
+                    } else {
+                        $where .= " AND `id` > '{$startrelationid}'";
+                    }
+                }
+            }
+            
+            $orderby = "ORDER BY `uptime` DESC, `id` DESC";
         } elseif ($ishot == 1) {
             // 最热门
-            $orderby = "ORDER BY `albumlistennum` DESC";
+            if (!empty($albumtagrelationinfo)) {
+                if (!empty($albumtagrelationinfo['albumlistennum'])) {
+                    if ($direction == "up") {
+                        $where .= " AND `albumlistennum` >= '{$albumtagrelationinfo['albumlistennum']}' AND `id` > '{$startrelationid}'";
+                    } else {
+                        $where .= " AND `albumlistennum` <= '{$albumtagrelationinfo['albumlistennum']}' AND `id` > '{$startrelationid}'";
+                    }
+                } else {
+                    if ($direction == "up") {
+                        $where .= " AND `id` > '{$startrelationid}'";
+                    } else {
+                        $where .= " AND `id` > '{$startrelationid}'";
+                    }
+                }
+            }
+            $orderby = "ORDER BY `albumlistennum` DESC, `id` DESC";
         } elseif ($isgoodcomment == 1) {
             // 好评榜
-            $orderby = "ORDER BY `commentstarlevel` DESC";
+            if (!empty($albumtagrelationinfo)) {
+                if (!empty($albumtagrelationinfo['commentstarlevel'])) {
+                    if ($direction == "up") {
+                        $where .= " AND `commentstarlevel` >= '{$albumtagrelationinfo['commentstarlevel']}' AND `id` > '{$startrelationid}'";
+                    } else {
+                        $where .= " AND `commentstarlevel` <= '{$albumtagrelationinfo['commentstarlevel']}' AND `id` > '{$startrelationid}'";
+                    }
+                } else {
+                    if ($direction == "up") {
+                        $where .= " AND `id` > '{$startrelationid}'";
+                    } else {
+                        $where .= " AND `id` > '{$startrelationid}'";
+                    }
+                }
+            }
+            $orderby = "ORDER BY `commentstarlevel` DESC, `id` DESC";
         } else {
             // 全部、其他标签
-            $orderby = "ORDER BY `uptime` DESC";
+            if (!empty($albumtagrelationinfo)) {
+                if (!empty($albumtagrelationinfo['uptime'])) {
+                    if ($direction == "up") {
+                        $where .= " AND `uptime` >= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
+                    } else {
+                        $where .= " AND `uptime` <= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
+                    }
+                } else {
+                    if ($direction == "up") {
+                        $where .= " AND `id` > '{$startrelationid}'";
+                    } else {
+                        $where .= " AND `id` > '{$startrelationid}'";
+                    }
+                }
+            }
+            $orderby = "ORDER BY `uptime` DESC, `id` DESC";
         }
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
@@ -275,7 +349,7 @@ class TagNew extends ModelBase
             } elseif ($isnewonline == 1) {
                 $where .= " AND `isnewonline` = 1 AND `newonlinestatus` = $onlinestatus";
             }
-            $orderby = "ORDER BY `uptime` DESC";
+            $orderby = "ORDER BY `uptime` DESC, `id` DESC";
             $offset = ($currentpage - 1) * $len;
             
             $db = DbConnecter::connectMysql($this->DB_INSTANCE);

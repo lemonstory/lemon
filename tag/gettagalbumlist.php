@@ -11,7 +11,7 @@ class gettagalbumlist extends controller
         
         $isgettag = $this->getRequest("isgettag", 1);
         $direction = $this->getRequest("direction", "down");
-        $startalbumid = $this->getRequest("startalbumid", 0);
+        $startrelationid = $this->getRequest("startrelationid", 0);
         $len = $this->getRequest("len", 20);
         if (empty($currenttagid)) {
             $this->showErrorJson(ErrorConf::paramError());
@@ -77,27 +77,36 @@ class gettagalbumlist extends controller
             $tagids = array_unique($tagids);
         }
         
+        $albumlist = array();
         $tagalbumlist = array();
         $aliossobj = new AliOss();
         // 获取指定二级标签下，指定长度的专辑与标签关联列表
-        $albumrelationlist = $tagnewobj->getAlbumTagRelationListFromTag($tagids, $recommend, $hot, $goodcomment, $direction, $startalbumid, $len);
+        $albumrelationlist = $tagnewobj->getAlbumTagRelationListFromTag($tagids, $recommend, $hot, $goodcomment, $direction, $startrelationid, $len);
         if (!empty($albumrelationlist)) {
             $albumids = array();
+            $relationids = array();
             foreach ($albumrelationlist as $relationinfo) {
                 $albumids[] = $relationinfo['albumid'];
             }
             if (!empty($albumids)) {
                 $albumids = array_unique($albumids);
-                $albumidstr = implode(",", $albumids);
                 // 获取专辑列表
                 $albumobj = new Album();
-                $tagalbumres = $albumobj->get_list("id IN ($albumidstr)");
-                if (!empty($tagalbumres)) {
-                    foreach ($tagalbumres as $albuminfo) {
+                $albumlist = $albumobj->getListByIds($albumids);
+            }
+            
+            foreach ($albumrelationlist as $relationinfo) {
+                $albumid = $relationinfo['albumid'];
+                $relationinfo['albuminfo'] = array();
+                if (!empty($albumlist[$albumid])) {
+                    $albuminfo = $albumlist[$albumid];
+                    if (!empty($albuminfo['cover'])) {
                         $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
-                        $tagalbumlist[] = $albuminfo;
                     }
+                    $relationinfo['albuminfo'] = $albuminfo;
                 }
+                
+                $tagalbumlist[] = $relationinfo;
             }
         }
         
