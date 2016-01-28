@@ -153,7 +153,7 @@ class index extends controller
     		if (!empty($firsttagres)) {
     		    foreach ($firsttagres as $value) {
     		        if (!empty($value['cover'])) {
-    		            $value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_TAG, $value['cover'], 135, $value['covertime']);
+    		            $value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_TAG, $value['cover'], 0, $value['covertime']);
     		        }
     		        $firsttaglist[] = $value;
     		    }
