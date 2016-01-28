@@ -20,10 +20,10 @@ class TagNew extends ModelBase
     public function getFirstTagList($len)
     {
         if (empty($len) || $len < 0) {
-            $len = 10;
+            $len = 20;
         }
         
-        $key = $len;
+        $key = "firsttaglist_" . $len;
         $cacheobj = new CacheWrapper();
         $redisData = $cacheobj->getListCache($this->TAG_INFO_TABLE, $key);
         if (empty($redisData)) {
@@ -57,10 +57,10 @@ class TagNew extends ModelBase
             return array();
         }
         if (empty($len) || $len < 0) {
-            $len = 10;
+            $len = 20;
         }
         
-        $key = $pid . "_" . $len;
+        $key = "secondtaglist_" . $pid . "_" . $len;
         $cacheobj = new CacheWrapper();
         $redisData = $cacheobj->getListCache($this->TAG_INFO_TABLE, $key);
         if (empty($redisData)) {
@@ -544,6 +544,9 @@ class TagNew extends ModelBase
         // clear cache
         $this->clearTagInfoCacheById($tagid);
         $this->clearTagInfoCacheByName($tagname);
+        
+        $cacheobj = new CacheWrapper();
+        $redisData = $cacheobj->deleteNSCache($this->TAG_INFO_TABLE);
         return true;
     }
     
@@ -690,6 +693,9 @@ class TagNew extends ModelBase
         // clear cache
         $this->clearTagInfoCacheById($tagid);
         $this->clearTagInfoCacheByName($tagname);
+        
+        $cacheobj = new CacheWrapper();
+        $redisData = $cacheobj->deleteNSCache($this->TAG_INFO_TABLE);
         return true;
     }
     
