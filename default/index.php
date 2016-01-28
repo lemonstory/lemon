@@ -10,8 +10,14 @@ class index extends controller
 		$recommendobj = new Recommend();
 		$aliossobj = new AliOss();
 		
+		if ($_SERVER['visitorappversion'] >= "130000") {
+		    $albumlen = 4;
+		} else {
+		    $albumlen = 9;
+		}
+		
 		// 热门推荐
-		$hotrecommendres = $recommendobj->getRecommendHotList(1, 9);
+		$hotrecommendres = $recommendobj->getRecommendHotList(1, $albumlen);
 		if (!empty($hotrecommendres)) {
 			foreach ($hotrecommendres as $value) {
 				$albumids[] = $value['albumid'];
@@ -29,7 +35,7 @@ class index extends controller
 		}
 		
 		// 同龄在听
-		$sameageres = $recommendobj->getSameAgeListenList($babyagetype, 1, 9);
+		$sameageres = $recommendobj->getSameAgeListenList($babyagetype, 1, $albumlen);
 		if (!empty($sameageres)) {
 			foreach ($sameageres as $value) {
 				$albumids[] = $value['albumid'];
@@ -37,7 +43,7 @@ class index extends controller
 		}
 		
 		// 最新上架
-		$newonlineres = $recommendobj->getNewOnlineList($babyagetype, 1, 9);
+		$newonlineres = $recommendobj->getNewOnlineList($babyagetype, 1, $albumlen);
 		if (!empty($newonlineres)) {
 			foreach ($newonlineres as $value) {
 				$albumids[] = $value['albumid'];
