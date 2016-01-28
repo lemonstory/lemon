@@ -95,21 +95,54 @@ class TagNew extends ModelBase
         if (!is_array($tagids)) {
             $tagids = array($tagids);
         }
-        $tagidstr = implode(",", $tagids);
         
-        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `id` IN ($tagidstr)";
-        $selectst = $db->prepare($selectsql);
-        $selectst->execute();
-        $reslist = $selectst->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($reslist)) {
-            return array();
+        $keys = RedisKey::getTagInfoKeyByIds($tagids);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->mget($keys);
+        $cacheData = array();
+        $cacheIds = array();
+        if (is_array($redisData)){
+            foreach ($redisData as $oneredisdata){
+                if (empty($oneredisdata)) {
+                    continue;
+                }
+                $oneredisdata = json_decode($oneredisdata, true);
+                $cacheIds[] = $oneredisdata['id'];
+                $cacheData[$oneredisdata['id']] = $oneredisdata;
+            }
+        } else {
+            $redisData = array();
         }
-        $list = array();
-        foreach ($reslist as $value) {
-            $list[$value['id']] = $value;
+        // @huqq
+        //$cacheIds = array();
+        $dbIds = array_diff($tagids, $cacheIds);
+        $dbData = array();
+        
+        if(!empty($dbIds)) {
+            $tagidstr = implode(",", $tagids);
+            $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+            $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `id` IN ($tagidstr)";
+            $selectst = $db->prepare($selectsql);
+            $selectst->execute();
+            $tmpDbData = $selectst->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (!empty($tmpDbData)) {
+                foreach ($tmpDbData as $onedbdata){
+                    $dbData[$onedbdata['id']] = $onedbdata;
+                    $taginfokey = RedisKey::getTagInfoKeyById($onedbdata['id']);
+                    $redisobj->setex($taginfokey, 604800, json_encode($onedbdata));
+                }
+            }
         }
-        return $list;
+        
+        foreach($tagids as $tagid) {
+            if(in_array($tagid, $dbIds)) {
+                $data[$tagid] = @$dbData[$tagid];
+            } else {
+                $data[$tagid] = $cacheData[$tagid];
+            }
+        }
+        return $data;
     }
     
     
@@ -125,55 +158,24 @@ class TagNew extends ModelBase
         }
         $md5name = md5($name);
         
-        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `md5name` = ?";
-        $selectst = $db->prepare($selectsql);
-        $selectst->execute(array($md5name));
-        $info = $selectst->fetch(PDO::FETCH_ASSOC);
-        if (empty($info)) {
-            return array();
+        $key = RedisKey::getTagInfoKeyByName($md5name);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->get($key);
+        if (empty($redisData)) {
+            $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+            $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `md5name` = ?";
+            $selectst = $db->prepare($selectsql);
+            $selectst->execute(array($md5name));
+            $dbData = $selectst->fetch(PDO::FETCH_ASSOC);
+            $db = null;
+            if (empty($dbData)) {
+                return array();
+            }
+            $redisobj->setex($key, 604800, json_encode($dbData));
+            return $dbData;
+        } else {
+            return json_decode($redisData, true);
         }
-        return $info;
-    }
-    
-    
-    /**
-     * 获取指定专辑、标签的关联信息
-     * @param I $albumid    
-     * @param I $tagid      
-     * @return array
-     */
-    public function getAlbumTagRelationInfo($albumid, $tagid)
-    {
-        if (empty($albumid) || empty($tagid)) {
-            return array();
-        }
-        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `albumid` = ? AND `tagid` = ?";
-        $selectst = $db->prepare($selectsql);
-        $selectst->execute(array($albumid, $tagid));
-        $info = $selectst->fetch(PDO::FETCH_ASSOC);
-        if (empty($info)) {
-            return array();
-        }
-        return $info;
-    }
-    
-    // 获取指定id的专辑、标签的关联信息
-    public function getAlbumTagRelationInfoByRelationId($albumtagrelationid)
-    {
-        if (empty($albumtagrelationid)) {
-            return array();
-        }
-        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `id` = ?";
-        $selectst = $db->prepare($selectsql);
-        $selectst->execute(array($albumtagrelationid));
-        $info = $selectst->fetch(PDO::FETCH_ASSOC);
-        if (empty($info)) {
-            return array();
-        }
-        return $info;
     }
     
     
@@ -208,7 +210,7 @@ class TagNew extends ModelBase
         
         $albumtagrelationinfo = array();
         if (!empty($startrelationid)) {
-            $albumtagrelationinfo = $this->getAlbumTagRelationInfoByRelationId($startrelationid);
+            $albumtagrelationinfo = $this->getAlbumTagRelationInfoById($startrelationid);
         }
         
         $orderby = "";
@@ -408,7 +410,7 @@ class TagNew extends ModelBase
             $redisData = array();
         }
         // @huqq
-        $cacheIds = array();
+        //$cacheIds = array();
         $dbIds = array_diff($albumids, $cacheIds);
         $dbData = array();
         
@@ -424,7 +426,7 @@ class TagNew extends ModelBase
                 foreach ($tmpDbData as $onedbdata){
                     $dbData[$onedbdata['albumid']][$onedbdata['tagid']] = $onedbdata;
                     $relationkey = RedisKey::getAlbumTagRelationKeyByAlbumId($onedbdata['albumid']);
-                    //$redisobj->setex($relationkey, 604800, json_encode($dbData));
+                    $redisobj->setex($relationkey, 604800, json_encode($dbData));
                 }
             }
         }
@@ -461,7 +463,7 @@ class TagNew extends ModelBase
             $tagid = $taginfo['id'];
         }
         
-        $albumtagrelation = $this->getAlbumTagRelationInfo($albumid, $tagid);
+        $albumtagrelation = $this->getAlbumTagRelationInfoByAlbumIdTagId($albumid, $tagid);
         if (empty($albumtagrelation)) {
             $this->addAlbumTagRelationDb($albumid, $tagid);
         }
@@ -482,7 +484,7 @@ class TagNew extends ModelBase
             return false;
         }
         
-        $albumtagrelation = $this->getAlbumTagRelationInfo($albumid, $tagid);
+        $albumtagrelation = $this->getAlbumTagRelationInfoByAlbumIdTagId($albumid, $tagid);
         if (empty($albumtagrelation)) {
             $this->addAlbumTagRelationDb($albumid, $tagid);
         }
@@ -515,13 +517,14 @@ class TagNew extends ModelBase
     
     /**
      * 更新标签信息
-     * @param U $tagid
+     * @param I $tagid
+     * @param I $tagname
      * @param A $updatedata
      * @return boolean
      */
-    public function updateTagInfo($tagid, $updatedata)
+    public function updateTagInfo($tagid, $tagname, $updatedata)
     {
-        if (empty($tagid) || empty($updatedata)) {
+        if (empty($tagid) || empty($tagname) || empty($updatedata)) {
             return false;
         }
         $updatestr = "";
@@ -539,7 +542,8 @@ class TagNew extends ModelBase
         }
         
         // clear cache
-        
+        $this->clearTagInfoCacheById($tagid);
+        $this->clearTagInfoCacheByName($tagname);
         return true;
     }
     
@@ -565,7 +569,7 @@ class TagNew extends ModelBase
             return false;
         }
         // clear cache
-        
+        $this->clearAlbumTagRelationCacheByAlbumIds($albumid);
         return true;
     }
     
@@ -590,8 +594,9 @@ class TagNew extends ModelBase
         if (empty($updateres)) {
             return false;
         }
-        // clear cache
         
+        // clear cache
+        $this->clearAlbumTagRelationCacheByAlbumIds($albumid);
         return true;
     }
     
@@ -616,8 +621,9 @@ class TagNew extends ModelBase
         if (empty($updateres)) {
             return false;
         }
-        // clear cache
         
+        // clear cache
+        $this->clearAlbumTagRelationCacheByAlbumIds($albumid);
         return true;
     }
     
@@ -634,6 +640,16 @@ class TagNew extends ModelBase
             return false;
         }
         
+        // 获取标签的所有专辑列表
+        $relationlist = $this->getAlbumTagRelationInfoByTagId($tagid);
+        if (empty($relationlist)) {
+            return false;
+        }
+        $albumids = array();
+        foreach ($relationlist as $value) {
+            $albumids[] = $value['albumid'];
+        }
+        
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
         $selectsql = "DELETE FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `tagid` = ?";
         $selectst = $db->prepare($selectsql);
@@ -641,8 +657,12 @@ class TagNew extends ModelBase
         if (empty($updateres)) {
             return false;
         }
-        // clear cache
         
+        // clear cache
+        if (!empty($albumids)) {
+            $albumids = array_unique($albumids);
+            $this->clearAlbumTagRelationCacheByAlbumIds($albumids);
+        }
         return true;
     }
     
@@ -650,11 +670,12 @@ class TagNew extends ModelBase
     /**
      * 删除指定标签信息
      * @param I $tagid
+     * @param S $tagname
      * @return boolean
      */
-    public function deleteTagInfo($tagid)
+    public function deleteTagInfo($tagid, $tagname)
     {
-        if (empty($tagid)) {
+        if (empty($tagid) || empty($tagname)) {
             return false;
         }
         
@@ -665,9 +686,142 @@ class TagNew extends ModelBase
         if (empty($res)) {
             return false;
         }
-        // clear cache
         
+        // clear cache
+        $this->clearTagInfoCacheById($tagid);
+        $this->clearTagInfoCacheByName($tagname);
         return true;
+    }
+    
+    
+    // 通过tagid清除标签cache
+    public function clearTagInfoCacheById($tagid)
+    {
+        if (empty($tagid)) {
+            return false;
+        }
+        $key = RedisKey::getTagInfoKeyById($tagid);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        return $redisobj->delete($key);
+    }
+    // 通过tagname清除标签cache
+    public function clearTagInfoCacheByName($name)
+    {
+        if (empty($name)) {
+            return false;
+        }
+        $md5name = md5($name);
+        $key = RedisKey::getTagInfoKeyByName($md5name);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        return $redisobj->delete($key);
+    }
+    
+    
+    // 清除指定albumid、tagid的专辑、标签关联信息cache
+    /* public function clearAlbumTagRelationCacheByAlbumIdTagId($albumid, $tagid)
+    {
+        if (empty($albumid) || empty($tagid)) {
+            return false;
+        }
+        $key = RedisKey::getAlbumTagRelationKeyByAlbumIdTagId($albumid, $tagid);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        return $redisobj->delete($key);
+    } */
+    // 清除指定id的专辑、标签关联cache
+    /* public function clearAlbumTagRelationCacheById($id)
+    {
+        if (empty($id)) {
+            return false;
+        }
+        $key = RedisKey::getAlbumTagRelationKeyById($id);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        return $redisobj->delete($key);
+    } */
+    // 清除指定专辑id的关联cache
+    public function clearAlbumTagRelationCacheByAlbumIds($albumids)
+    {
+        if (empty($albumids)) {
+            return false;
+        }
+        if (!is_array($albumids)) {
+            $albumids = array($albumids);
+        }
+        $keys = RedisKey::getAlbumTagRelationKeyByAlbumIds($albumids);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        return $redisobj->delete($keys);
+    }
+    
+    
+    
+    // 获取指定id的专辑、标签的关联信息
+    private function getAlbumTagRelationInfoById($albumtagrelationid)
+    {
+        if (empty($albumtagrelationid)) {
+            return array();
+        }
+    
+        /* $key = RedisKey::getAlbumTagRelationKeyById($albumtagrelationid);
+         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->get($key); */
+        $redisData = array();
+        if (empty($redisData)) {
+            $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+            $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `id` = ?";
+            $selectst = $db->prepare($selectsql);
+            $selectst->execute(array($albumtagrelationid));
+            $dbData = $selectst->fetch(PDO::FETCH_ASSOC);
+            $db = null;
+            if (empty($dbData)) {
+                return array();
+            }
+            //$redisobj->setex($key, 604800, json_encode($dbData));
+            return $dbData;
+        } else {
+            return json_decode($redisData, true);
+        }
+    }
+    
+    // 获取指定tagid的专辑、标签的关联信息
+    private function getAlbumTagRelationInfoByTagId($tagid)
+    {
+        if (empty($tagid)) {
+            return array();
+        }
+        
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `tagid` = ?";
+        $selectst = $db->prepare($selectsql);
+        $selectst->execute(array($tagid));
+        $dbData = $selectst->fetchAll(PDO::FETCH_ASSOC);
+        $db = null;
+        if (empty($dbData)) {
+            return array();
+        }
+        return $dbData;
+    }
+    
+    /**
+     * 获取指定专辑、标签的关联信息
+     * @param I $albumid
+     * @param I $tagid
+     * @return array
+     */
+    private function getAlbumTagRelationInfoByAlbumIdTagId($albumid, $tagid)
+    {
+        if (empty($albumid) || empty($tagid)) {
+            return array();
+        }
+    
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `albumid` = ? AND `tagid` = ?";
+        $selectst = $db->prepare($selectsql);
+        $selectst->execute(array($albumid, $tagid));
+        $dbData = $selectst->fetch(PDO::FETCH_ASSOC);
+        $db = null;
+        if (empty($dbData)) {
+            return array();
+        }
+        return $dbData;
     }
     
     
@@ -720,6 +874,9 @@ class TagNew extends ModelBase
         if (empty($res)) {
             return false;
         }
+        
+        // 清除专辑标签列表cache
+        $this->clearAlbumTagRelationCacheByAlbumIds($albumid);
         return true;
     }
     
@@ -730,7 +887,7 @@ class TagNew extends ModelBase
      * @param I $storyid      
      * @return boolean
      */
-    private function addStoryTagRelationDb($storyid, $tagid)
+    /* private function addStoryTagRelationDb($storyid, $tagid)
     {
         if (empty($storyid) || empty($tagid)) {
             $this->setError(ErrorConf::paramError());
@@ -744,6 +901,6 @@ class TagNew extends ModelBase
             return false;
         }
         return true;
-    }
+    } */
 }
 ?>

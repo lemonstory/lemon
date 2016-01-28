@@ -278,9 +278,30 @@ class RedisKey
 	    }
 	    return $albumidarr;
 	}
-	// 专辑与标签关联：某个专辑，某个标签的key
-	public static function getAlbumTagRelationKey($albumid, $tagid)
+	// 专辑与标签关联：某个id的key
+	/* public static function getAlbumTagRelationKeyById($id)
 	{
-	    //return "atrelation_{$albumid}_{$tagid}";
+	    return "atr_id_{$id}";
+	} */
+	
+	
+	// 通过标签ID获取标签信息
+	public static function getTagInfoKeyById($tagid)
+	{
+	    return "tag_tagid_" . $tagid;
+	}
+	// 批量获取标签信息
+	public static function getTagInfoKeyByIds($tagids)
+	{
+	    $tagidarr = array();
+	    foreach ($tagids as $tagid) {
+	        $tagidarr[] = self::getTagInfoKeyById($tagid);
+	    }
+	    return $tagidarr;
+	}
+	// 通过标签名称获取标签信息
+	public static function getTagInfoKeyByName($tagname)
+	{
+	    return "tag_tagname_" . $tagname;
 	}
 }
