@@ -11,7 +11,7 @@ class index extends controller
 		$aliossobj = new AliOss();
 		
 		if ($_SERVER['visitorappversion'] >= "130000") {
-		    $albumlen = 4;
+		    $albumlen = 8;
 		} else {
 		    $albumlen = 9;
 		}
