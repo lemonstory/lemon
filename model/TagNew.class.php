@@ -228,7 +228,7 @@ class TagNew extends ModelBase
                     if ($direction == "up") {
                         $where .= " AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `id` > '{$startrelationid}'";
+                        $where .= " AND `id` < '{$startrelationid}'";
                     }
                 }
             }
@@ -247,7 +247,7 @@ class TagNew extends ModelBase
                     if ($direction == "up") {
                         $where .= " AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `id` > '{$startrelationid}'";
+                        $where .= " AND `id` < '{$startrelationid}'";
                     }
                 }
             }
@@ -265,7 +265,7 @@ class TagNew extends ModelBase
                     if ($direction == "up") {
                         $where .= " AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `id` > '{$startrelationid}'";
+                        $where .= " AND `id` < '{$startrelationid}'";
                     }
                 }
             }
@@ -283,7 +283,7 @@ class TagNew extends ModelBase
                     if ($direction == "up") {
                         $where .= " AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `id` > '{$startrelationid}'";
+                        $where .= " AND `id` < '{$startrelationid}'";
                     }
                 }
             }
