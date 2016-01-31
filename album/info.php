@@ -132,7 +132,7 @@ class info extends controller
                     if (!empty($tagrelationalbumlist)) {
                         foreach ($tagrelationalbumlist as $value) {
                             if (!empty($value['cover'])) {
-                                $value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $value['cover'], 100, $value['cover_time']);
+                                $value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $value['cover'], 460, $value['cover_time']);
                             }
                             $value['listennum'] = 0;
                             if (!empty($tagrelationlist[$value['id']])) {
