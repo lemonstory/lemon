@@ -103,9 +103,11 @@ class gettagalbumlist extends controller
                     if (!empty($albuminfo['cover'])) {
                         $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
                     }
+                    $albuminfo['listennum'] = $relationinfo['albumlistennum'];
+                    $albuminfo['favnum'] = $relationinfo['albumfavnum'];
+                    $albuminfo['star_level'] = $relationinfo['commentstarlevel'];
                     $relationinfo['albuminfo'] = $albuminfo;
                 }
-                
                 $tagalbumlist[] = $relationinfo;
             }
         }
