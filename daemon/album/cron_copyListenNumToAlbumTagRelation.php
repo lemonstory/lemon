@@ -21,7 +21,7 @@ class cron_copyListenNumToAlbumTagRelation extends DaemonBase {
 	        $albumid = $value['albumid'];
 	        $num = $value['num'];
 	        
-	        $res = $tagnewobj->updateAlbumTagRelationListenNum($albumid, $num);
+	        $res = $tagnewobj->updateAlbumTagRelationListenNum($albumid, $num,true);
 	        if (empty($res)) {
 	            $res = 0;
 	        }
