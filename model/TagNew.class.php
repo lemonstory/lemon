@@ -388,6 +388,8 @@ class TagNew extends ModelBase
         $keys = RedisKey::getAlbumTagRelationKeyByAlbumIds($albumids);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisData = $redisobj->mget($keys);
+        // @huqq
+        //$redisData = array();
         
         $cacheData = array();
         $cacheIds = array();
@@ -397,20 +399,18 @@ class TagNew extends ModelBase
                     continue;
                 }
                 $listredisdata = json_decode($listredisdata, true);
-                foreach ($listredisdata as $albumidkey => $listredisdata) {
-                    foreach ($listredisdata as $oneredisdata) {
-                        $cacheIds[] = $oneredisdata['albumid'];
-                        if ($albumidkey == $oneredisdata['albumid']) {
-                            $cacheData[$oneredisdata['albumid']][$oneredisdata['tagid']] = $oneredisdata;
-                        }
-                    }
+                foreach ($listredisdata as $tagidkey => $albumtagrelationinfo) {
+                    $albumid = $albumtagrelationinfo['albumid'];
+                    $cacheIds[] = $albumid;
+                    $cacheData[$albumid][$tagidkey] = $albumtagrelationinfo;
                 }
             }
         } else {
             $redisData = array();
         }
-        // @huqq
-        //$cacheIds = array();
+        if (!empty($cacheIds)) {
+            $cacheIds = array_unique($cacheIds);
+        }
         $dbIds = array_diff($albumids, $cacheIds);
         $dbData = array();
         
@@ -425,8 +425,14 @@ class TagNew extends ModelBase
             if (!empty($tmpDbData)) {
                 foreach ($tmpDbData as $onedbdata){
                     $dbData[$onedbdata['albumid']][$onedbdata['tagid']] = $onedbdata;
-                    $relationkey = RedisKey::getAlbumTagRelationKeyByAlbumId($onedbdata['albumid']);
-                    $redisobj->setex($relationkey, 604800, json_encode($dbData));
+                }
+                if (!empty($dbData)) {
+                    foreach ($dbData as $setdata) {
+                        $value = current($setdata);
+                        $albumid = $value['albumid'];
+                        $relationkey = RedisKey::getAlbumTagRelationKeyByAlbumId($albumid);
+                        $redisobj->setex($relationkey, 604800, json_encode($setdata));
+                    }
                 }
             }
         }
