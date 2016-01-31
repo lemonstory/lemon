@@ -37,6 +37,8 @@ class hotrecommendlist extends controller
                     }
                     $secondtagids = array_unique($secondtagids);
                 }
+            } else {
+                // 获取全部标签
             }
             $hotrecommendres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 1, 0, 0, $p, $len);
         }

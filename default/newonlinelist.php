@@ -47,6 +47,8 @@ class newonlinelist extends controller
                     }
                     $secondtagids = array_unique($secondtagids);
                 }
+            } else {
+                // 获取全部标签
             }
             $newonlineres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 0, 0, 1, $p, $len);
         }

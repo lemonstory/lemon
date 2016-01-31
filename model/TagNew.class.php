@@ -340,16 +340,16 @@ class TagNew extends ModelBase
                     $tagidstr .= "'{$tagid}',";
                 }
                 $tagidstr = rtrim($tagidstr, ",");
-                $where .= "`tagid` IN ($tagidstr)";
+                $where .= "`tagid` IN ($tagidstr) AND ";
             }
             
             $onlinestatus = $this->RECOMMEND_STATUS_ONLIINE;
             if ($isrecommend == 1) {
-                $where .= " AND `isrecommend` = 1 AND `recommendstatus` = $onlinestatus";
+                $where .= "`isrecommend` = 1 AND `recommendstatus` = $onlinestatus";
             } elseif ($issameage == 1) {
-                $where .= " AND `issameage` = 1 AND `sameagestatus` = $onlinestatus";
+                $where .= "`issameage` = 1 AND `sameagestatus` = $onlinestatus";
             } elseif ($isnewonline == 1) {
-                $where .= " AND `isnewonline` = 1 AND `newonlinestatus` = $onlinestatus";
+                $where .= "`isnewonline` = 1 AND `newonlinestatus` = $onlinestatus";
             }
             $orderby = "ORDER BY `uptime` DESC, `id` DESC";
             $offset = ($currentpage - 1) * $len;

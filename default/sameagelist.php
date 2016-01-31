@@ -48,6 +48,8 @@ class sameagelist extends controller
                     }
                     $secondtagids = array_unique($secondtagids);
                 }
+            } else {
+                // 获取全部标签
             }
             $sameageres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 0, 1, 0, $p, $len);
         }
