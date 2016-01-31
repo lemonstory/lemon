@@ -62,10 +62,12 @@ class gettagalbumlist extends controller
         $tagids = array();
         if ($selectsecondtagid == 0) {
             // 二级标签为全部，选取一级标签下的所有专辑列表
-            if (!empty($secondtaglist)) {
-                foreach ($secondtaglist as $value) {
-                    $tagids[] = $value['id'];
-                }
+            if (empty($secondtaglist)) {
+                // 为空读取一次
+                $secondtaglist = $tagnewobj->getSecondTagList($selectfirsttagid, $secondtagnum);
+            }
+            foreach ($secondtaglist as $value) {
+                $tagids[] = $value['id'];
             }
             // 同时包含一级标签本身的专辑
             array_unshift($tagids, $currenttagid);
