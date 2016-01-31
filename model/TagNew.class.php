@@ -222,7 +222,7 @@ class TagNew extends ModelBase
                     if ($direction == "up") {
                         $where .= " AND `uptime` >= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `uptime` <= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
+                        $where .= " AND `uptime` <= '{$albumtagrelationinfo['uptime']}' AND `id` < '{$startrelationid}'";
                     }
                 } else {
                     if ($direction == "up") {
@@ -241,7 +241,7 @@ class TagNew extends ModelBase
                     if ($direction == "up") {
                         $where .= " AND `albumlistennum` >= '{$albumtagrelationinfo['albumlistennum']}' AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `albumlistennum` <= '{$albumtagrelationinfo['albumlistennum']}' AND `id` > '{$startrelationid}'";
+                        $where .= " AND `albumlistennum` <= '{$albumtagrelationinfo['albumlistennum']}' AND `id` < '{$startrelationid}'";
                     }
                 } else {
                     if ($direction == "up") {
@@ -259,7 +259,7 @@ class TagNew extends ModelBase
                     if ($direction == "up") {
                         $where .= " AND `commentstarlevel` >= '{$albumtagrelationinfo['commentstarlevel']}' AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `commentstarlevel` <= '{$albumtagrelationinfo['commentstarlevel']}' AND `id` > '{$startrelationid}'";
+                        $where .= " AND `commentstarlevel` <= '{$albumtagrelationinfo['commentstarlevel']}' AND `id` < '{$startrelationid}'";
                     }
                 } else {
                     if ($direction == "up") {
@@ -277,7 +277,7 @@ class TagNew extends ModelBase
                     if ($direction == "up") {
                         $where .= " AND `uptime` >= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `uptime` <= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
+                        $where .= " AND `uptime` <= '{$albumtagrelationinfo['uptime']}' AND `id` < '{$startrelationid}'";
                     }
                 } else {
                     if ($direction == "up") {
