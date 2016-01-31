@@ -47,10 +47,12 @@ class newonlinelist extends controller
                     }
                     $secondtagids = array_unique($secondtagids);
                 }
+                $newonlineres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 0, 0, 1, $p, $len);
             } else {
                 // 获取全部标签
+                $recommendobj = new Recommend();
+                $newonlineres = $recommendobj->getNewOnlineList($babyagetype, $p, $len);
             }
-            $newonlineres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 0, 0, 1, $p, $len);
         }
         if (! empty($newonlineres)) {
             foreach ($newonlineres as $value) {
