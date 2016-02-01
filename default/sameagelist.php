@@ -36,25 +36,16 @@ class sameagelist extends controller
         } else {
             if ($isgettag == 1) {
                 // 一级标签
-                $firsttaglist = $tagnewobj->getFirstTagList(8);
+                $firsttaglist = $tagnewobj->getFirstTagList($first_tags_count);
             }
-            
-            if (!empty($currentfirsttagid)) {
-                // 获取当前一级标签下，前50个二级标签
-                $secondtaglist = $tagnewobj->getSecondTagList($currentfirsttagid, 50);
-                if (!empty($secondtaglist)) {
-                    foreach ($secondtaglist as $value) {
-                        $secondtagids[] = $value['id'];
-                    }
-                    $secondtagids = array_unique($secondtagids);
-                }
-                $sameageres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 0, 1, 0, $p, $len);
-            } else {
-                // 获取全部标签
-                $recommendobj = new Recommend();
-                $sameageres = $recommendobj->getSameAgeListenList($babyagetype, $p, $len);
+
+            //热门推荐->全部
+            if (empty($currentfirsttagid)) {
+                $currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
             }
-            
+
+            //热门推荐->子标签
+            $sameageres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 0, 0, 1, $p, $len);
         }
         if (! empty($sameageres)) {
             foreach ($sameageres as $value) {

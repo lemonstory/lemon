@@ -4,6 +4,8 @@ class hotrecommendlist extends controller
 {
     public function action() 
     {
+
+        $first_tags_count = 8;
         $currentfirsttagid = $this->getRequest("currentfirsttagid", 0);
         $isgettag = $this->getRequest("isgettag", 1);
         $p = $this->getRequest("p", 1);
@@ -17,7 +19,7 @@ class hotrecommendlist extends controller
         $listenobj = new Listen();
         $aliossobj = new AliOss();
         $tagnewobj = new TagNew();
-        
+
         // 热门推荐
         if ($_SERVER['visitorappversion'] < "130000") {
             $recommendobj = new Recommend();
@@ -25,24 +27,16 @@ class hotrecommendlist extends controller
         } else {
             if ($isgettag == 1) {
                 // 一级标签
-                $firsttaglist = $tagnewobj->getFirstTagList(8);
+                $firsttaglist = $tagnewobj->getFirstTagList($first_tags_count);
             }
-            
-            if (!empty($currentfirsttagid)) {
-                // 获取当前一级标签下，前50个二级标签
-                $secondtaglist = $tagnewobj->getSecondTagList($currentfirsttagid, 50);
-                if (!empty($secondtaglist)) {
-                    foreach ($secondtaglist as $value) {
-                        $secondtagids[] = $value['id'];
-                    }
-                    $secondtagids = array_unique($secondtagids);
-                }
-                $hotrecommendres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 1, 0, 0, $p, $len);
-            } else {
-                // 获取全部标签，按原版推荐数据
-                $recommendobj = new Recommend();
-                $hotrecommendres = $recommendobj->getRecommendHotList($p, $len);
+
+            //热门推荐->全部
+            if (empty($currentfirsttagid)) {
+                $currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
             }
+
+            //热门推荐->子标签
+            $hotrecommendres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 1, 0, 0, $p, $len);
         }
         
         if (! empty($hotrecommendres)) {

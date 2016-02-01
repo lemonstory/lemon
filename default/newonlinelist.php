@@ -4,6 +4,7 @@ class newonlinelist extends controller
 {
     public function action() 
     {
+        $first_tags_count = 8;
         $currentfirsttagid = $this->getRequest("currentfirsttagid", 0);
         $isgettag = $this->getRequest("isgettag", 1);
         $p = $this->getRequest("p", 1);
@@ -35,24 +36,16 @@ class newonlinelist extends controller
         } else {
             if ($isgettag == 1) {
                 // 一级标签
-                $firsttaglist = $tagnewobj->getFirstTagList(8);
+                $firsttaglist = $tagnewobj->getFirstTagList($first_tags_count);
             }
-            
-            if (!empty($currentfirsttagid)) {
-                // 获取当前一级标签下，前50个二级标签
-                $secondtaglist = $tagnewobj->getSecondTagList($currentfirsttagid, 50);
-                if (!empty($secondtaglist)) {
-                    foreach ($secondtaglist as $value) {
-                        $secondtagids[] = $value['id'];
-                    }
-                    $secondtagids = array_unique($secondtagids);
-                }
-                $newonlineres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 0, 0, 1, $p, $len);
-            } else {
-                // 获取全部标签
-                $recommendobj = new Recommend();
-                $newonlineres = $recommendobj->getNewOnlineList($babyagetype, $p, $len);
+
+            //热门推荐->全部
+            if (empty($currentfirsttagid)) {
+                $currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
             }
+
+            //热门推荐->子标签
+            $newonlineres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 0, 0, 1, $p, $len);
         }
         if (! empty($newonlineres)) {
             foreach ($newonlineres as $value) {
