@@ -45,34 +45,40 @@ class gettagalbumlist extends controller
             } elseif ($goodcomment == 1) {
                 $selectsecondtagid = "goodcomment"; // 表示二级标签选中好评榜
             } else {
-                $selectsecondtagid = 0; // 表示二级标签选中全部
+
+                //表示二级标签选中全部
+                //更改:二级标签选中全部(即是:选中标签为当前一级标签)
+                $selectsecondtagid = 0;
             }
             if ($isgettag == 1) {
                 $secondtaglist = $tagnewobj->getSecondTagList($selectfirsttagid, $secondtagnum);
             }
         } else {
             // 当前选中的currenttagid为二级标签，获取该标签的父级下的所有二级标签列表
-            $selectfirsttagid = $currentpid;
-            $selectsecondtagid = $currenttagid;
+
             if ($isgettag == 1) {
                 $secondtaglist = $tagnewobj->getSecondTagList($selectfirsttagid, $secondtagnum);
             }
         }
-        
+
         $tagids = array();
         if ($selectsecondtagid == 0) {
             // 二级标签为全部，选取一级标签下的所有专辑列表
-            if (!empty($secondtaglist)) {
-                foreach ($secondtaglist as $value) {
-                    $tagids[] = $value['id'];
-                }
-            }
-            // 同时包含一级标签本身的专辑
-            array_unshift($tagids, $currenttagid);
+//            if (empty($secondtaglist)) {
+//                // 为空读取一次
+//                $secondtaglist = $tagnewobj->getSecondTagList($selectfirsttagid, $secondtagnum);
+//            }
+//            foreach ($secondtaglist as $value) {
+//                $tagids[] = $value['id'];
+//            }
+//            // 同时包含一级标签本身的专辑
+//            array_unshift($tagids, $currenttagid);
+            $tagids = array($currenttagid);
         } else {
             // 指定二级标签下的专辑列表
             $tagids = array($selectsecondtagid);
         }
+
         if (!empty($tagids)) {
             $tagids = array_unique($tagids);
         }
