@@ -222,13 +222,13 @@ class TagNew extends ModelBase
                     if ($direction == "up") {
                         $where .= " AND `uptime` >= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `uptime` <= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
+                        $where .= " AND `uptime` <= '{$albumtagrelationinfo['uptime']}' AND `id` < '{$startrelationid}'";
                     }
                 } else {
                     if ($direction == "up") {
                         $where .= " AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `id` > '{$startrelationid}'";
+                        $where .= " AND `id` < '{$startrelationid}'";
                     }
                 }
             }
@@ -241,13 +241,13 @@ class TagNew extends ModelBase
                     if ($direction == "up") {
                         $where .= " AND `albumlistennum` >= '{$albumtagrelationinfo['albumlistennum']}' AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `albumlistennum` <= '{$albumtagrelationinfo['albumlistennum']}' AND `id` > '{$startrelationid}'";
+                        $where .= " AND `albumlistennum` <= '{$albumtagrelationinfo['albumlistennum']}' AND `id` < '{$startrelationid}'";
                     }
                 } else {
                     if ($direction == "up") {
                         $where .= " AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `id` > '{$startrelationid}'";
+                        $where .= " AND `id` < '{$startrelationid}'";
                     }
                 }
             }
@@ -259,13 +259,13 @@ class TagNew extends ModelBase
                     if ($direction == "up") {
                         $where .= " AND `commentstarlevel` >= '{$albumtagrelationinfo['commentstarlevel']}' AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `commentstarlevel` <= '{$albumtagrelationinfo['commentstarlevel']}' AND `id` > '{$startrelationid}'";
+                        $where .= " AND `commentstarlevel` <= '{$albumtagrelationinfo['commentstarlevel']}' AND `id` < '{$startrelationid}'";
                     }
                 } else {
                     if ($direction == "up") {
                         $where .= " AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `id` > '{$startrelationid}'";
+                        $where .= " AND `id` < '{$startrelationid}'";
                     }
                 }
             }
@@ -277,13 +277,13 @@ class TagNew extends ModelBase
                     if ($direction == "up") {
                         $where .= " AND `uptime` >= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `uptime` <= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
+                        $where .= " AND `uptime` <= '{$albumtagrelationinfo['uptime']}' AND `id` < '{$startrelationid}'";
                     }
                 } else {
                     if ($direction == "up") {
                         $where .= " AND `id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `id` > '{$startrelationid}'";
+                        $where .= " AND `id` < '{$startrelationid}'";
                     }
                 }
             }
@@ -340,16 +340,16 @@ class TagNew extends ModelBase
                     $tagidstr .= "'{$tagid}',";
                 }
                 $tagidstr = rtrim($tagidstr, ",");
-                $where .= "`tagid` IN ($tagidstr)";
+                $where .= "`tagid` IN ($tagidstr) AND ";
             }
             
             $onlinestatus = $this->RECOMMEND_STATUS_ONLIINE;
             if ($isrecommend == 1) {
-                $where .= " AND `isrecommend` = 1 AND `recommendstatus` = $onlinestatus";
+                $where .= "`isrecommend` = 1 AND `recommendstatus` = $onlinestatus";
             } elseif ($issameage == 1) {
-                $where .= " AND `issameage` = 1 AND `sameagestatus` = $onlinestatus";
+                $where .= "`issameage` = 1 AND `sameagestatus` = $onlinestatus";
             } elseif ($isnewonline == 1) {
-                $where .= " AND `isnewonline` = 1 AND `newonlinestatus` = $onlinestatus";
+                $where .= "`isnewonline` = 1 AND `newonlinestatus` = $onlinestatus";
             }
             $orderby = "ORDER BY `uptime` DESC, `id` DESC";
             $offset = ($currentpage - 1) * $len;
@@ -388,6 +388,8 @@ class TagNew extends ModelBase
         $keys = RedisKey::getAlbumTagRelationKeyByAlbumIds($albumids);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisData = $redisobj->mget($keys);
+        // @huqq
+        //$redisData = array();
         
         $cacheData = array();
         $cacheIds = array();
@@ -397,20 +399,18 @@ class TagNew extends ModelBase
                     continue;
                 }
                 $listredisdata = json_decode($listredisdata, true);
-                foreach ($listredisdata as $albumidkey => $listredisdata) {
-                    foreach ($listredisdata as $oneredisdata) {
-                        $cacheIds[] = $oneredisdata['albumid'];
-                        if ($albumidkey == $oneredisdata['albumid']) {
-                            $cacheData[$oneredisdata['albumid']][$oneredisdata['tagid']] = $oneredisdata;
-                        }
-                    }
+                foreach ($listredisdata as $tagidkey => $albumtagrelationinfo) {
+                    $albumid = $albumtagrelationinfo['albumid'];
+                    $cacheIds[] = $albumid;
+                    $cacheData[$albumid][$tagidkey] = $albumtagrelationinfo;
                 }
             }
         } else {
             $redisData = array();
         }
-        // @huqq
-        //$cacheIds = array();
+        if (!empty($cacheIds)) {
+            $cacheIds = array_unique($cacheIds);
+        }
         $dbIds = array_diff($albumids, $cacheIds);
         $dbData = array();
         
@@ -425,8 +425,14 @@ class TagNew extends ModelBase
             if (!empty($tmpDbData)) {
                 foreach ($tmpDbData as $onedbdata){
                     $dbData[$onedbdata['albumid']][$onedbdata['tagid']] = $onedbdata;
-                    $relationkey = RedisKey::getAlbumTagRelationKeyByAlbumId($onedbdata['albumid']);
-                    $redisobj->setex($relationkey, 604800, json_encode($dbData));
+                }
+                if (!empty($dbData)) {
+                    foreach ($dbData as $setdata) {
+                        $value = current($setdata);
+                        $albumid = $value['albumid'];
+                        $relationkey = RedisKey::getAlbumTagRelationKeyByAlbumId($albumid);
+                        $redisobj->setex($relationkey, 604800, json_encode($setdata));
+                    }
                 }
             }
         }

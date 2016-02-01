@@ -37,8 +37,12 @@ class hotrecommendlist extends controller
                     }
                     $secondtagids = array_unique($secondtagids);
                 }
+                $hotrecommendres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 1, 0, 0, $p, $len);
+            } else {
+                // 获取全部标签，按原版推荐数据
+                $recommendobj = new Recommend();
+                $hotrecommendres = $recommendobj->getRecommendHotList($p, $len);
             }
-            $hotrecommendres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 1, 0, 0, $p, $len);
         }
         
         if (! empty($hotrecommendres)) {

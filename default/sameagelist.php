@@ -48,8 +48,13 @@ class sameagelist extends controller
                     }
                     $secondtagids = array_unique($secondtagids);
                 }
+                $sameageres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 0, 1, 0, $p, $len);
+            } else {
+                // 获取全部标签
+                $recommendobj = new Recommend();
+                $sameageres = $recommendobj->getSameAgeListenList($babyagetype, $p, $len);
             }
-            $sameageres = $tagnewobj->getAlbumTagRelationListFromRecommend($secondtagids, 0, 1, 0, $p, $len);
+            
         }
         if (! empty($sameageres)) {
             foreach ($sameageres as $value) {
