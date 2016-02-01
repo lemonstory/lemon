@@ -104,13 +104,13 @@ class Story extends ModelBase
         $len = intval($len);
 
         //简体->繁体替换
-        $search = array("壹","贰","叁","肆","伍","陆","柒","捌","玖","拾","零");
-        $replace = array('一', '二', '三', '四', '五', '六', '七', '八', '九','零');
+        $search = array("零","壹","贰","叁","肆","伍","陆","柒","捌","玖","拾");
+        $replace = array("零","一","二","三","四","五","六","七","八","九","十");
         $title = str_replace($search,$replace,$title);
 
         //简体->数字替换
         $search = $replace;
-        $replace = array("1","2","3","4","5","6","7","8","9","0");
+        $replace = array("0","1","2","3","4","5","6","7","8","9","10");
         $title = str_replace($search,$replace,$title);
 
         //提取字符串中所有的数字拼成字符串
