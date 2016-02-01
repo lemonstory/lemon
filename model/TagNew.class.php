@@ -43,6 +43,19 @@ class TagNew extends ModelBase
             return $redisData;
         }
     }
+
+    public function getFirstTagIds($len) {
+
+        $ids = array();
+        $list = $this->getFirstTagList($len);
+        if(!empty($list)) {
+
+            foreach($list as $taginfo) {
+                $ids[] = $taginfo['id'];
+            }
+        }
+        return $ids;
+    }
     
     
     /**
@@ -315,6 +328,10 @@ class TagNew extends ModelBase
      */
     public function getAlbumTagRelationListFromRecommend($tagids, $isrecommend = 0, $issameage = 0, $isnewonline = 0, $currentpage = 1, $len = 20)
     {
+       if(!is_array($tagids)) {
+            $tagids = array($tagids);
+        }
+
         if (empty($isrecommend) && empty($issameage) && empty($isnewonline)) {
             return array();
         }
@@ -327,7 +344,8 @@ class TagNew extends ModelBase
         if ($len > 50) {
             $len = 50;
         }
-        
+
+        //TODO:先去掉cache测试
         /* $key = $currentpage . "_" . $len;
         $cacheobj = new CacheWrapper();
         $redisData = $cacheobj->getListCache($this->ALBUM_TAG_RELATION_TABLE, $key); */
@@ -337,10 +355,14 @@ class TagNew extends ModelBase
             if (!empty($tagids)) {
                 $tagidstr = "";
                 foreach ($tagids as $tagid) {
-                    $tagidstr .= "'{$tagid}',";
+                    if(!empty($tagid)) {
+                        $tagidstr .= "'{$tagid}',";
+                    }
                 }
-                $tagidstr = rtrim($tagidstr, ",");
-                $where .= "`tagid` IN ($tagidstr) AND ";
+                if(!empty($tagidstr)) {
+                    $tagidstr = rtrim($tagidstr, ",");
+                    $where .= "`tagid` IN ($tagidstr) AND ";
+                }
             }
             
             $onlinestatus = $this->RECOMMEND_STATUS_ONLIINE;
@@ -356,6 +378,7 @@ class TagNew extends ModelBase
             
             $db = DbConnecter::connectMysql($this->DB_INSTANCE);
             $sql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} {$orderby} LIMIT $offset, $len";
+            //echo $sql;
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
