@@ -98,38 +98,30 @@ class Story extends ModelBase
     }
 
     // 获取排序
-    public function get_view_order($title = '', $level = 1)
-    {
-        // 夜 首 集 
-        // $number_list = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-        // $big_number = array( '零', '一', '二', '三', '四', '五', '六', '七', '八', '九');
-        $title = str_replace(array('mp3', 'MP3'), array('', ''), $title);
-        $title = preg_replace('/&#\d+;/', '', $title);
-        $result = '';
+    public function get_view_order($title = '',$len = 0) {
 
-        if ($level == 1) {
-            $str_list = array('回', '集', '首', '夜', '个');
-            foreach ($str_list as $k => $v) {
-                $str = trim(Http::sub_data($title, '第', $v));
-                if (!empty($str) && is_numeric($str)) {
-                    $result = $str;
-                    break;
-                }
-            }
-        } else if ($level == 2) {
-            preg_match_all('/\d+/', $title, $r);
-            if (isset($r[0][0]) && count($r[0]) == 1 && is_numeric($r[0][0])) {
-                if (is_numeric($r[0][0])) {
-                    if ($r[0][0] >= 2147483647) {
-                        $result = substr($r[0][0], 4);
-                    } else {
-                        $result = $r[0][0];
-                    }
-                }
-            }
+        $title = trim($title);
+        $len = intval($len);
+
+        //简体->繁体替换
+        $search = array("壹","贰","叁","肆","伍","陆","柒","捌","玖","拾","零");
+        $replace = array('一', '二', '三', '四', '五', '六', '七', '八', '九','零');
+        $title = str_replace($search,$replace,$title);
+
+        //简体->数字替换
+        $search = $replace;
+        $replace = array("1","2","3","4","5","6","7","8","9","0");
+        $title = str_replace($search,$replace,$title);
+
+        //提取字符串中所有的数字拼成字符串
+        $view_order_str = preg_replace('/[^0-9]/','',$title);
+        if(0 != $len) {
+            $view_order_str = substr($view_order_str,0,$len);
         }
 
-        return $result;
+        //字符串->数字
+        $view_order = intval($view_order_str);
+        return $view_order;
     }
 
 	/**
