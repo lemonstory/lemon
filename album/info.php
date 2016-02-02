@@ -48,6 +48,13 @@ class info extends controller
             $result['albuminfo']['cover'] = $result['albuminfo']['s_cover'];
         }
 
+        //简介为空的处理
+        if (empty($result['albuminfo']['intro'])) {
+
+            $intro = sprintf("%暂时没有简介内容 (>.<)", $result['albuminfo']['title']);
+            $result['albuminfo']['intro'] = $intro;
+        }
+
         // 是否收藏
         $favinfo = $fav->getUserFavInfoByAlbumId($uid, $album_id);
         if ($favinfo) {
