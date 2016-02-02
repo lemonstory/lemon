@@ -48,10 +48,11 @@ class info extends controller
             $result['albuminfo']['cover'] = $result['albuminfo']['s_cover'];
         }
 
+
         //简介为空的处理
         if (empty($result['albuminfo']['intro'])) {
 
-            $intro = sprintf("%暂时没有简介内容 (>.<)", $result['albuminfo']['title']);
+            $intro = sprintf("《%s》暂时没有简介(>.<)", $result['albuminfo']['title']);
             $result['albuminfo']['intro'] = $intro;
         }
 
