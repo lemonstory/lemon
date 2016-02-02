@@ -127,9 +127,12 @@ class gettagalbumlist extends controller
                 }
             }
             $albumrelationlistcount = count($albumrelationlist);
+            if (count($section_relation_list) < $max_len) {
+                break;
+            }
         }
 
-        if ($albumrelationlistcount == $len) {
+        if ($albumrelationlistcount <= $len) {
 
             $albumids = array();
             foreach ($albumrelationlist as $relationinfo) {
