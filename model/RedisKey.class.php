@@ -279,10 +279,10 @@ class RedisKey
 	    return $albumidarr;
 	}
 	// 专辑与标签关联：某个id的key
-	/* public static function getAlbumTagRelationKeyById($id)
+	public static function getAlbumTagRelationKeyById($id)
 	{
 	    return "atr_id_{$id}";
-	} */
+	}
 	
 	
 	// 通过标签ID获取标签信息
