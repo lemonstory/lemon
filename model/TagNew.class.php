@@ -46,11 +46,27 @@ class TagNew extends ModelBase
 
     public function getFirstTagIds($len) {
 
-        $ids = array();
         $list = $this->getFirstTagList($len);
-        if(!empty($list)) {
+        $ids = $this->getTagIdsWithTagList($list);
+        return $ids;
+    }
 
-            foreach($list as $taginfo) {
+    public function getSecondTagIds($pid, $len)
+    {
+
+        $list = $this->getSecondTagList($pid, $len);
+        $ids = $this->getTagIdsWithTagList($list);
+        return $ids;
+    }
+
+
+    private function getTagIdsWithTagList($tagList)
+    {
+
+        $ids = array();
+        if (!empty($tagList)) {
+
+            foreach ($tagList as $taginfo) {
                 $ids[] = $taginfo['id'];
             }
         }
@@ -210,7 +226,7 @@ class TagNew extends ModelBase
         if (!is_array($tagids)) {
             $tagids = array($tagids);
         }
-        if (empty($len) || $len < 0 || $len > 100) {
+        if (empty($len) || $len < 0 || $len > 10000) {
             $len = 20;
         }
         
@@ -564,6 +580,7 @@ class TagNew extends ModelBase
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
         $selectsql = "UPDATE `{$this->TAG_INFO_TABLE}` SET {$updatestr} WHERE `id` = ?";
+        echo $selectsql;
         $selectst = $db->prepare($selectsql);
         $updateres = $selectst->execute(array($tagid));
         if (empty($updateres)) {
@@ -794,10 +811,10 @@ class TagNew extends ModelBase
         if (empty($albumtagrelationid)) {
             return array();
         }
-    
-        /* $key = RedisKey::getAlbumTagRelationKeyById($albumtagrelationid);
+
+        $key = RedisKey::getAlbumTagRelationKeyById($albumtagrelationid);
          $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
-        $redisData = $redisobj->get($key); */
+        $redisData = $redisobj->get($key);
         $redisData = array();
         if (empty($redisData)) {
             $db = DbConnecter::connectMysql($this->DB_INSTANCE);
@@ -809,7 +826,7 @@ class TagNew extends ModelBase
             if (empty($dbData)) {
                 return array();
             }
-            //$redisobj->setex($key, 604800, json_encode($dbData));
+            $redisobj->setex($key, 604800, json_encode($dbData));
             return $dbData;
         } else {
             return json_decode($redisData, true);
