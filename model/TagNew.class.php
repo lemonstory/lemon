@@ -241,7 +241,7 @@ class TagNew extends ModelBase
         if (!empty($startrelationid)) {
             $albumtagrelationinfo = $this->getAlbumTagRelationInfoById($startrelationid);
         }
-        
+
         $orderby = "";
         if ($isrecommend == 1) {
             // 推荐
@@ -361,10 +361,9 @@ class TagNew extends ModelBase
             $len = 50;
         }
 
-        //TODO:先去掉cache测试
-        /* $key = $currentpage . "_" . $len;
+        $key = $currentpage . "_" . $len;
         $cacheobj = new CacheWrapper();
-        $redisData = $cacheobj->getListCache($this->ALBUM_TAG_RELATION_TABLE, $key); */
+        $redisData = $cacheobj->getListCache($this->ALBUM_TAG_RELATION_TABLE, $key);
         $redisData = array();
         if (empty($redisData)) {
             $where = "";
@@ -394,7 +393,6 @@ class TagNew extends ModelBase
             
             $db = DbConnecter::connectMysql($this->DB_INSTANCE);
             $sql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} {$orderby} LIMIT $offset, $len";
-            //echo $sql;
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -402,8 +400,8 @@ class TagNew extends ModelBase
             if (empty($dbData)) {
                 return array();
             }
-            
-            //$cacheobj->setListCache($this->ALBUM_TAG_RELATION_TABLE, $key, $dbData);
+
+            $cacheobj->setListCache($this->ALBUM_TAG_RELATION_TABLE, $key, $dbData);
             return $dbData;
         } else {
             return $redisData;
@@ -811,12 +809,13 @@ class TagNew extends ModelBase
         if (empty($albumtagrelationid)) {
             return array();
         }
-
-        $key = RedisKey::getAlbumTagRelationKeyById($albumtagrelationid);
-         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
-        $redisData = $redisobj->get($key);
         $redisData = array();
+        $key = RedisKey::getAlbumTagRelationKeyById($albumtagrelationid);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->get($key);
+
         if (empty($redisData)) {
+
             $db = DbConnecter::connectMysql($this->DB_INSTANCE);
             $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `id` = ?";
             $selectst = $db->prepare($selectsql);
