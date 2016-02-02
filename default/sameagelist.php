@@ -41,11 +41,18 @@ class sameagelist extends controller
 
             //热门推荐->全部
             if (empty($currentfirsttagid)) {
-                $currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
-            }
 
-            //热门推荐->子标签
-            $sameageres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 0, 0, 1, $p, $len);
+                $recommendobj = new Recommend();
+                $sameageres = $recommendobj->getSameAgeListenList($babyagetype, $p, $len);
+
+                //无法识别年龄段及排序
+                //$currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
+
+            } else {
+
+                //热门推荐->子标签
+                $sameageres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 0, 0, 1, $p, $len);
+            }
         }
         if (! empty($sameageres)) {
             foreach ($sameageres as $value) {

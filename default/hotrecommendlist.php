@@ -32,11 +32,18 @@ class hotrecommendlist extends controller
 
             //热门推荐->全部
             if (empty($currentfirsttagid)) {
-                $currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
-            }
 
-            //热门推荐->子标签
-            $hotrecommendres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 1, 0, 0, $p, $len);
+                $recommendobj = new Recommend();
+                $hotrecommendres = $recommendobj->getRecommendHotList($p, $len);
+
+                //无法对推荐做排序
+                //$currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
+
+            } else {
+
+                //热门推荐->子标签
+                $hotrecommendres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 1, 0, 0, $p, $len);
+            }
         }
         
         if (! empty($hotrecommendres)) {

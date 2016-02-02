@@ -41,11 +41,18 @@ class newonlinelist extends controller
 
             //热门推荐->全部
             if (empty($currentfirsttagid)) {
-                $currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
+
+                $recommendobj = new Recommend();
+                $newonlineres = $recommendobj->getNewOnlineList($babyagetype, $p, $len);
+
+                //无法识别年龄段及排序
+                //$currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
+            } else {
+
+                //热门推荐->子标签
+                $newonlineres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 0, 0, 1, $p, $len);
             }
 
-            //热门推荐->子标签
-            $newonlineres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 0, 0, 1, $p, $len);
         }
         if (! empty($newonlineres)) {
             foreach ($newonlineres as $value) {
