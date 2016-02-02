@@ -353,7 +353,7 @@ class Story extends ModelBase
         if ($redisData) {
             $story_list = json_decode($redisData, true);
         } else {
-            $story_list = $this->get_list("`album_id`='{$album_id}' and status=1 and `mediapath` != '' ", '', '', ' ORDER BY `view_order` ASC,`id` DESC ');
+            $story_list = $this->get_list("`album_id`='{$album_id}' and status=1 and `mediapath` != '' ", '', '', ' ORDER BY `view_order` ASC,`id` ASC ');
             // 缓存
             if ($story_list) {
                 $redisobj->setex($key, 86400, json_encode($story_list));
