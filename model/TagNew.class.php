@@ -648,6 +648,33 @@ class TagNew extends ModelBase
         }
         return true;
     }
+
+    public function updateAlbumTagRelationInfo($album_id, $tag_id, $update_data)
+    {
+
+
+        if (empty($album_id) || empty($tag_id) || empty($update_data)) {
+            return false;
+        }
+
+        $update_str = "";
+        foreach ($update_data as $key => $value) {
+            $update_str .= "`{$key}` = '{$value}',";
+        }
+        $update_str = rtrim($update_str, ",");
+
+        $db = DbConnecter::connectMysql($this->DB_INSTANCE);
+        $selectsql = "UPDATE `{$this->ALBUM_TAG_RELATION_TABLE}` SET {$update_str} WHERE `albumid` = ? and  `tagid` = ?";
+        $selectst = $db->prepare($selectsql);
+        $updateres = $selectst->execute(array($album_id, $tag_id));
+        if (empty($updateres)) {
+            return false;
+        }
+
+        // clear cache
+        $this->clearAlbumTagRelationCacheByAlbumIds($album_id);
+        return true;
+    }
     
     
     /**
