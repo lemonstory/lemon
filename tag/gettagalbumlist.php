@@ -61,15 +61,13 @@ class gettagalbumlist extends controller
         
         $tagids = array();
         if ($selectsecondtagid == 0) {
-
+            // 二级标签为全部
             $tagids = array($currenttagid);
         } else {
-
             // 指定二级标签下的专辑列表
             $tagids = array($selectsecondtagid);
         }
         if (!empty($tagids)) {
-
             $tagids = array_unique($tagids);
         }
         
@@ -77,61 +75,56 @@ class gettagalbumlist extends controller
         $tagalbumlist = array();
         $aliossobj = new AliOss();
 
+
         // 获取指定二级标签下，指定长度的专辑与标签关联列表
         // 避免取到故事数量为0的故事专辑,做排查处理
         //TODO:该业务效率偏低
         $albumrelationlist = array();
-        $albumrelationlistcount = 0;
-        $max_len = 100;
-        $albumobj = new Album();
+        $max_len = 500;
         $index = 0;
+        $albumobj = new Album();
 
-        while ($albumrelationlistcount < $len) {
+        //故事辑去重
+        $albumrelationlist = $tagnewobj->getAlbumTagRelationListFromTag($tagids, $recommend, $hot, $goodcomment, $direction, $startrelationid, $max_len);
+        $albumids = array();
+        foreach ($albumrelationlist as $k => $relationlist) {
+            $albumids[] = $relationlist['albumid'];
+        }
 
-            //故事辑去重
-            $section_relation_list = $tagnewobj->getAlbumTagRelationListFromTag($tagids, $recommend, $hot, $goodcomment, $direction, $startrelationid, $max_len);
-            $albumrelationlist = array_merge($albumrelationlist, $section_relation_list);
-            $unique_albumids = array();
-            foreach ($albumrelationlist as $k => $relationlist) {
+        //键名保留不变
+        $albumids = array_unique($albumids);
 
-                $albumids[] = $relationlist['albumid'];
-            }
-            $unique_albumids = array_unique($albumids);
+        $unique_album_relation_list = array();
+        foreach ($albumids as $i => $item) {
+            $unique_album_relation_list[] = $albumrelationlist[$i];
+        }
 
-            $unique_album_relation_list = array();
-            foreach ($unique_albumids as $i => $item) {
+        $albumrelationlist = $unique_album_relation_list;
+        $album_infos = $albumobj->getListByIds($albumids);
 
-                $unique_album_relation_list[] = $albumrelationlist[$i];
-            }
-            $albumrelationlist = $unique_album_relation_list;
-            $album_infos = $albumobj->getListByIds($unique_albumids);
-
-            //取出$len长度的story_num大于0的$albumrelationlist
-            if (!empty($albumrelationlist) && !empty($album_infos)) {
-                $albumids = array();
-                foreach ($albumrelationlist as $k => $relationinfo) {
-                    if ($index < $len) {
-                        $albumid = $relationinfo['albumid'];
-                        if ($album_infos[$albumid]['story_num'] > 0) {
-                            $index++;
-                        } else {
-
-                            //array_splice($albumrelationlist, $k, 1);
-                            unset($albumrelationlist[$k]);
-                        }
+        //取出$len长度的story_num大于0的$albumrelationlist
+        if (!empty($albumrelationlist) && !empty($album_infos)) {
+            $albumids = array();
+            foreach ($albumrelationlist as $k => $relationinfo) {
+                if ($index < $len) {
+                    $albumid = $relationinfo['albumid'];
+                    if ($album_infos[$albumid]['story_num'] > 0) {
+                        $index++;
                     } else {
 
-                        $albumrelationlist = array_slice($albumrelationlist, 0, $index);
-                        break;
+                        //array_splice($albumrelationlist, $k, 1);
+                        unset($albumrelationlist[$k]);
                     }
+                } else {
+
+                    $albumrelationlist = array_slice($albumrelationlist, 0, $index);
+                    break;
                 }
-            }
-            $albumrelationlistcount = count($albumrelationlist);
-            if (count($section_relation_list) < $max_len) {
-                break;
             }
         }
 
+
+        $albumrelationlistcount = count($albumrelationlist);
         if ($albumrelationlistcount <= $len) {
 
             $albumids = array();
