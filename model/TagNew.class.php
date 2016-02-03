@@ -58,20 +58,6 @@ class TagNew extends ModelBase
         $ids = $this->getTagIdsWithTagList($list);
         return $ids;
     }
-
-
-    private function getTagIdsWithTagList($tagList)
-    {
-
-        $ids = array();
-        if (!empty($tagList)) {
-
-            foreach ($tagList as $taginfo) {
-                $ids[] = $taginfo['id'];
-            }
-        }
-        return $ids;
-    }
     
     
     /**
@@ -226,7 +212,7 @@ class TagNew extends ModelBase
         if (!is_array($tagids)) {
             $tagids = array($tagids);
         }
-        if (empty($len) || $len < 0 || $len > 10000) {
+        if (empty($len) || $len < 0 || $len > 1000) {
             $len = 20;
         }
         
@@ -347,7 +333,6 @@ class TagNew extends ModelBase
        if(!is_array($tagids)) {
             $tagids = array($tagids);
         }
-
         if (empty($isrecommend) && empty($issameage) && empty($isnewonline)) {
             return array();
         }
@@ -360,10 +345,7 @@ class TagNew extends ModelBase
         if ($len > 50) {
             $len = 50;
         }
-
-        $key = $currentpage . "_" . $len;
-        $cacheobj = new CacheWrapper();
-        $redisData = $cacheobj->getListCache($this->ALBUM_TAG_RELATION_TABLE, $key);
+        
         $redisData = array();
         if (empty($redisData)) {
             $where = "";
@@ -400,8 +382,6 @@ class TagNew extends ModelBase
             if (empty($dbData)) {
                 return array();
             }
-
-            $cacheobj->setListCache($this->ALBUM_TAG_RELATION_TABLE, $key, $dbData);
             return $dbData;
         } else {
             return $redisData;
@@ -578,7 +558,6 @@ class TagNew extends ModelBase
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
         $selectsql = "UPDATE `{$this->TAG_INFO_TABLE}` SET {$updatestr} WHERE `id` = ?";
-        echo $selectsql;
         $selectst = $db->prepare($selectsql);
         $updateres = $selectst->execute(array($tagid));
         if (empty($updateres)) {
@@ -590,7 +569,7 @@ class TagNew extends ModelBase
         $this->clearTagInfoCacheByName($tagname);
         
         $cacheobj = new CacheWrapper();
-        $redisData = $cacheobj->deleteNSCache($this->TAG_INFO_TABLE);
+        $cacheobj->deleteNSCache($this->TAG_INFO_TABLE);
         return true;
     }
     
@@ -607,6 +586,14 @@ class TagNew extends ModelBase
             $this->setError(ErrorConf::paramError());
             return false;
         }
+        $relationlist = $this->getAlbumTagRelationListByAlbumIds($albumid);
+        if (empty($relationlist)) {
+            return false;
+        }
+        $relationids = array();
+        foreach ($relationlist as $value) {
+            $relationids[] = $value['id'];
+        }
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
         $selectsql = "UPDATE `{$this->ALBUM_TAG_RELATION_TABLE}` SET `albumlistennum` = `albumlistennum` + $num WHERE `albumid` = ?";
@@ -615,8 +602,12 @@ class TagNew extends ModelBase
         if (empty($updateres)) {
             return false;
         }
+        
         // clear cache
         $this->clearAlbumTagRelationCacheByAlbumIds($albumid);
+        if (!empty($relationids)) {
+            $this->clearAlbumTagRelationCacheById($relationids);
+        }
         return true;
     }
     
@@ -633,7 +624,15 @@ class TagNew extends ModelBase
             $this->setError(ErrorConf::paramError());
             return false;
         }
-    
+        $relationlist = $this->getAlbumTagRelationListByAlbumIds($albumid);
+        if (empty($relationlist)) {
+            return false;
+        }
+        $relationids = array();
+        foreach ($relationlist as $value) {
+            $relationids[] = $value['id'];
+        }
+        
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
         $selectsql = "UPDATE `{$this->ALBUM_TAG_RELATION_TABLE}` SET `commentstarlevel` = ? WHERE `albumid` = ?";
         $selectst = $db->prepare($selectsql);
@@ -644,6 +643,9 @@ class TagNew extends ModelBase
         
         // clear cache
         $this->clearAlbumTagRelationCacheByAlbumIds($albumid);
+        if (!empty($relationids)) {
+            $this->clearAlbumTagRelationCacheById($relationids);
+        }
         return true;
     }
     
@@ -661,6 +663,10 @@ class TagNew extends ModelBase
             return false;
         }
         
+        $relationinfo = $this->getAlbumTagRelationInfoByAlbumIdTagId($albumid, $tagid);
+        if (empty($relationinfo)) {
+            return false;
+        }
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
         $selectsql = "DELETE FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `albumid` = ? AND `tagid` = ?";
         $selectst = $db->prepare($selectsql);
@@ -671,6 +677,7 @@ class TagNew extends ModelBase
         
         // clear cache
         $this->clearAlbumTagRelationCacheByAlbumIds($albumid);
+        $this->clearAlbumTagRelationCacheById($relationinfo['id']);
         return true;
     }
     
@@ -693,8 +700,10 @@ class TagNew extends ModelBase
             return false;
         }
         $albumids = array();
+        $relationids = array();
         foreach ($relationlist as $value) {
             $albumids[] = $value['albumid'];
+            $relationids[] = $value['id'];
         }
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
@@ -709,6 +718,9 @@ class TagNew extends ModelBase
         if (!empty($albumids)) {
             $albumids = array_unique($albumids);
             $this->clearAlbumTagRelationCacheByAlbumIds($albumids);
+        }
+        if (!empty($relationids)) {
+            $this->clearAlbumTagRelationCacheById($relationids);
         }
         return true;
     }
@@ -739,7 +751,7 @@ class TagNew extends ModelBase
         $this->clearTagInfoCacheByName($tagname);
         
         $cacheobj = new CacheWrapper();
-        $redisData = $cacheobj->deleteNSCache($this->TAG_INFO_TABLE);
+        $cacheobj->deleteNSCache($this->TAG_INFO_TABLE);
         return true;
     }
     
@@ -778,15 +790,18 @@ class TagNew extends ModelBase
         return $redisobj->delete($key);
     } */
     // 清除指定id的专辑、标签关联cache
-    /* public function clearAlbumTagRelationCacheById($id)
+    public function clearAlbumTagRelationCacheById($ids)
     {
-        if (empty($id)) {
+        if (empty($ids)) {
             return false;
         }
-        $key = RedisKey::getAlbumTagRelationKeyById($id);
+        if (!is_array($ids)) {
+            $ids = array($ids);
+        }
+        $keys = RedisKey::getAlbumTagRelationKeyByIds($ids);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
-        return $redisobj->delete($key);
-    } */
+        return $redisobj->delete($keys);
+    }
     // 清除指定专辑id的关联cache
     public function clearAlbumTagRelationCacheByAlbumIds($albumids)
     {
@@ -802,6 +817,17 @@ class TagNew extends ModelBase
     }
     
     
+    private function getTagIdsWithTagList($tagList)
+    {
+        $ids = array();
+        if (!empty($tagList)) {
+            foreach ($tagList as $taginfo) {
+                $ids[] = $taginfo['id'];
+            }
+        }
+        return $ids;
+    }
+    
     
     // 获取指定id的专辑、标签的关联信息
     private function getAlbumTagRelationInfoById($albumtagrelationid)
@@ -813,9 +839,7 @@ class TagNew extends ModelBase
         $key = RedisKey::getAlbumTagRelationKeyById($albumtagrelationid);
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisData = $redisobj->get($key);
-
         if (empty($redisData)) {
-
             $db = DbConnecter::connectMysql($this->DB_INSTANCE);
             $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `id` = ?";
             $selectst = $db->prepare($selectsql);
@@ -862,7 +886,7 @@ class TagNew extends ModelBase
         if (empty($albumid) || empty($tagid)) {
             return array();
         }
-    
+        
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
         $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE `albumid` = ? AND `tagid` = ?";
         $selectst = $db->prepare($selectsql);

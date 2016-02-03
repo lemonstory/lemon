@@ -229,7 +229,7 @@ class Story extends ModelBase
         }
         
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY ' ORDER BY `view_order` ASC,`id` DESC ' DESC LIMIT {$len}";
+        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY `view_order` ASC, `id` DESC LIMIT {$len}";
         $st = $db->prepare($sql);
         $st->execute();
         $res = $st->fetchAll(PDO::FETCH_ASSOC);

@@ -283,6 +283,14 @@ class RedisKey
 	{
 	    return "atr_id_{$id}";
 	}
+	public static function getAlbumTagRelationKeyByIds($ids)
+	{
+	    $idarr = array();
+	    foreach ($ids as $id) {
+	        $idarr[] = self::getAlbumTagRelationKeyById($id);
+	    }
+	    return $idarr;
+	}
 	
 	
 	// 通过标签ID获取标签信息
