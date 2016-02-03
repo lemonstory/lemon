@@ -18,6 +18,7 @@ class sameagelist extends controller
         $listenobj = new Listen();
         $aliossobj = new AliOss();
         $tagnewobj = new TagNew();;
+        $first_tags_count = 8;
         
         $babyagetype = 0;
         if (! empty($uid)) {
