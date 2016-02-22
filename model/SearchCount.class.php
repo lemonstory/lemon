@@ -67,12 +67,19 @@ class SearchCount extends ModelBase
         if (empty($countres)) {
             return false;
         }
-        if (!empty($searchcountinfo)) {
-            // 用户搜索行为的更新，暂时不清cache，1天后自动更新，防止搜索更新太快，cache命中率不高
-            //$this->clearSearchContentCountInfoCache($searchcontent);
-            //$this->clearHotSearchContentListCache();
+        
+        if (empty($searchcountinfo)) {
+            $searchid = $db->lastInsertId();
+        } else {
+            $searchid = $searchcountinfo['id'];
         }
-        return true;
+        
+        /* if (!empty($searchcountinfo)) {
+            // 用户搜索行为的更新，暂时不清cache，1天后自动更新，防止搜索更新太快，cache命中率不高
+            $this->clearSearchContentCountInfoCache($searchcontent);
+            $this->clearHotSearchContentListCache();
+        } */
+        return $searchid;
     }
     
     

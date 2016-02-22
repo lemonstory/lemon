@@ -40,4 +40,21 @@ class DataAnalytics extends ModelBase
     }
     
     
+    /**
+     * 获取登录用户搜索过的关键词中，所关联的专辑，出现在相关推荐的专辑
+     * @param I $uimid
+     * @param I $len
+     */
+    public function getRecommendAlbumListBySearchContent($uimid, $len)
+    {
+        if (empty($uimid) || empty($len)) {
+            $this->setError(ErrorConf::paramError());
+            return array();
+        }
+        if ($len < 0 || $len > 100) {
+            $len = 10;
+        }
+        
+        
+    }
 }

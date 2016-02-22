@@ -19,12 +19,15 @@ class ActionLog extends ModelBase
     public $ACTION_TYPE_DOWNLOAD_STORY = 'downloadstory';
     // 下载整个专辑
     //public $ACTION_TYPE_DOWNLOAD_ALBUM = 'downloadalbum';
+    // 搜索关键词
+    public $ACTION_TYPE_SEARCH_CONTENT = 'searchcontent';
     
     public $ACTION_TYPE_LIST = array(
             "login" => "登录",
             "listenstory" => "收听故事",
             "favalbum" => "收藏故事辑",
             "downloadstory" => "下载故事",
+            "searchcontent" => "搜索关键词",
             );
     
     

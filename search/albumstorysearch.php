@@ -19,7 +19,14 @@ class albumstorysearch extends controller
         if (empty($page) || $page == 1) {
             // add search count
             $searchcountobj = new SearchCount();
-            $searchcountobj->addSearchContentCount($searchcontent);
+            $searchid = $searchcountobj->addSearchContentCount($searchcontent);
+            
+            $actionlogobj = new ActionLog();
+            $userimsiobj = new UserImsi();
+            $uimid = $userimsiobj->getUimid();
+            if (!empty($uimid)) {
+                MnsQueueManager::pushActionLogQueue($uimid, $searchid, $actionlogobj->ACTION_TYPE_SEARCH_CONTENT);
+            }
         }
         
         $storyids = array();
