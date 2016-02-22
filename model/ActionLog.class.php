@@ -53,7 +53,7 @@ class ActionLog extends ModelBase
     }
     
     // $month = 201601
-    private function getUserImsiActionLogTableName($month)
+    public function getUserImsiActionLogTableName($month)
     {
         return "user_imsi_action_log_" . $month;
     }
