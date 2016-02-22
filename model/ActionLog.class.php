@@ -39,14 +39,22 @@ class ActionLog extends ModelBase
         if (empty($addtime)) {
             $addtime = date("Y-m-d H:i:s");
         }
+        $month = date("Ym");
+        $monthtablename = $this->getUserImsiActionLogTableName($month);
         
         $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-        $sql = "INSERT INTO `{$this->ACTION_LOG_TABLE_NAME}` (`uimid`, `actionid`, `actiontype`, `addtime`) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO `{$monthtablename}` (`uimid`, `actionid`, `actiontype`, `addtime`) VALUES (?, ?, ?, ?)";
         $st = $db->prepare($sql);
         $res = $st->execute(array($uimid, $actionid, $actiontype, $addtime));
         if (empty($res)) {
             return false;
         }
         return true;
+    }
+    
+    // $month = 201601
+    private function getUserImsiActionLogTableName($month)
+    {
+        return "user_imsi_action_log_" . $month;
     }
 }
