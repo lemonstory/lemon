@@ -42,7 +42,7 @@ class ActionLog extends ModelBase
         if (empty($starttime) || empty($endtime)) {
             return array();
         }
-        $month = date("Ym", $starttime);
+        $month = date("Ym", strtotime($starttime));
         $monthtablename = $this->getUserImsiActionLogTableName($month);
         $list = array();
         $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
