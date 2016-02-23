@@ -31,6 +31,40 @@ class ActionLog extends ModelBase
             );
     
     
+    /**
+     * 获取指定时间内的行为记录
+     * @param S $starttime    开始时间，如2016-02-22 10:00:00
+     * @param S $endtime
+     * @return array
+     */
+    public function getUserImsiActionLogListByTime($starttime, $endtime)
+    {
+        if (empty($starttime) || empty($endtime)) {
+            return array();
+        }
+        $month = date("Ym", $starttime);
+        $monthtablename = $this->getUserImsiActionLogTableName($month);
+        $list = array();
+        $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
+        $sql = "SELECT * FROM `{$monthtablename}` WHERE `addtime` > ? and `addtime` < ?";
+        $st = $db->prepare($sql);
+        $st->execute(array($starttime, $endtime));
+        $list = $st->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($list)) {
+            return array();
+        }
+        return $list;
+    }
+    
+    
+    /**
+     * 添加uimid行为日志记录
+     * @param I $uimid
+     * @param S $actionid
+     * @param S $actiontype
+     * @param S $addtime
+     * @return boolean
+     */
     public function addUserImsiActionLog($uimid, $actionid, $actiontype, $addtime = "")
     {
         if (empty($uimid) || empty($actionid) || empty($actiontype)) {
