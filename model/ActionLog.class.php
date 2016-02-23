@@ -46,7 +46,7 @@ class ActionLog extends ModelBase
         $monthtablename = $this->getUserImsiActionLogTableName($month);
         $list = array();
         $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-        $sql = "SELECT * FROM `{$monthtablename}` WHERE `addtime` > ? and `addtime` < ?";
+        $sql = "SELECT * FROM `{$monthtablename}` WHERE `addtime` >= ? and `addtime` <= ?";
         $st = $db->prepare($sql);
         $st->execute(array($starttime, $endtime));
         $list = $st->fetchAll(PDO::FETCH_ASSOC);
