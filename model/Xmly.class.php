@@ -118,6 +118,9 @@ class Xmly extends Http
             $content = Http::get($v);
             sleep(1);
             $title = Http::sub_data($content, '<h1 class="name">', '</h1>');
+            if (empty($title)) {
+                $title = Http::sub_data($content, '<h1 class="pl-name">', '</h1>');
+            }
             $source_audio_url = Http::sub_data($content, 'sound_url="', '"');
             $times = Http::sub_data($content, '<span class="time fr">', '</span>');
             $times = $this->get_seconds($times);
@@ -185,6 +188,9 @@ class Xmly extends Http
         usleep(100);
         $content = Http::get($url);
         $title = Http::sub_data($content, '<h1 class="name">', '</h1>');
+        if (empty($title)) {
+            $title = Http::sub_data($content, '<h1 class="pl-name">', '</h1>');
+        }
         $source_audio_url = Http::sub_data($content, 'sound_url="', '"');
         $times = Http::sub_data($content, '<span class="time fr">', '</span>');
         $times = $this->get_seconds($times);
@@ -209,9 +215,9 @@ class Xmly extends Http
         }
         $times = explode(":", $times);
         if (isset($times[2])) {
-            return $times[2] * 60 * 60 + $times[1] * 60 + $times[0];
+            return $times[0] * 60 * 60 + $times[1] * 60 + $times[2];
         } else if (isset($times[1])) {
-            return $times[1] * 60 + $times[0];
+            return $times[0] * 60 + $times[1];
         } else {
             return $times[0];
         }
