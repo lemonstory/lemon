@@ -135,6 +135,10 @@ class info extends controller
             $interesttagids = array();
             $uimid = $userimsiobj->getUimid($uid);
             
+            $logfile = "/alidata1/rc.log";
+            $fp = @fopen($logfile, "a+");
+            @fwrite($fp, "uid={$uid}##uimid={$uimid}");
+            
             // 获取设备喜好的标签
             $interestlist = $uimidinterestobj->getUimidInterestTagListByUimid($uimid, 10);
             if (!empty($interestlist)) {
