@@ -8,7 +8,7 @@ class DataAnalytics extends ModelBase
     
     
     /**
-     * 指定专辑的多个标签中，出现在相关推荐列表的专辑
+     * 出现在相关推荐列表的专辑
      * @param A $albumtagids    标签id数组
      * @param I $len            推荐的专辑数量
      * @return array            专辑id列表
@@ -19,7 +19,7 @@ class DataAnalytics extends ModelBase
             $this->setError(ErrorConf::paramError());
             return array();
         }
-        if ($len < 0 || $len > 100) {
+        if ($len < 0 || $len > 1000) {
             $len = 10;
         }
         $albumtagidstr = implode(",", $albumtagids);

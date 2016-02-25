@@ -15,7 +15,7 @@ class UimidInterest extends ModelBase
      * @param S $endtime
      * @return array
      */
-    public function getUimidInterestTagListByTime($starttime, $endtime)
+    /* public function getUimidInterestTagListByTime($starttime, $endtime)
     {
         $db = DbConnecter::connectMysql($this->ANALYTICS_DB_INSTANCE);
         $sql = "select * from {$this->UIMID_INTEREST_TAG_TABLE_NAME} where `addtime` >= ? and `addtime` <= ? order by `num` desc";
@@ -26,7 +26,7 @@ class UimidInterest extends ModelBase
             return array();
         }
         return $dbData;
-    }
+    } */
     
     /**
      * 获取指定设备喜好的标签列表
@@ -45,7 +45,7 @@ class UimidInterest extends ModelBase
         }
         return $dbData;
     }
-    public function getUimidInterestTagListByTagid($tagid, $len)
+    /* public function getUimidInterestTagListByTagid($tagid, $len)
     {
         $db = DbConnecter::connectMysql($this->ANALYTICS_DB_INSTANCE);
         $sql = "select * from {$this->UIMID_INTEREST_TAG_TABLE_NAME} where `tagid` = ? order by `num` desc limit {$len}";
@@ -56,14 +56,14 @@ class UimidInterest extends ModelBase
             return array();
         }
         return $dbData;
-    }
+    } */
     
     /**
      * 获取指定设备喜好的专辑列表
      * @param S $uimid
      * @return array
      */
-    public function getUimidInterestAlbumListByUimid($uimid, $len)
+    /* public function getUimidInterestAlbumListByUimid($uimid, $len)
     {
         $db = DbConnecter::connectMysql($this->ANALYTICS_DB_INSTANCE);
         $sql = "select * from {$this->UIMID_INTEREST_ALBUM_TABLE_NAME} where `uimid` = ? order by `recommendscore` desc limit {$len}";
@@ -74,7 +74,7 @@ class UimidInterest extends ModelBase
             return array();
         }
         return $dbData;
-    }
+    } */
     
     
     /**
@@ -103,7 +103,7 @@ class UimidInterest extends ModelBase
      * @param I $albumid
      * @return boolean
      */
-    public function updateUimidInterestAlbum($uimid, $albumid)
+    /* public function updateUimidInterestAlbum($uimid, $albumid)
     {
         if (empty($uimid) || empty($albumid)) {
             return false;
@@ -115,7 +115,7 @@ class UimidInterest extends ModelBase
             $this->updateUimidInterestAlbumRecommendScoreDb($interestinfo['id']);
         }
         return true;
-    }
+    } */
     
     
     /**
@@ -137,7 +137,7 @@ class UimidInterest extends ModelBase
         return $dbData;
     }
     
-    private function getUimidInterestAlbumInfoDb($uimid, $albumid)
+    /* private function getUimidInterestAlbumInfoDb($uimid, $albumid)
     {
         $db = DbConnecter::connectMysql($this->ANALYTICS_DB_INSTANCE);
         $sql = "select * from {$this->UIMID_INTEREST_ALBUM_TABLE_NAME} where `uimid` = ? and `albumid` = ?";
@@ -148,7 +148,7 @@ class UimidInterest extends ModelBase
             return array();
         }
         return $dbData;
-    }
+    } */
     
     
     /**
@@ -174,7 +174,7 @@ class UimidInterest extends ModelBase
         return true;
     }
     
-    private function addUimidInterestAlbumDb($uimid, $albumid)
+    /* private function addUimidInterestAlbumDb($uimid, $albumid)
     {
         if (empty($uimid) || empty($albumid)) {
             return false;
@@ -188,7 +188,7 @@ class UimidInterest extends ModelBase
             return false;
         }
         return true;
-    }
+    } */
     
     
     // 更新感兴趣的标签次数
@@ -201,12 +201,12 @@ class UimidInterest extends ModelBase
         return true;
     }
     
-    private function updateUimidInterestAlbumRecommendScoreDb($id)
+    /* private function updateUimidInterestAlbumRecommendScoreDb($id)
     {
         $db = DbConnecter::connectMysql($this->ANALYTICS_DB_INSTANCE);
         $sql = "UPDATE `{$this->UIMID_INTEREST_ALBUM_TABLE_NAME}` SET `recommendscore` = `recommendscore` + 1 WHERE `id` = ?";
         $st = $db->prepare ( $sql );
         $st->execute (array($id));
         return true;
-    }
+    } */
 }
