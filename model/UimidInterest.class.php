@@ -35,6 +35,9 @@ class UimidInterest extends ModelBase
      */
     public function getUimidInterestTagListByUimid($uimid, $len)
     {
+        if (empty($uimid) || empty($len)) {
+            return array();
+        }
         $db = DbConnecter::connectMysql($this->ANALYTICS_DB_INSTANCE);
         $sql = "select * from {$this->UIMID_INTEREST_TAG_TABLE_NAME} where `uimid` = ? order by `num` desc limit {$len}";
         $st = $db->prepare ( $sql );
@@ -126,6 +129,9 @@ class UimidInterest extends ModelBase
      */
     private function getUimidInterestTagInfoDb($uimid, $tagid)
     {
+        if (empty($uimid) || empty($tagid)) {
+            return array();
+        }
         $db = DbConnecter::connectMysql($this->ANALYTICS_DB_INSTANCE);
         $sql = "select * from {$this->UIMID_INTEREST_TAG_TABLE_NAME} where `uimid` = ? and `tagid` = ?";
         $st = $db->prepare ( $sql );
@@ -194,6 +200,9 @@ class UimidInterest extends ModelBase
     // 更新感兴趣的标签次数
     private function updateUimidInterestTagNumDb($id)
     {
+        if (empty($id)) {
+            return array();
+        }
         $db = DbConnecter::connectMysql($this->ANALYTICS_DB_INSTANCE);
         $sql = "UPDATE `{$this->UIMID_INTEREST_TAG_TABLE_NAME}` SET `num` = `num` + 1 WHERE `id` = ?";
         $st = $db->prepare ( $sql );

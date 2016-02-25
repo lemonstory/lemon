@@ -9,24 +9,28 @@ class DataAnalytics extends ModelBase
     
     /**
      * 出现在相关推荐列表的专辑
-     * @param A $albumtagids    标签id数组
+     * @param A $tagids         感兴趣的标签id数组，可为空
      * @param I $len            推荐的专辑数量
      * @return array            专辑id列表
      */
-    public function getRecommendAlbumTagRelationListByAlbumTagIds($albumtagids, $len)
+    public function getRecommendAlbumTagRelationListByInterestTag($tagids = array(), $len = 20)
     {
-        if (empty($albumtagids) || empty($len)) {
+        if (empty($len)) {
             $this->setError(ErrorConf::paramError());
             return array();
         }
         if ($len < 0 || $len > 1000) {
-            $len = 10;
+            $len = 20;
         }
-        $albumtagidstr = implode(",", $albumtagids);
+        $where = "";
+        if (!empty($tagids)) {
+            $tagidstr = implode(",", $tagids);
+            $where = "WHERE `tagid` IN ($tagidstr)";
+        }
         
         $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
         // 按推荐倒序、收听量倒序
-        $sql = "SELECT * FROM {$this->ALBUM_TAG_RELATION_TABLE} WHERE `tagid` IN ($albumtagidstr) ORDER BY `isrecommend` DESC, `albumlistennum` DESC LIMIT {$len}";
+        $sql = "SELECT * FROM {$this->ALBUM_TAG_RELATION_TABLE} {$where} ORDER BY `isrecommend` DESC, `albumlistennum` DESC LIMIT {$len}";
         $st = $db->prepare($sql);
         $st->execute();
         $reslist = $st->fetchAll(PDO::FETCH_ASSOC);
