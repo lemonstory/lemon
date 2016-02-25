@@ -196,7 +196,7 @@ class Xmly extends Http
         $times = $this->get_seconds($times);
         $intro = htmlspecialchars_decode(Http::sub_data($content, 'data-text="', '"'));
         $intro = preg_replace('/<a[\s|\S].*?a>/', '', $intro);
-        $cover = Http::sub_data($content, "background-image: url('", "')");
+        $cover = Http::sub_data($content, '<img class="abs" src="', '"');
         if ($title && $source_audio_url) {
             $story_info['title'] = addslashes(str_replace('&#39;', "'", $title));
             $story_info['source_audio_url'] = $source_audio_url;
