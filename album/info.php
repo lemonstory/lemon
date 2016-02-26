@@ -113,11 +113,11 @@ class info extends controller
             $userimsiobj = new UserImsi();
             $taglist = array();
             $recommendalbumlist = array();
+            $tagids = array();
             
             // 获取当前专辑的标签
             $relationtaglist = current($tagnewobj->getAlbumTagRelationListByAlbumIds($album_id));
             if (!empty($relationtaglist)) {
-                $tagids = array();
                 foreach ($relationtaglist as $value) {
                     $tagids[] = $value['tagid'];
                 }
@@ -145,10 +145,14 @@ class info extends controller
             
             $tagrelationalbumids = array();
             $tagrelationalbumlist = array();
-            
-            // 获取喜好标签的专辑
             $tagrelationlist = array();
-            $tagrelationlist = $dataanalyticsobj->getRecommendAlbumTagRelationListByInterestTag($interesttagids, 100);
+            if (!empty($interesttagids)) {
+                // 获取喜好标签的专辑
+                $tagrelationlist = $dataanalyticsobj->getRecommendAlbumListByTagids($interesttagids, 100);
+            } else {
+                // 获取本专辑标签相同的其他专辑
+                $tagrelationlist = $dataanalyticsobj->getRecommendAlbumListByTagids($tagids, 100);
+            }
             if (!empty($tagrelationlist)) {
                 foreach ($tagrelationlist as $value) {
                     // 过滤当前专辑

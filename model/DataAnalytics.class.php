@@ -13,9 +13,9 @@ class DataAnalytics extends ModelBase
      * @param I $len            推荐的专辑数量
      * @return array            专辑id列表
      */
-    public function getRecommendAlbumTagRelationListByInterestTag($tagids = array(), $len = 20)
+    public function getRecommendAlbumListByTagids($tagids, $len = 20)
     {
-        if (empty($len)) {
+        if (empty($tagids) || empty($len)) {
             $this->setError(ErrorConf::paramError());
             return array();
         }
@@ -23,10 +23,8 @@ class DataAnalytics extends ModelBase
             $len = 20;
         }
         $where = "";
-        if (!empty($tagids)) {
-            $tagidstr = implode(",", $tagids);
-            $where = "WHERE `tagid` IN ($tagidstr)";
-        }
+        $tagidstr = implode(",", $tagids);
+        $where = "WHERE `tagid` IN ($tagidstr)";
         
         $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
         // 按推荐倒序、收听量倒序
