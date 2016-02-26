@@ -166,10 +166,8 @@ class info extends controller
             // 获取指定长度的推荐专辑id数组
             if (!empty($tagrelationalbumids)) {
                 $tagrelationalbumids = array_unique($tagrelationalbumids);
-                if (empty($interesttagids)) {
-                    // 未登录、没有喜好的新用户,随机推荐
-                    shuffle($tagrelationalbumids);
-                }
+                // 随机推荐
+                shuffle($tagrelationalbumids);
                 $tagrelationalbumids = array_slice($tagrelationalbumids, 0, 6);
                 $tagrelationalbumlist = $album->getListByIds($tagrelationalbumids);
             }
