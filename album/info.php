@@ -150,8 +150,10 @@ class info extends controller
                 // 获取喜好标签的专辑
                 $tagrelationlist = $dataanalyticsobj->getRecommendAlbumListByTagids($interesttagids, 100);
             } else {
-                // 获取本专辑标签相同的其他专辑
+                // 未登录、没有喜好的新用户，默认获取本专辑标签相同的其他专辑
                 $tagrelationlist = $dataanalyticsobj->getRecommendAlbumListByTagids($tagids, 100);
+                // 随机推荐
+                shuffle($tagrelationlist);
             }
             if (!empty($tagrelationlist)) {
                 foreach ($tagrelationlist as $value) {
