@@ -81,21 +81,22 @@ class UimidInterest extends ModelBase
     
     
     /**
-     * 新增设备感兴趣的标签，或更新感兴趣的标签的次数
+     * 新增设备感兴趣的标签，或更新感兴趣的标签的喜好次数
      * @param S $uimid
      * @param I $tagid
+     * @param I $incrnum    更新喜好度的涨幅
      * @return boolean
      */
-    public function updateUimidInterestTag($uimid, $tagid)
+    public function updateUimidInterestTag($uimid, $tagid, $incrnum = 1)
     {
-        if (empty($uimid) || empty($tagid)) {
+        if (empty($uimid) || empty($tagid) || empty($incrnum)) {
             return false;
         }
         $interestinfo = $this->getUimidInterestTagInfoDb($uimid, $tagid);
         if (empty($interestinfo)) {
-            $this->addUimidInterestTagDb($uimid, $tagid);
+            $this->addUimidInterestTagDb($uimid, $tagid, $incrnum);
         } else {
-            $this->updateUimidInterestTagNumDb($interestinfo['id']);
+            $this->updateUimidInterestTagNumDb($interestinfo['id'], $incrnum);
         }
         return true;
     }
@@ -163,9 +164,9 @@ class UimidInterest extends ModelBase
      * @param I $tagid
      * @return boolean
      */
-    private function addUimidInterestTagDb($uimid, $tagid)
+    private function addUimidInterestTagDb($uimid, $tagid, $num = 1)
     {
-        if (empty($uimid) || empty($tagid)) {
+        if (empty($uimid) || empty($tagid) || empty($num)) {
             return false;
         }
         $addtime = date("Y-m-d H:i:s");
@@ -173,7 +174,7 @@ class UimidInterest extends ModelBase
         $db = DbConnecter::connectMysql($this->ANALYTICS_DB_INSTANCE);
         $sql = "INSERT INTO `{$this->UIMID_INTEREST_TAG_TABLE_NAME}` (`uimid`, `tagid`, `num`, `addtime`) VALUES (?, ?, ?, ?)";
         $st = $db->prepare ( $sql );
-        $res = $st->execute (array($uimid, $tagid, 1, $addtime));
+        $res = $st->execute (array($uimid, $tagid, $num, $addtime));
         if (empty($res)) {
             return false;
         }
@@ -198,13 +199,13 @@ class UimidInterest extends ModelBase
     
     
     // 更新感兴趣的标签次数
-    private function updateUimidInterestTagNumDb($id)
+    private function updateUimidInterestTagNumDb($id, $num = 1)
     {
-        if (empty($id)) {
+        if (empty($id) || empty($num)) {
             return array();
         }
         $db = DbConnecter::connectMysql($this->ANALYTICS_DB_INSTANCE);
-        $sql = "UPDATE `{$this->UIMID_INTEREST_TAG_TABLE_NAME}` SET `num` = `num` + 1 WHERE `id` = ?";
+        $sql = "UPDATE `{$this->UIMID_INTEREST_TAG_TABLE_NAME}` SET `num` = `num` + {$num} WHERE `id` = ?";
         $st = $db->prepare ( $sql );
         $st->execute (array($id));
         return true;
