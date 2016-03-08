@@ -7,7 +7,7 @@
 //      遍历version<1.3的所有推荐专辑,查找该专辑所属的一级标签,更新该专辑在album_tag_relation里面的
 //      tagid,isrecommend,recommendstatus,uptime,addtime
 //备注:
-//      目前线上只修复了热门推荐
+//      目前线上只修复了热门推荐,同龄,最新(2016.2.3)
 //使用:
 //
 //  php your_path/cron_copyRecommendHotToAlbumTagRelation.php
@@ -39,15 +39,15 @@ class cron_copyRecommendHotToAlbumTagRelation extends DaemonBase {
 	    $selectst->execute();
         $hot_recommend_list = $selectst->fetchAll(PDO::FETCH_ASSOC);
 
-//        $selectsql = "SELECT * FROM `recommend_same_age`";
-//        $selectst = $db->prepare($selectsql);
-//        $selectst->execute();
-//        $same_age_recommend_list = $selectst->fetchAll(PDO::FETCH_ASSOC);
-//
-//        $selectsql = "SELECT * FROM `recommend_new_online`";
-//        $selectst = $db->prepare($selectsql);
-//        $selectst->execute();
-//        $new_online_recommend_list = $selectst->fetchAll(PDO::FETCH_ASSOC);
+        $selectsql = "SELECT * FROM `recommend_same_age`";
+        $selectst = $db->prepare($selectsql);
+        $selectst->execute();
+        $same_age_recommend_list = $selectst->fetchAll(PDO::FETCH_ASSOC);
+
+        $selectsql = "SELECT * FROM `recommend_new_online`";
+        $selectst = $db->prepare($selectsql);
+        $selectst->execute();
+        $new_online_recommend_list = $selectst->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($hot_recommend_list as $k => $item) {
 
@@ -58,39 +58,39 @@ class cron_copyRecommendHotToAlbumTagRelation extends DaemonBase {
             $all_recommend_list[$albumid] = $item;
         }
 
-//        foreach($same_age_recommend_list as $k => $item) {
-//
-//            $albumid = $item['albumid'];
-//            $agetype = $item['agetype'];
-//            $ordernum = $item['ordernum'];
-//            $status = $item['status'];
-//            $addtime = $item['addtime'];
-//
-//            $all_recommend_list[$albumid] = array(
-//
-//                'albumid' => $albumid,
-//                'ordernum' => $ordernum,
-//                'status'   => $status,
-//                'addtime'  => $addtime,
-//            );
-//        }
-//
-//        foreach($new_online_recommend_list as $k => $item) {
-//
-//            $albumid = $item['albumid'];
-//            $agetype = $item['agetype'];
-//            $ordernum = $item['ordernum'];
-//            $status = $item['status'];
-//            $addtime = $item['addtime'];
-//
-//            $all_recommend_list[$albumid] = array(
-//
-//                'albumid' => $albumid,
-//                'ordernum' => $ordernum,
-//                'status'   => $status,
-//                'addtime'  => $addtime,
-//            );
-//        }
+        foreach ($same_age_recommend_list as $k => $item) {
+
+            $albumid = $item['albumid'];
+            $agetype = $item['agetype'];
+            $ordernum = $item['ordernum'];
+            $status = $item['status'];
+            $addtime = $item['addtime'];
+
+            $all_recommend_list[$albumid] = array(
+
+                'albumid' => $albumid,
+                'ordernum' => $ordernum,
+                'status' => $status,
+                'addtime' => $addtime,
+            );
+        }
+
+        foreach ($new_online_recommend_list as $k => $item) {
+
+            $albumid = $item['albumid'];
+            $agetype = $item['agetype'];
+            $ordernum = $item['ordernum'];
+            $status = $item['status'];
+            $addtime = $item['addtime'];
+
+            $all_recommend_list[$albumid] = array(
+
+                'albumid' => $albumid,
+                'ordernum' => $ordernum,
+                'status' => $status,
+                'addtime' => $addtime,
+            );
+        }
 
 
         if (!empty($all_recommend_list))

@@ -14,6 +14,7 @@
 //使用:
 //  修复tagid为2的所有专辑:
 //  php your_path/cron_repairAlbumFirstTag.php -t 2
+//TODO:是否需要定期执行?
 
 
 include_once (dirname ( dirname ( __FILE__ ) ) . "/DaemonBase.php");
