@@ -108,12 +108,17 @@ class info extends controller
         if ($_SERVER['visitorappversion'] >= "130000") {
             // 获取专辑标签列表
             $tagnewobj = new TagNew();
-            $relationreslist = current($tagnewobj->getAlbumTagRelationListByAlbumIds($album_id));
+            $uimidinterestobj = new UimidInterest();
+            $dataanalyticsobj = new DataAnalytics();
+            $userimsiobj = new UserImsi();
             $taglist = array();
             $recommendalbumlist = array();
-            if (!empty($relationreslist)) {
-                $tagids = array();
-                foreach ($relationreslist as $value) {
+            $tagids = array();
+            
+            // 获取当前专辑的标签
+            $relationtaglist = current($tagnewobj->getAlbumTagRelationListByAlbumIds($album_id));
+            if (!empty($relationtaglist)) {
+                foreach ($relationtaglist as $value) {
                     $tagids[] = $value['tagid'];
                 }
                 if (!empty($tagids)) {
@@ -122,37 +127,64 @@ class info extends controller
                     if (!empty($taglist)) {
                         $taglist = array_values($taglist);
                     }
-                    
-                    // 相关推荐专辑
-                    $tagrelationalbumids = array();
-                    $tagrelationalbumlist = array();
-                    $recommendalbumlist = array();
-                    
-                    $dataanalyticsobj = new DataAnalytics();
-                    $tagrelationlist = $dataanalyticsobj->getRecommendAlbumTagRelationListByAlbumTagIds($tagids, 6);
-                    foreach ($tagrelationlist as $value) {
-                        $tagrelationalbumids[] = $value['albumid'];
-                    }
-                    if (!empty($tagrelationalbumids)) {
-                        $tagrelationalbumids = array_unique($tagrelationalbumids);
-                        $tagrelationalbumlist = $album->getListByIds($tagrelationalbumids);
-                    }
-                    if (!empty($tagrelationalbumlist)) {
-                        foreach ($tagrelationalbumlist as $value) {
-                            if (!empty($value['cover'])) {
-                                $value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $value['cover'], 460, $value['cover_time']);
-                            }
-                            $value['listennum'] = 0;
-                            if (!empty($tagrelationlist[$value['id']])) {
-                                $value['listennum'] = $tagrelationlist[$value['id']]['albumlistennum'] + 0;
-                            }
-                            $recommendalbumlist[] = $value;
-                        }
-                    }
+                }
+            }
+            $result['taglist'] = $taglist;
+            
+            $interestlist = array();
+            $interesttagids = array();
+            $uimid = $userimsiobj->getUimid($uid);
+            
+            // 获取设备喜好的标签
+            $interestlist = $uimidinterestobj->getUimidInterestTagListByUimid($uimid, 10);
+            if (!empty($interestlist)) {
+                foreach ($interestlist as $interestinfo) {
+                    $interesttagids[] = $interestinfo['tagid'];
                 }
             }
             
-            $result['taglist'] = $taglist;
+            $tagrelationalbumids = array();
+            $tagrelationalbumlist = array();
+            $tagrelationlist = array();
+            if (!empty($interesttagids)) {
+                // 获取喜好标签的专辑
+                $tagrelationlist = $dataanalyticsobj->getRecommendAlbumListByTagids($interesttagids, 100);
+            } else {
+                // 未登录、没有喜好的新用户，默认获取本专辑标签相同的其他专辑
+                $tagrelationlist = $dataanalyticsobj->getRecommendAlbumListByTagids($tagids, 100);
+            }
+            if (!empty($tagrelationlist)) {
+                foreach ($tagrelationlist as $value) {
+                    // 过滤当前专辑
+                    if ($value['albumid'] == $album_id) {
+                        continue;
+                    }
+                    $tagrelationalbumids[] = $value['albumid'];
+                }
+            }
+            
+            // 获取指定长度的推荐专辑id数组
+            if (!empty($tagrelationalbumids)) {
+                $tagrelationalbumids = array_unique($tagrelationalbumids);
+                // 随机推荐
+                shuffle($tagrelationalbumids);
+                $tagrelationalbumids = array_slice($tagrelationalbumids, 0, 6);
+                $tagrelationalbumlist = $album->getListByIds($tagrelationalbumids);
+            }
+            
+            if (!empty($tagrelationalbumlist)) {
+                foreach ($tagrelationalbumlist as $value) {
+                    if (!empty($value['cover'])) {
+                        $value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $value['cover'], 460, $value['cover_time']);
+                    }
+                    $value['listennum'] = 0;
+                    if (!empty($tagrelationlist[$value['id']])) {
+                        $value['listennum'] = $tagrelationlist[$value['id']]['albumlistennum'] + 0;
+                    }
+                    $recommendalbumlist[] = $value;
+                }
+            }
+            
             $result['recommendalbumlist'] = $recommendalbumlist;
         }
 

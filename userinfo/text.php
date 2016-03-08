@@ -3,12 +3,16 @@ include_once '../controller.php';
 class text extends controller 
 {
     function action() {
-        /* $key = RedisKey::getQqLoginFirstKey("12533DC7E4738C7649395DB191903F2E");
-        $redisObj = AliRedisConnecter::connRedis('cache');
-        $cacheData = $redisObj->delete($key); */
-        $tagobj = new TagNew();
-        $list = $tagobj->getFirstTagList(10);
-        var_dump($list);
+        set_time_limit(0);
+        $url_page = "http://play.ximalaya.com/trackcount/12602679/played?device=android";
+        $ch = curl_init();
+        for ($i=0; $i<1000; $i++) {
+            curl_setopt($ch,CURLOPT_URL, $url_page);
+            $content = curl_exec($ch);
+            var_dump($i);
+            sleep(1);
+        }
+        curl_close($ch);
         die();
         
         

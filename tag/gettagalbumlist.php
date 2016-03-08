@@ -71,7 +71,6 @@ class gettagalbumlist extends controller
             $tagids = array_unique($tagids);
         }
         
-        $albumlist = array();
         $tagalbumlist = array();
         $aliossobj = new AliOss();
 
@@ -104,7 +103,6 @@ class gettagalbumlist extends controller
 
         //取出$len长度的story_num大于0的$albumrelationlist
         if (!empty($albumrelationlist) && !empty($album_infos)) {
-            $albumids = array();
             foreach ($albumrelationlist as $k => $relationinfo) {
                 if ($index < $len) {
                     $albumid = $relationinfo['albumid'];
@@ -123,27 +121,13 @@ class gettagalbumlist extends controller
             }
         }
 
-
         $albumrelationlistcount = count($albumrelationlist);
         if ($albumrelationlistcount <= $len) {
-
-            $albumids = array();
-            foreach ($albumrelationlist as $relationinfo) {
-                $albumids[] = $relationinfo['albumid'];
-            }
-
-            if (!empty($albumids)) {
-
-                // 获取专辑列表
-                $albumobj = new Album();
-                $albumlist = $albumobj->getListByIds($albumids);
-            }
-            
             foreach ($albumrelationlist as $relationinfo) {
                 $albumid = $relationinfo['albumid'];
                 $relationinfo['albuminfo'] = array();
-                if (!empty($albumlist[$albumid])) {
-                    $albuminfo = $albumlist[$albumid];
+                if (!empty($album_infos[$albumid])) {
+                    $albuminfo = $album_infos[$albumid];
                     if (!empty($albuminfo['cover'])) {
                         $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
                     }
