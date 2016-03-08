@@ -169,6 +169,9 @@ class Kdgs extends Http
         $r = array();
 
         foreach ($title_list as $k => $v) {
+            if (empty($audio_list[$k])) {
+                continue;
+            }
             $title = http::sub_data($v, '>', '<');
             $title = http::remove_n($title);
             $source_audio_url = http::sub_data($audio_list[$k], "src='", "'");
