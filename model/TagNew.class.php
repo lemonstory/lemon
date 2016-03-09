@@ -482,14 +482,25 @@ class TagNew extends ModelBase
         $taginfo = $this->getTagInfoByName($name);
         if (empty($taginfo)) {
             $tagid = $this->addTagDb($pid, $name);
+            $parenttagid = $pid;
         } else {
             $tagid = $taginfo['id'];
+            $parenttagid = $taginfo['pid'];
         }
         
         $albumtagrelation = $this->getAlbumTagRelationInfoByAlbumIdTagId($albumid, $tagid);
         if (empty($albumtagrelation)) {
             $this->addAlbumTagRelationDb($albumid, $tagid);
         }
+        
+        // 新增的标签若为二级标签时，则检测父级标签与专辑albumid的关联记录是否存在
+        if (!empty($parenttagid)) {
+            $parentalbumtagrelation = $this->getAlbumTagRelationInfoByAlbumIdTagId($albumid, $parenttagid);
+            if (empty($parentalbumtagrelation)) {
+                $this->addAlbumTagRelationDb($albumid, $parenttagid);
+            }
+        }
+        
         return true;
     }
     
