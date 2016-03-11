@@ -143,6 +143,14 @@ class RedisKey
 	{
 		return 'album_info_'.$albumId;
 	}
+	public static function getAlbumInfoKeys($albumids)
+	{
+	    $albumidarr = array();
+	    foreach ($albumids as $albumid) {
+	        $albumidarr[] = self::getAlbumInfoKey($albumid);
+	    }
+	    return $albumidarr;
+	}
     
 	/**
 	 * 故事信息
