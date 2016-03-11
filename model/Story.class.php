@@ -159,6 +159,8 @@ class Story extends ModelBase
      */
     public function getListByIds($id = 0, $uid = 0)
     {
+        return $this->getListByIdsNew($id);
+        
         if (is_array($id)) {
             $idarr = $id;
         } else {
@@ -192,6 +194,68 @@ class Story extends ModelBase
             }
         }
         return $storylist;
+    }
+    
+    
+    // 优化getListByIds，批量获取专辑列表
+    public function getListByIdsNew($storyids)
+    {
+        if (empty($storyids)) {
+            return array();
+        }
+        if (!is_array($storyids)) {
+            $storyids = array($storyids);
+        }
+        
+        $keys = RedisKey::getStoryInfoKeys($storyids);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->mget($keys);
+        
+        $cacheData = array();
+        $cacheIds = array();
+        if (is_array($redisData)){
+            foreach ($redisData as $oneredisdata){
+                if (empty($oneredisdata)) {
+                    continue;
+                }
+                $oneredisdata = json_decode($oneredisdata, true);
+                $cacheIds[] = $oneredisdata['id'];
+                $cacheData[$oneredisdata['id']] = $oneredisdata;
+            }
+        } else {
+            $redisData = array();
+        }
+        $dbIds = array_diff($storyids, $cacheIds);
+        $dbData = array();
+        
+        if(!empty($dbIds)) {
+            $storyidstr = implode(",", $storyids);
+            $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
+            $sql = "SELECT * FROM {$this->table} WHERE `id` IN ($storyidstr)";
+            $st = $db->prepare($sql);
+            $st->execute();
+            $tmpDbData = $st->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (!empty($tmpDbData)) {
+                foreach ($tmpDbData as $onedbdata){
+                    $onedbdata = $this->format_to_api($onedbdata);
+                    $dbData[$onedbdata['id']] = $onedbdata;
+                    $onekey = RedisKey::getStoryInfoKey($onedbdata['id']);
+                    $redisobj->setex($onekey, 86400, json_encode($onedbdata));
+                }
+            }
+        }
+        
+        $data = array();
+        foreach($storyids as $storyid) {
+            if(in_array($storyid, $dbIds)) {
+                $data[$storyid] = @$dbData[$storyid];
+            } else {
+                $data[$storyid] = $cacheData[$storyid];
+            }
+        }
+        
+        return $data;
     }
 
     /**

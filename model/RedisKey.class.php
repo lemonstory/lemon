@@ -159,6 +159,14 @@ class RedisKey
 	{
 		return 'story_info_'.$storyId;
 	}
+	public static function getStoryInfoKeys($storyids)
+	{
+	    $storyidarr = array();
+	    foreach ($storyids as $storyid) {
+	        $storyidarr[] = self::getStoryInfoKey($storyid);
+	    }
+	    return $storyidarr;
+	}
 
 	/**
 	 * 故事列表
