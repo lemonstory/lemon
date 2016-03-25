@@ -143,6 +143,14 @@ class RedisKey
 	{
 		return 'album_info_'.$albumId;
 	}
+	public static function getAlbumInfoKeys($albumids)
+	{
+	    $albumidarr = array();
+	    foreach ($albumids as $albumid) {
+	        $albumidarr[] = self::getAlbumInfoKey($albumid);
+	    }
+	    return $albumidarr;
+	}
     
 	/**
 	 * 故事信息
@@ -150,6 +158,14 @@ class RedisKey
 	public static function getStoryInfoKey($storyId)
 	{
 		return 'story_info_'.$storyId;
+	}
+	public static function getStoryInfoKeys($storyids)
+	{
+	    $storyidarr = array();
+	    foreach ($storyids as $storyid) {
+	        $storyidarr[] = self::getStoryInfoKey($storyid);
+	    }
+	    return $storyidarr;
 	}
 
 	/**

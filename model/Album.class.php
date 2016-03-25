@@ -137,6 +137,8 @@ class Album extends ModelBase
      */
     public function getListByIds($id = 0, $uid = 0)
     {
+        return $this->getListByIdsNew($id, $uid);
+        
         if (is_array($id)) {
             $idarr = $id;
         } else {
@@ -180,6 +182,77 @@ class Album extends ModelBase
         }
         return $albumlist;
     }
+    
+    // 优化getListByIds，批量获取专辑列表
+    public function getListByIdsNew($albumids, $visituid = 0)
+    {
+        if (empty($albumids)) {
+            return array();
+        }
+        if (!is_array($albumids)) {
+            $albumids = array($albumids);
+        }
+        
+        // 初始化Redis
+        $keys = RedisKey::getAlbumInfoKeys($albumids);
+        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+        $redisData = $redisobj->mget($keys);
+        
+        $cacheData = array();
+        $cacheIds = array();
+        if (is_array($redisData)){
+            foreach ($redisData as $oneredisdata){
+                if (empty($oneredisdata)) {
+                    continue;
+                }
+                $oneredisdata = json_decode($oneredisdata, true);
+                $cacheIds[] = $oneredisdata['id'];
+                $cacheData[$oneredisdata['id']] = $oneredisdata;
+            }
+        } else {
+            $redisData = array();
+        }
+        $dbIds = array_diff($albumids, $cacheIds);
+        $dbData = array();
+        $fav = new Fav();
+        
+        if(!empty($dbIds)) {
+            $albumidstr = implode(",", $albumids);
+            $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
+            $sql = "SELECT * FROM {$this->table} WHERE `id` IN ($albumidstr)";
+            $st = $db->prepare($sql);
+            $st->execute();
+            $tmpDbData = $st->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (!empty($tmpDbData)) {
+                foreach ($tmpDbData as $onedbdata){
+                    $favinfo = array();
+                    $onedbdata = $this->format_to_api($onedbdata);
+                    $favinfo = $fav->getUserFavInfoByAlbumId($visituid, $onedbdata['id']);
+                    if ($favinfo) {
+                        $onedbdata['fav'] = 1;
+                    } else {
+                        $onedbdata['fav'] = 0;
+                    }
+                    $dbData[$onedbdata['id']] = $onedbdata;
+                    $onekey = RedisKey::getAlbumInfoKey($onedbdata['id']);
+                    $redisobj->setex($onekey, 86400, json_encode($onedbdata));
+                }
+            }
+        }
+        
+        $data = array();
+        foreach($albumids as $albumid) {
+            if(in_array($albumid, $dbIds)) {
+                $data[$albumid] = @$dbData[$albumid];
+            } else {
+                $data[$albumid] = $cacheData[$albumid];
+            }
+        }
+        
+        return $data;
+    }
+    
 
     /**
      * 获取用户专辑列表
