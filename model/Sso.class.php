@@ -107,6 +107,7 @@ class Sso extends ModelBase
     
     public function initQqLoginUser($qc, $accessToken, $openId, $nickName) 
     {
+        $userinfo = array();
         if (empty($qc) || empty($accessToken) || empty($openId) || empty($nickName)) {
             return false;
         }
@@ -167,7 +168,16 @@ class Sso extends ModelBase
         if(empty($ucsynlogin)) {
             errorLog("ucenter注册用户失败,ucsynloginuid = {$ucsynlogin}",E_USER_ERROR);
         }
-        
+        //uc返回的是多个<script>代码,这里只有一个小柠檬app所以只匹配1个做处理
+        if (preg_match('/<\s*script\s+[^>]*?src\s*=\s*(\'|\")(.*?)\\1[^>]*?\/?\s*>/i', $ucsynlogin, $match)) {
+            uc_fopen($match[2]);
+        }
+
+        $userinfo['uc_callback'] = $match[2];
+        $userinfo['uid'] = $uid;
+        $userinfo['nickname'] = $nickName;
+        $userinfo['avatartime'] = time();
+
         // 登录后的处理
         $actionlogobj = new ActionLog();
         $userimsiobj = new UserImsi();
@@ -181,9 +191,7 @@ class Sso extends ModelBase
         $content = "qqregister";
         $alislsobj = new AliSlsUserActionLog();
         $alislsobj->addRegisterActionLog($uimid, $uid, $content, getClientIp(), $addtime);
-        
-        $return = array('uid' => $uid, 'nickname' => $nickName, 'avatartime' => time());
-        return $return;
+        return $userinfo;
     }
 
     public function qqlogin($accessToken, $openId)
