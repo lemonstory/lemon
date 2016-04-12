@@ -239,7 +239,7 @@ class Comment extends ModelBase
     	}
         // 写入缓存
         if ($albumid && $newcommentlist) {
-            $redisobj->setex($key, 86400, json_encode($newcommentlist));
+            $redisobj->setex($key, 1800, json_encode($newcommentlist));
         }
     	return $newcommentlist;
     }
