@@ -106,7 +106,7 @@ class gettagalbumlist extends controller
             foreach ($albumrelationlist as $k => $relationinfo) {
                 if ($index < $len) {
                     $albumid = $relationinfo['albumid'];
-                    if ($album_infos[$albumid]['story_num'] > 0) {
+                    if ($album_infos[$albumid]['story_num'] > 0 && $album_infos[$albumid]['status'] == 1) {
                         $index++;
                     } else {
 
