@@ -48,7 +48,7 @@ class albumstorysearch extends controller
             $albumsearch = $searchobj->searchAlbum($searchcontent, $page, $len);
             if (!empty($albumsearch)) {
                 $albumids = $albumsearch['albumids'];
-                $albumcount = count($albumids);
+                //$albumcount = count($albumids);
             }
         }
         
@@ -75,7 +75,7 @@ class albumstorysearch extends controller
                 }
             }
         }
-        
+
         $albumlist = array();
         if (!empty($albumids)) {
             // 过滤掉没有音频的故事，所属的专辑
@@ -96,10 +96,14 @@ class albumstorysearch extends controller
                         } else {
                             $info['cover'] = "";
                         }
-                        $albumlist[] = $info;
+                        //过滤被删除的专辑
+                        if ($info['status'] === 1) {
+                            $albumlist[] = $info;
+                        }
                     }
                 }
             }
+            $albumcount = count($albumlist);
         }
         
         $searchlist = array(
