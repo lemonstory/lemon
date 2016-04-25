@@ -97,7 +97,7 @@ class albumstorysearch extends controller
                             $info['cover'] = "";
                         }
                         //过滤被删除的专辑
-                        if ($info['status'] === 1) {
+                        if ($info['status'] === "1") {
                             $albumlist[] = $info;
                         }
                     }
