@@ -173,6 +173,9 @@ class Sso extends ModelBase
             uc_fopen($match[2]);
         }
 
+        //test --start
+        //$match[2] = str_replace("bbs.xiaoningmeng.net","dev.bbs.xiaoningmeng.net",$match[2]);
+        //test --end
         $userinfo['uc_callback'] = $match[2];
         $userinfo['uid'] = $uid;
         $userinfo['nickname'] = $nickName;
@@ -237,7 +240,9 @@ class Sso extends ModelBase
         if(preg_match('/<\s*script\s+[^>]*?src\s*=\s*(\'|\")(.*?)\\1[^>]*?\/?\s*>/i',$ucsynlogin,$match)) {
             uc_fopen($match[2]);
         }
-
+        //test --start
+        //$match[2] = str_replace("bbs.xiaoningmeng.net","dev.bbs.xiaoningmeng.net",$match[2]);
+        //test --end
         $userinfo['uc_callback'] = $match[2];
 
         // 登录后的处理
@@ -340,12 +345,9 @@ class Sso extends ModelBase
         setcookie('al', '', time() - 86400, '/', $domain);
 
         //uc各个app同步退出,既是调用个个app的uc.php然后执行setcookie.在此次一并处理
-//        $ucsynlogout = uc_user_synlogout();
-//        if(empty($ucsynlogout)) {
-//
-//        }
+        $ucsynlogout = uc_user_synlogout();
         header('P3P: CP="CURa ADMa DEVa PSAo PSDo OUR BUS UNI PUR INT DEM STA PRE COM NAV OTC NOI DSP COR"');
-        setcookie('xnm_auth', '', -86400 * 365);
+        setcookie('xnm_auth', '', -86400 * 365, time() - 86400, '/', $domain);
 
         return true;
     }
