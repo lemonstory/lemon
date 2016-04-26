@@ -591,7 +591,7 @@ class TagNew extends ModelBase
      * @param I $num
      * @return boolean
      */
-    public function updateAlbumTagRelationListenNum($albumid, $num)
+    public function updateAlbumTagRelationListenNum($albumid, $num, $isforce = false)
     {
         if (empty($albumid) || empty($num)) {
             $this->setError(ErrorConf::paramError());
@@ -607,13 +607,17 @@ class TagNew extends ModelBase
         }
         
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "UPDATE `{$this->ALBUM_TAG_RELATION_TABLE}` SET `albumlistennum` = `albumlistennum` + $num WHERE `albumid` = ?";
+        if ($isforce) {
+            $field = " `albumlistennum` =  {$num} ";
+        } else {
+            $field = " `albumlistennum` = `albumlistennum` + {$num} ";
+        }
+        $selectsql = "UPDATE `{$this->ALBUM_TAG_RELATION_TABLE}` SET {$field} WHERE `albumid` = ?";
         $selectst = $db->prepare($selectsql);
         $updateres = $selectst->execute(array($albumid));
         if (empty($updateres)) {
             return false;
         }
-        
         // clear cache
         $this->clearAlbumTagRelationCacheByAlbumIds($albumid);
         if (!empty($relationids)) {
