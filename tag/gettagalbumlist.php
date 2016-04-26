@@ -16,9 +16,10 @@ class gettagalbumlist extends controller
         if (empty($currenttagid)) {
             $this->showErrorJson(ErrorConf::paramError());
         }
-        
+
+        //一级标签和二级标签的最大数量
         $firsttagnum = 8;
-        $secondtagnum = 10;
+        $secondtagnum = 15;
         $selectfirsttagid = 0; // 当前选中的一级标签id
         $selectsecondtagid = 0; // 当前选中的二级标签id
         $firsttaglist = array(); // 一级标签列表
