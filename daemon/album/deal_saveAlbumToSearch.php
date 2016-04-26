@@ -8,7 +8,7 @@ class deal_saveAlbumToSearch extends DaemonBase {
 	protected function deal() {
 	    $storyid = MnsQueueManager::popAlbumToSearchQueue();
 	    if (empty($storyid)) {
-	        sleep(10);
+            sleep(2);
 	        return true;
 	    }
 	    
@@ -38,7 +38,7 @@ class deal_saveAlbumToSearch extends DaemonBase {
             $this->writeLog($storyid, $albumid, "ret={$ret}");
         //}
         // 控制opensearch写入频率
-        sleep(2);
+        usleep(250000);
 	}
 
 	protected function checkLogPath() {}
