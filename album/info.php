@@ -89,11 +89,12 @@ class info extends controller
                 if (!empty($value['cover'])) {
                     $value['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $value['cover'], 230, $value['cover_time']);
                 }
+                //部分英文故事辑里面会有多余的反斜杠
+                $value['title'] = stripslashes($value['title']);
                 $storylist[] = $value;
             }
         }
         $result['storylist'] = $storylist;
-        
         // 评论数量
         $result['albuminfo']['commentnum'] = (int)$comment->get_total("`albumid`={$album_id} and `status`=1");
 
