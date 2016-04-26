@@ -2,11 +2,11 @@
 /*
  * 按专辑名称、作者、故事名称搜索专辑
  */
-include_once SERVER_ROOT . 'libs/Pinyin.php';
-include_once SERVER_ROOT . "libs/opensearch/CloudsearchDoc.php";
-include_once SERVER_ROOT . "libs/opensearch/CloudsearchIndex.php";
-include_once SERVER_ROOT . "libs/opensearch/CloudsearchClient.php";
-include_once SERVER_ROOT . "libs/opensearch/CloudsearchSearch.php";
+include_once API_LEMON_ROOT . 'libs/Pinyin.php';
+include_once API_LEMON_ROOT . "libs/opensearch/CloudsearchDoc.php";
+include_once API_LEMON_ROOT . "libs/opensearch/CloudsearchIndex.php";
+include_once API_LEMON_ROOT . "libs/opensearch/CloudsearchClient.php";
+include_once API_LEMON_ROOT . "libs/opensearch/CloudsearchSearch.php";
 class OpenSearch 
 {
     public $OPEN_INSTANCE = 'albumstorysearch';
@@ -63,24 +63,27 @@ class OpenSearch
         $search->setStartHit($offset);
         $search->setHits($len);
         $search->setFormat('json');
+        $search->addSummary('albumtitle', 50, 'em', '...', 1, "<font color='#F5A623'>", "</font>");
+        $search->addSummary('storytitle', 50, 'em', '...', 1, "<font color='#F5A623'>", "</font>");
         $data = json_decode($search->search(), true);
         if ($data['status'] != "OK") {
             return array();
         }
-        
+
         $total = $data['result']['total'];
         $albumids = array();
+        $albumsummarytitles = array();
         if (! empty($data['result']['items'])) {
             $items = $data['result']['items'];
             foreach ($items as $one) {
                 $albumids[] = $one['albumid'];
+                $albumsummarytitles[$one['albumid']] = $one['albumtitle'];
             }
         }
         if (!empty($albumids)) {
             $albumids = array_unique($albumids);
         }
-        
-        return array("albumids" => $albumids, "total" => $total);
+        return array("albumids" => $albumids, "total" => $total, 'albumsummarytitles' => $albumsummarytitles);
     }
     
     
@@ -130,6 +133,8 @@ class OpenSearch
         $search->setStartHit($offset);
         $search->setHits($len);
         $search->setFormat('json');
+        $search->addSummary('albumtitle', 50, 'em', '...', 1, "<font color='#F5A623'>", "</font>");
+        $search->addSummary('storytitle', 50, 'em', '...', 1, "<font color='#F5A623'>", "</font>");
         $data = json_decode($search->search(), true);
         if ($data['status'] != "OK") {
             return array();
@@ -137,17 +142,18 @@ class OpenSearch
         
         $total = $data['result']['total'];
         $storyids = array();
+        $storysummarytitles = array();
         if (! empty($data['result']['items'])) {
             $items = $data['result']['items'];
             foreach ($items as $one) {
                 $storyids[] = $one['storyid'];
+                $storysummarytitles[$one['storyid']] = $one['storytitle'];
             }
         }
         if (!empty($storyids)) {
             $storyids = array_unique($storyids);
         }
-        
-        return array("storyids" => $storyids, "total" => $total);;
+        return array("storyids" => $storyids, "total" => $total, 'storysummarytitles' => $storysummarytitles);
     }
     
     
@@ -181,31 +187,11 @@ class OpenSearch
             $albumtitlepytmp .= $albumtitlepy[$i] . " ";
         }
         $albumtitlepytmp = $albumtitle . " " . $albumtitlepytmp;
-        
-        
         $addtime = time();
         $client = $this->getClientinfo();
         $doc = new CloudsearchDoc($this->OPEN_INSTANCE, $client);
-        $storyinfo = array(
-                "cmd" => "UPDATE",
-                'fields' => array(
-                        'storyid' => $storyid,
-                        'storytitle' => $storytitle,
-                        'storytitlepy' => $storytitlepytmp,
-                        'albumid' => $albumid,
-                        'storyaddtime' => $addtime
-                ) 
-        );
-        $albuminfo = array(
-                "cmd" => "UPDATE",
-                'fields' => array(
-                        'albumid' => $albumid,
-                        'albumtitle' => $albumtitle,
-                        'albumtitlepy' => $albumtitlepytmp,
-                        'albumaddtime' => $addtime
-                ) 
-        );
-        
+        $storyinfo = $this->storyDoc("UPDATE", $storyid, $storytitle, $storytitlepytmp, $albumid, $addtime);
+        $albuminfo = $this->albumDoc("UPDATE", $albumid, $albumtitle, $albumtitlepytmp, $addtime);
         $storydocs = json_encode(array($storyinfo));
         $albumdocs = json_encode(array($albuminfo));
         $storyresult = json_decode($doc->add($storydocs, $this->OPEN_TABLENAME_STORY), true);
@@ -215,6 +201,130 @@ class OpenSearch
         }
         return true;
     }
+
+    public function removeAlbumFromSearch($albumid)
+    {
+
+        $client = $this->getClientinfo();
+        $search = new CloudsearchSearch($client);
+        $doc = new CloudsearchDoc($this->OPEN_INSTANCE, $client);
+        $search->addIndex($this->OPEN_INSTANCE);
+        $query = "albumid:'{$albumid}'";
+        $search->setQueryString($query);
+        $search->setFormat('json');
+        $search->setHits('100');
+        $data = json_decode($search->search(), true);
+        $albumItems = array();
+        $storyItems = array();
+        while ($data['status'] == "OK" && $data['result']['total'] > 0) {
+            foreach ($data['result']['items'] as $item) {
+                $albumItems[] = $this->albumDoc("DELETE", $item['albumid'], $item['albumtitle'], $item['albumtitlepy'], $item['albumaddtime']);
+                $storyItems[] = $this->storyDoc("DELETE", $item['storyid'], $item['storytitle'], $item['storytitlepy'], $item['albumid'], $item['storyaddtime']);
+            }
+            $albumDocs = json_encode($albumItems);
+            $storyDocs = json_encode($storyItems);
+            $storyresult = json_decode($doc->remove($storyDocs, $this->OPEN_TABLENAME_STORY), true);
+            $albumresult = json_decode($doc->remove($albumDocs, $this->OPEN_TABLENAME_ALBUM), true);
+            if ($storyresult['status'] == "OK" && $albumresult['status'] == "OK") {
+                $data = json_decode($search->search(), true);
+                usleep(100000);
+            } else {
+                //TODO:wirte log
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function addAlbumToSearchWithAlbumid($albumid)
+    {
+
+        $albumObj = new Album();
+        $storyObj = new Story();
+        $albumInfo = $albumObj->get_album_info($albumid);
+        $albumtitle = "";
+        if (!empty($albumInfo['title'])) {
+            $albumtitle = $albumInfo['title'];
+        }
+        $storyArr = $storyObj->get_album_story_list($albumid);
+        if (count($storyArr) > 0 && !empty($albumtitle)) {
+            foreach ($storyArr as $story) {
+                $storyid = $story['id'];
+                MnsQueueManager::pushAlbumToSearchQueue($storyid);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public function removeStroyFromSearch($storyid)
+    {
+
+        $client = $this->getClientinfo();
+        $search = new CloudsearchSearch($client);
+        $doc = new CloudsearchDoc($this->OPEN_INSTANCE, $client);
+        $search->addIndex($this->OPEN_INSTANCE);
+        $query = "id:'{$storyid}'";
+        $search->setQueryString($query);
+        $search->setFormat('json');
+        $data = json_decode($search->search(), true);
+        $storyItems = array();
+        if ($data['status'] == "OK" && $data['result']['total'] > 0) {
+            foreach ($data['result']['items'] as $item) {
+                $storyItems[] = $this->storyDoc("DELETE", $item['storyid'], $item['storytitle'], $item['storytitlepy'], $item['albumid'], $item['storyaddtime']);
+            }
+            $storyDocs = json_encode($storyItems);
+            $storyresult = json_decode($doc->remove($storyDocs, $this->OPEN_TABLENAME_STORY), true);
+            if ($storyresult['status'] == "OK") {
+                return true;
+            } else {
+                //TODO:wirte log
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function addStoryoSearchWithStoryid($storyid)
+    {
+
+        if (!empty($storyid)) {
+            MnsQueueManager::pushAlbumToSearchQueue($storyid);
+            return true;
+        }
+        return false;
+    }
+
+    private function albumDoc($cmd, $albumid, $albumtitle, $albumtitlepy, $albumaddtime)
+    {
+        return array(
+            "cmd" => $cmd,
+            'fields' => array(
+                'albumid' => $albumid,
+                'albumtitle' => $albumtitle,
+                'albumtitlepy' => $albumtitlepy,
+                'albumaddtime' => $albumaddtime,
+            )
+        );
+    }
+
+    private function storyDoc($cmd, $storyid, $storytitle, $storytitlepy, $albumid, $storyaddtime)
+    {
+        return array(
+            "cmd" => $cmd,
+            'fields' => array(
+                'storyid' => $storyid,
+                'storytitle' => $storytitle,
+                'storytitlepy' => $storytitlepy,
+                'albumid' => $albumid,
+                'storyaddtime' => $storyaddtime,
+            )
+        );
+    }
+
+
+
+
     
     /* public function exportstory($where)
     {

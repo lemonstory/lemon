@@ -2,6 +2,10 @@
 include_once '../controller.php';
 class albumstorysearch extends controller
 {
+
+    //增加一个线上版本判断,避免上下版本不兼容
+    private $OnlineVerionNow = 240000;
+
     public function action()
     {
         $searchtype = $this->getRequest("searchtype", "");
@@ -31,6 +35,7 @@ class albumstorysearch extends controller
         
         $storyids = array();
         $storycount = 0;
+        $storysummarytitles = array();
         $searchobj = new OpenSearch();
         // 搜索故事
         if (empty($searchtype) || $searchtype == 'story') {
@@ -38,17 +43,20 @@ class albumstorysearch extends controller
             if (!empty($storysearch)) {
                 $storyids = $storysearch['storyids'];
                 $storycount = $storysearch['total'];
+                $storysummarytitles = $storysearch['storysummarytitles'];
             }
         }
         
         // 搜索专辑
         $albumcount = 0;
+        $albumsummarytitles = array();
         if (empty($searchtype) || $searchtype == 'album') {
             $albumids = array();
             $albumsearch = $searchobj->searchAlbum($searchcontent, $page, $len);
             if (!empty($albumsearch)) {
                 $albumids = $albumsearch['albumids'];
                 //$albumcount = count($albumids);
+                $albumsummarytitles = $albumsearch['albumsummarytitles'];
             }
         }
         
@@ -70,6 +78,9 @@ class albumstorysearch extends controller
                     } else {
                         $info['cover'] = "";
                         $info['playcover'] = "";
+                    }
+                    if ($_SERVER['visitorappversion'] > $this->OnlineVerionNow) {
+                        $info['title'] = $storysummarytitles[$info['id']];
                     }
                     $storylist[] = $info;
                 }
@@ -96,10 +107,10 @@ class albumstorysearch extends controller
                         } else {
                             $info['cover'] = "";
                         }
-                        //过滤被删除的专辑
-                        if ($info['status'] === "1") {
-                            $albumlist[] = $info;
+                        if ($_SERVER['visitorappversion'] > $this->OnlineVerionNow) {
+                            $info['title'] = $albumsummarytitles[$info['id']];
                         }
+                        $albumlist[] = $info;
                     }
                 }
             }
@@ -110,7 +121,7 @@ class albumstorysearch extends controller
                 "storylist" => $storylist,
                 'storycount' => $storycount,
                 'albumlist' => $albumlist,
-                'albumcount' => $albumcount
+            'albumcount' => $albumcount,
                 );
         $this->showSuccJson($searchlist);
     }
