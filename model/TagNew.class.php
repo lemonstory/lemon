@@ -270,19 +270,11 @@ class TagNew extends ModelBase
         } elseif ($isgoodcomment == 1) {
             // 好评榜
             if (!empty($albumtagrelationinfo)) {
-                if (!empty($albumtagrelationinfo['commentstarlevel'])) {
                     if ($direction == "up") {
                         $where .= " AND `commentstarlevel` >= '{$albumtagrelationinfo['commentstarlevel']}' AND `id` > '{$startrelationid}'";
                     } else {
                         $where .= " AND `commentstarlevel` <= '{$albumtagrelationinfo['commentstarlevel']}' AND `id` < '{$startrelationid}'";
                     }
-                } else {
-                    if ($direction == "up") {
-                        $where .= " AND `id` > '{$startrelationid}'";
-                    } else {
-                        $where .= " AND `id` < '{$startrelationid}'";
-                    }
-                }
             }
             $orderby = "ORDER BY `commentstarlevel` DESC, `id` DESC";
         } else {
@@ -304,7 +296,7 @@ class TagNew extends ModelBase
             }
             $orderby = "ORDER BY `uptime` DESC, `id` DESC";
         }
-        
+
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
         $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} $orderby LIMIT {$len}";
         $selectst = $db->prepare($selectsql);
