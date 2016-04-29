@@ -80,7 +80,6 @@ class gettagalbumlist extends controller
         // 避免取到故事数量为0的故事专辑,做排查处理
         //TODO:该业务效率偏低
         $albumrelationlist = array();
-        $max_len = 500;
         $index = 0;
         $albumobj = new Album();
 
@@ -95,8 +94,8 @@ class gettagalbumlist extends controller
         $albumids = array_unique($albumids);
 
         $unique_album_relation_list = array();
-        foreach ($albumids as $i => $item) {
-            $unique_album_relation_list[] = $albumrelationlist[$i];
+        foreach ($albumids as $key => $item) {
+            $unique_album_relation_list[] = $albumrelationlist[$key];
         }
 
         $albumrelationlist = $unique_album_relation_list;
