@@ -20,7 +20,7 @@ class AliOss extends ModelBase
     );
     
     public $OSS_IMAGE_ENABLE = array('jpg','jpeg','png');
-    public $OSS_MEDIA_ENABLE = array('mp4', 'mp3', 'audio');
+    public $OSS_MEDIA_ENABLE = array('mp4', 'mp3', 'audio', 'm4a');
     
     public $LOCAL_IMG_TMP_PATH = '/alidata1/tmppicfile/';
     public $LOCAL_MEDIA_TMP_PATH = '/alidata1/tmpmediafile/';
