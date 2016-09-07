@@ -311,20 +311,8 @@ class Album extends ModelBase
         if (!$age_str) {
             return 0;
         }
-
-        if (stristr($age_str, 'P')) {
-            $age = (int)str_replace(array('P', 'p', '-', '+'), array('', '', '', ''), $age_str);
-        } else if (stristr($age_str, '岁')) {
-            $tmp_str = str_replace('岁', '', $age_str);
-            if(strstr($tmp_str, '-')) {
-                $tmp_arr = explode('-', $tmp_str);
-                if (isset($tmp_arr[1])) {
-                    $age = (int)$tmp_arr[1];
-                } else {
-                    $age = (int)$tmp_arr[0];
-                }
-            }
-        }
+        $age_str_arr = $this->get_age_arr($age_str);
+        $age = intval($age_str_arr[0]);
         // 没有取到年龄处理
         if (!isset($age)) {
             return 0;
@@ -337,6 +325,62 @@ class Album extends ModelBase
             $age_type = 3;
         }
         return $age_type;
+    }
+
+    /**
+     * 根据年龄字符串返回数组$arr[0]=album_min_age,$arr[1]=album_max_age
+     * @param string $age_str
+     * @return array
+     */
+    public function get_age_arr($age_str = '')
+    {
+
+        $age_str_arr = array(0, 14);
+        $min_age_exist = false;
+        $max_age_exist = false;
+        if (!empty($age_str)) {
+
+            if (stristr($age_str, '+')) {
+                $min_age_exist = true;
+            } else if (stristr($age_str, '-')) {
+                $max_age_exist = true;
+            }
+
+            if (stristr($age_str, 'P')) {
+                $tmp_str = str_replace(array('P', 'p', '-', '+'), array('', '', '', ''), $age_str);
+            } else if (stristr($age_str, '岁')) {
+                $tmp_str = str_replace('岁', '', $age_str);
+            }
+            $age_str_arr = explode('-', $tmp_str);
+
+            if (count($age_str_arr) == 1) {
+                $album_min_age = 0;
+                $album_max_age = 14;
+
+                if ($min_age_exist) {
+                    $album_min_age = $age_str_arr[0];
+                    $album_max_age_arr = array(2, 6, 10, 14);
+                    foreach ($album_max_age_arr as $value) {
+                        if ($album_min_age < $value) {
+                            $album_max_age = $value;
+                            break;
+                        }
+                    }
+                } else if ($max_age_exist) {
+                    $album_max_age = $age_str_arr[0];
+                    $album_min_age_arr = array(0, 3, 7, 11);
+                    foreach ($album_min_age_arr as $value) {
+                        if ($album_max_age > $value) {
+                            $album_min_age = $value;
+                        }
+                    }
+                }
+
+                $age_str_arr[0] = $album_min_age;
+                $age_str_arr[1] = $album_max_age;
+            }
+        }
+        return $age_str_arr;
     }
 
     /**
