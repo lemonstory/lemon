@@ -476,4 +476,11 @@ class Album extends ModelBase
         $redisobj->delete($albumIdKey);
         return true;
     }
+
+    public function coverNotUploadOssCount()
+    {
+
+        $count = $this->get_total("s_cover!='' and cover=''");
+        return $count;
+    }
 }

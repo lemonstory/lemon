@@ -466,4 +466,18 @@ class Story extends ModelBase
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisobj->delete(RedisKey::getAlbumStoryListKey($album_id));
     }
+
+    public function coverNotUploadOssCount()
+    {
+        $default_story_cover_list = "http://s1.xmcdn.com/wap/css/img/default/bg_player.jpg?v=20160202125906,http://s1.xmcdn.com/wap/css/img/default/sound.jpg";
+        //SELECT * FROM `story` WHERE cover='' and find_in_set(`s_cover`,'http://s1.xmcdn.com/wap/css/img/default/bg_player.jpg?v=20160202125906,http://s1.xmcdn.com/wap/css/img/default/sound.jpg')=0 and `status` = 1 LIMIT 20
+        $count = $this->get_total("cover='' and find_in_set(`s_cover`,'{$default_story_cover_list}')=0 and `status` = 1");
+        return $count;
+    }
+
+    public function mediaNotUploadOssCount()
+    {
+        $count = $this->get_total("`mediapath`='' and `status`=1 AND `source_audio_url` !=''");
+        return $count;
+    }
 }

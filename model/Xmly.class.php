@@ -17,17 +17,17 @@ class Xmly extends Http
 
         $r = array();
 
-        foreach($result[0] as $k => $v) {
-            $url   = 'http://m.ximalaya.com'.Http::sub_data($v, 'href="', '"');
+        foreach ($result[0] as $k => $v) {
+            $url = 'http://m.ximalaya.com' . Http::sub_data($v, 'href="', '"');
             if (strstr($url, 'kid/rank')) {
                 continue;
             }
             $title = Http::sub_data($v, 'mgt-5">', '<');
             $cover = Http::sub_data($v, 'src="', '"');
             if ($title && $cover && $url) {
-                $r[$k]['title']    = $title;
-                $r[$k]['cover']    = $cover;
-                $r[$k]['link_url'] = 'http://m.ximalaya.com/explore/more_album?page=1&per_page=10&category_id=6&condition=rank&tag='.$title;
+                $r[$k]['title'] = $title;
+                $r[$k]['cover'] = $cover;
+                $r[$k]['link_url'] = 'http://m.ximalaya.com/explore/more_album?page=1&per_page=10&category_id=6&condition=rank&tag=' . $title;
             }
         }
         return $r;
@@ -36,6 +36,7 @@ class Xmly extends Http
     // 获取专辑列表
     public function get_album_list($page = 1, $tag = '')
     {
+        $arr = array();
         $page_url = "http://m.ximalaya.com/explore/more_album?page={{page}}&per_page=10&category_id=6&condition=recent&tag={{tag}}";
         $page_url = str_replace("{{page}}", $page, $page_url);
         $page_url = str_replace("{{tag}}", urlencode($tag), $page_url);
@@ -46,31 +47,28 @@ class Xmly extends Http
         } else {
             $content = Http::ajax_get($page_url);
         }
-
         $content = json_decode($content, true);
+        //var_dump($content);
 
-        if (!isset($content['html'])) {
-            return array();
-        }
-        if (!$content['next_page']) {
-            return array();
-        }
+        if (isset($content['res']) && $content['res'] == true && isset($content['html']) && isset($content['next_page'])) {
 
-        preg_match_all('/<li [\s|\S]*?<\/li>/', $content['html'], $result);
-        $r = array();
-        foreach($result[0] as $k => $v) {
-            $title = Http::sub_data($v, 'icon-album1 mgr-5"></i>', '<');
-            $cover = Http::sub_data($v, 'src="', '"');
-            $url   = Http::sub_data($v, 'data-url="', '"');
-            $count = Http::sub_data($v, 'icon-player mgr-5"></i>', '<');
-            if ($title && $url) {
-                $arr[$k]['title'] = $title;
-                // http://fdfs.xmcdn.com/group7/M05/53/22/wKgDX1W24DjS695KAApQxFCdpw4454_web_meduim.jpg
-                $arr[$k]['cover'] = str_replace("_meduim", "_large", $cover);
-                $arr[$k]['url']   = 'http://m.ximalaya.com'.$url;
-                $arr[$k]['count'] = $count;
+            //var_dump($content['html']);
+            preg_match_all('/<li [\s|\S]*?<\/li>/', $content['html'], $result);
+            foreach ($result[0] as $k => $v) {
+                $title = Http::sub_data($v, '<p class="name">', '</p>');
+                $cover = Http::sub_data($v, '<img onerror=\'this.style.display="none";\' src="', '" alt="">');
+                $url = Http::sub_data($v, 'data-url="', '"');
+                $count = Http::sub_data($v, '<span><i class="icon icon-player mgr-5"></i>', '</span>');
+                if ($title && $url) {
+                    $arr[$k]['title'] = trim($title);
+                    // http://fdfs.xmcdn.com/group7/M05/53/22/wKgDX1W24DjS695KAApQxFCdpw4454_web_meduim.jpg
+                    $arr[$k]['cover'] = str_replace("_meduim", "_large", $cover);
+                    $arr[$k]['cover'] = str_replace("_web_large", "", $arr[$k]['cover']);
+                    $arr[$k]['url'] = 'http://m.ximalaya.com' . $url;
+                    $arr[$k]['count'] = intval($count);
+                }
+
             }
-
         }
         return $arr;
     }
@@ -110,7 +108,7 @@ class Xmly extends Http
         $r = array();
 
         foreach ($result[0] as $k => $v) {
-            $r[]= 'http://m.ximalaya.com'.Http::sub_data($v, 'data-url="', '"');
+            $r[] = 'http://m.ximalaya.com' . Http::sub_data($v, 'data-url="', '"');
         }
 
         $n = array();
@@ -144,11 +142,11 @@ class Xmly extends Http
             return array();
         }
 
-        $r = array(); 
+        $r = array();
         $page = 0;
 
         while (true) {
-            $page ++;
+            $page++;
             $album_url = "http://m.ximalaya.com/album/more_tracks?url=%2Falbum%2Fmore_tracks&aid={$album_id}&page={$page}";
 
             if ($page == 1) {
@@ -170,33 +168,33 @@ class Xmly extends Http
 
             preg_match_all('/<li [\s|\S]*?<\/li>/', $content['html'], $result);
 
-            if($result[0]) {
+            if ($result[0]) {
                 foreach ($result[0] as $k => $v) {
-                    $r[]= 'http://m.ximalaya.com'.Http::sub_data($v, 'data-url="', '"');
+                    $r[] = 'http://m.ximalaya.com' . Http::sub_data($v, 'href="', '"');
+
                 }
             } else {
                 break;
             }
         }
-
         return $r;
     }
 
     public function get_story_info($url)
     {
-        $story_info =  array();
+        $story_info = array();
         usleep(100);
         $content = Http::get($url);
-        $title = Http::sub_data($content, '<h1 class="name">', '</h1>');
-        if (empty($title)) {
-            $title = Http::sub_data($content, '<h1 class="pl-name">', '</h1>');
-        }
-        $source_audio_url = Http::sub_data($content, 'sound_url="', '"');
-        $times = Http::sub_data($content, '<span class="time fr">', '</span>');
+        $title = trim(Http::sub_data($content, '<h1 class="pl-name elli-multi" itemprop="name">', '</h1>'));
+//        if (empty($title)) {
+//            $title = Http::sub_data($content, '<h1 class="pl-name">', '</h1>');
+//        }
+        $source_audio_url = Http::sub_data($content, 'dataUrl: "', '"');
+        $times = Http::sub_data($content, '<span class="time fr" itemprop="duration">', '</span>');
         $times = $this->get_seconds($times);
-        $intro = htmlspecialchars_decode(Http::sub_data($content, 'data-text="', '"'));
+        $intro = htmlspecialchars_decode(Http::sub_data($content, '<div class="pl-intro">', '</div>'));
         $intro = preg_replace('/<a[\s|\S].*?a>/', '', $intro);
-        $cover = Http::sub_data($content, '<img class="abs" src="', '"');
+        $cover = Http::sub_data($content, '<img class="abs" itemprop="image" src="', '"');
         if ($title && $source_audio_url) {
             $story_info['title'] = addslashes(str_replace('&#39;', "'", $title));
             $story_info['source_audio_url'] = $source_audio_url;

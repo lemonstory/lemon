@@ -44,6 +44,7 @@ class Kdgs extends Http
                 $r[$k]['s_id'] = http::sub_data($url, 'parentId=', '&'); // parent_source_category_id
                 $r[$k]['s_p_id'] = 0;
             }
+//            echo sprintf("link_url:%s, title:%s, cover:%s, s_id:%s, s_p_id:%d ",$r[$k]['link_url'],$r[$k]['title'],$r[$k]['cover'],$r[$k]['s_id'],$r[$k]['s_p_id']);
         }
 
         return $r;
