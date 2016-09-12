@@ -59,6 +59,22 @@ function humanCommentTime($time)
 	}
 }
 
+// 返回秒数
+function get_seconds($times = '')
+{
+	if (!$times) {
+		return 0;
+	}
+	$times = explode(":", $times);
+	if (isset($times[2])) {
+		return $times[0] * 60 * 60 + $times[1] * 60 + $times[2];
+	} else if (isset($times[1])) {
+		return $times[0] * 60 + $times[1];
+	} else {
+		return $times[0];
+	}
+}
+
 
 function getIsAjaxRequest()
 {

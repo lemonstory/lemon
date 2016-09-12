@@ -121,7 +121,7 @@ class Xmly extends Http
             }
             $source_audio_url = Http::sub_data($content, 'sound_url="', '"');
             $times = Http::sub_data($content, '<span class="time fr">', '</span>');
-            $times = $this->get_seconds($times);
+            $times = get_seconds($times);
             $intro = htmlspecialchars_decode(Http::sub_data($content, 'data-text="', '"'));
             $intro = preg_replace('/<a[\s|\S].*?a>/', '', $intro);
             $cover = Http::sub_data($content, "background-image: url('", "')");
@@ -148,6 +148,7 @@ class Xmly extends Http
         while (true) {
             $page++;
             $album_url = "http://m.ximalaya.com/album/more_tracks?url=%2Falbum%2Fmore_tracks&aid={$album_id}&page={$page}";
+
 
             if ($page == 1) {
                 $content = Http::ajax_get($album_url);
@@ -191,7 +192,7 @@ class Xmly extends Http
 //        }
         $source_audio_url = Http::sub_data($content, 'dataUrl: "', '"');
         $times = Http::sub_data($content, '<span class="time fr" itemprop="duration">', '</span>');
-        $times = $this->get_seconds($times);
+        $times = get_seconds($times);
         $intro = htmlspecialchars_decode(Http::sub_data($content, '<div class="pl-intro">', '</div>'));
         $intro = preg_replace('/<a[\s|\S].*?a>/', '', $intro);
         $cover = Http::sub_data($content, '<img class="abs" itemprop="image" src="', '"');
@@ -203,21 +204,5 @@ class Xmly extends Http
             $story_info['s_cover'] = $cover;
         }
         return $story_info;
-    }
-
-    // 返回秒数
-    public function get_seconds($times = '')
-    {
-        if (!$times) {
-            return 0;
-        }
-        $times = explode(":", $times);
-        if (isset($times[2])) {
-            return $times[0] * 60 * 60 + $times[1] * 60 + $times[2];
-        } else if (isset($times[1])) {
-            return $times[0] * 60 + $times[1];
-        } else {
-            return $times[0];
-        }
     }
 }
