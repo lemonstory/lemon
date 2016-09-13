@@ -236,6 +236,9 @@ class AliOss extends ModelBase
         $ext = $tmpfiletype;
         $times = 0;
         $size = 0;
+
+        $content = sprintf("[%s] mediainfo开始 %s\r\n", date('Y-m-d H:i:s'), $tmpfilename . $tmpfiletype);
+        //echo $content;
         $command = "mediainfo \"--Inform=General;%Duration% %FileSize%\" {$tmpFile}";
         exec($command, $output);
         if (!empty($output)) {
@@ -247,10 +250,16 @@ class AliOss extends ModelBase
                 $size = $mediainfo[1] + 0;
             }
         }
-        
+        $content = sprintf("[%s] mediainfo结束 %s\r\n", date('Y-m-d H:i:s'), $tmpfilename . $tmpfiletype);
+        //echo $content;
         $to = $this->formatVideoFile($relationid, $ext);
+
+        $content = sprintf("[%s] upload_file_by_file开始 %s\r\n", date('Y-m-d H:i:s'), $tmpfilename . $tmpfiletype);
+        //echo $content;
         $responseObj = $obj->upload_file_by_file($bucket, $to, $tmpFile);
         if ($responseObj->status==200){
+            $content = sprintf("[%s] upload_file_by_file结束 %s\r\n", date('Y-m-d H:i:s'), $tmpfilename . $tmpfiletype);
+            //echo $content;
             $return['mediapath'] = $to;
             $return['size'] = $size;
             $return['times'] = $times;

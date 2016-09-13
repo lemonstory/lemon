@@ -70,7 +70,9 @@ class alioss_sdk{
 	/**
 	 * OSS服务地址
 	 */
-	const DEFAULT_OSS_HOST = 'oss.aliyuncs.com';
+	//https://help.aliyun.com/knowledge_detail/39584.html
+	//https://help.aliyun.com/document_detail/31837.html?spm=5176.doc32100.2.1.tf5gWX
+	const DEFAULT_OSS_HOST = 'oss-cn-hangzhou-internal.aliyuncs.com';
 	//const DEFAULT_OSS_HOST = '10.230.201.90';
 	/**
 	 * 软件名称
