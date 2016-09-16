@@ -153,7 +153,6 @@ class Story extends ModelBase
         }
 	}
 
-
     /**
      * 批量获取故事信息
      */
