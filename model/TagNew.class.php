@@ -280,18 +280,18 @@ class TagNew extends ModelBase
         } else {
             // 全部、其他标签
             if (!empty($albumtagrelationinfo)) {
-                if (!empty($albumtagrelationinfo['uptime'])) {
-                    if ($direction == "up") {
-                        $where .= " AND `uptime` >= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
-                    } else {
-                        $where .= " AND `uptime` <= '{$albumtagrelationinfo['uptime']}' AND `id` < '{$startrelationid}'";
-                    }
-                } else {
+//                if (!empty($albumtagrelationinfo['uptime'])) {
+//                    if ($direction == "up") {
+//                        $where .= " AND `uptime` >= '{$albumtagrelationinfo['uptime']}' AND `id` > '{$startrelationid}'";
+//                    } else {
+//                        $where .= " AND `uptime` <= '{$albumtagrelationinfo['uptime']}' AND `id` < '{$startrelationid}'";
+//                    }
+//                } else {
                     if ($direction == "up") {
                         $where .= " AND `id` > '{$startrelationid}'";
                     } else {
                         $where .= " AND `id` < '{$startrelationid}'";
-                    }
+//                    }
                 }
             }
             $orderby = "ORDER BY `uptime` DESC, `id` DESC";
