@@ -205,4 +205,23 @@ class Xmly extends Http
         }
         return $story_info;
     }
+
+    /**
+     * @param $album_url http://m.ximalaya.com/1870065/album/4975103
+     */
+    public function get_album_info($album_url)
+    {
+
+        $album_info = array();
+        $content = Http::get($album_url);
+        //封面
+        $album_info['cover'] = trim(Http::sub_data($content, '<img itemprop="image" src="', '"'));
+        //标题
+        $album_info['title'] = trim(Http::sub_data($content, '<h2 class="album-tit elli-multi" itemprop="name">', '</h2>'));
+        //TODO:主播可能会有多个
+        $album_info['anchor'] = trim(Http::sub_data($content, 'itemprop="url">', '</a>'));
+        //播放次数
+        $album_info['play_count'] = trim(Http::sub_data($content, '播放：</span>', '</p>'));
+        return $album_info;
+    }
 }
