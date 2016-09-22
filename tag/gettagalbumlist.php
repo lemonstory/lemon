@@ -1,40 +1,39 @@
 <?php
 include_once '../controller.php';
+
 class gettagalbumlist extends controller
 {
     public function action()
     {
-        $currenttagid = $this->getRequest("currenttagid", 0);
+
+        $currenttagid = $this->getRequest("currenttagid", 0); //指定标签id，可以是一级标签id，也可以是二级标签id
+        $isgettag = $this->getRequest("isgettag", 1); //是否获取一级和二级标签列表，默认为1获取，分页时不重复获取传0即可
+
         $recommend = $this->getRequest("recommend", 0); // 是否为推荐
         $hot = $this->getRequest("hot", 0); // 是否为最热门
         $goodcomment = $this->getRequest("goodcomment", 0); // 是否为好评榜
-        
-        $isgettag = $this->getRequest("isgettag", 1);
+
         $direction = $this->getRequest("direction", "down");
         $startrelationid = $this->getRequest("startrelationid", 0);
         $len = $this->getRequest("len", 20);
+
         if (empty($currenttagid)) {
             $this->showErrorJson(ErrorConf::paramError());
         }
 
-        //一级标签和二级标签的最大数量
-        $firsttagnum = 8;
-        $secondtagnum = 15;
+        $firsttagnum = 8; //一级标签的最大数量
+        $secondtagnum = 15; //二级标签的最大数量
         $selectfirsttagid = 0; // 当前选中的一级标签id
         $selectsecondtagid = 0; // 当前选中的二级标签id
         $firsttaglist = array(); // 一级标签列表
         $secondtaglist = array(); // 二级标签列表
-        
         $tagnewobj = new TagNew();
-        if ($isgettag == 1) {
-            // 获取一级标签列表
-            $firsttaglist = $tagnewobj->getFirstTagList($firsttagnum);
-        }
-        
+
         $currenttaginfo = current($tagnewobj->getTagInfoByIds($currenttagid));
         if (empty($currenttaginfo)) {
             $this->showErrorJson(ErrorConf::TagInfoIsEmpty());
         }
+
         $currentpid = $currenttaginfo['pid'];
         if ($currentpid == 0) {
             // 当前选中的currenttagid为一级标签，获取该标签下的二级标签列表
@@ -48,30 +47,31 @@ class gettagalbumlist extends controller
             } else {
                 $selectsecondtagid = 0; // 表示二级标签选中全部
             }
-            if ($isgettag == 1) {
-                $secondtaglist = $tagnewobj->getSecondTagList($selectfirsttagid, $secondtagnum);
-            }
         } else {
             // 当前选中的currenttagid为二级标签，获取该标签的父级下的所有二级标签列表
             $selectfirsttagid = $currentpid;
             $selectsecondtagid = $currenttagid;
-            if ($isgettag == 1) {
-                $secondtaglist = $tagnewobj->getSecondTagList($selectfirsttagid, $secondtagnum);
-            }
         }
-        
+
+        if ($isgettag == 1) {
+            //获取一级标签列表
+            $firsttaglist = $tagnewobj->getFirstTagList($firsttagnum);
+            //获取二级标签列表
+            $secondtaglist = $tagnewobj->getSecondTagList($selectfirsttagid, $secondtagnum);
+        }
+
         $tagids = array();
         if ($selectsecondtagid == 0) {
             // 二级标签为全部
-            $tagids = array($currenttagid);
+            $tagids = array($currenttagid); //array(0)?
         } else {
             // 指定二级标签下的专辑列表
             $tagids = array($selectsecondtagid);
         }
         if (!empty($tagids)) {
-            $tagids = array_unique($tagids);
+            $tagids = array_unique($tagids); //?
         }
-        
+
         $tagalbumlist = array();
         $aliossobj = new AliOss();
 
@@ -83,43 +83,45 @@ class gettagalbumlist extends controller
         $index = 0;
         $albumobj = new Album();
 
-        //故事辑去重
-        $albumrelationlist = $tagnewobj->getAlbumTagRelationListFromTag($tagids, $recommend, $hot, $goodcomment, $direction, $startrelationid, $max_len);
+
+        $albumrelationlist = $tagnewobj->getAlbumTagRelationListFromTag($tagids, $recommend, $hot, $goodcomment, $direction, $startrelationid, $len);
         $albumids = array();
         foreach ($albumrelationlist as $k => $relationlist) {
             $albumids[] = $relationlist['albumid'];
         }
 
+        //故事辑去重
         //键名保留不变
-        $albumids = array_unique($albumids);
-
-        $unique_album_relation_list = array();
-        foreach ($albumids as $key => $item) {
-            $unique_album_relation_list[] = $albumrelationlist[$key];
-        }
-
-        $albumrelationlist = $unique_album_relation_list;
+//        $albumids = array_unique($albumids);
+//
+//        $unique_album_relation_list = array();
+//        foreach ($albumids as $key => $item) {
+//            $unique_album_relation_list[] = $albumrelationlist[$key];
+//        }
+//
+//        $albumrelationlist = $unique_album_relation_list;
         $album_infos = $albumobj->getListByIds($albumids);
 
+
         //取出$len长度的story_num大于0的$albumrelationlist
-        if (!empty($albumrelationlist) && !empty($album_infos)) {
-            foreach ($albumrelationlist as $k => $relationinfo) {
-                if ($index < $len) {
-                    $albumid = $relationinfo['albumid'];
-                    if ($album_infos[$albumid]['story_num'] > 0 && $album_infos[$albumid]['status'] == 1) {
-                        $index++;
-                    } else {
-
-                        //array_splice($albumrelationlist, $k, 1);
-                        unset($albumrelationlist[$k]);
-                    }
-                } else {
-
-                    $albumrelationlist = array_slice($albumrelationlist, 0, $index);
-                    break;
-                }
-            }
-        }
+//        if (!empty($albumrelationlist) && !empty($album_infos)) {
+//            foreach ($albumrelationlist as $k => $relationinfo) {
+//                if ($index < $len) {
+//                    $albumid = $relationinfo['albumid'];
+//                    if ($album_infos[$albumid]['story_num'] > 0 && $album_infos[$albumid]['status'] == 1) {
+//                        $index++;
+//                    } else {
+//
+//                        //array_splice($albumrelationlist, $k, 1);
+//                        unset($albumrelationlist[$k]);
+//                    }
+//                } else {
+//
+//                    $albumrelationlist = array_slice($albumrelationlist, 0, $index);
+//                    break;
+//                }
+//            }
+//        }
 
         $albumrelationlistcount = count($albumrelationlist);
         if ($albumrelationlistcount <= $len) {
@@ -139,12 +141,13 @@ class gettagalbumlist extends controller
                 $tagalbumlist[] = $relationinfo;
             }
         }
-        
+
+
         $specialtaglist = array(
-                array("name" => "推荐", "paramkey" => "recommend", "paramvalue" => 1),
-                array("name" => "最热门", "paramkey" => "hot", "paramvalue" => 1),
-                array("name" => "好评榜", "paramkey" => "goodcomment", "paramvalue" => 1),
-                );
+            array("name" => "推荐", "paramkey" => "recommend", "paramvalue" => 1),
+            array("name" => "最热门", "paramkey" => "hot", "paramvalue" => 1),
+            array("name" => "好评榜", "paramkey" => "goodcomment", "paramvalue" => 1),
+        );
         $data = array(
             "selectfirsttagid" => $selectfirsttagid,
             "selectsecondtagid" => $selectsecondtagid,
@@ -156,4 +159,5 @@ class gettagalbumlist extends controller
         $this->showSuccJson($data);
     }
 }
+
 new gettagalbumlist();

@@ -3,7 +3,7 @@
 class Album extends ModelBase
 {
 
-    private $table = 'album';
+    public $table = 'album';
     public $CACHE_INSTANCE = 'cache';
 
     /**
@@ -219,7 +219,8 @@ class Album extends ModelBase
         if(!empty($dbIds)) {
             $albumidstr = implode(",", $albumids);
             $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
-            $sql = "SELECT * FROM {$this->table} WHERE `id` IN ($albumidstr)";
+            //$sql = "SELECT * FROM {$this->table} WHERE `id` IN ($albumidstr)";
+            $sql = "select id,title,age_type,category_id,star_level,view_order,story_num,author,intro,cover_time,cover,age_str,status,add_time,update_time,min_age,max_age,serial_status,online_status from {$this->table}  where `id` IN ($albumidstr)";
             $st = $db->prepare($sql);
             $st->execute();
             $tmpDbData = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -275,7 +276,7 @@ class Album extends ModelBase
             return json_decode($redisData, true);
         }
 
-        $where = "`is_show`=1 AND `status` = '1'";
+        $where = "`online_status`=1 AND `status` = '1'";
         if (!empty($startid)) {
             if ($direction == "up") {
                 $where .= " AND `id` > '{$startid}' ";
@@ -299,6 +300,41 @@ class Album extends ModelBase
         // 缓存
         $redisobj->setex($key, 300, json_encode($albumlist));
         return $albumlist;
+    }
+
+    /**
+     * 读取某个作者下的所有专辑
+     * @param $author_id
+     * @param $min_age
+     * @param $max_age
+     * @return array
+     */
+    public function getAuthorAlbums($author_id, $min_age = 0, $max_age = 0, $limit = 20)
+    {
+
+        $albums = array();
+        #TODO,此处可缓存作者album_id列表
+        #TODO,在对每个album做缓存
+        $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
+        #TODO,SQL执行效率很低,需要加索引
+
+//        SELECT  DISTINCT(`album_id`) AS album_id,`album`.`title` AS title,`album`.`intro` AS intro, `album`.`cover` AS cover, `album`.`cover_time` AS cover_time,`album`.`min_age` AS min_age, `album`.`max_age` AS max_age FROM `story` LEFT JOIN `album` ON album_id = `album`.`id`
+//                    WHERE FIND_IN_SET('3',`story`.`author_id`)  AND `album`.`min_age` = 0 AND `album`.`max_age` = 0  LIMIT 5;
+
+        #TODO:没有对其做相关性排序,理想情况下，和作者越相关的排在前面，然后用户口碑越好的拍在前面（例如：阅读量越大）
+        $sql = "SELECT  DISTINCT(`album_id`) AS album_id,`album`.`title` AS title,`album`.`intro` AS intro, `album`.`cover` AS cover, `album`.`cover_time` AS cover_time,`album`.`min_age` AS min_age, `album`.`max_age` AS max_age FROM `story` LEFT JOIN `album` ON album_id = `album`.`id`
+                    WHERE FIND_IN_SET({$author_id},`story`.`author_id`)  AND `album`.`min_age` = {$min_age} AND `album`.`max_age` = {$max_age}  LIMIT {$limit}";
+
+        $st = $db->prepare($sql);
+        $st->execute();
+        $db_data = $st->fetchAll(PDO::FETCH_ASSOC);
+        if (is_array($db_data) && !empty($db_data)) {
+            foreach ($db_data as $db_data_item) {
+                $albums[$db_data_item['id']] = $db_data_item;
+            }
+        }
+        $db = null;
+        return $albums;
     }
 
     /**

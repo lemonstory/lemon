@@ -288,17 +288,18 @@ class TagNew extends ModelBase
 //                    }
 //                } else {
                     if ($direction == "up") {
-                        $where .= " AND `id` > '{$startrelationid}'";
+                        $where .= " AND `{$this->ALBUM_TAG_RELATION_TABLE}`.`id` > '{$startrelationid}'";
                     } else {
-                        $where .= " AND `id` < '{$startrelationid}'";
+                        $where .= " AND `{$this->ALBUM_TAG_RELATION_TABLE}`.`id` < '{$startrelationid}'";
 //                    }
                 }
             }
-            $orderby = "ORDER BY `uptime` DESC, `id` DESC";
+            $orderby = "ORDER BY `{$this->ALBUM_TAG_RELATION_TABLE}`.`uptime` DESC, `{$this->ALBUM_TAG_RELATION_TABLE}`.`id` DESC";
         }
-
+        $album = new Album();
+        $where .= " AND `{$album->table}`.`status` = 1 AND `{$album->table}`.`online_status` = 1 AND `{$album->table}`.`story_num` > 0";
         $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-        $selectsql = "SELECT * FROM `{$this->ALBUM_TAG_RELATION_TABLE}` WHERE {$where} $orderby LIMIT {$len}";
+        $selectsql = "SELECT `{$this->ALBUM_TAG_RELATION_TABLE}`.* FROM `{$this->ALBUM_TAG_RELATION_TABLE}` LEFT JOIN `{$album->table}` ON `{$this->ALBUM_TAG_RELATION_TABLE}`.`albumid`=`{$album->table}`.`id` WHERE {$where} $orderby LIMIT {$len}";
         $selectst = $db->prepare($selectsql);
         $selectst->execute();
         $dbdata = $selectst->fetchAll(PDO::FETCH_ASSOC);
