@@ -516,7 +516,7 @@ class Album extends ModelBase
     public function coverNotUploadOssCount()
     {
 
-        $count = $this->get_total("s_cover!='' and cover=''");
+        $count = $this->get_total("s_cover!='' AND cover='' AND LOCATE ('default/bg_player.jpg',`s_cover`) = 0 AND LOCATE ('default/sound.jpg',`s_cover`) = 0 AND `status` = 1");
         return $count;
     }
 }
