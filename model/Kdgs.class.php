@@ -154,7 +154,7 @@ class Kdgs extends Http
             return array();
         }
         $content = http::get($url);
-
+        $story_count = intval(trim(http::sub_data($content, '<li>共', '集</li>')));
         $intro = http::sub_data($content, '<div id="video_word">', '</div>');
         $intro = http::remove_n(trim($intro));
         $cover = http::sub_data($content, '<div id="infoImg">', '</div>');
@@ -167,7 +167,9 @@ class Kdgs extends Http
         $audio_list = array_pop($audio_list);
         $title_list = array_pop($title_list);
 
-        $r = array();
+        $storys = array();
+        $storys['count'] = $story_count;
+        $storys['items'] = array();
 
         foreach ($title_list as $k => $v) {
             if (empty($audio_list[$k])) {
@@ -176,14 +178,16 @@ class Kdgs extends Http
             $title = http::sub_data($v, '>', '<');
             $title = http::remove_n($title);
             $source_audio_url = http::sub_data($audio_list[$k], "src='", "'");
-            if ($title && $source_audio_url) {
-                $r[$k]['title'] = addslashes(str_replace('&#39;', "'", $title));
-                $r[$k]['intro'] = addslashes(str_replace('&#39;', "'", $intro));
-                $r[$k]['cover'] = $cover;
-                $r[$k]['source_audio_url'] = $source_audio_url;
+            $ext = strtolower(ltrim(strrchr($source_audio_url, '.'), '.'));
+            #TODO 这里的音频格式没有全局定义
+            if ($title && in_array($ext, array('mp3', 'audio', 'm4a'))) {
+                $storys['items'][$k]['title'] = addslashes(str_replace('&#39;', "'", $title));
+                $storys['items'][$k]['intro'] = addslashes(str_replace('&#39;', "'", $intro));
+                $storys['items'][$k]['cover'] = $cover;
+                $storys['items'][$k]['source_audio_url'] = $source_audio_url;
             }
         }
-        return $r;
+        return $storys;
     }
 
     /**
