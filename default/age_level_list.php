@@ -15,14 +15,16 @@ class agelevellist extends controller
 
         $res = array(
             'code'=>200,
-            'data'=>array(),// 焦点图
-            'album_section'=>array(),
-            'recommend_tags'=>array(),
+            'data'=>array(
+                'focus_pic'=>array(),// 焦点图
+                'album_section'=>array(),
+                'recommend_tags'=>array(),
+            ),
         );
         //获取焦点图
         $focusObj = new ManageFocus();
         $focusList = $focusObj->get_list(' status=1 ','covertime,linkurl');
-        $res['data'] = $focusList;
+        $res['data']['focus_pic'] = array('total'=>count($focusList),'items'=>$focusList);
 
         //热门播放
         $albumObj = new Album();
@@ -37,7 +39,7 @@ class agelevellist extends controller
         $albumTagObj = new AlbumTagRelation();
         $albumTagList = $albumTagObj->getAlbumListByTagId(array('tagid'=>$albumTagIdList[$minAge]['id']));
 
-        $res['album_section'] = array('total'=>2,
+        $res['data']['album_section'] = array('total'=>2,
             'items'=>array(
                 0=>array('title'=>'热门播放','total'=>4,'items'=>$albumList),
                 1=>array('title'=>$albumTagIdList[$minAge]['name'],'total'=>4,'items'=>$albumTagList)
@@ -59,7 +61,7 @@ class agelevellist extends controller
             $tagInfoList[] = $tagInfo;
         }
 
-        $res['recommend_tags'] = array('total'=>6,'items'=>$tagInfoList);
+        $res['data']['recommend_tags'] = array('total'=>6,'items'=>$tagInfoList);
         echo json_encode($res);
     }
 }
