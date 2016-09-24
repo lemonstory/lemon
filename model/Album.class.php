@@ -532,4 +532,25 @@ class Album extends ModelBase
         $count = $this->get_total("s_cover!='' AND cover='' AND LOCATE ('default/bg_player.jpg',`s_cover`) = 0 AND LOCATE ('default/sound.jpg',`s_cover`) = 0 AND `status` = 1");
         return $count;
     }
+
+    public function getAlbumListOrderListenNum($where,$offset=0,$perPage=4){
+        if ($where) {
+            $whereStr = ' WHERE 1 ';
+            foreach ($where as $key=>$val){
+                $whereStr .= " and `{$key}`=:{$key}";
+            }
+        } else {
+            $whereStr = '';
+        }
+        
+        $db = DbConnecter::connectMysql('share_story');
+        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num,a.intro,a.link_url 
+                FROM `album` AS a LEFT JOIN `album_tag_relation` AS a_t ON a.id=a_t.albumid 
+                {$whereStr}
+                ORDER BY a_t.`albumlistennum` DESC LIMIT {$offset}, {$perPage}";
+        $st = $db->prepare($sql);
+        $st->execute($where);
+        $list = $st->fetchAll(PDO::FETCH_ASSOC);
+        return $list;
+    }
 }
