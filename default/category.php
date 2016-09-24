@@ -28,7 +28,7 @@ class categorylist extends controller
             }
             $data['items'][] = $tmp;
         }
-        echo json_encode($data);
+        echo json_encode(array('code'=>200,'data'=>$data));
     }
 }
 new categorylist();
