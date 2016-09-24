@@ -10,22 +10,18 @@ class categorylist extends controller
 {
     public function action()
     {
-        $categoryObj = new Category();
+        $tagInfoObj = new TagInfo();
         $data = array();
         //获取一级分类
-        $firstList = $categoryObj->get_list(' parent_id = 0 ');
+        $firstList = $tagInfoObj->get_list(' pid = 0 and status=1','id,name','ordernum asc',100);
         $data['total'] = count($firstList);
         foreach($firstList as $key=>$val){
             $tmp['id'] = $val['id'];
-            $tmp['title'] = $val['title'];
+            $tmp['name'] = $val['name'];
             //取二级分类
-            $secondList = $categoryObj->get_list(' parent_id = '.$val['id']);
+            $secondList = $tagInfoObj->get_list(' pid = '.$val['id'].' and status=1','id,name','ordernum asc',100);
             $tmp['child_total'] = count($secondList);
-            foreach($secondList as $val1){
-                $tmp1['id'] = $val1['id'];
-                $tmp1['title'] = $val1['title'];
-                $tmp['child_items'][] = $tmp1;
-            }
+            $tmp['child_items'] = $secondList;
             $data['items'][] = $tmp;
         }
         echo json_encode(array('code'=>200,'data'=>$data));
