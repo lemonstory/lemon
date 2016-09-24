@@ -133,6 +133,19 @@ class Album extends ModelBase
     }
 
     /**
+     * 获取列表
+     */
+    public function get_list_new($where = '', $filed = '*', $orderby='id desc', $limit = '20')
+    {
+        $db = DbConnecter::connectMysql('share_story');
+        $sql = "select {$filed} from {$this->table}  where {$where} order by {$orderby} limit {$limit}";
+        $st = $db->query( $sql);
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r = $st->fetchAll();
+        return $r;
+    }
+
+    /**
      * 批量获取专辑信息
      */
     public function getListByIds($id = 0, $uid = 0)
