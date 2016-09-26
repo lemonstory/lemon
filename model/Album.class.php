@@ -133,6 +133,19 @@ class Album extends ModelBase
     }
 
     /**
+     * 获取列表
+     */
+    public function get_list_new($where = '', $filed = '*', $orderby='id desc', $limit = '20')
+    {
+        $db = DbConnecter::connectMysql('share_story');
+        $sql = "select {$filed} from {$this->table}  where {$where} order by {$orderby} limit {$limit}";
+        $st = $db->query( $sql);
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r = $st->fetchAll();
+        return $r;
+    }
+
+    /**
      * 批量获取专辑信息
      */
     public function getListByIds($id = 0, $uid = 0)
@@ -518,5 +531,26 @@ class Album extends ModelBase
 
         $count = $this->get_total("s_cover!='' AND cover='' AND LOCATE ('default/bg_player.jpg',`s_cover`) = 0 AND LOCATE ('default/sound.jpg',`s_cover`) = 0 AND `status` = 1");
         return $count;
+    }
+
+    public function getAlbumListOrderListenNum($where,$offset=0,$perPage=4){
+        if ($where) {
+            $whereStr = ' WHERE 1 ';
+            foreach ($where as $key=>$val){
+                $whereStr .= " and `{$key}`=:{$key}";
+            }
+        } else {
+            $whereStr = '';
+        }
+        
+        $db = DbConnecter::connectMysql('share_story');
+        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num,a.intro,a.link_url 
+                FROM `album` AS a LEFT JOIN `album_tag_relation` AS a_t ON a.id=a_t.albumid 
+                {$whereStr}
+                ORDER BY a_t.`albumlistennum` DESC LIMIT {$offset}, {$perPage}";
+        $st = $db->prepare($sql);
+        $st->execute($where);
+        $list = $st->fetchAll(PDO::FETCH_ASSOC);
+        return $list;
     }
 }
