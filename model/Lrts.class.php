@@ -8,6 +8,10 @@
 class Lrts extends Http
 {
 
+    public $AUTHOR = 1;         //作者
+    public $TRANSLATOR = 2;     //译者
+    public $ILLUSTRATOR = 3;    //插画作者
+
     // 获取专辑分类
     public function get_category($url = '')
     {
@@ -114,12 +118,22 @@ class Lrts extends Http
         $album_story_info['album']['intro'] = '';
         $album_story_info['album']['story_total_count'] = 0;
         $album_story_info['album']['status'] = '';
+        $album_story_info['album']['author'] = '';
+        $album_story_info['album']['anchor'] = '';
         $album_story_info['story'] = array();
         if (!empty($link_url)) {
             $album_page_content = parent::get($link_url);
+            //从js代码中获取
             $story_total_count = intval(Http::sub_data($album_page_content, 'totalCount=\'', '\''));
             $story_page_size = intval(Http::sub_data($album_page_content, 'pageSize=\'', '\''));
-            $story_page_count = intval(ceil($story_total_count / $story_page_size));
+            $story_page_count = $story_page_size > 0 ? intval(ceil($story_total_count / $story_page_size)) : 0;
+
+            //从页面内容获取
+            $author = trim(Http::sub_data($album_page_content, '<a class="author">', '</a>'));
+            $album_story_info['album']['author'] = $author;
+            $anchor = trim(Http::sub_data($album_page_content, 'g-user">', '</a>'));
+            $album_story_info['album']['anchor'] = $anchor;
+
 
             if ($story_page_count > 0) {
                 for ($page = 0; $page <= $story_page_count - 1; $page++) {
@@ -129,6 +143,7 @@ class Lrts extends Http
                     $ajax_url = sprintf("http://www.lrts.me/ajax/book/%d/%d/%d", $book_id, $page, $story_page_size);
                     //$ajax_url;
                     $story_page_content = json_decode(parent::ajax_get($ajax_url));
+
                     if (0 == strcmp("success", $story_page_content->status)) {
                         $story_count_with_page = count($story_page_content->data->data);
 
@@ -136,7 +151,6 @@ class Lrts extends Http
                             $first_section_with_page = intval($story_page_content->data->data[0]->section);
                             $lrts_playlist_url = sprintf("http://www.lrts.me/ajax/playlist/2/%d/%d", $book_id, $first_section_with_page);
                             $story_info_with_playlist = parent::ajax_get($lrts_playlist_url);
-
                             if (empty($album_story_info['album']['intro']) || empty($album_story_info['album']['story_total_count']) || empty($album_story_info['album']['status'])) {
 
                                 $album_story_info['album']['intro'] = html_entity_decode(trim(Http::sub_data($story_info_with_playlist, '<p>', '</p>')));
@@ -152,7 +166,15 @@ class Lrts extends Http
                             if (!empty($result[0]) && count($result[0]) > 0) {
                                 foreach ($result[0] as $index => $story_content) {
                                     $k = $page * $story_page_size + $index;
-                                    $album_story_info['story'][$k]['source_audio_url'] = trim(Http::sub_data($story_content, 'value="', '" name="source'));
+                                    #TODO:source_audio_url可能为空(http://www.lrts.me/book/30816)
+                                    $source_audio_url = trim(Http::sub_data($story_content, 'value="', '" name="source'));
+                                    if (!empty($source_audio_url)) {
+                                        $album_story_info['story'][$k]['source_audio_url'] = $source_audio_url;
+                                    } else {
+                                        $album_story_info['story'][$k]['source_audio_url'] = '';
+                                        echo sprintf("[{$lrts_playlist_url}] 下面的故事source_audio_url 为空 \r\n");
+                                    }
+
                                     $album_story_info['story'][$k]['view_order'] = trim(Http::sub_data($story_content, 'section-number">', '</span>'));
                                     $title = trim(Http::sub_data($story_content, '<span>', '</span>'));
                                     $album_story_info['story'][$k]['title'] = html_entity_decode($title);
@@ -170,7 +192,6 @@ class Lrts extends Http
                         }
                     }
                 }
-
             }
         }
         return $album_story_info;
@@ -194,5 +215,106 @@ class Lrts extends Http
         return $intro;
 
     }
-    
+
+    /**
+     * 处理作者,译者字符串为结构化数组
+     * @param $author_str
+     * @return array
+     */
+    public function get_album_authors($author_str)
+    {
+
+        $author_str = str_replace("王玉峰等", "王玉峰", $author_str);
+        $author_str = str_replace("喻雪红", "喻雪红改写", $author_str);
+        $author_str = str_replace("　", "", $author_str);
+        $author_str_arr = explode("，", $author_str);
+
+
+        if (count($author_str_arr) == 1) {
+            $author_str_arr = explode("、", $author_str);
+        }
+
+        if (count($author_str_arr) == 1) {
+            $author_str_arr = explode(",", $author_str);
+        }
+
+        if (count($author_str_arr) == 1) {
+            $author_str_arr = explode(" ", $author_str);
+        }
+//        var_dump($author_str_arr);
+
+        foreach ($author_str_arr as $k => $item) {
+
+            $arr = array();
+            $type = $this->AUTHOR; //默认为原著
+            $o_pos = strpos($item, "原著");
+            $oi_pos = strpos($item, "著");
+
+            //album_id = 14355
+            //http://www.lrts.me/book/6310
+            $bt_pos = strpos($item, "（编译）");
+            $t_pos = strpos($item, "译");
+
+            $c_pos = strpos($item, "改写");
+            $d_pos = strpos($item, "绘画");
+
+
+            if ($o_pos) {
+
+                $type = $this->AUTHOR;
+                $name = trim(substr($item, 0, $o_pos));
+                $name = trim($name);
+                $arr['type'] = $type;
+                $arr['name'] = $name;
+                $anthor_arr[] = $arr;
+
+            } else if ($oi_pos) {
+
+                $type = $this->AUTHOR;
+                $name = trim(substr($item, 0, $oi_pos));
+                $arr['type'] = $type;
+                $arr['name'] = $name;
+                $anthor_arr[] = $arr;
+
+            } else if ($bt_pos) {
+
+                $type = $this->TRANSLATOR;
+                $name = trim(substr($item, 0, $bt_pos));
+                $arr['type'] = $type;
+                $arr['name'] = $name;
+                $anthor_arr[] = $arr;
+            } else if ($t_pos) {
+
+                $type = $this->TRANSLATOR;
+                $name = trim(substr($item, 0, $t_pos));
+                $arr['type'] = $type;
+                $arr['name'] = $name;
+                $anthor_arr[] = $arr;
+
+            } else if ($c_pos) {
+
+                $type = $this->TRANSLATOR;
+                $name = trim(substr($item, 0, $c_pos));
+                $arr['type'] = $type;
+                $arr['name'] = $name;
+                $anthor_arr[] = $arr;
+            } else if ($d_pos) {
+
+                $type = $this->ILLUSTRATOR;
+                $name = trim(substr($item, 0, $d_pos));
+                $arr['type'] = $type;
+                $arr['name'] = $name;
+                $anthor_arr[] = $arr;
+            } else {
+
+                $type = $this->AUTHOR;
+                $name = $item;
+                $arr['type'] = $type;
+                $arr['name'] = $name;
+                $anthor_arr[] = $arr;
+            }
+        }
+        return $anthor_arr;
+    }
+
 }
