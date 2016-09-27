@@ -75,7 +75,7 @@ class Story extends ModelBase
         	return $r[0];
         }
 	}
-    
+
     // 获取字段列表
     public function get_filed_list($filed = '*', $where = '', $orderby = '', $limit = '')
     {
