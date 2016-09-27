@@ -5,13 +5,32 @@ class User extends ModelBase
 	public $USER_INFO_TABLE_NAME = 'user_info';
 	
 	public $CACHE_INSTANCE = 'cache';
-	
+
+	/**
+	 * 示例:
+	 *
+	 * 通过QQ注册的普通用户:            来源,QQ. 角色,普通用户
+	 * 通过后台添加手机号注册的管理员:    来源,手机号,角色,系统管理员
+	 * 通过微信注册的主播用户:            来源,微信.角色,主播
+	 * 通过程序注册的作者:                来源,系统.角色,作者
+	 */
+	//注册来源
+	//QQ注册
 	public $TYPE_QQ = 1;
+	//微信注册
 	public $TYPE_WX = 2;
+	//手机号注册
 	public $TYPE_PH = 3;
-	public $TYPE_SYS = 4;// 系统用户
-	
-	
+	#TODO:需要更改数据
+	//系统注册{主播,作者....}
+	public $TYPE_SYS = 4;
+
+	//用户角色
+	public $IDENTITY_NORMAR = 1; //普通用户
+	public $IDENTITY_SYSTEM_USER = 2; //系统注册用户{主播,作者,插图作者...}
+	public $IDENTITY_SYSTEM_ADMIN = 4; //系统管理员
+
+
 	public function getUserInfo($uids, $isgetbabay = 0)
 	{
 		if(!is_array($uids)) {
@@ -39,7 +58,7 @@ class User extends ModelBase
 		
 		$dbIds = array_diff($uids, $cacheIds);
 		$dbData = array();
-		
+
 		if(!empty($dbIds)) {
 			$idlist = implode(',', $dbIds);
 			$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
@@ -59,6 +78,7 @@ class User extends ModelBase
 
 		foreach($uids as $uid) {
 			if(in_array($uid, $dbIds)) {
+
 				$data[$uid] = @$dbData[$uid];
 			} else {
 				$data[$uid] = $cacheData[$uid];
@@ -211,14 +231,14 @@ class User extends ModelBase
 	 * @param S $addtime
 	 * @return boolean
 	 */
-	public function initUser($uid, $nickname, $avatartime, $birthday, $gender, $province, $city, $type, $addtime)
+	public function initUser($uid, $nickname, $avatartime, $birthday, $gender, $province, $city, $type, $indentity, $addtime)
 	{
 	    if(empty($uid) || empty($nickname) || empty($type)) {
 	        $this->setError(ErrorConf::paramError());
 	        return false;
 	    }
-	    
-	    $userextobj = new UserExtend();
+
+		$userextobj = new UserExtend();
 	    $babyid = $userextobj->addUserBabyInfo($uid, $birthday, $gender);
 	    if (empty($babyid)) {
 	        $this->setError($userextobj->getError());
@@ -234,15 +254,35 @@ class User extends ModelBase
 	    }
 	    
 	    $db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
-	    $sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid, nickname, avatartime, defaultbabyid, defaultaddressid, province, city, type, addtime)
-	        values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		$sql = "insert into {$this->USER_INFO_TABLE_NAME} (uid, nickname, avatartime, defaultbabyid, defaultaddressid, province, city, type,indentity, addtime)
+	        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	    $st = $db->prepare ( $sql );
-	    $re = $st->execute (array($uid, $nickname, $avatartime, $babyid, $addressid, $province, $city, $type, $addtime));
+		$re = $st->execute(array($uid, $nickname, $avatartime, $babyid, $addressid, $province, $city, $type, $indentity, $addtime));
 	    if($re) {
 	        return true;
 	    }
 		return false;
+
 	}
+
+
+	#TODO:需要加缓存
+	public function getUsersInfo($identity)
+	{
+
+		$users_info = array();
+		$db = DbConnecter::connectMysql($this->PASSPORT_DB_INSTANCE);
+		$sql = "select * from {$this->USER_INFO_TABLE_NAME} where `identity`='{$identity}'";
+		$st = $db->prepare($sql);
+		$st->execute();
+		$db_data = $st->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($db_data as $db_data_item) {
+			$users_info[$db_data_item['uid']] = $db_data_item;
+		}
+		$db = null;
+		return $users_info;
+	}
+
 	
 	private function formatUserBaseInfo($one)
 	{
