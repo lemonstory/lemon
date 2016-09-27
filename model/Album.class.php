@@ -322,31 +322,27 @@ class Album extends ModelBase
      * @param $max_age
      * @return array
      */
-    public function getAuthorAlbums($author_id, $min_age = 0, $max_age = 0, $limit = 20)
+    public function getAuthorAlbums($author_id, $start_album_id, $min_age = 0, $max_age = 0, $limit = 20)
     {
 
-        $albums = array();
+
         #TODO,此处可缓存作者album_id列表
         #TODO,在对每个album做缓存
-        $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
         #TODO,SQL执行效率很低,需要加索引
-
-//        SELECT  DISTINCT(`album_id`) AS album_id,`album`.`title` AS title,`album`.`intro` AS intro, `album`.`cover` AS cover, `album`.`cover_time` AS cover_time,`album`.`min_age` AS min_age, `album`.`max_age` AS max_age FROM `story` LEFT JOIN `album` ON album_id = `album`.`id`
-//                    WHERE FIND_IN_SET('3',`story`.`author_id`)  AND `album`.`min_age` = 0 AND `album`.`max_age` = 0  LIMIT 5;
-
         #TODO:没有对其做相关性排序,理想情况下，和作者越相关的排在前面，然后用户口碑越好的拍在前面（例如：阅读量越大）
-        $sql = "SELECT  DISTINCT(`album_id`) AS album_id,`album`.`title` AS title,`album`.`intro` AS intro, `album`.`cover` AS cover, `album`.`cover_time` AS cover_time,`album`.`min_age` AS min_age, `album`.`max_age` AS max_age FROM `story` LEFT JOIN `album` ON album_id = `album`.`id`
-                    WHERE FIND_IN_SET({$author_id},`story`.`author_id`)  AND `album`.`min_age` = {$min_age} AND `album`.`max_age` = {$max_age}  LIMIT {$limit}";
 
-        $st = $db->prepare($sql);
-        $st->execute();
-        $db_data = $st->fetchAll(PDO::FETCH_ASSOC);
-        if (is_array($db_data) && !empty($db_data)) {
-            foreach ($db_data as $db_data_item) {
-                $albums[$db_data_item['id']] = $db_data_item;
-            }
+        $albums = array();
+        $where = " ( FIND_IN_SET({$author_id},`author_uid`) OR FIND_IN_SET({$author_id},`translator_uid`) OR FIND_IN_SET({$author_id},`illustrator_uid`) ) AND `online_status` = 1 AND `status` = 1";
+        if ($min_age != 0 || $max_age != 0) {
+            $where .= "AND `min_age` = {$min_age} AND `max_age` = {$max_age}";
         }
-        $db = null;
+        if ($start_album_id > 0) {
+            $where .= " id > {$start_album_id} ";
+        }
+
+        $filed = "`id` ,`title`,`cover`,`cover_time`,`star_level`,`story_num`,`intro`,`min_age`,`max_age`";
+        $order_by = "id desc";
+        $albums = $this->get_list_new($where, $filed, $order_by, $limit);
         return $albums;
     }
 
