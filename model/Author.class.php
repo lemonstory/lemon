@@ -1,0 +1,334 @@
+<?php
+
+/**
+ * Class Author
+ *
+ * 将原著,插画,译者 这3类角色统称为作者
+ *
+ * 作者基本信息
+ *  头像
+ *  名称
+ *  简介
+ *  认证信息
+ *  总专辑数(含有作者图书所组成的专辑)
+ *      一部分专辑只有一个作者,一部分是专辑有多个作者
+ *      专辑排序
+ *          一个作者的专辑排在前面(按收听量由高至低)
+ *          多个作者的专辑排在后面(按收听量由高至低)(该专辑可能是合集,或者是和其他作者合作出版的内容)
+ *  总播放量
+ *  今日播放量
+ *
+ * 方法
+ *  curd作者基本信息
+ *  声音内容添加作者信息
+ *      主播新增声音(新增声音并加入专辑,先有专辑然后往专辑中添加声音)
+ *  读取系统内所有的作者
+ *  读取某个作者下的所有专辑
+ *      作者的所有声音内容所在的专辑,去重复
+ *  读取某个专辑下的所有作者
+ *      专辑下所有声音的作者,去重复
+ *  读取某个作者的总播放量
+ *      作者的所有声音内容的总播放量
+ *
+ * 存储设计:
+ *  用户表
+ *      头像
+ *      名称
+ *
+ *  作者表
+ *      简介
+ *      认证信息
+ *      总专辑数
+ *      总播放量
+ *      今日播放量
+ *
+ * 声音表
+ *      ...
+ *      作者[新增]
+ *
+ * 缓存设计:
+ *
+ */
+class Author extends ModelBase
+{
+
+    public $AUTHOR_DB_INSTANCE = 'share_main';
+    public $AUTHOR_TABLE_NAME = 'author';
+    public $CACHE_INSTANCE = 'cache';
+
+
+    /**
+     * 根据名称获取作者uid
+     * @param $name
+     * @return int|false
+     */
+    public function getAuthorUid($name)
+    {
+
+        $sso_obj = new Sso();
+        $user_obj = new User();
+        $uid_arr = array();
+        $uid = false;
+        $db = DbConnecter::connectMysql($sso_obj->PASSPORT_DB_INSTANCE);
+        $sql = "SELECT `uid` FROM {$sso_obj->PASSPORT_TABLE_NAME} WHERE `username` LIKE '%{$name}%'";
+        echo $sql;
+
+        $st = $db->prepare($sql);
+        $st->execute();
+        $sso_uid_arr = $st->fetchAll(PDO::FETCH_ASSOC);
+        if (is_array($sso_uid_arr) && !empty($sso_uid_arr)) {
+
+            $sso_uid_str = "";
+            foreach ($sso_uid_arr as $k => $sso_uid_item) {
+
+                $sso_uid_str .= ", " . $sso_uid_item['uid'];
+            }
+            $sso_uid_str = trim($sso_uid_str, ",");
+            //$indentity = $user_obj->IDENTITY_AUTHOR;
+            $sql = "SELECT * FROM {$user_obj->USER_INFO_TABLE_NAME} WHERE `uid` IN ($sso_uid_str) AND `indentity` = {$user_obj->IDENTITY_SYSTEM_USER} AND `status` = 1";
+            $st = $db->prepare($sql);
+            $st->execute();
+            $user_arr = $st->fetchAll(PDO::FETCH_ASSOC);
+            $db = null;
+            if (is_array($user_arr) && !empty($user_arr)) {
+
+                foreach ($user_arr as $k => $user) {
+                    $uid_arr[] = $user['uid'];
+                }
+            }
+        }
+
+        if (!empty($uid_arr)) {
+
+            //TODO:同名的作者处理不严谨
+            if (count($uid_arr) > 1) {
+                $content = sprintf("作者名称为: [%s] 共有 %d 个\r\n", $name, count($uid_arr));
+                echo $content;
+            }
+            $uid = intval($uid_arr[0]);
+        }
+        return $uid;
+    }
+
+
+    /**
+     * @param $uname 名称
+     * @param $intro 简介
+     * @param $card 认证
+     */
+    public function addAuthor($name, $intro, $card, $is_author, $is_translator, $is_illustrator)
+    {
+        $uid = false;
+        $user = new User();
+        //$NicknameMd5Obj = new NicknameMd5();
+        //$is_exist = $NicknameMd5Obj->checkNameIsExist($name);
+        //if (!$is_exist) {
+        //add user
+        $sso = new Sso();
+        $password = md5('AU' . time());
+        $user_type = $user->TYPE_SYS;
+        //$indentity = $user->IDENTITY_AUTHOR;
+        $uid = $sso->userReg($name, $name, $password, $user_type, $user->IDENTITY_SYSTEM_USER);
+        if ($uid) {
+            //add author extend info
+            //$uid = 14852;
+            $db = DbConnecter::connectMysql($this->AUTHOR_DB_INSTANCE);
+            $sql = "insert into {$this->AUTHOR_TABLE_NAME} (uid,intro,card,is_author,is_translator,is_illustrator) values (?,?,?,?,?,?)";
+            $st = $db->prepare($sql);
+            $ret = $st->execute(array($uid, $intro, $card, $is_author, $is_translator, $is_illustrator));
+            if (!$ret) {
+                $log = sprintf("[{$name}]用户在author表添加失败\r\n");
+                echo $log;
+            } else {
+                $log = sprintf("[{$name}]用户在author表添加成功\r\n");
+                echo $log;
+            }
+        } else {
+            $log = sprintf("[{$name}]用户在SSO注册失败\r\n");
+            echo $log;
+        }
+
+//        } else {
+//            $log = sprintf("[{$name}]已经在用户表中存在\r\n");
+//            echo $log;
+//        }
+
+        return $uid;
+    }
+
+    //https://github.com/lemonstory/lemondocs/blob/master/docs/%E6%8E%A5%E5%8F%A3%E6%96%87%E6%A1%A3/%E7%94%A8%E6%88%B7%E5%A4%B4%E5%83%8F%E8%A7%84%E5%88%99.txt
+    //更改作者头像
+    //User->setUserinfo
+
+
+    /**
+     * 声音内容添加作者信息(多个)
+     * @param $author_id
+     * @param $story_id
+     * @return bool
+     */
+    public function appendStory($authors_id, $story_id)
+    {
+
+        $is_add_success = false;
+        $story = new Story();
+        //UPDATE `story` SET `author_id`=concat_ws(',',`author_id`,6 ) WHERE `id` = 491150
+        $data = array('author_id' => "concat_ws(',',`author_id`,{$authors_id} )");
+        $where = "`id`={$story_id}";
+        $is_add_success = $story->update($data, $where);
+        return $is_add_success;
+    }
+
+
+    /**
+     * 读取系统内所有的作者[原著]
+     * @return array
+     */
+    public function getAllAuthors()
+    {
+
+        $db = DbConnecter::connectMysql($this->AUTHOR_DB_INSTANCE);
+        $sql = "SELECT `author`.`uid` as uid,`author`.`album_num` as album_num,`author`.`listen_num` as listen_num,`user_info`.`nickname` as nickname, `user_info`.`avatartime` as avatartime 
+                from `author` LEFT JOIN `user_info` ON `author`.`uid` = `user_info`.`uid`  
+                WHERE `author`.`is_author` = 1 AND `author`.`album_num` > 0 AND `user_info`.`status` =1";
+        $st = $db->query($sql);
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $ret = $st->fetchAll();
+        return $ret;
+    }
+
+    //读取某个作者下的所有专辑
+    //Album->getAuthorAlbums
+
+    #TODO: 下面这个方法要更改
+    /**
+     * 读取某个专辑下的所有作者
+     * @param $album_id
+     * @return array
+     */
+    public function getAuthorsInAlbum($album_id)
+    {
+
+        $all_authors = array();
+        //
+        //$sql = "SELECT DISTINCT(`author_id`)  as author_id FROM `story` WHERE `album_id` = {$album_id}";
+        $filed = "DISTINCT(`author_id`)  as author_id";
+        $where = "`album_id` = {$album_id}";
+        $orderby = '';
+        $limit = '';
+        $story = new Story();
+        $authors_id_array = $story->get_filed_list($filed, $where, $orderby, $limit);
+
+        //取出专辑中的所有作者并按照出现次数排序
+        foreach ($authors_id_array as $key => $authors_id_str) {
+            $album_authors_id_array = explode(",", $authors_id_str);
+            array_push($all_authors, $album_authors_id_array);
+        }
+        $all_authors_count_array = array_count_values($all_authors);
+        asort($all_authors_count_array);
+        $authors_id = array_keys($all_authors_count_array);
+
+        //根据uid列表取作者信息
+        $user = new User();
+        $user_list = $user->getUserInfo($authors_id, 0);
+        $all_authors = $this->mergeUserAuthorTableData($user_list);
+        return $all_authors;
+    }
+
+
+    /**
+     * 将用户信息和作者信息合并
+     * @param $user_list
+     * @return array
+     */
+    private function mergeUserAuthorTableData($user_list)
+    {
+
+        $merge_data = array();
+        //获取作者信息
+        if (is_array($user_list) && !empty($user_list)) {
+
+            $uid_list = array_keys($user_list);
+            $uid_str = implode(',', $uid_list);
+            $data = array();
+            $where = "uid in ($uid_str)";
+            $limit = '';
+            $filed = '';
+            $orderby = '';
+            $list = $this->get_list($where, $limit, $filed, $orderby);
+            if (is_array($list) && !empty($list)) {
+                foreach ($list as $item) {
+                    $data[$item['uid']] = $item;
+                }
+                $merge_data = array_merge($user_list, $data);
+            }
+        }
+        return $merge_data;
+    }
+
+
+    /**
+     * 获取总数
+     */
+    public function get_total($where = '')
+    {
+        $db = DbConnecter::connectMysql($this->AUTHOR_DB_INSTANCE);
+        $sql = "select count(*) as count from {$this->AUTHOR_TABLE_NAME}  where {$where}";
+        $st = $db->query($sql);
+        $r = $st->fetchAll();
+        return $r[0]['count'];
+    }
+
+    /**
+     * 更新
+     */
+    public function update($data, $where = '')
+    {
+        if (!$data) {
+            return false;
+        }
+
+        $tmp_data = array();
+        foreach ($data as $k => $v) {
+            $tmp_data[] = "`{$k}`='{$v}'";
+        }
+        $tmp_data = implode(",", $tmp_data);
+        $set_str = "SET {$tmp_data} ";
+
+        $db = DbConnecter::connectMysql($this->AUTHOR_DB_INSTANCE);
+        $sql = "UPDATE {$this->AUTHOR_TABLE_NAME} {$set_str} where {$where}";
+        $st = $db->query($sql);
+        unset($tmp_data);
+        #TODO清缓存
+//        $arr = explode("=", $where);
+//        if (isset($arr[1]) && $arr[1]) {
+//            $this->clearStoryCache(intval($arr[1]));
+//        }
+        return true;
+    }
+
+    /**
+     * 获取列表
+     */
+    public function get_list($where = '', $limit = '', $filed = '', $orderby = '')
+    {
+        $db = DbConnecter::connectMysql($this->AUTHOR_DB_INSTANCE);
+        if ($limit) {
+            $sql = "select * from {$this->AUTHOR_TABLE_NAME}  where {$where} {$orderby} limit {$limit} ";
+        } else {
+            $sql = "select * from {$this->AUTHOR_TABLE_NAME}  where {$where} {$orderby} ";
+        }
+        $st = $db->query($sql);
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $r = $st->fetchAll();
+        if ($filed) {
+            $arr = array();
+            foreach ($r as $k => $v) {
+                $arr[] = $v[$filed];
+            }
+            return $arr;
+        } else {
+            return $r;
+        }
+    }
+}
