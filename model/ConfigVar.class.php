@@ -38,4 +38,6 @@ class ConfigVar
     
     public $GENDER_BOY = 1;    // 男
     public $GENDER_GIRL = 2;   // 女
+
+    public $FOCUS_IMG_CATEGORY_EN_NAME = "home"; //App首页焦点图英文名称
 }

@@ -176,7 +176,7 @@ class Recommend extends ModelBase
         $redisData = $cacheobj->getListCache($this->FOCUS_TABLE_NAME, $key);
         if (empty($redisData)) {
             $db = DbConnecter::connectMysql('share_manage');
-            $sql = "SELECT * FROM `{$this->FOCUS_TABLE_NAME}` WHERE `status` = '{$this->RECOMMEND_STATUS_ONLIINE}' ORDER BY `ordernum` LIMIT $len";
+            $sql = "SELECT * FROM `{$this->FOCUS_TABLE_NAME}` WHERE `status` = '{$this->RECOMMEND_STATUS_ONLIINE}' AND `category` = '{$this->FOCUS_IMG_CATEGORY_EN_NAME}'  ORDER BY `ordernum` LIMIT $len";
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
