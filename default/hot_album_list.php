@@ -10,7 +10,13 @@ class hotalbumlist extends controller
 {
     public function action()
     {
-        $data = array();
+        $minAge = $this->getRequest('min_age', '0');
+        $maxAge = $this->getRequest('max_age', '2');
+        $startAlbumId = $this->getRequest('start_album_id', '');
+        $len = $this->getRequest('len', '');
+
+
+        $data = array('age_level'=>array(),'total'=>100,'items'=>array());
         $this->showSuccJson($data);
     }
 }
