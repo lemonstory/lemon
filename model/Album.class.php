@@ -5,6 +5,27 @@ class Album extends ModelBase
 
     public $table = 'album';
     public $CACHE_INSTANCE = 'cache';
+    public $AGE_LEVEL_ARR = array(
+        array(
+            'min_age' => 0,
+            'max_age' => 2,
+        ),
+
+        array(
+            'min_age' => 3,
+            'max_age' => 6,
+        ),
+
+        array(
+            'min_age' => 7,
+            'max_age' => 10,
+        ),
+
+        array(
+            'min_age' => 11,
+            'max_age' => 14,
+        ),
+    );
 
     /**
      * 检查是否存在
@@ -139,6 +160,7 @@ class Album extends ModelBase
     {
         $db = DbConnecter::connectMysql('share_story');
         $sql = "select {$filed} from {$this->table}  where {$where} order by {$orderby} limit {$limit}";
+        //var_dump($sql);
         $st = $db->query( $sql);
         $st->setFetchMode(PDO::FETCH_ASSOC);
         $r = $st->fetchAll();
@@ -325,7 +347,6 @@ class Album extends ModelBase
     public function getAuthorAlbums($author_id, $start_album_id, $min_age = 0, $max_age = 0, $limit = 20)
     {
 
-
         #TODO,此处可缓存作者album_id列表
         #TODO,在对每个album做缓存
         #TODO,SQL执行效率很低,需要加索引
@@ -333,11 +354,15 @@ class Album extends ModelBase
 
         $albums = array();
         $where = " ( FIND_IN_SET({$author_id},`author_uid`) OR FIND_IN_SET({$author_id},`translator_uid`) OR FIND_IN_SET({$author_id},`illustrator_uid`) ) AND `online_status` = 1 AND `status` = 1";
-        if ($min_age != 0 || $max_age != 0) {
-            $where .= "AND `min_age` = {$min_age} AND `max_age` = {$max_age}";
+
+        //和getAgeLevelWithAlbums的年龄比较的规则相同
+        if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
+            $where .= " AND `min_age` = 0 AND `max_age` >= {$max_age}";
+        } elseif ($min_age != 0 && $max_age != 0) {
+            $where .= " AND `max_age` <= {$max_age}";
         }
         if ($start_album_id > 0) {
-            $where .= " id > {$start_album_id} ";
+            $where .= " AND id > {$start_album_id} ";
         }
 
         $filed = "`id` ,`title`,`cover`,`cover_time`,`star_level`,`story_num`,`intro`,`min_age`,`max_age`";
@@ -345,6 +370,104 @@ class Album extends ModelBase
         $albums = $this->get_list_new($where, $filed, $order_by, $limit);
         return $albums;
     }
+
+    /**
+     * 计算专辑所属年龄段的数量
+     * @param $albums_arr
+     */
+    public function getAgeLevelWithAlbums($albums_arr)
+    {
+
+        $data = array();
+        $data['total'] = 0;
+        $data['items'] = array();
+        $num_arr = array();
+
+        if (!empty($albums_arr)) {
+            foreach ($albums_arr as $album_item) {
+                $min_age = $album_item['min_age'];
+                $max_age = $album_item['max_age'];
+
+                if ($min_age == 0 && $max_age == 0) {
+                    continue;
+                } else {
+                    foreach ($this->AGE_LEVEL_ARR as $k => $age_level_item) {
+
+                        /**
+                         * 年龄比较:
+                         *  min_age = 0 && max_age = 0  ==> 全部(所有的年龄段都出现该专辑)
+                         *  min_age = 0 && max_age = 14 ==> 全部(所有的年龄段都出现该专辑)
+                         *  max_age = 0 && max_age > 0  ==> max_age >= age_level_max_age
+                         *  max_age > 0 && max_age > 0  ==> max_age <= age_level_max_age
+                         */
+                        if (($min_age == 0 && $max_age == 0) || ($min_age == 0 && $max_age == 14)) {
+
+                            $num_arr[$k] = isset($num_arr[$k]) ? $num_arr[$k] + 1 : 1;
+
+                        } elseif ($min_age == 0 && $max_age > 0) {
+
+                            if ($max_age >= $age_level_item['max_age']) {
+                                $num_arr[$k] = isset($num_arr[$k]) ? $num_arr[$k] + 1 : 1;
+                            }
+                        } elseif ($min_age > 0 && $max_age > 0) {
+                            if ($max_age <= $age_level_item['max_age']) {
+                                $num_arr[$k] = isset($num_arr[$k]) ? $num_arr[$k] + 1 : 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach ($num_arr as $k => $num_item) {
+
+            $age_level_item = $this->AGE_LEVEL_ARR[$k];
+            $age_level_item['album_num'] = $num_item;
+            $data['items'][] = $age_level_item;
+        }
+
+        $data['total'] = count($data['items']);
+        return $data;
+    }
+
+    public function getAgeLevelWithAlbumsFormat($age_level_album_num_arr)
+    {
+
+        $data_format = array();
+        $data_format['total'] = 0;
+        $data_format['items'] = array();
+        $item_all = array();
+        //处理{全部}
+        $item_all['age_level_str'] = "全部";
+        $item_all['min_age'] = "0";
+        $item_all['max_age'] = "0";
+
+        if (isset($age_level_album_num_arr['total']) && intval($age_level_album_num_arr['total']) > 0) {
+
+            $data_format['total'] = $age_level_album_num_arr['total'];
+            $item_all['album_num'] = count($age_level_album_num_arr['items']);
+            if (is_array($age_level_album_num_arr['items']) && !empty($age_level_album_num_arr['items'])) {
+
+                $arr = array();
+                foreach ($age_level_album_num_arr['items'] as $item) {
+                    $arr['age_level_str'] = sprintf("%d-%d岁", $item['min_age'], $item['max_age']);
+                    $arr['min_age'] = $item['min_age'];
+                    $arr['max_age'] = $item['max_age'];
+                    $arr['album_num'] = $item['album_num'];
+                    $data_format['items'][] = $arr;
+                }
+            }
+        }
+
+        $data_format['total'] = $data_format['total'] + 1;
+        $data_format['items'][] = $item_all;
+        //{全部}放在数组首位
+        $data_format['items'] = array_reverse($data_format['items']);
+
+        return $data_format;
+    }
+
+
 
     /**
      * 获取年龄类型
