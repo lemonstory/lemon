@@ -362,7 +362,7 @@ class Album extends ModelBase
             $where .= " AND `max_age` <= {$max_age}";
         }
         if ($start_album_id > 0) {
-            $where .= " AND id > {$start_album_id} ";
+            $where .= " AND id < {$start_album_id} ";
         }
 
         $filed = "`id` ,`title`,`cover`,`cover_time`,`star_level`,`story_num`,`intro`,`min_age`,`max_age`";
