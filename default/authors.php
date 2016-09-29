@@ -11,11 +11,9 @@ class authors extends controller
 {
     public function action()
     {
-        $startAuthorId = $this->getRequest('start_author_id', '0');
-        $len = $this->getRequest('len', '10000');
-
+        $startAuthorId = intval($this->getRequest('start_author_id', '0'));
+        $len = intval($this->getRequest('len', '10000'));
         $ret = array();
-
         $author = new Author();
         $allAuthors = $author->getAllAuthors($startAuthorId, $len);
         $ret['total'] = count($allAuthors);
