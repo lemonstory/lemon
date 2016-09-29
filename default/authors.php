@@ -14,15 +14,13 @@ class authors extends controller
         $startAuthorId = $this->getRequest('start_author_id', '0');
         $len = $this->getRequest('len', '10000');
 
-        $ret = array(
-            'code' => 200,
-            'data' => array(),
-        );
+        $ret = array();
 
         $author = new Author();
         $allAuthors = $author->getAllAuthors($startAuthorId, $len);
-        $ret['data']['total'] = count($allAuthors);
-        $ret['data']['items'] = $allAuthors;
+        $ret['total'] = count($allAuthors);
+        $ret['items'] = $allAuthors;
+        $this->showSuccJson($ret);
         echo json_encode($ret);
     }
 }

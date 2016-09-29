@@ -144,6 +144,7 @@ class Author extends ModelBase
         if ($start_author_id > 0) {
             $where .= " AND `author`.`uid` > {$start_author_id}";
         }
+
         $db = DbConnecter::connectMysql($this->AUTHOR_DB_INSTANCE);
         $sql = "SELECT `author`.`uid` as uid,`author`.`album_num` as album_num,`author`.`listen_num` as listen_num,`user_info`.`nickname` as nickname, `user_info`.`avatartime` as avatartime 
                 from `author` LEFT JOIN `user_info` ON `author`.`uid` = `user_info`.`uid`  
