@@ -14,17 +14,15 @@ class agelevellist extends controller
         $maxAge = $this->getRequest('max_age', '2');
 
         $res = array(
-            'code'=>200,
-            'data'=>array(
-                'focus_pic'=>array(),// 焦点图
-                'album_section'=>array(),
-                'recommend_tags'=>array(),
-            ),
+            'focus_pic'=>array(),// 焦点图
+            'album_section'=>array(),
+            'recommend_tags'=>array(),
         );
         //获取焦点图
+        $category = 'age'.$minAge;
         $focusObj = new ManageFocus();
-        $focusList = $focusObj->get_list(' status=1 ','covertime,linkurl');
-        $res['data']['focus_pic'] = array('total'=>count($focusList),'items'=>$focusList);
+        $focusList = $focusObj->get_list(" category ='".$category."' and status=1 ",'covertime,linkurl');
+        $res['focus_pic'] = array('total'=>count($focusList),'items'=>$focusList);
 
         //热门播放
         $albumObj = new Album();
@@ -39,7 +37,7 @@ class agelevellist extends controller
         $albumTagObj = new AlbumTagRelation();
         $albumTagList = $albumTagObj->getAlbumListByTagId(array('tagid'=>$albumTagIdList[$minAge]['id']));
 
-        $res['data']['album_section'] = array('total'=>2,
+        $res['album_section'] = array('total'=>2,
             'items'=>array(
                 0=>array('title'=>'热门播放','total'=>4,'items'=>$albumList),
                 1=>array('title'=>$albumTagIdList[$minAge]['name'],'total'=>4,'items'=>$albumTagList)
@@ -50,8 +48,8 @@ class agelevellist extends controller
         $tagIdList = array(
             '0'=>array(13,14,15,16,17,18),
             '3'=>array(23,24,25,26,27,28),
-            '7'=>array(),
-            '11'=>array(),
+            '7'=>array(13,14,15,16,17,18),
+            '11'=>array(23,24,25,26,27,28),
         );
         $tagInfoObj = new TagInfo();
 
@@ -61,8 +59,8 @@ class agelevellist extends controller
             $tagInfoList[] = $tagInfo;
         }
 
-        $res['data']['recommend_tags'] = array('total'=>6,'items'=>$tagInfoList);
-        echo json_encode($res);
+        $res['recommend_tags'] = array('total'=>6,'items'=>$tagInfoList);
+        $this->showSuccJson($res);
     }
 }
 new agelevellist();
