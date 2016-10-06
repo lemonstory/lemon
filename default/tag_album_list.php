@@ -11,7 +11,7 @@ class tagalbumlist extends controller
     public function action()
     {
         $minAge = $this->getRequest('min_age', '0');
-        $maxAge = $this->getRequest('max_age', '2');
+        $maxAge = $this->getRequest('max_age', '0');
         $tagId = $this->getRequest('tag_id', '');
         $startAlbumId = $this->getRequest('start_album_id', '');
         $len = $this->getRequest('len', 10);
