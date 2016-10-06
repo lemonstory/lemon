@@ -27,6 +27,7 @@ class User extends ModelBase
 
 	//用户角色
 	public $IDENTITY_NORMAR = 1; //普通用户
+	//部分作者既是作者又是插图作者,所以不能单独区分(创建两个角色的uid)
 	public $IDENTITY_SYSTEM_USER = 2; //系统注册用户{主播,作者,插图作者...}
 	public $IDENTITY_SYSTEM_ADMIN = 4; //系统管理员
 
