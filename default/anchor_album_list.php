@@ -1,29 +1,30 @@
 <?php
 /**
- * 作者的专辑
- * Date: 16/9/27
- * Time: 下午6:59
+ * 主播的专辑
+ *
+ * Date: 16/9/30
+ * Time: 下午6:36
  */
 
 include_once '../controller.php';
 
-class author_album_list extends controller
+class anchor_album_list extends controller
 {
     public function action()
     {
-        $authorId = $this->getRequest('author_id', '');
+        $anchorId = $this->getRequest('anchor_id', '');
         $startAlbumId = $this->getRequest('start_album_id', '0');
         $minAge = $this->getRequest('min_age', '0');
         $maxAge = $this->getRequest('max_age', '0');
         $len = $this->getRequest('len', '20');
 
-        if (!empty($authorId)) {
+        if (!empty($anchorId)) {
 
             $ret = array();
             $album = new Album();
             $creator = new Creator();
-            $albums = $album->getAuthorAlbums($authorId, $startAlbumId, $minAge, $maxAge, $len);
-            $age_level_albums_num = $creator->getCreatorAgeLevelAlbumsNum($authorId);
+            $albums = $album->getAnchorAlbums($anchorId, $startAlbumId, $minAge, $maxAge, $len);
+            $age_level_albums_num = $creator->getCreatorAgeLevelAlbumsNum($anchorId);
             $age_level_albums_num = $album->getAgeLevelWithAlbumsFormat($age_level_albums_num);
 
             $ret['age_level'] = $age_level_albums_num;
@@ -37,4 +38,4 @@ class author_album_list extends controller
     }
 }
 
-new author_album_list();
+new anchor_album_list();

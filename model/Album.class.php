@@ -372,6 +372,37 @@ class Album extends ModelBase
     }
 
     /**
+     * 读取某个主播下的所有专辑
+     * @param $anchor_id
+     * @param $start_album_id
+     * @param int $min_age
+     * @param int $max_age
+     * @param int $limit
+     * @return array
+     */
+    public function getAnchorAlbums($anchor_id, $start_album_id, $min_age = 0, $max_age = 0, $limit = 20)
+    {
+        $albums = array();
+        $where = " FIND_IN_SET('{$anchor_id}',`anchor_uid`) AND `online_status` = 1 AND `status` = 1";
+
+        //和getAgeLevelWithAlbums的年龄比较的规则相同
+        if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
+            $where .= " AND `min_age` = 0 AND `max_age` >= {$max_age}";
+        } elseif ($min_age != 0 && $max_age != 0) {
+            $where .= " AND `max_age` <= {$max_age}";
+        }
+        if ($start_album_id > 0) {
+            $where .= " AND id < {$start_album_id} ";
+        }
+
+        $filed = "`id` ,`title`,`cover`,`cover_time`,`star_level`,`story_num`,`intro`,`min_age`,`max_age`";
+        $order_by = "id desc";
+        $albums = $this->get_list_new($where, $filed, $order_by, $limit);
+        return $albums;
+    }
+
+
+    /**
      * 计算专辑所属年龄段的数量
      * @param $albums_arr
      */

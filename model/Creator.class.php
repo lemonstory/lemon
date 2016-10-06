@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Class Author
+ * Class Creator
  *
- * 将原著,插画,译者 这3类角色统称为作者
+ * 将原著,插画,译者,主播.. 等角色统称为创作者
  *
  */
-class Author extends ModelBase
+class Creator extends ModelBase
 {
-    public $AUTHOR_DB_INSTANCE = 'share_main';
-    public $AUTHOR_TABLE_NAME = 'author';
+    public $CREATOR_DB_INSTANCE = 'share_main';
+    public $CREATOR_TABLE_NAME = 'creator';
     public $CACHE_INSTANCE = 'cache';
 
     /**
@@ -17,7 +17,7 @@ class Author extends ModelBase
      * @param $name
      * @return int|false
      */
-    public function getAuthorUid($name)
+    public function getCreatorUid($name)
     {
 
         $sso_obj = new Sso();
@@ -41,7 +41,8 @@ class Author extends ModelBase
             $st = $db->prepare($sql);
             $st->execute();
             $user_arr = $st->fetchAll(PDO::FETCH_ASSOC);
-            $db = null;
+            unset($st);
+            unset($db);
             if (is_array($user_arr) && !empty($user_arr)) {
 
                 foreach ($user_arr as $k => $user) {
@@ -59,6 +60,8 @@ class Author extends ModelBase
             }
             $uid = intval($uid_arr[0]);
         }
+
+
         return $uid;
     }
 
@@ -68,7 +71,7 @@ class Author extends ModelBase
      * @param $intro 简介
      * @param $card 认证
      */
-    public function addAuthor($name, $intro, $card, $is_author, $is_translator, $is_illustrator)
+    public function addCreator($name, $intro, $card, $is_author, $is_translator, $is_illustrator, $is_anchor)
     {
         $uid = false;
         $user = new User();
@@ -83,17 +86,17 @@ class Author extends ModelBase
         //$indentity = $user->IDENTITY_AUTHOR;
         $uid = $sso->userReg($name, $name, $password, $user_type, $user->IDENTITY_SYSTEM_USER);
         if ($uid) {
-            //add author extend info
+            //add user Creator info
             //$uid = 14852;
-            $db = DbConnecter::connectMysql($this->AUTHOR_DB_INSTANCE);
-            $sql = "insert into {$this->AUTHOR_TABLE_NAME} (uid,intro,card,is_author,is_translator,is_illustrator) values (?,?,?,?,?,?)";
+            $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
+            $sql = "insert into {$this->CREATOR_TABLE_NAME} (uid,intro,card,is_author,is_translator,is_illustrator,is_anchor) values (?,?,?,?,?,?,?)";
             $st = $db->prepare($sql);
-            $ret = $st->execute(array($uid, $intro, $card, $is_author, $is_translator, $is_illustrator));
+            $ret = $st->execute(array($uid, $intro, $card, $is_author, $is_translator, $is_illustrator, $is_anchor));
             if (!$ret) {
-                $log = sprintf("[{$name}]用户在author表添加失败\r\n");
+                $log = sprintf("[{$name}]用户在creator_info表添加失败\r\n");
                 echo $log;
             } else {
-                $log = sprintf("[{$name}]用户在author表添加成功\r\n");
+                $log = sprintf("[{$name}]用户在creator_info表添加成功\r\n");
                 echo $log;
             }
         } else {
@@ -120,7 +123,7 @@ class Author extends ModelBase
      * @param $story_id
      * @return bool
      */
-    public function appendStory($authors_id, $story_id)
+    public function addAuthorsInStory($authors_id, $story_id)
     {
 
         $is_add_success = false;
@@ -140,15 +143,37 @@ class Author extends ModelBase
     public function getAllAuthors($start_author_id, $limit = 20)
     {
 
-        $where = " `author`.`is_author` = 1 AND `author`.`album_num` > 0 AND `user_info`.`status` =1";
+        $where = " `{$this->CREATOR_TABLE_NAME}`.`is_author` = 1 AND `{$this->CREATOR_TABLE_NAME}`.`album_num` > 0 AND `user_info`.`status` =1";
         if ($start_author_id > 0) {
-            $where .= " AND `author`.`uid` > {$start_author_id}";
+            $where .= " AND `{$this->CREATOR_TABLE_NAME}`.`uid` > {$start_author_id}";
         }
 
-        $db = DbConnecter::connectMysql($this->AUTHOR_DB_INSTANCE);
-        $sql = "SELECT `author`.`uid` as uid,`author`.`album_num` as album_num,`author`.`listen_num` as listen_num,`user_info`.`nickname` as nickname, `user_info`.`avatartime` as avatartime 
-                from `author` LEFT JOIN `user_info` ON `author`.`uid` = `user_info`.`uid`  
-                WHERE {$where} ORDER BY `author`.`uid` ASC  limit {$limit}";
+        $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
+        $sql = "SELECT `{$this->CREATOR_TABLE_NAME}`.`uid` as uid,`{$this->CREATOR_TABLE_NAME}`.`album_num` as album_num,`{$this->CREATOR_TABLE_NAME}`.`listen_num` as listen_num,`user_info`.`nickname` as nickname, `user_info`.`avatartime` as avatartime 
+                from `{$this->CREATOR_TABLE_NAME}` LEFT JOIN `user_info` ON `{$this->CREATOR_TABLE_NAME}`.`uid` = `user_info`.`uid`  
+                WHERE {$where} ORDER BY `{$this->CREATOR_TABLE_NAME}`.`uid` ASC  limit {$limit}";
+        $st = $db->query($sql);
+        $st->setFetchMode(PDO::FETCH_ASSOC);
+        $ret = $st->fetchAll();
+        return $ret;
+    }
+
+    /**
+     * 读取系统内所有的主播
+     * @return array
+     */
+    public function getAllAnchors($start_anchor_id, $limit = 20)
+    {
+
+        $where = " `{$this->CREATOR_TABLE_NAME}`.`is_anchor` = 1 AND `{$this->CREATOR_TABLE_NAME}`.`album_num` > 0 AND `user_info`.`status` =1";
+        if ($start_anchor_id > 0) {
+            $where .= " AND `{$this->CREATOR_TABLE_NAME}`.`uid` > {$start_anchor_id}";
+        }
+
+        $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
+        $sql = "SELECT `{$this->CREATOR_TABLE_NAME}`.`uid` as uid,`{$this->CREATOR_TABLE_NAME}`.`album_num` as album_num,`{$this->CREATOR_TABLE_NAME}`.`listen_num` as listen_num,`user_info`.`nickname` as nickname, `user_info`.`avatartime` as avatartime 
+                from `{$this->CREATOR_TABLE_NAME}` LEFT JOIN `user_info` ON `{$this->CREATOR_TABLE_NAME}`.`uid` = `user_info`.`uid`  
+                WHERE {$where} ORDER BY `{$this->CREATOR_TABLE_NAME}`.`uid` ASC  limit {$limit}";
         $st = $db->query($sql);
         $st->setFetchMode(PDO::FETCH_ASSOC);
         $ret = $st->fetchAll();
@@ -158,11 +183,11 @@ class Author extends ModelBase
     //读取某个作者下的所有专辑
     //Album->getAuthorAlbums
 
-    public function getAuthorAgeLevelAlbumsNum($author_uid)
+    public function getCreatorAgeLevelAlbumsNum($creator_uid)
     {
 
-        $db = DbConnecter::connectMysql($this->AUTHOR_DB_INSTANCE);
-        $sql = "SELECT `age_level_album_num` FROM {$this->AUTHOR_TABLE_NAME}  where `uid` = {$author_uid}";
+        $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
+        $sql = "SELECT `age_level_album_num` FROM {$this->CREATOR_TABLE_NAME}  where `uid` = {$creator_uid}";
         $st = $db->query($sql);
         $r = $st->fetchAll();
         $age_level_album_num = $r[0]['age_level_album_num'];
@@ -178,8 +203,8 @@ class Author extends ModelBase
      */
     public function get_total($where = '')
     {
-        $db = DbConnecter::connectMysql($this->AUTHOR_DB_INSTANCE);
-        $sql = "select count(*) as count from {$this->AUTHOR_TABLE_NAME}  where {$where}";
+        $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
+        $sql = "select count(*) as count from {$this->CREATOR_TABLE_NAME}  where {$where}";
         $st = $db->query($sql);
         $r = $st->fetchAll();
         return $r[0]['count'];
@@ -201,15 +226,20 @@ class Author extends ModelBase
         $tmp_data = implode(",", $tmp_data);
         $set_str = "SET {$tmp_data} ";
 
-        $db = DbConnecter::connectMysql($this->AUTHOR_DB_INSTANCE);
-        $sql = "UPDATE {$this->AUTHOR_TABLE_NAME} {$set_str} where {$where}";
+        static $db;
+        if (!isset($db)) {
+            $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
+        }
+        $sql = "UPDATE {$this->CREATOR_TABLE_NAME} {$set_str} where {$where}";
         $st = $db->query($sql);
         unset($tmp_data);
+        unset($st);
         #TODO清缓存
 //        $arr = explode("=", $where);
 //        if (isset($arr[1]) && $arr[1]) {
 //            $this->clearStoryCache(intval($arr[1]));
 //        }
+        //$db = null;
         return true;
     }
 
@@ -218,11 +248,11 @@ class Author extends ModelBase
      */
     public function get_list($where = '', $limit = '', $filed = '', $orderby = '')
     {
-        $db = DbConnecter::connectMysql($this->AUTHOR_DB_INSTANCE);
+        $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
         if ($limit) {
-            $sql = "select * from {$this->AUTHOR_TABLE_NAME}  where {$where} {$orderby} limit {$limit} ";
+            $sql = "select * from {$this->CREATOR_TABLE_NAME}  where {$where} {$orderby} limit {$limit} ";
         } else {
-            $sql = "select * from {$this->AUTHOR_TABLE_NAME}  where {$where} {$orderby} ";
+            $sql = "select * from {$this->CREATOR_TABLE_NAME}  where {$where} {$orderby} ";
         }
         $st = $db->query($sql);
         $st->setFetchMode(PDO::FETCH_ASSOC);

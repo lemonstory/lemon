@@ -11,6 +11,7 @@ class Lrts extends Http
     public $AUTHOR = 1;         //作者
     public $TRANSLATOR = 2;     //译者
     public $ILLUSTRATOR = 3;    //插画作者
+    public $ANCHOR = 4;         //主播
 
     // 获取专辑分类
     public function get_category($url = '')
@@ -221,7 +222,7 @@ class Lrts extends Http
      * @param $author_str
      * @return array
      */
-    public function get_album_authors($author_str)
+    public function get_album_creator($author_str, $anchor_str)
     {
 
         $author_str = str_replace("王玉峰等", "王玉峰", $author_str);
@@ -266,7 +267,7 @@ class Lrts extends Http
                 $name = trim($name);
                 $arr['type'] = $type;
                 $arr['name'] = $name;
-                $anthor_arr[] = $arr;
+                $creator_arr[] = $arr;
 
             } else if ($oi_pos) {
 
@@ -274,7 +275,7 @@ class Lrts extends Http
                 $name = trim(substr($item, 0, $oi_pos));
                 $arr['type'] = $type;
                 $arr['name'] = $name;
-                $anthor_arr[] = $arr;
+                $creator_arr[] = $arr;
 
             } else if ($bt_pos) {
 
@@ -282,14 +283,14 @@ class Lrts extends Http
                 $name = trim(substr($item, 0, $bt_pos));
                 $arr['type'] = $type;
                 $arr['name'] = $name;
-                $anthor_arr[] = $arr;
+                $creator_arr[] = $arr;
             } else if ($t_pos) {
 
                 $type = $this->TRANSLATOR;
                 $name = trim(substr($item, 0, $t_pos));
                 $arr['type'] = $type;
                 $arr['name'] = $name;
-                $anthor_arr[] = $arr;
+                $creator_arr[] = $arr;
 
             } else if ($c_pos) {
 
@@ -297,24 +298,33 @@ class Lrts extends Http
                 $name = trim(substr($item, 0, $c_pos));
                 $arr['type'] = $type;
                 $arr['name'] = $name;
-                $anthor_arr[] = $arr;
+                $creator_arr[] = $arr;
             } else if ($d_pos) {
 
                 $type = $this->ILLUSTRATOR;
                 $name = trim(substr($item, 0, $d_pos));
                 $arr['type'] = $type;
                 $arr['name'] = $name;
-                $anthor_arr[] = $arr;
+                $creator_arr[] = $arr;
             } else {
 
                 $type = $this->AUTHOR;
                 $name = $item;
                 $arr['type'] = $type;
                 $arr['name'] = $name;
-                $anthor_arr[] = $arr;
+                $creator_arr[] = $arr;
             }
         }
-        return $anthor_arr;
-    }
 
+        $anchor_str = trim($anchor_str);
+        if (!empty($anchor_str)) {
+            $type = $this->ANCHOR;
+            $name = $anchor_str;
+            $arr['type'] = $type;
+            $arr['name'] = $name;
+            $creator_arr[] = $arr;
+        }
+
+        return $creator_arr;
+    }
 }
