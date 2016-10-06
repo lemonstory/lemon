@@ -301,7 +301,8 @@ class Sso extends ModelBase
     }
     
     // 后台手机号注册
-    public function phonereg($username, $nickName, $password)
+    //userReg($username, $username, $password,$user->TYPE_PH,$user->IDENTITY_SYSTEM_ADMIN);
+    public function userReg($username, $nickName, $password, $type, $indentity)
     {
         if (empty($username) || empty($nickName) || empty($password)) {
             $this->setError(ErrorConf::paramError());
@@ -328,10 +329,13 @@ class Sso extends ModelBase
         $avatartime = 0;
         $birthday = date("Y-m-d");
         $UserObj = new User();
-        $type = $UserObj->TYPE_PH;
-        $UserObj->initUser($uid, $nickName, $avatartime, $birthday, 0, "", "", $type, $addtime);
+        $is_init = $UserObj->initUser($uid, $nickName, $avatartime, $birthday, 0, "", "", $type, $indentity, $addtime);
+        if (!$is_init) {
+            return false;
+        } else {
+            return $uid;
+        }
         
-        return $uid;
     }
     
     
