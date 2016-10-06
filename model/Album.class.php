@@ -6,6 +6,13 @@ class Album extends ModelBase
     public $table = 'album';
     public $CACHE_INSTANCE = 'cache';
     public $AGE_LEVEL_ARR = array(
+
+        //全部
+        array(
+            'min_age' => 0,
+            'max_age' => 14,
+        ),
+
         array(
             'min_age' => 0,
             'max_age' => 2,
@@ -415,35 +422,35 @@ class Album extends ModelBase
         $num_arr = array();
 
         if (!empty($albums_arr)) {
+
             foreach ($albums_arr as $album_item) {
                 $min_age = $album_item['min_age'];
                 $max_age = $album_item['max_age'];
 
-                if ($min_age == 0 && $max_age == 0) {
-                    continue;
-                } else {
-                    foreach ($this->AGE_LEVEL_ARR as $k => $age_level_item) {
+                foreach ($this->AGE_LEVEL_ARR as $k => $age_level_item) {
 
-                        /**
-                         * 年龄比较:
-                         *  min_age = 0 && max_age = 0  ==> 全部(所有的年龄段都出现该专辑)
-                         *  min_age = 0 && max_age = 14 ==> 全部(所有的年龄段都出现该专辑)
-                         *  max_age = 0 && max_age > 0  ==> max_age >= age_level_max_age
-                         *  max_age > 0 && max_age > 0  ==> max_age <= age_level_max_age
-                         */
-                        if (($min_age == 0 && $max_age == 0) || ($min_age == 0 && $max_age == 14)) {
+                    /**
+                     * 年龄比较:
+                     *  min_age = 0 && max_age = 0  ==> 全部(所有的年龄段都出现该专辑)
+                     *  min_age = 0 && max_age = 14 ==> 全部(所有的年龄段都出现该专辑)
+                     *  max_age = 0 && max_age > 0  ==> max_age >= age_level_max_age
+                     *  max_age > 0 && max_age > 0  ==> max_age <= age_level_max_age
+                     */
+                    if (($min_age == 0 && $max_age == 0) || ($min_age == 0 && $max_age == 14)) {
 
+                        $num_arr[$k] = isset($num_arr[$k]) ? $num_arr[$k] + 1 : 1;
+                        break;
+
+                    } elseif ($min_age == 0 && $max_age != 0 && $max_age > 0) {
+
+                        if ($max_age >= $age_level_item['max_age']) {
                             $num_arr[$k] = isset($num_arr[$k]) ? $num_arr[$k] + 1 : 1;
-
-                        } elseif ($min_age == 0 && $max_age > 0) {
-
-                            if ($max_age >= $age_level_item['max_age']) {
-                                $num_arr[$k] = isset($num_arr[$k]) ? $num_arr[$k] + 1 : 1;
-                            }
-                        } elseif ($min_age > 0 && $max_age > 0) {
-                            if ($max_age <= $age_level_item['max_age']) {
-                                $num_arr[$k] = isset($num_arr[$k]) ? $num_arr[$k] + 1 : 1;
-                            }
+                            break;
+                        }
+                    } elseif ($min_age > 0 && $max_age != 0 && $max_age > 0) {
+                        if ($max_age <= $age_level_item['max_age']) {
+                            $num_arr[$k] = isset($num_arr[$k]) ? $num_arr[$k] + 1 : 1;
+                            break;
                         }
                     }
                 }
@@ -467,21 +474,19 @@ class Album extends ModelBase
         $data_format = array();
         $data_format['total'] = 0;
         $data_format['items'] = array();
-        $item_all = array();
-        //处理{全部}
-        $item_all['age_level_str'] = "全部";
-        $item_all['min_age'] = "0";
-        $item_all['max_age'] = "0";
-
         if (isset($age_level_album_num_arr['total']) && intval($age_level_album_num_arr['total']) > 0) {
 
             $data_format['total'] = $age_level_album_num_arr['total'];
-            $item_all['album_num'] = count($age_level_album_num_arr['items']);
             if (is_array($age_level_album_num_arr['items']) && !empty($age_level_album_num_arr['items'])) {
 
                 $arr = array();
                 foreach ($age_level_album_num_arr['items'] as $item) {
-                    $arr['age_level_str'] = sprintf("%d-%d岁", $item['min_age'], $item['max_age']);
+
+                    if ($item['min_age'] == 0 && $item['max_age'] == 14) {
+                        $arr['age_level_str'] = "全部";
+                    } else {
+                        $arr['age_level_str'] = sprintf("%d-%d岁", $item['min_age'], $item['max_age']);
+                    }
                     $arr['min_age'] = $item['min_age'];
                     $arr['max_age'] = $item['max_age'];
                     $arr['album_num'] = $item['album_num'];
@@ -490,8 +495,8 @@ class Album extends ModelBase
             }
         }
 
-        $data_format['total'] = $data_format['total'] + 1;
-        $data_format['items'][] = $item_all;
+        $data_format['total'] = $data_format['total'];
+
         //{全部}放在数组首位
         $data_format['items'] = array_reverse($data_format['items']);
 
