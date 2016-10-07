@@ -119,8 +119,8 @@ class Lrts extends Http
         $album_story_info['album']['intro'] = '';
         $album_story_info['album']['story_total_count'] = 0;
         $album_story_info['album']['status'] = '';
-        $album_story_info['album']['author'] = '';
-        $album_story_info['album']['anchor'] = '';
+        $album_story_info['album']['author'] = array();
+        $album_story_info['album']['anchor'] = array();
         $album_story_info['story'] = array();
         if (!empty($link_url)) {
             $album_page_content = parent::get($link_url);
@@ -131,10 +131,12 @@ class Lrts extends Http
 
             //从页面内容获取
             $author = trim(Http::sub_data($album_page_content, '<a class="author">', '</a>'));
-            $album_story_info['album']['author'] = $author;
+            $album_story_info['album']['author']['name'] = $author;
+            //<a href="/user/121646857" class="g-user">呼呼收音机</a>
             $anchor = trim(Http::sub_data($album_page_content, 'g-user">', '</a>'));
-            $album_story_info['album']['anchor'] = $anchor;
-
+            $album_story_info['album']['anchor']['name'] = $anchor;
+            $anchor_avatar_url = trim(Http::sub_data($album_page_content, 'class="g-user"><img src="', '" alt="" class="round photo-s50'));
+            $album_story_info['album']['anchor']['avatar'] = $anchor_avatar_url;
 
             if ($story_page_count > 0) {
                 for ($page = 0; $page <= $story_page_count - 1; $page++) {
