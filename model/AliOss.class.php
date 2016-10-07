@@ -55,13 +55,21 @@ class AliOss extends ModelBase
             $ext = "jpg";
         }
         $from = $this->LOCAL_IMG_TMP_PATH . $uid . '.' . $ext;
-        move_uploaded_file($tmpFile, $from);
-         
-        $to = $uid;
-        $responseObj = $obj->upload_file_by_file($bucket,$uid,$from);
-        if ($responseObj->status==200){
-            $path = $to;
-            return $path;
+
+        //增加:
+        //  先下载远端图片然后在上传至头像服务器,即非所有头像均是POST上传
+        //  此时move_uploaded_file 会返回false 增加rename处理
+        $is_move = move_uploaded_file($tmpFile, $from);
+        if (!$is_move) {
+            $is_move = rename($tmpFile, $from);
+        }
+        if ($is_move) {
+            $to = $uid;
+            $responseObj = $obj->upload_file_by_file($bucket, $uid, $from);
+            if ($responseObj->status == 200) {
+                $path = $to;
+                return $path;
+            }
         } else {
             $this->setError(ErrorConf::uploadImgfileFail());
             return "";
