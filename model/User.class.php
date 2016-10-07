@@ -139,6 +139,30 @@ class User extends ModelBase
  		
 		return $avatartime;
 	}
+
+	public function setAvatarWithUrl($avatar_remote_url, $uid)
+	{
+
+
+		$avatartime = false;
+		$aliossobj = new AliOss();
+		$savedir = $aliossobj->LOCAL_IMG_TMP_PATH;
+		$url_arr = parse_url($avatar_remote_url);
+		$pos = strrpos($url_arr['path'], "/") + 1;
+		$full_file = $savedir . substr($url_arr['path'], $pos);
+		if (file_exists($full_file)) {
+			@unlink($full_file);
+		}
+		$tmp_file_name = Http::download($avatar_remote_url, $full_file);
+		$size = getimagesize($tmp_file_name);
+		if ($tmp_file_name) {
+			$file = array();
+			$file['tmp_name'] = $tmp_file_name;
+			$file['type'] = $size['mime'];
+			$avatartime = $this->setAvatar($file, $uid);
+		}
+		return $avatartime;
+	}
 	
 	
 	public function setUserinfo($uid, $data)
