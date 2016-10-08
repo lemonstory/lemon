@@ -25,6 +25,13 @@ class tagalbumlist extends controller
 
         $albumTagObj = new AlbumTagRelation();
         $albumTagList = $albumTagObj->getAlbumListByTagId($where,1,$len);
+        //格式化返回
+        foreach ($albumTagList as $key=>$val){
+            $val['cover'] = 'http://lemonpic.oss-cn-hangzhou.aliyuncs.com/'.$val['cover'];
+            $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
+
+            $albumTagList[$key] = $val;
+        }
 
         $data = array('age_level'=>array(),'total'=>100,'items'=>$albumTagList);
         $this->showSuccJson($data);

@@ -24,7 +24,7 @@ class AlbumTagRelation extends ModelBase
         $offset = ($currentPage - 1) * $perPage;
 
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num,a.intro,a.link_url
+        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num,a.intro
                 FROM `album_tag_relation` AS a_t LEFT JOIN `album` AS a ON a_t.albumid=a.id {$whereStr} 
                 ORDER BY `id` DESC LIMIT {$offset}, {$perPage}";
 

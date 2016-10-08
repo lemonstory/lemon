@@ -27,6 +27,13 @@ class agelevellist extends controller
         //热门播放
         $albumObj = new Album();
         $albumList = $albumObj->getAlbumListOrderListenNum(array('min_age'=>$minAge,'max_age'=>$maxAge));
+        //格式化返回
+        foreach ($albumList as $key=>$val){
+            $val['cover'] = 'http://lemonpic.oss-cn-hangzhou.aliyuncs.com/'.$val['cover'];
+            $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
+
+            $albumList[$key] = $val;
+        }
 
         $albumTagIdList = array(
             '0'=>array('id'=>23,'name'=>'睡前故事'),
@@ -56,6 +63,7 @@ class agelevellist extends controller
         $tagInfoList =array();
         foreach($tagIdList[$minAge] as $val){
             $tagInfo = $tagInfoObj->get_info("id = ".$val,'id,name,cover');
+            $tagInfo['cover'] = 'http://fdfs.xmcdn.com/'.$tagInfo['cover'];
             $tagInfoList[] = $tagInfo;
         }
 
