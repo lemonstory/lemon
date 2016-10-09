@@ -142,14 +142,13 @@ class User extends ModelBase
 
 	public function setAvatarWithUrl($avatar_remote_url, $uid)
 	{
-
-
 		$avatartime = false;
 		$aliossobj = new AliOss();
 		$savedir = $aliossobj->LOCAL_IMG_TMP_PATH;
 		$url_arr = parse_url($avatar_remote_url);
 		$pos = strrpos($url_arr['path'], "/") + 1;
 		$full_file = $savedir . substr($url_arr['path'], $pos);
+
 		if (file_exists($full_file)) {
 			@unlink($full_file);
 		}
