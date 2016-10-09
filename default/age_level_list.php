@@ -42,7 +42,7 @@ class agelevellist extends controller
             '11'=>array('id'=>23,'name'=>'睡前故事'),
         );
         $albumTagObj = new AlbumTagRelation();
-        $albumTagList = $albumTagObj->getAlbumListByTagId(array('tagid'=>$albumTagIdList[$minAge]['id']));
+        $albumTagList = $albumTagObj->getAlbumList(array('tagid'=>$albumTagIdList[$minAge]['id']));
 
         $res['album_section'] = array('total'=>2,
             'items'=>array(

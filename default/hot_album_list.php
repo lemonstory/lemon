@@ -11,21 +11,25 @@ class hotalbumlist extends controller
     public function action()
     {
         $minAge = $this->getRequest('min_age', '0');
-        $maxAge = $this->getRequest('max_age', '2');
-        $startAlbumId = $this->getRequest('start_album_id', '');
+        $maxAge = $this->getRequest('max_age', '0');
+        $startAlbumId = $this->getRequest('start_album_id', '0');
         $len = $this->getRequest('len', 10);
 
-        $where['min_age']= intval($minAge);
-        $where['max_age']= intval($maxAge);
-
-        $albumTagObj = new AlbumTagRelation();
-        $albumTagList = $albumTagObj->getAlbumListByTagId($where,1,$len);
+        $albumObj = new Album();
+        $albumTagList = $albumObj->getAlbumListByAge($minAge,$maxAge, $startAlbumId,1,$len);
         
-        //取专辑下面对应的故事
-        $storyObj = new Story();
+        //取专辑下面对应的标签
+        $albumTagObj = new AlbumTagRelation();
+        $tagInfoObj = new TagInfo();
+        $tagInfoList = array();
         foreach ($albumTagList as $key=>$val){
-            $storyList = $storyObj->get_filed_list('title,cover',' album_id='.$val['id'],'',4);
-            $val['items'] = $storyList;
+            $tagList = $albumTagObj->getTagListByAlbumId($val['id'],'1',10);
+            foreach ($tagList as $k=>$v){
+                $tagInfo = $tagInfoObj->get_info("id = ".$v['tagid'],'id,name,cover');
+                $tagInfo['cover'] = 'http://p.xiaoningmeng.net/'.$tagInfo['cover'];
+                $tagInfoList[] = $tagInfo;
+            }
+            $val['items'] = $tagInfoList;
             $albumTagList[$key]=$val;
         }
 

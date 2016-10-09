@@ -709,13 +709,17 @@ class Album extends ModelBase
         return $list;
     }
 
-    public function getAlbumListByAge($min_age,$max_age,$offset=0,$perPage=4){
+    public function getAlbumListByAge($min_age,$max_age,$start_album_id=0,$offset=0,$perPage=4){
         $where = '1';
         //和getAgeLevelWithAlbums的年龄比较的规则相同
         if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
             $where .= " AND `min_age` = 0 AND `max_age` >= {$max_age}";
         } elseif ($min_age != 0 && $max_age != 0) {
             $where .= " AND `max_age` <= {$max_age}";
+        }
+
+        if ($start_album_id > 0) {
+            $where .= " AND a.id < {$start_album_id} ";
         }
 
         $db = DbConnecter::connectMysql('share_story');
