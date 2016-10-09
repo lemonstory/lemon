@@ -1,0 +1,282 @@
+<?php
+/**
+ * 首页接口
+ * Date: 16/10/9
+ * Time: 下午3:51
+ */
+
+include_once '../../controller.php';
+
+class index extends controller
+{
+    public function action()
+    {
+        $uid = $this->getUid();
+        $userInfo = array();
+        $albumIds = array();
+        $recommendObj = new Recommend();
+        $aliossObj = new AliOss();
+        $data = array();
+
+        //焦点图
+        $data['focus_pic'] = array();
+        $focuspiclist = array();
+        $focusres = $recommendObj->getFocusList(6);
+        if (!empty($focusres)) {
+            foreach ($focusres as $value) {
+                $focusinfo['cover'] = $aliossObj->getFocusUrl($value['id'], $value['covertime'], 1);
+                //$focusinfo['linktype'] = $value['linktype'];
+                $focusinfo['linkurl'] = $value['linkurl'];
+                $focuspiclist[] = $focusinfo;
+            }
+            $data['focus_pic']['total'] = count($focuspiclist);
+            $data['focus_pic']['items'] = $focuspiclist;
+        }
+
+        //年龄分组
+        $data['age_level']['total'] = 4;
+        $data['age_level']['items'][] = array(
+            "cover" => "http://lemonpic.oss-cn-hangzhou.aliyuncs.com/focus/1.png",
+            "title" => "0-2岁",
+            //"linkurl"   => "xnm://www.xiaoningmeng.net/age_level/info.php?min=0&max=2",
+        );
+        $data['age_level']['items'][] = array(
+            "cover" => "http://lemonpic.oss-cn-hangzhou.aliyuncs.com/focus/1.png",
+            "title" => "3-6岁",
+            //"linkurl"   => "xnm://www.xiaoningmeng.net/age_level/info.php?min=3&max=6",
+        );
+        $data['age_level']['items'][] = array(
+            "cover" => "http://lemonpic.oss-cn-hangzhou.aliyuncs.com/focus/1.png",
+            "title" => "7-10岁",
+            //"linkurl"   => "xnm://www.xiaoningmeng.net/age_level/info.php?min=7&max=10",
+        );
+        $data['age_level']['items'][] = array(
+            "cover" => "http://lemonpic.oss-cn-hangzhou.aliyuncs.com/focus/1.png",
+            "title" => "11-14岁",
+            //"linkurl"   => "xnm://www.xiaoningmeng.net/age_level/info.php?min=11&max=14",
+        );
+
+        //内容分类
+        $data['content_category']['total'] = 3;
+        $data['content_category']['items'][] = array(
+            "cover" => "http://p.xiaoningmeng.net/tag/2016/01/28/c81e728d9d4c2f636f067f89cc14862c.png?v=1453911544",
+            "title" => "分类",
+            //"linkurl" => "xnm://www.xiaoningmeng.net/album/tag_list.php"
+        );
+        $data['content_category']['items'][] = array(
+            "cover" => "http://p.xiaoningmeng.net/tag/2016/01/28/c81e728d9d4c2f636f067f89cc14862c.png?v=1453911544",
+            "title" => "作者",
+            //"linkurl" => "xnm://www.xiaoningmeng.net/album/author_list.php"
+        );
+        $data['content_category']['items'][] = array(
+            "cover" => "http://p.xiaoningmeng.net/tag/2016/01/28/c81e728d9d4c2f636f067f89cc14862c.png?v=1453911544",
+            "title" => "主播",
+            //"linkurl" => "xnm://www.xiaoningmeng.net/album/anchor_list.php"
+        );
+
+        $albumlen = 6;
+        // 热门推荐
+        $hotrecommendres = $recommendObj->getRecommendHotList(1, $albumlen);
+        if (!empty($hotrecommendres)) {
+            foreach ($hotrecommendres as $value) {
+                $albumIds[] = $value['albumid'];
+            }
+        }
+
+        $babyagetype = 0;
+        if (!empty($uid)) {
+            $userobj = new User();
+            $userInfo = current($userobj->getUserInfo($uid, 1));
+            if (!empty($userInfo)) {
+                $userextobj = new UserExtend();
+                $babyagetype = $userextobj->getBabyAgeType($userInfo['age']);
+            }
+        }
+
+        // 同龄在听
+        $sameageres = $recommendObj->getSameAgeListenList($babyagetype, 1, $albumlen);
+        if (!empty($sameageres)) {
+            foreach ($sameageres as $value) {
+                $albumIds[] = $value['albumid'];
+            }
+        }
+
+        // 最新上架
+        $newonlineres = $recommendObj->getNewOnlineList($babyagetype, 1, $albumlen);
+        if (!empty($newonlineres)) {
+            foreach ($newonlineres as $value) {
+                $albumIds[] = $value['albumid'];
+            }
+        }
+
+        $albumList = array();
+        $recommendDescList = array();
+        if (!empty($albumIds)) {
+            $albumIds = array_unique($albumIds);
+            // 专辑信息
+            $albumObj = new Album();
+            $albumList = $albumObj->getListByIds($albumIds);
+            // 专辑收听数
+            $listenobj = new Listen();
+            $albumListenNum = $listenobj->getAlbumListenNum($albumIds);
+
+            // 获取推荐语
+            $recommenddescobj = new RecommendDesc();
+            $recommendDescList = $recommenddescobj->getAlbumRecommendDescList($albumIds);
+        }
+
+
+        $hotRecommendList = array();
+        $sameAgeAlbumList = array();
+        $newAlbumList = array();
+        $albumInfo = array();
+        if (!empty($hotrecommendres)) {
+            foreach ($hotrecommendres as $value) {
+
+                $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $value['albumid']);
+                if (is_array($albumInfo) && !empty($albumInfo)) {
+                    $hotRecommendList[] = $albumInfo;
+                }
+            }
+        }
+
+        $data['album_section']['items'][] = array(
+            'title' => "今日精选",
+            'total' => count($hotRecommendList),
+            'items' => $hotRecommendList,
+        );
+
+        if (!empty($sameageres)) {
+            foreach ($sameageres as $value) {
+
+                $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $value['albumid']);
+                if (is_array($albumInfo) && !empty($albumInfo)) {
+                    $sameAgeAlbumList[] = $albumInfo;
+                }
+            }
+        }
+        $data['album_section']['items'][] = array(
+            'title' => "同龄在听",
+            'total' => count($sameAgeAlbumList),
+            'items' => $sameAgeAlbumList,
+        );
+
+        if (!empty($newonlineres)) {
+            foreach ($newonlineres as $value) {
+                $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $value['albumid']);
+                if (is_array($albumInfo) && !empty($albumInfo)) {
+                    $newAlbumList[] = $albumInfo;
+                }
+            }
+        }
+        $data['album_section']['items'][] = array(
+            'title' => "最新上架",
+            'total' => count($newAlbumList),
+            'items' => $newAlbumList,
+        );
+
+        //一级标签
+        $tagNewObj = new TagNew();
+        $firstTagRes = $tagNewObj->getFirstTagList(8);
+        $len = 4;
+        $tagAlbumIdArr = array();
+        if (!empty($firstTagRes)) {
+
+            $tagAlbumRelArr = array();
+            foreach ($firstTagRes as $item) {
+                $tagAlbumRelArr = $tagNewObj->getAlbumTagRelationListFromTag($item['id'], 1, 0, 0, "down", 0, $len);
+                if (!empty($tagAlbumRelArr)) {
+                    foreach ($tagAlbumRelArr as $tagAlbumRelItem) {
+                        $tagAlbumIdArr[$item['id']][] = $tagAlbumRelItem['albumid'];
+                    }
+                }
+            }
+
+            $albumIdArr = array();
+            if (!empty($tagAlbumIdArr)) {
+
+                foreach ($tagAlbumIdArr as $tag_id => $albumIdArrItem) {
+                    $albumIdArr = array_merge($albumIdArr, $albumIdArrItem);
+                }
+            }
+
+            if (!empty($albumIdArr)) {
+                $albumIdArr = array_unique($albumIdArr);
+                // 专辑信息
+                $albumObj = new Album();
+                $albumList = $albumObj->getListByIds($albumIdArr);
+                // 专辑收听数
+                $listenObj = new Listen();
+                $albumListenNum = $listenObj->getAlbumListenNum($albumIdArr);
+
+                // 获取推荐语
+                $recommendDescObj = new RecommendDesc();
+                $recommendDescList = $recommendDescObj->getAlbumRecommendDescList($albumIdArr);
+            }
+
+
+            foreach ($firstTagRes as $tagItem) {
+
+                $albumSectionItem = array();
+                $albumSectionItem['title'] = $tagItem['name'];
+                $albumSectionItem['total'] = 0;
+                $albumSectionItem['items'] = array();
+
+                $id = $tagItem['id'];
+                foreach ($tagAlbumIdArr[$id] as $albumId) {
+
+                    $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $albumId);
+                    if (is_array($albumInfo) && !empty($albumInfo)) {
+                        $albumSectionItem['items'][] = $albumInfo;
+                    }
+                }
+                $albumSectionItem['total'] = count($albumSectionItem['items']);
+                $data['album_section']['items'][] = $albumSectionItem;
+            }
+        }
+
+        //广告
+        $data['ad'] = array(
+            "total" => 2,
+            "items" => array(
+                array(
+                    "cover" => "https://img3.doubanio.com/view/dale-online/dale_ad/public/ae6b5444cfad075.jpg",
+                    "linkurl" => "https://www.douban.com/",
+                ),
+                array(
+                    "cover" => "https://img3.doubanio.com/view/dale-online/dale_ad/public/18a3cc696cf9561.jpg",
+                    "linkurl" => "https://www.douban.com/",
+                ),
+            )
+        );
+        $this->showSuccJson($data);
+    }
+
+
+    public function getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $albumId)
+    {
+
+        $aliossObj = new AliOss();
+        $albumInfo = array();
+        if (!empty($albumList[$albumId])) {
+            $albumInfo['id'] = $albumList[$albumId]['id'];
+            $albumInfo['title'] = $albumList[$albumId]['title'];
+            $albumInfo['intro'] = $albumList[$albumId]['intro'];
+            if (!empty($albumList[$albumId]['cover'])) {
+                $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumList[$albumId]['cover'], 460, $albumList[$albumId]['cover']);
+            }
+            $albumInfo['listennum'] = 0;
+            if (!empty($albumListenNum[$albumId])) {
+                $albumInfo['listennum'] = $albumListenNum[$albumId]['num'] + 0;
+            }
+            $albumInfo['recommenddesc'] = "";
+            if (!empty($recommendDescList[$albumId])) {
+                $albumInfo['recommenddesc'] = $recommendDescList[$albumId]['desc'];
+            }
+            //$albumSectionItem['items'][] = $albumInfo;
+        }
+        return $albumInfo;
+    }
+}
+
+new index();
