@@ -708,4 +708,24 @@ class Album extends ModelBase
         $list = $st->fetchAll(PDO::FETCH_ASSOC);
         return $list;
     }
+
+    public function getAlbumListByAge($min_age,$max_age,$offset=0,$perPage=4){
+        $where = '1';
+        //和getAgeLevelWithAlbums的年龄比较的规则相同
+        if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
+            $where .= " AND `min_age` = 0 AND `max_age` >= {$max_age}";
+        } elseif ($min_age != 0 && $max_age != 0) {
+            $where .= " AND `max_age` <= {$max_age}";
+        }
+
+        $db = DbConnecter::connectMysql('share_story');
+        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num,a.intro
+                FROM `album` AS a LEFT JOIN `album_tag_relation` AS a_t ON a.id=a_t.albumid 
+                WHERE {$where}
+                ORDER BY a_t.`albumlistennum` DESC LIMIT {$offset}, {$perPage}";
+        $st = $db->prepare($sql);
+        $st->execute();
+        $list = $st->fetchAll(PDO::FETCH_ASSOC);
+        return $list;
+    }
 }

@@ -11,7 +11,7 @@ class agelevellist extends controller
     public function action()
     {
         $minAge = $this->getRequest('min_age', '0');
-        $maxAge = $this->getRequest('max_age', '2');
+        $maxAge = $this->getRequest('max_age', '0');
 
         $res = array(
             'focus_pic'=>array(),// 焦点图
@@ -26,10 +26,10 @@ class agelevellist extends controller
 
         //热门播放
         $albumObj = new Album();
-        $albumList = $albumObj->getAlbumListOrderListenNum(array('min_age'=>$minAge,'max_age'=>$maxAge));
+        $albumList = $albumObj->getAlbumListByAge($minAge,$maxAge);
         //格式化返回
         foreach ($albumList as $key=>$val){
-            $val['cover'] = 'http://lemonpic.oss-cn-hangzhou.aliyuncs.com/'.$val['cover'];
+            $val['cover'] = 'http://p.xiaoningmeng.net/'.$val['cover'];
             $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
 
             $albumList[$key] = $val;
@@ -63,7 +63,7 @@ class agelevellist extends controller
         $tagInfoList =array();
         foreach($tagIdList[$minAge] as $val){
             $tagInfo = $tagInfoObj->get_info("id = ".$val,'id,name,cover');
-            $tagInfo['cover'] = 'http://fdfs.xmcdn.com/'.$tagInfo['cover'];
+            $tagInfo['cover'] = 'http://p.xiaoningmeng.net/'.$tagInfo['cover'];
             $tagInfoList[] = $tagInfo;
         }
 
