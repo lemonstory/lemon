@@ -14,7 +14,7 @@ class AlbumTagRelation extends ModelBase
     {
 
         if ($where) {
-            $whereStr = ' WHERE 1 ';
+            $whereStr = ' WHERE online_status=1 ';
             foreach ($where as $key=>$val){
                 $whereStr .= " and `{$key}`=:{$key}";
             }
@@ -51,7 +51,7 @@ class AlbumTagRelation extends ModelBase
 
     public function getAlbumListByAge($min_age, $max_age,$start_album_id, $currentPage = 1, $perPage = 4)
     {
-        $where = '1';
+        $where = ' online_status=1 ';
         if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
             $where .= " AND `min_age` = 0 AND `max_age` >= {$max_age}";
         } elseif ($min_age != 0 && $max_age != 0) {

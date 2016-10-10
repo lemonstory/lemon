@@ -21,15 +21,21 @@ class hotalbumlist extends controller
         //取专辑下面对应的标签
         $albumTagObj = new AlbumTagRelation();
         $tagInfoObj = new TagInfo();
+        $recommendDescObj = new RecommendDesc();
         $tagInfoList = array();
         foreach ($albumTagList as $key=>$val){
+            // 获取推荐语
+            $recommendList = $recommendDescObj->getAlbumRecommendDescList($val['id']);
+            $val['recommend'] = $recommendList[$val['id']]['desc'];
+
+            $val['cover'] = 'http://p.xiaoningmeng.net/'.$val['cover'];
             $tagList = $albumTagObj->getTagListByAlbumId($val['id'],'1',10);
             foreach ($tagList as $k=>$v){
-                $tagInfo = $tagInfoObj->get_info("id = ".$v['tagid'],'id,name,cover');
+                $tagInfo = $tagInfoObj->get_info("id = ".$v['tagid'],'id,pid,name,cover');
                 $tagInfo['cover'] = 'http://p.xiaoningmeng.net/'.$tagInfo['cover'];
                 $tagInfoList[] = $tagInfo;
             }
-            $val['items'] = $tagInfoList;
+            $val['recommend_tags'] = array('total'=>count($tagInfoList),'items'=>$tagInfoList);
             $albumTagList[$key]=$val;
         }
 

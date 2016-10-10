@@ -690,12 +690,12 @@ class Album extends ModelBase
 
     public function getAlbumListOrderListenNum($where,$offset=0,$perPage=4){
         if ($where) {
-            $whereStr = ' WHERE 1 ';
+            $whereStr = ' WHERE online_status=1 ';
             foreach ($where as $key=>$val){
                 $whereStr .= " and `{$key}`=:{$key}";
             }
         } else {
-            $whereStr = '';
+            $whereStr = ' WHERE online_status=1 ';
         }
         
         $db = DbConnecter::connectMysql('share_story');
@@ -710,7 +710,7 @@ class Album extends ModelBase
     }
 
     public function getAlbumListByAge($min_age,$max_age,$start_album_id=0,$offset=0,$perPage=4){
-        $where = '1';
+        $where = ' online_status=1 ';
         //和getAgeLevelWithAlbums的年龄比较的规则相同
         if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
             $where .= " AND `min_age` = 0 AND `max_age` >= {$max_age}";
