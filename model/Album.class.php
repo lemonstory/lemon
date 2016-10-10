@@ -690,21 +690,45 @@ class Album extends ModelBase
 
     public function getAlbumListOrderListenNum($where,$offset=0,$perPage=4){
         if ($where) {
-            $whereStr = ' WHERE 1 ';
+            $whereStr = ' WHERE online_status=1 ';
             foreach ($where as $key=>$val){
                 $whereStr .= " and `{$key}`=:{$key}";
             }
         } else {
-            $whereStr = '';
+            $whereStr = ' WHERE online_status=1 ';
         }
         
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num,a.intro,a.link_url 
+        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num,a.intro
                 FROM `album` AS a LEFT JOIN `album_tag_relation` AS a_t ON a.id=a_t.albumid 
                 {$whereStr}
                 ORDER BY a_t.`albumlistennum` DESC LIMIT {$offset}, {$perPage}";
         $st = $db->prepare($sql);
         $st->execute($where);
+        $list = $st->fetchAll(PDO::FETCH_ASSOC);
+        return $list;
+    }
+
+    public function getAlbumListByAge($min_age,$max_age,$start_album_id=0,$offset=0,$perPage=4){
+        $where = ' online_status=1 ';
+        //和getAgeLevelWithAlbums的年龄比较的规则相同
+        if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
+            $where .= " AND `min_age` = 0 AND `max_age` >= {$max_age}";
+        } elseif ($min_age != 0 && $max_age != 0) {
+            $where .= " AND `max_age` <= {$max_age}";
+        }
+
+        if ($start_album_id > 0) {
+            $where .= " AND a.id < {$start_album_id} ";
+        }
+
+        $db = DbConnecter::connectMysql('share_story');
+        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num
+                FROM `album` AS a LEFT JOIN `album_tag_relation` AS a_t ON a.id=a_t.albumid 
+                WHERE {$where} GROUP BY a.id
+                ORDER BY a_t.`albumlistennum` DESC LIMIT {$offset}, {$perPage}";
+        $st = $db->prepare($sql);
+        $st->execute();
         $list = $st->fetchAll(PDO::FETCH_ASSOC);
         return $list;
     }

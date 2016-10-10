@@ -5,13 +5,13 @@
  * Date: 2016/9/24
  * Time: 上午10:45
  */
-include_once '../controller.php';
+include_once '../../controller.php';
 class agelevellist extends controller
 {
     public function action()
     {
         $minAge = $this->getRequest('min_age', '0');
-        $maxAge = $this->getRequest('max_age', '2');
+        $maxAge = $this->getRequest('max_age', '0');
 
         $res = array(
             'focus_pic'=>array(),// 焦点图
@@ -26,7 +26,18 @@ class agelevellist extends controller
 
         //热门播放
         $albumObj = new Album();
-        $albumList = $albumObj->getAlbumListOrderListenNum(array('min_age'=>$minAge,'max_age'=>$maxAge));
+        $recommendDescObj = new RecommendDesc();
+        $albumList = $albumObj->getAlbumListByAge($minAge,$maxAge);
+        //格式化返回
+        foreach ($albumList as $key=>$val){
+            // 获取推荐语
+            $recommendList = $recommendDescObj->getAlbumRecommendDescList($val['id']);
+            $val['cover'] = 'http://p.xiaoningmeng.net/'.$val['cover'];
+            $val['recommend_desc'] = $recommendList[$val['id']]['desc'];
+            $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
+
+            $albumList[$key] = $val;
+        }
 
         $albumTagIdList = array(
             '0'=>array('id'=>23,'name'=>'睡前故事'),
@@ -35,7 +46,18 @@ class agelevellist extends controller
             '11'=>array('id'=>23,'name'=>'睡前故事'),
         );
         $albumTagObj = new AlbumTagRelation();
-        $albumTagList = $albumTagObj->getAlbumListByTagId(array('tagid'=>$albumTagIdList[$minAge]['id']));
+        $albumTagList = $albumTagObj->getAlbumList(array('tagid'=>$albumTagIdList[$minAge]['id']));
+        //格式化返回
+        foreach ($albumTagList as $key=>$val){
+            // 获取推荐语
+            $recommendList = $recommendDescObj->getAlbumRecommendDescList($val['id']);
+            $val['cover'] = 'http://p.xiaoningmeng.net/'.$val['cover'];
+            $val['recommend_desc'] = $recommendList[$val['id']]['desc'];
+            $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
+            unset($val['tagid']);
+
+            $albumTagList[$key] = $val;
+        }
 
         $res['album_section'] = array('total'=>2,
             'items'=>array(
@@ -56,6 +78,7 @@ class agelevellist extends controller
         $tagInfoList =array();
         foreach($tagIdList[$minAge] as $val){
             $tagInfo = $tagInfoObj->get_info("id = ".$val,'id,name,cover');
+            $tagInfo['cover'] = 'http://p.xiaoningmeng.net/'.$tagInfo['cover'];
             $tagInfoList[] = $tagInfo;
         }
 
