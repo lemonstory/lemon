@@ -24,9 +24,13 @@ class tagalbumlist extends controller
 
 
         $albumTagObj = new AlbumTagRelation();
+        $recommendDescObj = new RecommendDesc();
         $albumTagList = $albumTagObj->getAlbumList($where,1,$len);
         //格式化返回
         foreach ($albumTagList as $key=>$val){
+            // 获取推荐语
+            $recommendList = $recommendDescObj->getAlbumRecommendDescList($val['id']);
+            $val['recommend'] = $recommendList[$val['id']]['desc'];
             $val['cover'] = 'http://lemonpic.oss-cn-hangzhou.aliyuncs.com/'.$val['cover'];
             $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
 
