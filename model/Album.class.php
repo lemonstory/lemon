@@ -723,9 +723,9 @@ class Album extends ModelBase
         }
 
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num,a.intro
+        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num
                 FROM `album` AS a LEFT JOIN `album_tag_relation` AS a_t ON a.id=a_t.albumid 
-                WHERE {$where}
+                WHERE {$where} GROUP BY a.id
                 ORDER BY a_t.`albumlistennum` DESC LIMIT {$offset}, {$perPage}";
         $st = $db->prepare($sql);
         $st->execute();
