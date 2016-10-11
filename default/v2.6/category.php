@@ -5,7 +5,7 @@
  * Date: 2016/9/24
  * Time: 上午9:58
  */
-include_once '../controller.php';
+include_once '../../controller.php';
 class categorylist extends controller
 {
     public function action()
@@ -24,7 +24,8 @@ class categorylist extends controller
             $tmp['child_items'] = $secondList;
             $data['items'][] = $tmp;
         }
-        echo json_encode(array('code'=>200,'data'=>$data));
+
+        $this->showSuccJson($data);
     }
 }
 new categorylist();
