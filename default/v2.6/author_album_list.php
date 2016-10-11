@@ -5,7 +5,7 @@
  * Time: 下午6:59
  */
 
-include_once '../controller.php';
+include_once '../../controller.php';
 
 class author_album_list extends controller
 {

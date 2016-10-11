@@ -5,7 +5,7 @@
  * Time: 上午10:35
  */
 
-include_once '../controller.php';
+include_once '../../controller.php';
 
 class authors extends controller
 {

@@ -6,7 +6,7 @@
  * Time: 下午6:31
  */
 
-include_once '../controller.php';
+include_once '../../controller.php';
 
 class anchors extends controller
 {

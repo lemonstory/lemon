@@ -6,7 +6,7 @@
  * Time: 下午6:36
  */
 
-include_once '../controller.php';
+include_once '../../controller.php';
 
 class anchor_album_list extends controller
 {
