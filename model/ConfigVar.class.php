@@ -20,7 +20,10 @@ class ConfigVar
             "2" => "3-6岁",
             "3" => "7-10岁"
             );
-    
+
+    public $MIN_AGE = 0;    //最小年龄
+    public $MAX_AGE = 14;   //最大年龄
+
     public $RECOMMEND_STATUS_ONLIINE = 1; // 推荐上线状态
     public $RECOMMEND_STATUS_OFFLINE = 2; // 推荐下线状态
     

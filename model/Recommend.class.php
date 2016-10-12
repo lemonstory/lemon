@@ -2,18 +2,21 @@
 class Recommend extends ModelBase
 {
     public $MAIN_DB_INSTANCE = 'share_main';
+    public $STORY_DB_INSTANCE = 'share_story';
     public $RECOMMEND_HOT_TABLE_NAME = 'recommend_hot';
     public $RECOMMEND_SAME_AGE_TABLE_NAME = 'recommend_same_age';
     public $RECOMMEND_NEW_ONLINE_TABLE_NAME = 'recommend_new_online';
     public $FOCUS_TABLE_NAME = 'focus';
-    
+    public $RECOMMEND_AGE_LEVEL_TABLE_NAME = 'recommend_age_level';
+    public $ALBUM_TABLE_NAME = 'album';
+
     /**
      * 首页获取热门推荐列表
      * @param I $currentpage   加载第几个,默认为1表示从第一页获取
      * @param I $len           获取长度
      * @return array
      */
-    public function getRecommendHotList($currentpage = 1, $len = 20)
+    public function getRecommendHotList($minAge, $maxAge, $currentpage = 1, $len = 20)
     {
         if ($currentpage < 1) {
             $currentpage = 1;
@@ -24,17 +27,34 @@ class Recommend extends ModelBase
         if ($len > 50) {
             $len = 50;
         }
-        
-        $key = $currentpage . "_" . $len;
+
+        if ($minAge > $this->MAX_AGE) {
+            $minAge = $this->MIN_AGE;
+        }
+        if (!empty($maxAge) || $maxAge > $this->MAX_AGE) {
+            $maxAge = $this->MAX_AGE;
+        }
+
+        $key = $minAge . "_" . $maxAge . "_" . $currentpage . "_" . $len;
         $cacheobj = new CacheWrapper();
         $redisData = $cacheobj->getListCache($this->RECOMMEND_HOT_TABLE_NAME, $key);
         if (empty($redisData)) {
-            $where = "";
             $offset = ($currentpage - 1) * $len;
-            $where .= " `status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
-            
-            $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-            $sql = "SELECT * FROM `{$this->RECOMMEND_HOT_TABLE_NAME}` WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+            $where = "";
+            $where .= " `{$this->RECOMMEND_HOT_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
+
+            if ($minAge == 0 && $maxAge != 0 && $maxAge != $this->MAX_AGE) {
+                $where .= " AND `min_age` = 0 AND `max_age` >= {$maxAge}";
+            } elseif ($minAge != 0 && $maxAge != 0) {
+                $where .= " AND `min_age` >= {$minAge} AND `max_age` <= {$maxAge}";
+            }
+
+            $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
+            $sql = "SELECT `id`,`title`,`cover`,`cover_time` 
+                      FROM `{$this->RECOMMEND_HOT_TABLE_NAME}` 
+                      LEFT JOIN `{$this->ALBUM_TABLE_NAME}` 
+                      ON `{$this->RECOMMEND_HOT_TABLE_NAME}`.`albumid` = `{$this->ALBUM_TABLE_NAME}`.`id`
+                      WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -190,5 +210,22 @@ class Recommend extends ModelBase
         } else {
             return $redisData;
         }
+    }
+
+    public function getAgeLevelNum($name)
+    {
+
+        $dbData = array();
+        $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
+        $sql = "SELECT * FROM `{$this->RECOMMEND_AGE_LEVEL_TABLE_NAME}` WHERE `name` = '{$name}'";
+        $st = $db->prepare($sql);
+        $st->execute();
+        $row = $st->fetch(PDO::FETCH_ASSOC);
+        $db = null;
+        if (!empty($row) && isset($row['age_level_album_num'])) {
+
+            $dbData = json_decode($row['age_level_album_num'], true);
+        }
+        return $dbData;
     }
 }

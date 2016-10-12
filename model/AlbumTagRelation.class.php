@@ -55,7 +55,7 @@ class AlbumTagRelation extends ModelBase
         if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
             $where .= " AND `min_age` = 0 AND `max_age` >= {$max_age}";
         } elseif ($min_age != 0 && $max_age != 0) {
-            $where .= " AND `max_age` <= {$max_age}";
+            $where .= " AND `min_age` >= {$min_age} AND `max_age` <= {$max_age}";
         }
         if ($start_album_id > 0) {
             $where .= " AND a.id < {$start_album_id} ";

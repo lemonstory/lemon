@@ -366,7 +366,7 @@ class Album extends ModelBase
         if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
             $where .= " AND `min_age` = 0 AND `max_age` >= {$max_age}";
         } elseif ($min_age != 0 && $max_age != 0) {
-            $where .= " AND `max_age` <= {$max_age}";
+            $where .= " AND `min_age` >= {$min_age} AND `max_age` <= {$max_age}";
         }
         if ($start_album_id > 0) {
             $where .= " AND id < {$start_album_id} ";
@@ -396,7 +396,7 @@ class Album extends ModelBase
         if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
             $where .= " AND `min_age` = 0 AND `max_age` >= {$max_age}";
         } elseif ($min_age != 0 && $max_age != 0) {
-            $where .= " AND `max_age` <= {$max_age}";
+            $where .= " AND `min_age` >= {$min_age} AND `max_age` <= {$max_age}";
         }
         if ($start_album_id > 0) {
             $where .= " AND id < {$start_album_id} ";
@@ -436,21 +436,21 @@ class Album extends ModelBase
                      *  max_age = 0 && max_age > 0  ==> max_age >= age_level_max_age
                      *  max_age > 0 && max_age > 0  ==> max_age <= age_level_max_age
                      */
-                    if (($min_age == 0 && $max_age == 0) || ($min_age == 0 && $max_age == 14)) {
+                    if ((($min_age == 0 && $max_age == 0) || ($min_age == 0 && $max_age == 14)) && ($age_level_item['max_age'] == 14 && $age_level_item['min_age'] == 0)) {
 
                         $num_arr[$k] = isset($num_arr[$k]) ? $num_arr[$k] + 1 : 1;
-                        break;
+                        //break;
 
-                    } elseif ($min_age == 0 && $max_age != 0 && $max_age > 0) {
+                    } elseif ($min_age == 0 && $max_age > 0) {
 
-                        if ($max_age >= $age_level_item['max_age']) {
+                        if ($max_age >= $age_level_item['max_age'] || ($age_level_item['max_age'] == 14 && $age_level_item['min_age'] == 0)) {
                             $num_arr[$k] = isset($num_arr[$k]) ? $num_arr[$k] + 1 : 1;
-                            break;
+                            //break;
                         }
-                    } elseif ($min_age > 0 && $max_age != 0 && $max_age > 0) {
-                        if ($max_age <= $age_level_item['max_age']) {
+                    } elseif ($min_age > 0 && $max_age > 0) {
+                        if ($max_age <= $age_level_item['max_age'] && $min_age >= $age_level_item['min_age']) {
                             $num_arr[$k] = isset($num_arr[$k]) ? $num_arr[$k] + 1 : 1;
-                            break;
+                            //break;
                         }
                     }
                 }
@@ -495,10 +495,10 @@ class Album extends ModelBase
             }
         }
 
-        $data_format['total'] = $data_format['total'];
+        //$data_format['total'] = $data_format['total'];
 
         //{全部}放在数组首位
-        $data_format['items'] = array_reverse($data_format['items']);
+        //$data_format['items'] = array_reverse($data_format['items']);
 
         return $data_format;
     }
@@ -715,7 +715,7 @@ class Album extends ModelBase
         if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
             $where .= " AND `min_age` = 0 AND `max_age` >= {$max_age}";
         } elseif ($min_age != 0 && $max_age != 0) {
-            $where .= " AND `max_age` <= {$max_age}";
+            $where .= " AND `min_age` >= {$min_age} AND `max_age` <= {$max_age}";
         }
 
         if ($start_album_id > 0) {
