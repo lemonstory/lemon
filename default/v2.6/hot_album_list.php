@@ -19,7 +19,7 @@ class hotalbumlist extends controller
         $albumTagList = $albumObj->getAlbumListByAge($minAge,$maxAge, $startAlbumId,1,$len);
         
         //取专辑下面对应的标签
-        $albumTagObj = new AlbumTagRelation();
+        $tagnewobj = new TagNew();
         $tagInfoObj = new TagInfo();
         $recommendDescObj = new RecommendDesc();
         $tagInfoList = array();
@@ -29,8 +29,8 @@ class hotalbumlist extends controller
             $val['recommend'] = $recommendList[$val['id']]['desc'];
 
             $val['cover'] = 'http://p.xiaoningmeng.net/'.$val['cover'];
-            $tagList = $albumTagObj->getTagListByAlbumId($val['id'],'1',10);
-            foreach ($tagList as $k=>$v){
+            $tagList = $tagnewobj->getAlbumTagRelationListByAlbumIds(array($val['id']));
+            foreach ($tagList[$val['id']] as $k=>$v){
                 $tagInfo = $tagInfoObj->get_info("id = ".$v['tagid'],'id,pid,name,cover');
                 $tagInfo['cover'] = 'http://p.xiaoningmeng.net/'.$tagInfo['cover'];
                 $tagInfoList[] = $tagInfo;

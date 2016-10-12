@@ -719,7 +719,7 @@ class Album extends ModelBase
         }
 
         if ($start_album_id > 0) {
-            $where .= " AND a.id < {$start_album_id} ";
+            $where .= " AND a.id >= {$start_album_id} ";
         }
 
         $db = DbConnecter::connectMysql('share_story');
