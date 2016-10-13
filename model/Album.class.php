@@ -472,13 +472,19 @@ class Album extends ModelBase
                 }
             }
         }
-
-        //$data_format['total'] = $data_format['total'];
-
-        //{全部}放在数组首位
-        //$data_format['items'] = array_reverse($data_format['items']);
-
         return $data_format;
+    }
+
+    public function getAgeLevelStr($min_age, $max_age)
+    {
+
+        $ageLevelStr = "";
+        if ($min_age >= $this->MIN_AGE && $max_age <= $this->MAX_AGE && $max_age != $min_age) {
+            $ageLevelStr = sprintf("%s-%s", $min_age, $max_age);
+        } else {
+            $ageLevelStr = sprintf("%s-%s", $this->MIN_AGE, $this->MAX_AGE);
+        }
+        return $ageLevelStr;
     }
 
 

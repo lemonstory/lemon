@@ -80,8 +80,6 @@ class sameAgeList extends controller
 
                     $albumId = $item['id'];
                     $albumInfo = array();
-
-
                     $albumInfo['id'] = $recommendAlbumList[$key]['id'];
                     $albumInfo['title'] = $recommendAlbumList[$key]['title'];
                     if (!empty($recommendAlbumList[$key]['cover'])) {
@@ -95,6 +93,8 @@ class sameAgeList extends controller
                     if (!empty($recommendDescList[$albumId])) {
                         $albumInfo['recommenddesc'] = $recommendDescList[$albumId]['desc'];
                     }
+                    $albumAgeLevelStr = $albumObj->getAgeLevelStr($recommendAlbumList[$key]['min_age'], $recommendAlbumList[$key]['max_age']);
+                    $albumInfo['age_str'] = sprintf("(%s)岁", $albumAgeLevelStr);
 
                     //tag
                     if (!empty($albumTagRelationList[$albumId])) {

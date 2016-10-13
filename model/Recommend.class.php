@@ -31,7 +31,7 @@ class Recommend extends ModelBase
         if ($minAge > $this->MAX_AGE) {
             $minAge = $this->MIN_AGE;
         }
-        if (!empty($maxAge) || $maxAge > $this->MAX_AGE) {
+        if (!empty($maxAge) && $maxAge > $this->MAX_AGE) {
             $maxAge = $this->MAX_AGE;
         }
 
@@ -50,14 +50,16 @@ class Recommend extends ModelBase
             }
 
             $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
-            $sql = "SELECT `id`,`title`,`cover`,`cover_time` 
+            $sql = "SELECT `id`,`title`,`cover`,`cover_time`,`min_age`,`max_age` 
                       FROM `{$this->RECOMMEND_HOT_TABLE_NAME}` 
                       LEFT JOIN `{$this->ALBUM_TABLE_NAME}` 
                       ON `{$this->RECOMMEND_HOT_TABLE_NAME}`.`albumid` = `{$this->ALBUM_TABLE_NAME}`.`id`
                       WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
+
             $db = null;
             if (empty($dbData)) {
                 return array();
@@ -95,7 +97,7 @@ class Recommend extends ModelBase
         if ($minAge > $this->MAX_AGE) {
             $minAge = $this->MIN_AGE;
         }
-        if (!empty($maxAge) || $maxAge > $this->MAX_AGE) {
+        if (!empty($maxAge) && $maxAge > $this->MAX_AGE) {
             $maxAge = $this->MAX_AGE;
         }
 
@@ -115,12 +117,11 @@ class Recommend extends ModelBase
             }
 
             $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
-            $sql = "SELECT `id`,`title`,`cover`,`cover_time` 
+            $sql = "SELECT `id`,`title`,`cover`,`cover_time`,`min_age`,`max_age` 
                       FROM `{$this->RECOMMEND_NEW_ONLINE_TABLE_NAME}` 
                       LEFT JOIN `{$this->ALBUM_TABLE_NAME}` 
                       ON `{$this->RECOMMEND_NEW_ONLINE_TABLE_NAME}`.`albumid` = `{$this->ALBUM_TABLE_NAME}`.`id`
                       WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
-            
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -159,7 +160,7 @@ class Recommend extends ModelBase
         if ($minAge > $this->MAX_AGE) {
             $minAge = $this->MIN_AGE;
         }
-        if (!empty($maxAge) || $maxAge > $this->MAX_AGE) {
+        if (!empty($maxAge) && $maxAge > $this->MAX_AGE) {
             $maxAge = $this->MAX_AGE;
         }
 
@@ -179,7 +180,7 @@ class Recommend extends ModelBase
             }
 
             $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
-            $sql = "SELECT `id`,`title`,`cover`,`cover_time` 
+            $sql = "SELECT `id`,`title`,`cover`,`cover_time`,`min_age`,`max_age`  
                       FROM `{$this->RECOMMEND_SAME_AGE_TABLE_NAME}` 
                       LEFT JOIN `{$this->ALBUM_TABLE_NAME}` 
                       ON `{$this->RECOMMEND_SAME_AGE_TABLE_NAME}`.`albumid` = `{$this->ALBUM_TABLE_NAME}`.`id`
