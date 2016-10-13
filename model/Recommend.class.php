@@ -144,12 +144,8 @@ class Recommend extends ModelBase
      * @param I $len           获取长度
      * @return array
      */
-    public function getSameAgeListenList($babyagetype = 0, $currentPage = 1, $len = 20)
+    public function getSameAgeListenList($minAge, $maxAge, $currentPage = 1, $len = 20)
     {
-        if (!empty($babyagetype) && !in_array($babyagetype, $this->AGE_TYPE_LIST)) {
-            $this->setError(ErrorConf::paramError());
-            return array();
-        }
         if ($currentPage < 1) {
             $currentPage = 1;
         }
@@ -160,21 +156,35 @@ class Recommend extends ModelBase
             $len = 50;
         }
 
-        $key = $babyagetype . '_' . $currentPage . "_" . $len;
+        if ($minAge > $this->MAX_AGE) {
+            $minAge = $this->MIN_AGE;
+        }
+        if (!empty($maxAge) || $maxAge > $this->MAX_AGE) {
+            $maxAge = $this->MAX_AGE;
+        }
+
+        $key = $minAge . "_" . $maxAge . "_" . $currentPage . "_" . $len;
         $cacheobj = new CacheWrapper();
         $redisData = $cacheobj->getListCache($this->RECOMMEND_SAME_AGE_TABLE_NAME, $key);
         if (empty($redisData)) {
-            $where = "";
+
             $offset = ($currentPage - 1) * $len;
-            
-            $status = $this->RECOMMEND_STATUS_ONLIINE; // 已上线状态
-            $where .= " `status` = '{$status}'";
-            
-            if (!empty($babyagetype)) {
-                $where .= " AND (`agetype` = '{$babyagetype}' or `agetype` = '{$this->AGE_TYPE_All}')";
+            $where = "";
+            $where .= " `{$this->RECOMMEND_SAME_AGE_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
+
+            if ($minAge == 0 && $maxAge != 0 && $maxAge != $this->MAX_AGE) {
+                $where .= " AND `min_age` = 0 AND `max_age` >= {$maxAge}";
+            } elseif ($minAge != 0 && $maxAge != 0) {
+                $where .= " AND `min_age` >= {$minAge} AND `max_age` <= {$maxAge}";
             }
-            $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-            $sql = "SELECT * FROM {$this->RECOMMEND_SAME_AGE_TABLE_NAME} WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+
+            $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
+            $sql = "SELECT `id`,`title`,`cover`,`cover_time` 
+                      FROM `{$this->RECOMMEND_SAME_AGE_TABLE_NAME}` 
+                      LEFT JOIN `{$this->ALBUM_TABLE_NAME}` 
+                      ON `{$this->RECOMMEND_SAME_AGE_TABLE_NAME}`.`albumid` = `{$this->ALBUM_TABLE_NAME}`.`id`
+                      WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -182,9 +192,9 @@ class Recommend extends ModelBase
             if (empty($dbData)) {
                 return array();
             }
-            
             $cacheobj->setListCache($this->RECOMMEND_SAME_AGE_TABLE_NAME, $key, $dbData);
             return $dbData;
+
         } else {
             return $redisData;
         }

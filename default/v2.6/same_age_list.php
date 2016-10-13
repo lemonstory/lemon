@@ -1,6 +1,6 @@
 <?php
 /**
- * 编辑推荐-更多
+ *同龄在听 -更多
  *
  * Date: 16/10/11
  * Time: 下午4:36
@@ -8,7 +8,7 @@
 
 include_once '../../controller.php';
 
-class recommendList extends controller
+class sameAgeList extends controller
 {
     public function action()
     {
@@ -20,8 +20,24 @@ class recommendList extends controller
 
         $albumObj = new Album();
         $recommendObj = new Recommend();
-        $recommendAlbumList = $recommendObj->getRecommendHotList($minAge, $maxAge, $page, $len);
 
+        //登录用户
+        $uid = $this->getUid();
+        if (!empty($uid)) {
+            $userObj = new User();
+            $userInfo = current($userObj->getUserInfo($uid, 1));
+            if (!empty($userinfo)) {
+                $userBabyAge = $userinfo['age'];
+                $userExtend = new UserExtend();
+                $userBabyAgeGroup = $userExtend->getBabyAgeGroup($userBabyAge);
+                if ($minAge == $configVar->MIN_AGE && $maxAge == $configVar->MAX_AGE) {
+                    $minAge = $userBabyAgeGroup['min_age'];
+                    $maxAge = $userBabyAgeGroup['max_age'];
+                }
+            }
+        }
+
+        $recommendAlbumList = $recommendObj->getSameAgeListenList($minAge, $maxAge, $page, $len);
         $recommendAlbumArr = array();
         $recommendAlbumArr['age_level'] = array();
         $recommendAlbumArr['total'] = 0;
@@ -80,7 +96,6 @@ class recommendList extends controller
                         $albumInfo['recommenddesc'] = $recommendDescList[$albumId]['desc'];
                     }
 
-
                     //tag
                     if (!empty($albumTagRelationList[$albumId])) {
                         foreach ($albumTagRelationList[$albumId] as $item) {
@@ -103,13 +118,14 @@ class recommendList extends controller
             $recommendAlbumArr['total'] = count($recommendAlbumArr['items']);
 
             //年龄段
-            $hotAgeLevelNum = $recommendObj->getAgeLevelNum("hot");
+            $sameAgeAgeLevelNum = $recommendObj->getAgeLevelNum("same_age");
             $ageGroupItem = array("min_age" => $minAge, "max_age" => $maxAge);
             $selectedIndex = array_search($ageGroupItem, $configVar->AGE_LEVEL_ARR);
-            $recommendAlbumArr['age_level'] = $albumObj->getAgeLevelWithAlbumsFormat($hotAgeLevelNum, $selectedIndex);
+            $recommendAlbumArr['age_level'] = $albumObj->getAgeLevelWithAlbumsFormat($sameAgeAgeLevelNum, $selectedIndex);
+
         }
         $this->showSuccJson($recommendAlbumArr);
     }
 }
 
-new recommendList();
+new sameAgeList();

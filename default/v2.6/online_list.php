@@ -103,8 +103,10 @@ class onlineList extends controller
             $recommendAlbumArr['total'] = count($recommendAlbumArr['items']);
 
             //年龄段
-            $hotAgeLevelNum = $recommendObj->getAgeLevelNum("online");
-            $recommendAlbumArr['age_level'] = $albumObj->getAgeLevelWithAlbumsFormat($hotAgeLevelNum);
+            $onlineAgeLevelNum = $recommendObj->getAgeLevelNum("online");
+            $ageGroupItem = array("min_age" => $minAge, "max_age" => $maxAge);
+            $selectedIndex = array_search($ageGroupItem, $configVar->AGE_LEVEL_ARR);
+            $recommendAlbumArr['age_level'] = $albumObj->getAgeLevelWithAlbumsFormat($onlineAgeLevelNum, $selectedIndex);
         }
         $this->showSuccJson($recommendAlbumArr);
     }

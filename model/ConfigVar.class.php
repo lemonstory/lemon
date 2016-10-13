@@ -21,8 +21,36 @@ class ConfigVar
             "3" => "7-10岁"
             );
 
+
     public $MIN_AGE = 0;    //最小年龄
     public $MAX_AGE = 14;   //最大年龄
+    public $AGE_LEVEL_ARR = array(
+        //全部
+        array(
+            'min_age' => 0,
+            'max_age' => 14,
+        ),
+
+        array(
+            'min_age' => 0,
+            'max_age' => 2,
+        ),
+
+        array(
+            'min_age' => 3,
+            'max_age' => 6,
+        ),
+
+        array(
+            'min_age' => 7,
+            'max_age' => 10,
+        ),
+
+        array(
+            'min_age' => 11,
+            'max_age' => 14,
+        ),
+    );
 
     public $RECOMMEND_STATUS_ONLIINE = 1; // 推荐上线状态
     public $RECOMMEND_STATUS_OFFLINE = 2; // 推荐下线状态
