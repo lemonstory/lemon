@@ -1,6 +1,6 @@
 <?php
 /**
- * 编辑推荐-更多
+ * 最新上架-更多
  *
  * Date: 16/10/11
  * Time: 下午4:36
@@ -8,7 +8,7 @@
 
 include_once '../../controller.php';
 
-class recommendList extends controller
+class onlineList extends controller
 {
     public function action()
     {
@@ -20,7 +20,8 @@ class recommendList extends controller
 
         $albumObj = new Album();
         $recommendObj = new Recommend();
-        $recommendAlbumList = $recommendObj->getRecommendHotList($minAge, $maxAge, $page, $len);
+        $recommendAlbumList = $recommendObj->getNewOnlineList($minAge, $maxAge, $page, $len);
+
 
         $recommendAlbumArr = array();
         $recommendAlbumArr['age_level'] = array();
@@ -104,14 +105,13 @@ class recommendList extends controller
             $recommendAlbumArr['total'] = count($recommendAlbumArr['items']);
 
             //年龄段
-            $hotAgeLevelNum = $recommendObj->getAgeLevelNum("hot");
+            $onlineAgeLevelNum = $recommendObj->getAgeLevelNum("online");
             $ageGroupItem = array("min_age" => $minAge, "max_age" => $maxAge);
             $selectedIndex = array_search($ageGroupItem, $configVar->AGE_LEVEL_ARR);
-            $recommendAlbumArr['age_level'] = $albumObj->getAgeLevelWithAlbumsFormat($hotAgeLevelNum, $selectedIndex);
-
+            $recommendAlbumArr['age_level'] = $albumObj->getAgeLevelWithAlbumsFormat($onlineAgeLevelNum, $selectedIndex);
         }
         $this->showSuccJson($recommendAlbumArr);
     }
 }
 
-new recommendList();
+new onlineList();

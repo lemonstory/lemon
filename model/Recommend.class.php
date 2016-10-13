@@ -12,14 +12,14 @@ class Recommend extends ModelBase
 
     /**
      * 首页获取热门推荐列表
-     * @param I $currentpage   加载第几个,默认为1表示从第一页获取
+     * @param I $currentPage 加载第几个,默认为1表示从第一页获取
      * @param I $len           获取长度
      * @return array
      */
-    public function getRecommendHotList($minAge, $maxAge, $currentpage = 1, $len = 20)
+    public function getRecommendHotList($minAge, $maxAge, $currentPage = 1, $len = 20)
     {
-        if ($currentpage < 1) {
-            $currentpage = 1;
+        if ($currentPage < 1) {
+            $currentPage = 1;
         }
         if (empty($len)) {
             $len = 20;
@@ -31,15 +31,15 @@ class Recommend extends ModelBase
         if ($minAge > $this->MAX_AGE) {
             $minAge = $this->MIN_AGE;
         }
-        if (!empty($maxAge) || $maxAge > $this->MAX_AGE) {
+        if (!empty($maxAge) && $maxAge > $this->MAX_AGE) {
             $maxAge = $this->MAX_AGE;
         }
 
-        $key = $minAge . "_" . $maxAge . "_" . $currentpage . "_" . $len;
+        $key = $minAge . "_" . $maxAge . "_" . $currentPage . "_" . $len;
         $cacheobj = new CacheWrapper();
         $redisData = $cacheobj->getListCache($this->RECOMMEND_HOT_TABLE_NAME, $key);
         if (empty($redisData)) {
-            $offset = ($currentpage - 1) * $len;
+            $offset = ($currentPage - 1) * $len;
             $where = "";
             $where .= " `{$this->RECOMMEND_HOT_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
 
@@ -50,14 +50,16 @@ class Recommend extends ModelBase
             }
 
             $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
-            $sql = "SELECT `id`,`title`,`cover`,`cover_time` 
+            $sql = "SELECT `id`,`title`,`cover`,`cover_time`,`min_age`,`max_age` 
                       FROM `{$this->RECOMMEND_HOT_TABLE_NAME}` 
                       LEFT JOIN `{$this->ALBUM_TABLE_NAME}` 
                       ON `{$this->RECOMMEND_HOT_TABLE_NAME}`.`albumid` = `{$this->ALBUM_TABLE_NAME}`.`id`
                       WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
+
             $db = null;
             if (empty($dbData)) {
                 return array();
@@ -75,40 +77,51 @@ class Recommend extends ModelBase
      * 首页最新上架的上线列表
      * 按照年龄段，展示最新上架的故事专辑
      * @param I $babyagetype
-     * @param I $currentpage   加载第几个,默认为1表示从第一页获取
+     * @param I $currentPage 加载第几个,默认为1表示从第一页获取
      * @param I $len           获取长度
      * @return array
      */
-    public function getNewOnlineList($babyagetype = 0, $currentpage = 1, $len = 20)
+    public function getNewOnlineList($minAge, $maxAge, $currentPage = 1, $len = 20)
     {
-        if (!empty($babyagetype) && !in_array($babyagetype, $this->AGE_TYPE_LIST)) {
-            $this->setError(ErrorConf::paramError());
-            return array();
-        }
-        if ($currentpage < 1) {
-            $currentpage = 1;
+
+        if ($currentPage < 1) {
+            $currentPage = 1;
         }
         if (empty($len)) {
-            $len = 5;
+            $len = 20;
         }
         if ($len > 50) {
             $len = 50;
         }
-        
-        $key = $babyagetype . '_' . $currentpage . "_" . $len;
+
+        if ($minAge > $this->MAX_AGE) {
+            $minAge = $this->MIN_AGE;
+        }
+        if (!empty($maxAge) && $maxAge > $this->MAX_AGE) {
+            $maxAge = $this->MAX_AGE;
+        }
+
+        $key = $minAge . "_" . $maxAge . "_" . $currentPage . "_" . $len;
         $cacheobj = new CacheWrapper();
         $redisData = $cacheobj->getListCache($this->RECOMMEND_NEW_ONLINE_TABLE_NAME, $key);
         if (empty($redisData)) {
+
+            $offset = ($currentPage - 1) * $len;
             $where = "";
-            $offset = ($currentpage - 1) * $len;
-            
-            $status = $this->RECOMMEND_STATUS_ONLIINE; // 已上线状态
-            $where .= "`status` = '{$status}'";
-            if (!empty($babyagetype)) {
-                $where .= " AND (`agetype` = '{$babyagetype}' or `agetype` = '{$this->AGE_TYPE_All}')";
+            $where .= " `{$this->RECOMMEND_NEW_ONLINE_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
+
+            if ($minAge == 0 && $maxAge != 0 && $maxAge != $this->MAX_AGE) {
+                $where .= " AND `min_age` = 0 AND `max_age` >= {$maxAge}";
+            } elseif ($minAge != 0 && $maxAge != 0) {
+                $where .= " AND `min_age` >= {$minAge} AND `max_age` <= {$maxAge}";
             }
-            $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-            $sql = "SELECT * FROM `{$this->RECOMMEND_NEW_ONLINE_TABLE_NAME}` WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+
+            $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
+            $sql = "SELECT `id`,`title`,`cover`,`cover_time`,`min_age`,`max_age` 
+                      FROM `{$this->RECOMMEND_NEW_ONLINE_TABLE_NAME}` 
+                      LEFT JOIN `{$this->ALBUM_TABLE_NAME}` 
+                      ON `{$this->RECOMMEND_NEW_ONLINE_TABLE_NAME}`.`albumid` = `{$this->ALBUM_TABLE_NAME}`.`id`
+                      WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -116,7 +129,6 @@ class Recommend extends ModelBase
             if (empty($dbData)) {
                 return array();
             }
-            
             $cacheobj->setListCache($this->RECOMMEND_NEW_ONLINE_TABLE_NAME, $key, $dbData);
             return $dbData;
         } else {
@@ -129,18 +141,14 @@ class Recommend extends ModelBase
      * 获取同龄在听的上线列表
      * 按照年龄段，以及用户收听次数最多的专辑排序
      * @param I $babyagetype
-     * @param I $currentpage   加载第几个,默认为1表示从第一页获取
+     * @param I $currentPage 加载第几个,默认为1表示从第一页获取
      * @param I $len           获取长度
      * @return array
      */
-    public function getSameAgeListenList($babyagetype = 0, $currentpage = 1, $len = 20)
+    public function getSameAgeListenList($minAge, $maxAge, $currentPage = 1, $len = 20)
     {
-        if (!empty($babyagetype) && !in_array($babyagetype, $this->AGE_TYPE_LIST)) {
-            $this->setError(ErrorConf::paramError());
-            return array();
-        }
-        if ($currentpage < 1) {
-            $currentpage = 1;
+        if ($currentPage < 1) {
+            $currentPage = 1;
         }
         if (empty($len)) {
             $len = 20;
@@ -148,22 +156,36 @@ class Recommend extends ModelBase
         if ($len > 50) {
             $len = 50;
         }
-        
-        $key = $babyagetype . '_' . $currentpage . "_" . $len;
+
+        if ($minAge > $this->MAX_AGE) {
+            $minAge = $this->MIN_AGE;
+        }
+        if (!empty($maxAge) && $maxAge > $this->MAX_AGE) {
+            $maxAge = $this->MAX_AGE;
+        }
+
+        $key = $minAge . "_" . $maxAge . "_" . $currentPage . "_" . $len;
         $cacheobj = new CacheWrapper();
         $redisData = $cacheobj->getListCache($this->RECOMMEND_SAME_AGE_TABLE_NAME, $key);
         if (empty($redisData)) {
+
+            $offset = ($currentPage - 1) * $len;
             $where = "";
-            $offset = ($currentpage - 1) * $len;
-            
-            $status = $this->RECOMMEND_STATUS_ONLIINE; // 已上线状态
-            $where .= " `status` = '{$status}'";
-            
-            if (!empty($babyagetype)) {
-                $where .= " AND (`agetype` = '{$babyagetype}' or `agetype` = '{$this->AGE_TYPE_All}')";
+            $where .= " `{$this->RECOMMEND_SAME_AGE_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
+
+            if ($minAge == 0 && $maxAge != 0 && $maxAge != $this->MAX_AGE) {
+                $where .= " AND `min_age` = 0 AND `max_age` >= {$maxAge}";
+            } elseif ($minAge != 0 && $maxAge != 0) {
+                $where .= " AND `min_age` >= {$minAge} AND `max_age` <= {$maxAge}";
             }
-            $db = DbConnecter::connectMysql($this->MAIN_DB_INSTANCE);
-            $sql = "SELECT * FROM {$this->RECOMMEND_SAME_AGE_TABLE_NAME} WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+
+            $db = DbConnecter::connectMysql($this->STORY_DB_INSTANCE);
+            $sql = "SELECT `id`,`title`,`cover`,`cover_time`,`min_age`,`max_age`  
+                      FROM `{$this->RECOMMEND_SAME_AGE_TABLE_NAME}` 
+                      LEFT JOIN `{$this->ALBUM_TABLE_NAME}` 
+                      ON `{$this->RECOMMEND_SAME_AGE_TABLE_NAME}`.`albumid` = `{$this->ALBUM_TABLE_NAME}`.`id`
+                      WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -171,9 +193,9 @@ class Recommend extends ModelBase
             if (empty($dbData)) {
                 return array();
             }
-            
             $cacheobj->setListCache($this->RECOMMEND_SAME_AGE_TABLE_NAME, $key, $dbData);
             return $dbData;
+
         } else {
             return $redisData;
         }
