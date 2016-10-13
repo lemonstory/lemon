@@ -5,34 +5,7 @@ class Album extends ModelBase
 
     public $table = 'album';
     public $CACHE_INSTANCE = 'cache';
-    public $AGE_LEVEL_ARR = array(
 
-        //全部
-        array(
-            'min_age' => 0,
-            'max_age' => 14,
-        ),
-
-        array(
-            'min_age' => 0,
-            'max_age' => 2,
-        ),
-
-        array(
-            'min_age' => 3,
-            'max_age' => 6,
-        ),
-
-        array(
-            'min_age' => 7,
-            'max_age' => 10,
-        ),
-
-        array(
-            'min_age' => 11,
-            'max_age' => 14,
-        ),
-    );
 
     /**
      * 检查是否存在
@@ -468,7 +441,7 @@ class Album extends ModelBase
         return $data;
     }
 
-    public function getAgeLevelWithAlbumsFormat($age_level_album_num_arr)
+    public function getAgeLevelWithAlbumsFormat($age_level_album_num_arr, $selectedIndex = 0)
     {
 
         $data_format = array();
@@ -480,7 +453,7 @@ class Album extends ModelBase
             if (is_array($age_level_album_num_arr['items']) && !empty($age_level_album_num_arr['items'])) {
 
                 $arr = array();
-                foreach ($age_level_album_num_arr['items'] as $item) {
+                foreach ($age_level_album_num_arr['items'] as $key => $item) {
 
                     if ($item['min_age'] == 0 && $item['max_age'] == 14) {
                         $arr['age_level_str'] = "全部";
@@ -490,17 +463,28 @@ class Album extends ModelBase
                     $arr['min_age'] = $item['min_age'];
                     $arr['max_age'] = $item['max_age'];
                     $arr['album_num'] = $item['album_num'];
+                    if ($selectedIndex == $key) {
+                        $arr['selected'] = 1;
+                    } else {
+                        $arr['selected'] = 0;
+                    }
                     $data_format['items'][] = $arr;
                 }
             }
         }
-
-        //$data_format['total'] = $data_format['total'];
-
-        //{全部}放在数组首位
-        //$data_format['items'] = array_reverse($data_format['items']);
-
         return $data_format;
+    }
+
+    public function getAgeLevelStr($min_age, $max_age)
+    {
+
+        $ageLevelStr = "";
+        if ($min_age >= $this->MIN_AGE && $max_age <= $this->MAX_AGE && $max_age != $min_age) {
+            $ageLevelStr = sprintf("%s-%s", $min_age, $max_age);
+        } else {
+            $ageLevelStr = sprintf("%s-%s", $this->MIN_AGE, $this->MAX_AGE);
+        }
+        return $ageLevelStr;
     }
 
 

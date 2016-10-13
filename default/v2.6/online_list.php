@@ -80,6 +80,8 @@ class onlineList extends controller
                     if (!empty($recommendDescList[$albumId])) {
                         $albumInfo['recommenddesc'] = $recommendDescList[$albumId]['desc'];
                     }
+                    $albumAgeLevelStr = $albumObj->getAgeLevelStr($recommendAlbumList[$key]['min_age'], $recommendAlbumList[$key]['max_age']);
+                    $albumInfo['age_str'] = sprintf("(%s)岁", $albumAgeLevelStr);
 
                     //tag
                     if (!empty($albumTagRelationList[$albumId])) {
@@ -103,8 +105,10 @@ class onlineList extends controller
             $recommendAlbumArr['total'] = count($recommendAlbumArr['items']);
 
             //年龄段
-            $hotAgeLevelNum = $recommendObj->getAgeLevelNum("online");
-            $recommendAlbumArr['age_level'] = $albumObj->getAgeLevelWithAlbumsFormat($hotAgeLevelNum);
+            $onlineAgeLevelNum = $recommendObj->getAgeLevelNum("online");
+            $ageGroupItem = array("min_age" => $minAge, "max_age" => $maxAge);
+            $selectedIndex = array_search($ageGroupItem, $configVar->AGE_LEVEL_ARR);
+            $recommendAlbumArr['age_level'] = $albumObj->getAgeLevelWithAlbumsFormat($onlineAgeLevelNum, $selectedIndex);
         }
         $this->showSuccJson($recommendAlbumArr);
     }
