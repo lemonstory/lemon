@@ -18,6 +18,8 @@ class agelevellist extends controller
             'album_section'=>array(),
             'recommend_tags'=>array(),
         );
+        $aliossObj = new AliOss();
+
         //获取焦点图
         $category = 'age'.$minAge;
         $focusObj = new ManageFocus();
@@ -32,7 +34,7 @@ class agelevellist extends controller
         foreach ($albumList as $key=>$val){
             // 获取推荐语
             $recommendList = $recommendDescObj->getAlbumRecommendDescList($val['id']);
-            $val['cover'] = 'http://p.xiaoningmeng.net/'.$val['cover'];
+            $val['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $val['cover'], 460, $val['cover_time']);
             $val['recommend_desc'] = $recommendList[$val['id']]['desc'];
             $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
 
@@ -51,7 +53,7 @@ class agelevellist extends controller
         foreach ($albumTagList as $key=>$val){
             // 获取推荐语
             $recommendList = $recommendDescObj->getAlbumRecommendDescList($val['id']);
-            $val['cover'] = 'http://p.xiaoningmeng.net/'.$val['cover'];
+            $val['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $val['cover'], 460, $val['cover_time']);
             $val['recommend_desc'] = $recommendList[$val['id']]['desc'];
             $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
             unset($val['tagid']);
@@ -77,8 +79,8 @@ class agelevellist extends controller
 
         $tagInfoList =array();
         foreach($tagIdList[$minAge] as $val){
-            $tagInfo = $tagInfoObj->get_info("id = ".$val,'id,name,cover');
-            $tagInfo['cover'] = 'http://p.xiaoningmeng.net/'.$tagInfo['cover'];
+            $tagInfo = $tagInfoObj->get_info("id = ".$val,'id,name,cover,covertime');
+            $tagInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_TAG, $tagInfo['cover'], 460, $tagInfo['covertime']);
             $tagInfoList[] = $tagInfo;
         }
 
