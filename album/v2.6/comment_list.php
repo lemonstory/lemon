@@ -10,8 +10,9 @@ class commentList extends controller
         $albumId = $this->getRequest("album_id", "0");
         $direction = $this->getRequest("direction", "down");
         $startCommentId = $this->getRequest("start_comment_id", 0);
-        $len = $this->getRequest("len", 10);
+        $len = $this->getRequest("len", 20);
         $commentObj = new Comment();
+        $aliossObj = new AliOss();
         $sizeSize = 120;
         // 长度限制
         if ($len > 50) {
@@ -21,6 +22,7 @@ class commentList extends controller
 
         $totalArr = $commentObj->countAlbumComment($albumId);
         $result['total'] = $totalArr[$albumId];
+        $result['items'] = array();
 
         // 评论列表
         $commentList = $commentObj->get_comment_list(
@@ -37,7 +39,7 @@ class commentList extends controller
             $commentInfo['id'] = $item['id'];
             $commentInfo['uid'] = $item['uid'];
             $commentInfo['uname'] = $item['uname'];
-            $commentInfo['avatar'] = sprintf("http://a.xiaoningmeng.net/avatar/%s/%s/%s", $item['uid'], $item['avatartime'], $sizeSize);
+            $commentInfo['avatar'] = $aliossObj->getAvatarUrl($item['uid'], $item['avatartime'], $sizeSize);
             $commentInfo['start_level'] = $item['start_level'];
             $commentInfo['addtime'] = $item['addtime'];
             $commentInfo['comment'] = $item['comment'];
@@ -45,7 +47,6 @@ class commentList extends controller
         }
 
         $this->showSuccJson($result);
-
     }
 }
 
