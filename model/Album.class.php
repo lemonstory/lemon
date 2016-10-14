@@ -683,7 +683,7 @@ class Album extends ModelBase
         }
         
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num,a.intro
+        $sql = "SELECT a.id,a.title,a.cover,a.cover_time,a_t.albumlistennum as listen_num,a.intro
                 FROM `album` AS a LEFT JOIN `album_tag_relation` AS a_t ON a.id=a_t.albumid 
                 {$whereStr}
                 ORDER BY a_t.`albumlistennum` DESC LIMIT {$offset}, {$perPage}";
@@ -703,11 +703,11 @@ class Album extends ModelBase
         }
 
         if ($start_album_id > 0) {
-            $where .= " AND a.id < {$start_album_id} ";
+            $where .= " AND a.id >= {$start_album_id} ";
         }
 
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num
+        $sql = "SELECT a.id,a.title,a.cover,a.cover_time,a_t.albumlistennum as listen_num
                 FROM `album` AS a LEFT JOIN `album_tag_relation` AS a_t ON a.id=a_t.albumid 
                 WHERE {$where} GROUP BY a.id
                 ORDER BY a_t.`albumlistennum` DESC LIMIT {$offset}, {$perPage}";

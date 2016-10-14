@@ -22,7 +22,7 @@ class tagalbumlist extends controller
         $where['min_age']= intval($minAge);
         $where['max_age']= intval($maxAge);
 
-
+        $aliossObj = new AliOss();
         $albumTagObj = new AlbumTagRelation();
         $recommendDescObj = new RecommendDesc();
         $albumTagList = $albumTagObj->getAlbumList($where,1,$len);
@@ -31,7 +31,7 @@ class tagalbumlist extends controller
             // 获取推荐语
             $recommendList = $recommendDescObj->getAlbumRecommendDescList($val['id']);
             $val['recommend'] = $recommendList[$val['id']]['desc'];
-            $val['cover'] = 'http://lemonpic.oss-cn-hangzhou.aliyuncs.com/'.$val['cover'];
+            $val['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $val['cover'], 460, $val['cover_time']);
             $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
 
             $albumTagList[$key] = $val;
