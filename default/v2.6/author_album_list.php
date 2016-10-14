@@ -27,6 +27,8 @@ class author_album_list extends controller
             $age_level_albums_num = $album->getAgeLevelWithAlbumsFormat($age_level_albums_num);
 
             $ret['age_level'] = $age_level_albums_num;
+            //TODO:作者百科还需完善
+            $ret['pedia'] = "http://www.xiaoningmeng.net/author/detail.php";
             $ret['total'] = count($albums);
             $ret['items'] = $albums;
             $this->showSuccJson($ret);
