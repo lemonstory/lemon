@@ -7,7 +7,7 @@ class info extends controller
     function action()
     {
         $result = array();
-        $albumId = $this->getRequest("albumid", "0");
+        $albumId = $this->getRequest("album_id", "0");
         // 获取专辑信息参数
         $albumObj = new Album();
         $story = new Story();
