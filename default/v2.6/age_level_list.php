@@ -10,8 +10,9 @@ class agelevellist extends controller
 {
     public function action()
     {
-        $minAge = $this->getRequest('min_age', '0');
-        $maxAge = $this->getRequest('max_age', '0');
+        $configVar = new ConfigVar();
+        $minAge = $this->getRequest('min_age', $configVar->MIN_AGE);
+        $maxAge = $this->getRequest('max_age', $configVar->MAX_AGE);
 
         $res = array(
             'focus_pic'=>array(),// 焦点图
