@@ -671,27 +671,7 @@ class Album extends ModelBase
         $count = $this->get_total("s_cover!='' AND cover='' AND LOCATE ('default/bg_player.jpg',`s_cover`) = 0 AND LOCATE ('default/sound.jpg',`s_cover`) = 0 AND `status` = 1");
         return $count;
     }
-
-    public function getAlbumListOrderListenNum($where,$offset=0,$perPage=4){
-        if ($where) {
-            $whereStr = ' WHERE online_status=1 ';
-            foreach ($where as $key=>$val){
-                $whereStr .= " and `{$key}`=:{$key}";
-            }
-        } else {
-            $whereStr = ' WHERE online_status=1 ';
-        }
-        
-        $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT a.id,a.title,a.cover,a.cover_time,a_t.albumlistennum as listen_num,a.intro
-                FROM `album` AS a LEFT JOIN `album_tag_relation` AS a_t ON a.id=a_t.albumid 
-                {$whereStr}
-                ORDER BY a_t.`albumlistennum` DESC LIMIT {$offset}, {$perPage}";
-        $st = $db->prepare($sql);
-        $st->execute($where);
-        $list = $st->fetchAll(PDO::FETCH_ASSOC);
-        return $list;
-    }
+    
 
     public function getAlbumListByAge($min_age,$max_age,$start_album_id=0,$select='a.id,a.title,a.cover,a.cover_time,a_t.albumlistennum as listen_num',$offset=0,$perPage=4){
         $where = ' online_status=1 ';

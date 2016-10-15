@@ -54,7 +54,7 @@ class agelevellist extends controller
             '11'=>array('id'=>23,'name'=>'睡前故事'),
         );
         $albumTagObj = new AlbumTagRelation();
-        $albumTagList = $albumTagObj->getAlbumList(array('tagid'=>$albumTagIdList[$minAge]['id']));
+        $albumTagList = $albumTagObj->getAlbumListByTagId($albumTagIdList[$minAge]['id']);
         //格式化返回
         foreach ($albumTagList as $key=>$val){
             // 获取推荐语

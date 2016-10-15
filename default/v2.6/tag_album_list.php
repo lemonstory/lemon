@@ -13,21 +13,16 @@ class tagalbumlist extends controller
         $configVar = new ConfigVar();
         $minAge = $this->getRequest('min_age', $configVar->MIN_AGE);
         $maxAge = $this->getRequest('max_age', $configVar->MAX_AGE);
-        $tagId = $this->getRequest('tag_id', '');
+        $tagId = $this->getRequest('tag_id', '0');
         $startAlbumId = $this->getRequest('start_album_id', '');
         $len = $this->getRequest('len', 10);
-        if(!empty($tagId)){
-            $where['tagid']= intval($tagId);
-        }
-
-        $where['min_age']= intval($minAge);
-        $where['max_age']= intval($maxAge);
+        
 
         $aliossObj = new AliOss();
         $albumObj = new Album();
         $albumTagObj = new AlbumTagRelation();
         $recommendDescObj = new RecommendDesc();
-        $albumTagList = $albumTagObj->getAlbumList($where,1,$len);
+        $albumTagList = $albumTagObj->getAlbumListByAge($minAge,$maxAge,$tagId,$startAlbumId,1,$len);
         //格式化返回
         foreach ($albumTagList as $key=>$val){
             // 获取推荐语
