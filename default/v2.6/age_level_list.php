@@ -10,8 +10,9 @@ class agelevellist extends controller
 {
     public function action()
     {
-        $minAge = $this->getRequest('min_age', '0');
-        $maxAge = $this->getRequest('max_age', '0');
+        $configVar = new ConfigVar();
+        $minAge = $this->getRequest('min_age', $configVar->MIN_AGE);
+        $maxAge = $this->getRequest('max_age', $configVar->MAX_AGE);
 
         $res = array(
             'focus_pic'=>array(),// 焦点图
@@ -21,9 +22,14 @@ class agelevellist extends controller
         $aliossObj = new AliOss();
 
         //获取焦点图
-        $category = 'age'.$minAge;
+        $category = 'home';//'age'.$minAge;
         $focusObj = new ManageFocus();
-        $focusList = $focusObj->get_list(" category ='".$category."' and status=1 ",'covertime,linkurl');
+        $focusList = $focusObj->get_list(" category ='".$category."' and status=1 ",'id,covertime,linkurl');
+        foreach ($focusList as $key=>$val){
+            $val['cover'] = $aliossObj->getFocusUrl($val['id'], $val['covertime'], 1);
+            unset($val['id'],$val['covertime']);
+            $focusList[$key] = $val;
+        }
         $res['focus_pic'] = array('total'=>count($focusList),'items'=>$focusList);
 
         //热门播放
@@ -37,7 +43,7 @@ class agelevellist extends controller
             $val['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $val['cover'], 460, $val['cover_time']);
             $val['recommend_desc'] = $recommendList[$val['id']]['desc'];
             $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
-
+            unset($val['cover_time']);
             $albumList[$key] = $val;
         }
 
@@ -48,7 +54,7 @@ class agelevellist extends controller
             '11'=>array('id'=>23,'name'=>'睡前故事'),
         );
         $albumTagObj = new AlbumTagRelation();
-        $albumTagList = $albumTagObj->getAlbumList(array('tagid'=>$albumTagIdList[$minAge]['id']));
+        $albumTagList = $albumTagObj->getAlbumListByTagId($albumTagIdList[$minAge]['id']);
         //格式化返回
         foreach ($albumTagList as $key=>$val){
             // 获取推荐语
@@ -56,7 +62,7 @@ class agelevellist extends controller
             $val['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $val['cover'], 460, $val['cover_time']);
             $val['recommend_desc'] = $recommendList[$val['id']]['desc'];
             $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
-            unset($val['tagid']);
+            unset($val['tagid'],$val['cover_time']);
 
             $albumTagList[$key] = $val;
         }

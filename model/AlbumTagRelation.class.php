@@ -9,47 +9,30 @@ class AlbumTagRelation extends ModelBase
 {
     private $table = 'album_tag_relation';
 
-
-    public function getAlbumList($where = array(), $currentPage = 1, $perPage = 4)
+    public function getAlbumListByTagId($tag_id=0, $currentPage = 1, $perPage = 4)
     {
+        $where = ' online_status=1 ';
 
-        if ($where) {
-            $whereStr = ' WHERE online_status=1 ';
-            foreach ($where as $key=>$val){
-                $whereStr .= " and `{$key}`=:{$key}";
-            }
-        } else {
-            $whereStr = '';
+        if ($tag_id >0) {
+            $where .= " AND a_t.tagid = {$tag_id} ";
         }
+
         $offset = ($currentPage - 1) * $perPage;
 
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT a.id,a.title,a.cover,a.cover_time,a_t.albumlistennum as listen_num,a_t.tagid
-                FROM `album_tag_relation` AS a_t LEFT JOIN `album` AS a ON a_t.albumid=a.id {$whereStr} 
+        $select = 'a.id,a.title,a.cover,a.cover_time,a_t.albumlistennum as listen_num';
+        $sql = "SELECT {$select}
+                FROM `album_tag_relation` AS a_t LEFT JOIN `album` AS a ON a_t.albumid=a.id 
+                WHERE {$where} 
                 ORDER BY `id` DESC LIMIT {$offset}, {$perPage}";
 
         $st = $db->prepare($sql);
-        $st->execute($where);
+        $st->execute();
         $list = $st->fetchAll(PDO::FETCH_ASSOC);
         return $list;
     }
 
-    public function getTagListByAlbumId($albumId, $currentPage = 1, $perPage = 4)
-    {
-        $offset = ($currentPage - 1) * $perPage;
-
-        $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT a_t.albumlistennum as listen_num,a_t.tagid
-                FROM `album_tag_relation` AS a_t  WHERE `albumid`=:albumid 
-                ORDER BY `id` DESC LIMIT {$offset}, {$perPage}";
-
-        $st = $db->prepare($sql);
-        $st->execute(array('albumid'=>$albumId));
-        $list = $st->fetchAll(PDO::FETCH_ASSOC);
-        return $list;
-    }
-
-    public function getAlbumListByAge($min_age, $max_age,$start_album_id, $currentPage = 1, $perPage = 4)
+    public function getAlbumListByAge($min_age, $max_age,$tag_id=0, $start_album_id=0, $currentPage = 1, $perPage = 4)
     {
         $where = ' online_status=1 ';
         if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
@@ -57,14 +40,19 @@ class AlbumTagRelation extends ModelBase
         } elseif ($min_age != 0 && $max_age != 0) {
             $where .= " AND `min_age` >= {$min_age} AND `max_age` <= {$max_age}";
         }
+        if ($tag_id >0) {
+            $where .= " AND a_t.tagid = {$tag_id} ";
+        }
         if ($start_album_id > 0) {
-            $where .= " AND a.id < {$start_album_id} ";
+            $where .= " AND a.id > {$start_album_id} ";
         }
 
         $offset = ($currentPage - 1) * $perPage;
 
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT a.id,a.title,a.cover,a_t.albumlistennum as listen_num,a.intro
+        $select = 'a.id,a.title,a.intro,a.category_id,a.star_level,a.view_order,a.story_num,a.author,
+        a.age_str,a.status,a.add_time,a.update_time,a.cover,a.cover_time,a_t.albumfavnum as fav,a_t.albumlistennum as listen_num';
+        $sql = "SELECT {$select}
                 FROM `album_tag_relation` AS a_t LEFT JOIN `album` AS a ON a_t.albumid=a.id 
                 WHERE {$where} 
                 ORDER BY `id` DESC LIMIT {$offset}, {$perPage}";
