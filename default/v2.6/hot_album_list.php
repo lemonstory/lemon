@@ -18,7 +18,9 @@ class hotalbumlist extends controller
 
         $aliossObj = new AliOss();
         $albumObj = new Album();
-        $albumTagList = $albumObj->getAlbumListByAge($minAge,$maxAge, $startAlbumId,1,$len);
+        $select = 'a.id,a.title,a.intro,a.category_id,a.star_level,a.view_order,a.story_num,a.author,
+        a.age_str,a.status,a.add_time,a.update_time,a.cover,a.cover_time,a_t.albumfavnum as fav,a_t.albumlistennum as listen_num';
+        $albumTagList = $albumObj->getAlbumListByAge($minAge,$maxAge, $startAlbumId,$select,1,$len);
         
         //取专辑下面对应的标签
         $tagnewobj = new TagNew();
@@ -33,8 +35,9 @@ class hotalbumlist extends controller
             $val['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $val['cover'], 460, $val['cover_time']);
             $tagList = $tagnewobj->getAlbumTagRelationListByAlbumIds(array($val['id']));
             foreach ($tagList[$val['id']] as $k=>$v){
-                $tagInfo = $tagInfoObj->get_info("id = ".$v['tagid'],'id,pid,name,cover,covertime');
+                $tagInfo = $tagInfoObj->get_info("id = ".$v['tagid'],'id,pid,name,md5name,cover,covertime,ordernum,status,addtime');
                 $tagInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_TAG, $tagInfo['cover'], 460, $tagInfo['covertime']);
+                unset($tagInfo['covertime']);
                 $tagInfoList[] = $tagInfo;
             }
             $val['recommend_tags'] = array('total'=>count($tagInfoList),'items'=>$tagInfoList);

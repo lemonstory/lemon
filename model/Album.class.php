@@ -693,7 +693,7 @@ class Album extends ModelBase
         return $list;
     }
 
-    public function getAlbumListByAge($min_age,$max_age,$start_album_id=0,$offset=0,$perPage=4){
+    public function getAlbumListByAge($min_age,$max_age,$start_album_id=0,$select='a.id,a.title,a.cover,a.cover_time,a_t.albumlistennum as listen_num',$offset=0,$perPage=4){
         $where = ' online_status=1 ';
         //和getAgeLevelWithAlbums的年龄比较的规则相同
         if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
@@ -707,7 +707,7 @@ class Album extends ModelBase
         }
 
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT a.id,a.title,a.cover,a.cover_time,a_t.albumlistennum as listen_num
+        $sql = "SELECT {$select}
                 FROM `album` AS a LEFT JOIN `album_tag_relation` AS a_t ON a.id=a_t.albumid 
                 WHERE {$where} GROUP BY a.id
                 ORDER BY a_t.`albumlistennum` DESC LIMIT {$offset}, {$perPage}";
