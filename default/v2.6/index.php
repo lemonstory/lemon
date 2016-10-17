@@ -17,6 +17,7 @@ class index extends controller
         $recommendObj = new Recommend();
         $aliossObj = new AliOss();
         $data = array();
+        $configVar = new ConfigVar();
 
         //焦点图
         $data['focus_pic'] = array();
@@ -74,12 +75,13 @@ class index extends controller
             //"linkurl" => "xnm://www.xiaoningmeng.net/album/anchor_list.php"
         );
 
-        $albumlen = 6;
+        $albumLen = 6;
+        $currentPage = 1;
         // 热门推荐
-        $hotrecommendres = $recommendObj->getRecommendHotList(1, $albumlen);
-        if (!empty($hotrecommendres)) {
-            foreach ($hotrecommendres as $value) {
-                $albumIds[] = $value['albumid'];
+        $hotRecommendRes = $recommendObj->getRecommendHotList($configVar->MIN_AGE, $configVar->MAX_AGE, $currentPage, $albumLen);
+        if (!empty($hotRecommendRes)) {
+            foreach ($hotRecommendRes as $value) {
+                $albumIds[] = $value['id'];
             }
         }
 
@@ -94,18 +96,18 @@ class index extends controller
         }
 
         // 同龄在听
-        $sameageres = $recommendObj->getSameAgeListenList($babyagetype, 1, $albumlen);
-        if (!empty($sameageres)) {
-            foreach ($sameageres as $value) {
-                $albumIds[] = $value['albumid'];
+        $sameAgeRes = $recommendObj->getSameAgeListenList($configVar->MIN_AGE, $configVar->MAX_AGE, $currentPage, $albumLen);
+        if (!empty($sameAgeRes)) {
+            foreach ($sameAgeRes as $value) {
+                $albumIds[] = $value['id'];
             }
         }
 
         // 最新上架
-        $newonlineres = $recommendObj->getNewOnlineList($babyagetype, 1, $albumlen);
-        if (!empty($newonlineres)) {
-            foreach ($newonlineres as $value) {
-                $albumIds[] = $value['albumid'];
+        $newOnlineRes = $recommendObj->getNewOnlineList($configVar->MIN_AGE, $configVar->MAX_AGE, $currentPage, $albumLen);
+        if (!empty($newOnlineRes)) {
+            foreach ($newOnlineRes as $value) {
+                $albumIds[] = $value['id'];
             }
         }
 
@@ -130,10 +132,10 @@ class index extends controller
         $sameAgeAlbumList = array();
         $newAlbumList = array();
         $albumInfo = array();
-        if (!empty($hotrecommendres)) {
-            foreach ($hotrecommendres as $value) {
+        if (!empty($hotRecommendRes)) {
+            foreach ($hotRecommendRes as $value) {
 
-                $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $value['albumid']);
+                $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $value['id']);
                 if (is_array($albumInfo) && !empty($albumInfo)) {
                     $hotRecommendList[] = $albumInfo;
                 }
@@ -141,35 +143,39 @@ class index extends controller
         }
 
         $data['album_section']['items'][] = array(
+            'tag_id' => $configVar->HOT_RECOMMEND_TAG_ID,
             'title' => "今日精选",
             'total' => count($hotRecommendList),
             'items' => $hotRecommendList,
         );
 
-        if (!empty($sameageres)) {
-            foreach ($sameageres as $value) {
 
-                $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $value['albumid']);
+        if (!empty($sameAgeRes)) {
+            foreach ($sameAgeRes as $value) {
+
+                $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $value['id']);
                 if (is_array($albumInfo) && !empty($albumInfo)) {
                     $sameAgeAlbumList[] = $albumInfo;
                 }
             }
         }
         $data['album_section']['items'][] = array(
+            'tag_id' => $configVar->SAME_AGE_TAG_ID,
             'title' => "同龄在听",
             'total' => count($sameAgeAlbumList),
             'items' => $sameAgeAlbumList,
         );
 
-        if (!empty($newonlineres)) {
-            foreach ($newonlineres as $value) {
-                $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $value['albumid']);
+        if (!empty($newOnlineRes)) {
+            foreach ($newOnlineRes as $value) {
+                $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $value['id']);
                 if (is_array($albumInfo) && !empty($albumInfo)) {
                     $newAlbumList[] = $albumInfo;
                 }
             }
         }
         $data['album_section']['items'][] = array(
+            'tag_id' => $configVar->NEW_ONLINE_TAG_ID,
             'title' => "最新上架",
             'total' => count($newAlbumList),
             'items' => $newAlbumList,
@@ -218,6 +224,7 @@ class index extends controller
             foreach ($firstTagRes as $tagItem) {
 
                 $albumSectionItem = array();
+                $albumSectionItem['tag_id'] = $tagItem['id'];
                 $albumSectionItem['title'] = $tagItem['name'];
                 $albumSectionItem['total'] = 0;
                 $albumSectionItem['items'] = array();

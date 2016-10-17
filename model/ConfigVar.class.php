@@ -71,4 +71,12 @@ class ConfigVar
     public $GENDER_GIRL = 2;   // 女
 
     public $FOCUS_IMG_CATEGORY_EN_NAME = "home"; //App首页焦点图英文名称
+
+
+    //今日推荐tag_id
+    public $HOT_RECOMMEND_TAG_ID = "10000";
+    //同龄在听tag_id
+    public $SAME_AGE_TAG_ID = "10001";
+    //最新上架tag_id
+    public $NEW_ONLINE_TAG_ID = "10002";
 }
