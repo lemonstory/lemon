@@ -47,7 +47,11 @@ class AlbumTagRelation extends ModelBase
             $where .= " AND a.id > {$start_album_id} ";
         }
 
-        $offset = ($currentPage - 1) * $perPage;
+        $offset = 0;
+        if ($currentPage > 0) {
+            $offset = ($currentPage - 1) * $perPage;
+        }
+
 
         $db = DbConnecter::connectMysql('share_story');
         $select = 'a.id,a.title,a.intro,a.category_id,a.star_level,a.view_order,a.story_num,a.author,

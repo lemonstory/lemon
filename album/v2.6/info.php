@@ -85,7 +85,7 @@ class info extends controller
                 $storyList[] = $storyInfo;
             }
         }
-        $result['storylist'] = $storyList;
+        $result['storyList'] = $storyList;
 
         // 评论数量
         $result['albumInfo']['commentnum'] = (int)$comment->get_total("`albumid`={$albumId} and `status`=1");
@@ -124,7 +124,7 @@ class info extends controller
                 }
             }
         }
-        $result['taglist'] = $tagList;
+        $result['tagList'] = $tagList;
 
         $interestList = array();
         $interestTagIds = array();
@@ -201,7 +201,7 @@ class info extends controller
             }
         }
 
-        $result['recommendalbumlist'] = $recommendAlbumList;
+        $result['recommendAlbumList'] = $recommendAlbumList;
 
         // 返回成功json
         $this->showSuccJson($result);
