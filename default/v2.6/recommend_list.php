@@ -15,12 +15,12 @@ class recommendList extends controller
         $configVar = new ConfigVar();
         $minAge = $this->getRequest('min_age', $configVar->MIN_AGE);
         $maxAge = $this->getRequest('max_age', $configVar->MAX_AGE);
-        $page = $this->getRequest('page', '1');
+        $startAlbumId = $this->getRequest('start_album_id', '0');
         $len = $this->getRequest('len', '20');
 
         $albumObj = new Album();
         $recommendObj = new Recommend();
-        $recommendAlbumList = $recommendObj->getRecommendHotList($minAge, $maxAge, $page, $len);
+        $recommendAlbumList = $recommendObj->getRecommendHotList($minAge, $maxAge, $startAlbumId, 0, $len);
 
         $recommendAlbumArr = array();
         $recommendAlbumArr['age_level'] = array();

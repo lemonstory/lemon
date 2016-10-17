@@ -16,7 +16,7 @@ class Recommend extends ModelBase
      * @param I $len           获取长度
      * @return array
      */
-    public function getRecommendHotList($minAge, $maxAge, $currentPage = 1, $len = 20)
+    public function getRecommendHotList($minAge, $maxAge, $startAlbumId = 0, $currentPage = 1, $len = 20)
     {
         if ($currentPage < 1) {
             $currentPage = 1;
@@ -39,9 +39,16 @@ class Recommend extends ModelBase
         $cacheobj = new CacheWrapper();
         $redisData = $cacheobj->getListCache($this->RECOMMEND_HOT_TABLE_NAME, $key);
         if (empty($redisData)) {
-            $offset = ($currentPage - 1) * $len;
-            $where = "";
-            $where .= " `{$this->RECOMMEND_HOT_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
+
+            $where = "1";
+            $offset = 0;
+            if ($startAlbumId > 0) {
+                $where .= " AND `albumid` > {$startAlbumId} ";
+            }
+            if ($currentPage > 0) {
+                $offset = ($currentPage - 1) * $len;
+            }
+            $where .= " AND `{$this->RECOMMEND_HOT_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
 
             if ($minAge == 0 && $maxAge != 0 && $maxAge != $this->MAX_AGE) {
                 $where .= " AND `min_age` = 0 AND `max_age` >= {$maxAge}";
@@ -81,7 +88,7 @@ class Recommend extends ModelBase
      * @param I $len           获取长度
      * @return array
      */
-    public function getNewOnlineList($minAge, $maxAge, $currentPage = 1, $len = 20)
+    public function getNewOnlineList($minAge, $maxAge, $startAlbumId = 0, $currentPage = 1, $len = 20)
     {
 
         if ($currentPage < 1) {
@@ -106,9 +113,15 @@ class Recommend extends ModelBase
         $redisData = $cacheobj->getListCache($this->RECOMMEND_NEW_ONLINE_TABLE_NAME, $key);
         if (empty($redisData)) {
 
-            $offset = ($currentPage - 1) * $len;
-            $where = "";
-            $where .= " `{$this->RECOMMEND_NEW_ONLINE_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
+            $where = "1";
+            $offset = 0;
+            if ($startAlbumId > 0) {
+                $where .= " AND `albumid` > {$startAlbumId} ";
+            }
+            if ($currentPage > 0) {
+                $offset = ($currentPage - 1) * $len;
+            }
+            $where .= " AND `{$this->RECOMMEND_HOT_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
 
             if ($minAge == 0 && $maxAge != 0 && $maxAge != $this->MAX_AGE) {
                 $where .= " AND `min_age` = 0 AND `max_age` >= {$maxAge}";
@@ -145,7 +158,7 @@ class Recommend extends ModelBase
      * @param I $len           获取长度
      * @return array
      */
-    public function getSameAgeListenList($minAge, $maxAge, $currentPage = 1, $len = 20)
+    public function getSameAgeListenList($minAge, $maxAge, $startAlbumId = 0, $currentPage = 1, $len = 20)
     {
         if ($currentPage < 1) {
             $currentPage = 1;
@@ -169,9 +182,15 @@ class Recommend extends ModelBase
         $redisData = $cacheobj->getListCache($this->RECOMMEND_SAME_AGE_TABLE_NAME, $key);
         if (empty($redisData)) {
 
-            $offset = ($currentPage - 1) * $len;
-            $where = "";
-            $where .= " `{$this->RECOMMEND_SAME_AGE_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
+            $where = "1";
+            $offset = 0;
+            if ($startAlbumId > 0) {
+                $where .= " AND `albumid` > {$startAlbumId} ";
+            }
+            if ($currentPage > 0) {
+                $offset = ($currentPage - 1) * $len;
+            }
+            $where .= " AND `{$this->RECOMMEND_HOT_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
 
             if ($minAge == 0 && $maxAge != 0 && $maxAge != $this->MAX_AGE) {
                 $where .= " AND `min_age` = 0 AND `max_age` >= {$maxAge}";

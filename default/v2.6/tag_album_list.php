@@ -15,7 +15,7 @@ class tagAlbumList extends controller
         $minAge = $this->getRequest('min_age', $configVar->MIN_AGE);
         $maxAge = $this->getRequest('max_age', $configVar->MAX_AGE);
         $tagId = $this->getRequest('tag_id', '');
-        $page = $this->getRequest('page', '1');
+        $startAlbumId = $this->getRequest('start_album_id', '0');
         $len = $this->getRequest('len', '20');
 
 
@@ -23,19 +23,16 @@ class tagAlbumList extends controller
 
             case $configVar->HOT_RECOMMEND_TAG_ID: {
 
-                echo "HOT_RECOMMEND_TAG_ID";
                 include_once './recommend_list.php';
                 break;
             }
 
             case $configVar->SAME_AGE_TAG_ID: {
-                echo "SAME_AGE_TAG_ID";
                 include_once './same_age_list.php';
                 break;
             }
 
             case $configVar->NEW_ONLINE_TAG_ID: {
-                echo "NEW_ONLINE_TAG_ID";
                 include_once './online_list.php';
                 break;
             }
@@ -44,8 +41,7 @@ class tagAlbumList extends controller
                 $aliossObj = new AliOss();
                 $albumObj = new Album();
                 $albumTagObj = new AlbumTagRelation();
-                $recommendDescObj = new RecommendDesc();
-                $albumTagList = $albumTagObj->getAlbumListByAge($minAge, $maxAge, $tagId, 0, $page, $len);
+                $albumTagList = $albumTagObj->getAlbumListByAge($minAge, $maxAge, $tagId, $startAlbumId, 0, $len);
                 $ageLevel = array();
 
                 if (!empty($albumTagList)) {
