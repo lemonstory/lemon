@@ -55,7 +55,7 @@ class AlbumTagRelation extends ModelBase
 
         $db = DbConnecter::connectMysql('share_story');
         $select = 'a.id,a.title,a.intro,a.category_id,a.star_level,a.view_order,a.story_num,a.author,
-        a.age_str,a.status,a.add_time,a.update_time,a.cover,a.cover_time,a_t.albumfavnum as fav,a_t.albumlistennum as listen_num';
+        a.age_str,a.cover,a.cover_time,a_t.albumfavnum as fav,a_t.albumlistennum as listen_num';
         $sql = "SELECT {$select}
                 FROM `album_tag_relation` AS a_t LEFT JOIN `album` AS a ON a_t.albumid=a.id 
                 WHERE {$where} 
