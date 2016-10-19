@@ -38,7 +38,7 @@ class Recommend extends ModelBase
         $key = $minAge . "_" . $maxAge . "_" . $currentPage . "_" . $len;
         $cacheobj = new CacheWrapper();
         $redisData = $cacheobj->getListCache($this->RECOMMEND_HOT_TABLE_NAME, $key);
-        if (!empty($redisData)) {
+        if (empty($redisData)) {
 
             $where = "1";
             $offset = 0;
