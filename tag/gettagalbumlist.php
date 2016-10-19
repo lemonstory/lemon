@@ -135,7 +135,7 @@ class getTagAlbumList extends controller
                     }
 
 
-                    $albumInfo['listennum'] = substr($relationInfo['albumlistennum'], 0, 5);
+                    $albumInfo['listennum'] = intval($relationInfo['albumlistennum']) > 0 ? substr($relationInfo['albumlistennum'], 0, 5) : 0;
                     $albumInfo['favnum'] = $relationInfo['albumfavnum'];
                     $albumInfo['star_level'] = $relationInfo['commentstarlevel'];
                     $relationInfo['albuminfo'] = $albumInfo;

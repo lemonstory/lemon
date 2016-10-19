@@ -86,7 +86,7 @@ class index extends controller
                         $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
                     }
                     $albuminfo['listennum'] = 0;
-                    if (!empty($albumlistennum[$albumid])) {
+                    if (!empty($albumlistennum[$albumid]) && intval($albumlistennum[$albumid]['num']) > 0) {
                         $albuminfo['listennum'] = substr($albumlistennum[$albumid]['num'], 0, 5);
                     }
                     $albuminfo['recommenddesc'] = "";
@@ -107,7 +107,7 @@ class index extends controller
                         $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
                     }
                     $albuminfo['listennum'] = 0;
-                    if (!empty($albumlistennum[$albumid])) {
+                    if (!empty($albumlistennum[$albumid]) && intval($albumlistennum[$albumid]['num'])) {
                         $albuminfo['listennum'] = substr($albumlistennum[$albumid]['num'], 0, 5);
                     }
                     $albuminfo['recommenddesc'] = "";
@@ -127,7 +127,7 @@ class index extends controller
                         $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
                     }
                     $albuminfo['listennum'] = 0;
-                    if (!empty($albumlistennum[$albumid])) {
+                    if (!empty($albumlistennum[$albumid]) && intval($albumlistennum[$albumid]['num']) > 0) {
                         $albuminfo['listennum'] = substr($albumlistennum[$albumid]['num'], 0, 5);
                     }
                     $albuminfo['recommenddesc'] = "";

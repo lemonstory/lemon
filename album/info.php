@@ -196,7 +196,7 @@ class info extends controller
                     }
                     $albumInfo['listennum'] = 0;
                     if (!empty($tagRelationList[$value['id']])) {
-                        $albumInfo['listennum'] = substr($tagRelationList[$value['id']]['albumlistennum'], 0, 5);
+                        $albumInfo['listennum'] = substr(intval($tagRelationList[$value['id']]['albumlistennum']), 0, 5);
                     }
 
                     $recommendAlbumList[] = $albumInfo;;

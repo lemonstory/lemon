@@ -81,8 +81,8 @@ class hotrecommendlist extends controller
                         $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
                     }
                     $albuminfo['listennum'] = 0;
-                    if (! empty($albumlistennum[$albumid])) {
-                        $albuminfo['listennum'] = substr($albumlistennum[$albumid]['num']);
+                    if (!empty($albumlistennum[$albumid]) && intval($albumlistennum[$albumid]['num']) > 0) {
+                        $albuminfo['listennum'] = substr($albumlistennum[$albumid]['num'], 0, 5);
                     }
                     
                     if ($_SERVER['visitorappversion'] < "130000") {

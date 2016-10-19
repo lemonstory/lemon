@@ -58,8 +58,8 @@ class getfavlist extends controller
                     }
                     
                     $albuminfo['listennum'] = 0;
-                    if (! empty($albumlistennum[$albumid])) {
-                        $albuminfo['listennum'] = $albumlistennum[$albumid]['num'] + 0;
+                    if (!empty($albumlistennum[$albumid]) && intval($albumlistennum[$albumid]['num']) > 0) {
+                        $albuminfo['listennum'] = substr($albumlistennum[$albumid]['num'], 0, 5);
                     }
                     $albuminfo['favnum'] = 0;
                     if (!empty($albumfavnum[$albumid])) {

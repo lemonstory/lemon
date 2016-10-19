@@ -116,6 +116,7 @@ class mystory extends controller
                     $albuminfo['listennum'] = 0;
                     if (!empty($albumlistennum[$albumid])) {
                         $albuminfo['listennum'] = $albumlistennum[$albumid]['num'] + 0;
+                        $albuminfo['listennum'] = substr($albuminfo['listennum'], 0, 5);
                     }
                     $albuminfo['favnum'] = 0;
                     if (!empty($albumfavnum[$albumid])) {
