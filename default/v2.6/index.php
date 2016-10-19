@@ -78,7 +78,7 @@ class index extends controller
         $albumLen = 6;
         $currentPage = 1;
         // 热门推荐
-        $hotRecommendRes = $recommendObj->getRecommendHotList($configVar->MIN_AGE, $configVar->MAX_AGE, $currentPage, $albumLen);
+        $hotRecommendRes = $recommendObj->getRecommendHotList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $currentPage, $albumLen);
         if (!empty($hotRecommendRes)) {
             foreach ($hotRecommendRes as $value) {
                 $albumIds[] = $value['id'];
@@ -96,7 +96,7 @@ class index extends controller
         }
 
         // 同龄在听
-        $sameAgeRes = $recommendObj->getSameAgeListenList($configVar->MIN_AGE, $configVar->MAX_AGE, $currentPage, $albumLen);
+        $sameAgeRes = $recommendObj->getSameAgeListenList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $currentPage, $albumLen);
         if (!empty($sameAgeRes)) {
             foreach ($sameAgeRes as $value) {
                 $albumIds[] = $value['id'];
@@ -104,7 +104,7 @@ class index extends controller
         }
 
         // 最新上架
-        $newOnlineRes = $recommendObj->getNewOnlineList($configVar->MIN_AGE, $configVar->MAX_AGE, $currentPage, $albumLen);
+        $newOnlineRes = $recommendObj->getNewOnlineList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $currentPage, $albumLen);
         if (!empty($newOnlineRes)) {
             foreach ($newOnlineRes as $value) {
                 $albumIds[] = $value['id'];

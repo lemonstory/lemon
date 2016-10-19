@@ -38,7 +38,7 @@ class Recommend extends ModelBase
         $key = $minAge . "_" . $maxAge . "_" . $currentPage . "_" . $len;
         $cacheobj = new CacheWrapper();
         $redisData = $cacheobj->getListCache($this->RECOMMEND_HOT_TABLE_NAME, $key);
-        if (empty($redisData)) {
+        if (!empty($redisData)) {
 
             $where = "1";
             $offset = 0;
@@ -62,7 +62,6 @@ class Recommend extends ModelBase
                       LEFT JOIN `{$this->ALBUM_TABLE_NAME}` 
                       ON `{$this->RECOMMEND_HOT_TABLE_NAME}`.`albumid` = `{$this->ALBUM_TABLE_NAME}`.`id`
                       WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
-
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -121,7 +120,7 @@ class Recommend extends ModelBase
             if ($currentPage > 0) {
                 $offset = ($currentPage - 1) * $len;
             }
-            $where .= " AND `{$this->RECOMMEND_HOT_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
+            $where .= " AND `{$this->RECOMMEND_NEW_ONLINE_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
 
             if ($minAge == 0 && $maxAge != 0 && $maxAge != $this->MAX_AGE) {
                 $where .= " AND `min_age` = 0 AND `max_age` >= {$maxAge}";
@@ -190,7 +189,7 @@ class Recommend extends ModelBase
             if ($currentPage > 0) {
                 $offset = ($currentPage - 1) * $len;
             }
-            $where .= " AND `{$this->RECOMMEND_HOT_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
+            $where .= " AND `{$this->RECOMMEND_SAME_AGE_TABLE_NAME}`.`status` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
 
             if ($minAge == 0 && $maxAge != 0 && $maxAge != $this->MAX_AGE) {
                 $where .= " AND `min_age` = 0 AND `max_age` >= {$maxAge}";

@@ -66,7 +66,7 @@ class info extends controller
         // 收听数量
         $albumlistennum = $listenobj->getAlbumListenNum($album_id);
         if ($albumlistennum) {
-            $result['albuminfo']['listennum'] = (int)$albumlistennum[$album_id]['num'];
+            $result['albuminfo']['listennum'] = substr($albumlistennum[$album_id]['num'], 0, 5);
         } else {
             $result['albuminfo']['listennum'] = 0;
         }

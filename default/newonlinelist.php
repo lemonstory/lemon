@@ -18,6 +18,8 @@ class newonlinelist extends controller
         $listenobj = new Listen();
         $aliossobj = new AliOss();
         $tagnewobj = new TagNew();
+        $configVar = new ConfigVar();
+        $albumObj = new Album();
         $babyagetype = 0;
         
         if (!empty($uid)) {
@@ -32,7 +34,7 @@ class newonlinelist extends controller
         // 最新上架
         if ($_SERVER['visitorappversion'] < "130000") {
             $recommendobj = new Recommend();
-            $newonlineres = $recommendobj->getNewOnlineList($babyagetype, $p, $len);
+            $newonlineres = $recommendobj->getNewOnlineList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $p, $len);
         } else {
             if ($isgettag == 1) {
                 // 一级标签
@@ -43,7 +45,7 @@ class newonlinelist extends controller
             if (empty($currentfirsttagid)) {
 
                 $recommendobj = new Recommend();
-                $newonlineres = $recommendobj->getNewOnlineList($babyagetype, $p, $len);
+                $newonlineres = $recommendobj->getNewOnlineList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $p, $len);
 
                 //无法识别年龄段及排序
                 //$currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
@@ -56,7 +58,7 @@ class newonlinelist extends controller
         }
         if (! empty($newonlineres)) {
             foreach ($newonlineres as $value) {
-                $albumids[] = $value['albumid'];
+                $albumids[] = $value['id'];
             }
         }
         
@@ -81,7 +83,7 @@ class newonlinelist extends controller
         $newalbumlist = array();
         if (! empty($newonlineres)) {
             foreach ($newonlineres as $value) {
-                $albumid = $value['albumid'];
+                $albumid = $value['id'];
                 if (! empty($albumlist[$albumid])) {
                     $albuminfo = $albumlist[$albumid];
                     if (!empty($albuminfo['cover'])) {
@@ -89,7 +91,7 @@ class newonlinelist extends controller
                     }
                     $albuminfo['listennum'] = 0;
                     if (! empty($albumlistennum[$albumid])) {
-                        $albuminfo['listennum'] = $albumlistennum[$albumid]['num'] + 0;
+                        $albuminfo['listennum'] = substr($albumlistennum[$albumid]['num'], 0, 5);
                     }
                     if ($_SERVER['visitorappversion'] < "130000") {
                         $albuminfo['favnum'] = 0;

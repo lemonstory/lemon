@@ -17,7 +17,9 @@ class sameagelist extends controller
         $secondtagids = array();
         $listenobj = new Listen();
         $aliossobj = new AliOss();
-        $tagnewobj = new TagNew();;
+        $tagnewobj = new TagNew();
+        $configVar = new ConfigVar();
+        $albumObj = new Album();
         $first_tags_count = 8;
         
         $babyagetype = 0;
@@ -33,7 +35,7 @@ class sameagelist extends controller
         // 同龄在听
         if ($_SERVER['visitorappversion'] < "130000") {
             $recommendobj = new Recommend();
-            $sameageres = $recommendobj->getSameAgeListenList($babyagetype, $p, $len);
+            $sameageres = $recommendobj->getSameAgeListenList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $p, $len);
         } else {
             if ($isgettag == 1) {
                 // 一级标签
@@ -44,7 +46,7 @@ class sameagelist extends controller
             if (empty($currentfirsttagid)) {
 
                 $recommendobj = new Recommend();
-                $sameageres = $recommendobj->getSameAgeListenList($babyagetype, $p, $len);
+                $sameageres = $recommendobj->getSameAgeListenList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $p, $len);
 
                 //无法识别年龄段及排序
                 //$currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
@@ -55,9 +57,10 @@ class sameagelist extends controller
                 $sameageres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 0, 0, 1, $p, $len);
             }
         }
+
         if (! empty($sameageres)) {
             foreach ($sameageres as $value) {
-                $albumids[] = $value['albumid'];
+                $albumids[] = $value['id'];
             }
         }
         
@@ -83,7 +86,7 @@ class sameagelist extends controller
         $sameagealbumlist = array();
         if (! empty($sameageres)) {
             foreach ($sameageres as $value) {
-                $albumid = $value['albumid'];
+                $albumid = $value['id'];
                 if (! empty($albumlist[$albumid])) {
                     $albuminfo = $albumlist[$albumid];
                     if (!empty($albuminfo['cover'])) {
