@@ -609,6 +609,24 @@ class Album extends ModelBase
     }
 
     /**
+     * 格式化播放量
+     * 示例:
+     *      100000 返回 10万
+     * @param $listen_num
+     */
+    public function format_album_listen_num($listen_num)
+    {
+
+        $listen_num = intval($listen_num);
+        $listen_num_str = (string)$listen_num;
+
+        if ($listen_num >= 100000) {
+            $listen_num_str = substr($listen_num_str, 0, -4) . "万";
+        }
+        return $listen_num_str;
+    }
+
+    /**
      * 获取某字段值
      */
     public function get_filed_value($field = 's_cover', $value = '', $need_filed = '')

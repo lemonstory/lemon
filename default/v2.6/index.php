@@ -264,6 +264,8 @@ class index extends controller
     {
 
         $aliossObj = new AliOss();
+        $albumObj = new Album();
+
         $albumInfo = array();
         if (!empty($albumList[$albumId])) {
             $albumInfo['id'] = $albumList[$albumId]['id'];
@@ -274,7 +276,7 @@ class index extends controller
             }
             $albumInfo['listennum'] = 0;
             if (!empty($albumListenNum[$albumId])) {
-                $albumInfo['listennum'] = $albumListenNum[$albumId]['num'] + 0;
+                $albumInfo['listennum'] = $albumObj->format_album_listen_num($albumListenNum[$albumId]['num'] + 0);
             }
             $albumInfo['recommenddesc'] = "";
             if (!empty($recommendDescList[$albumId])) {

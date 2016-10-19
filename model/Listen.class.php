@@ -408,7 +408,7 @@ class Listen extends ModelBase
      * @param I $albumid
      * @return boolean
      */
-    private function addAlbumListenCountDb($albumid)
+	public function addAlbumListenCountDb($albumid, $addNum = 1)
 	{
 	    if (empty($albumid)) {
 	        $this->setError(ErrorConf::paramError());
@@ -421,9 +421,9 @@ class Listen extends ModelBase
 	    $selectst->execute(array($albumid));
 	    $selectres = $selectst->fetch(PDO::FETCH_ASSOC);
 	    if (empty($selectres)) {
-	        $sql = "INSERT INTO `{$this->LISTEN_ALBUM_COUNT_TABLE_NAME}` (`albumid`, `num`) VALUES ('{$albumid}', 1)";
+			$sql = "INSERT INTO `{$this->LISTEN_ALBUM_COUNT_TABLE_NAME}` (`albumid`, `num`) VALUES ('{$albumid}', {$addNum})";
 	    } else {
-	        $sql = "UPDATE `{$this->LISTEN_ALBUM_COUNT_TABLE_NAME}` SET `num` = `num` + 1 WHERE `albumid` = '{$albumid}'";
+			$sql = "UPDATE `{$this->LISTEN_ALBUM_COUNT_TABLE_NAME}` SET `num` = `num` + {$addNum} WHERE `albumid` = '{$albumid}'";
 	    }
 		$st = $db->prepare($sql);
 		$numres = $st->execute();

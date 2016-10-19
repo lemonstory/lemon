@@ -50,7 +50,7 @@ class info extends controller
         // 收听数量
         $albumListenNum = $listenobj->getAlbumListenNum($albumId);
         if ($albumListenNum) {
-            $result['albumInfo']['listennum'] = (int)$albumListenNum[$albumId]['num'];
+            $result['albumInfo']['listennum'] = $albumObj->format_album_listen_num((int)$albumListenNum[$albumId]['num']);
         } else {
             $result['albumInfo']['listennum'] = 0;
         }
@@ -189,7 +189,7 @@ class info extends controller
                 }
                 $albumInfo['listennum'] = 0;
                 if (!empty($tagRelationList[$value['id']])) {
-                    $albumInfo['listennum'] = $tagRelationList[$value['id']]['albumlistennum'] + 0;
+                    $albumInfo['listennum'] = $albumObj->format_album_listen_num($tagRelationList[$value['id']]['albumlistennum'] + 0);
                 }
 
                 //推荐语

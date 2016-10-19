@@ -74,7 +74,7 @@ class onlineList extends controller
                     }
                     $albumInfo['listennum'] = 0;
                     if (!empty($albumListenNum[$albumId])) {
-                        $albumInfo['listennum'] = $albumListenNum[$albumId]['num'] + 0;
+                        $albumInfo['listennum'] = $albumObj->format_album_listen_num($albumListenNum[$albumId]['num'] + 0);
                     }
                     $albumInfo['recommenddesc'] = "";
                     if (!empty($recommendDescList[$albumId])) {

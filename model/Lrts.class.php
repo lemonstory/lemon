@@ -117,8 +117,9 @@ class Lrts extends Http
 
         $album_story_info = array();
         $album_story_info['album']['intro'] = '';
+        $album_story_info['album']['serial_status'] = '';
+        $album_story_info['album']['listen_num'] = '';
         $album_story_info['album']['story_total_count'] = 0;
-        $album_story_info['album']['status'] = '';
         $album_story_info['album']['author'] = array();
         $album_story_info['album']['anchor'] = array();
         $album_story_info['story'] = array();
@@ -137,6 +138,8 @@ class Lrts extends Http
             $album_story_info['album']['anchor']['name'] = $anchor;
             $anchor_avatar_url = trim(Http::sub_data($album_page_content, 'class="g-user"><img src="', '" alt="" class="round photo-s50'));
             $album_story_info['album']['anchor']['avatar'] = $anchor_avatar_url;
+            $listen_num = trim(Http::sub_data($album_page_content, '<span><em>', '</em>播放</span>'));
+            $album_story_info['album']['listen_num'] = $listen_num;
 
             if ($story_page_count > 0) {
                 for ($page = 0; $page <= $story_page_count - 1; $page++) {
@@ -162,8 +165,8 @@ class Lrts extends Http
                                 if ($story_total_count != $album_story_info['album']['story_total_count']) {
                                     echo sprintf("[{$link_url}]js里面的故事数量[%d]和页面展示的故事数量[%d]不一致 \r\n", $story_total_count, $album_story_info['album']['story_total_count']);
                                 }
-                                //专辑状态,目前没有使用
-                                $album_story_info['album']['status'] = trim(Http::sub_data($story_info_with_playlist, '状态：<span>', '</span>'));
+                                //专辑状态
+                                $album_story_info['album']['serial_status'] = trim(Http::sub_data($story_info_with_playlist, '状态：<span>', '</span>'));
                             }
                             preg_match_all('/<li [\s|\S]*?<\/li>/', $story_info_with_playlist, $result);
                             if (!empty($result[0]) && count($result[0]) > 0) {

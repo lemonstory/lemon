@@ -52,6 +52,10 @@ class ConfigVar
         ),
     );
 
+    //专辑连载状态
+    public $ALBUM_SERIAL_STATUS_OFF = 0;    //完结
+    public $ALBUM_SERIAL_STATUS_ON = 1;     //连载中
+
     public $RECOMMEND_STATUS_ONLIINE = 1; // 推荐上线状态
     public $RECOMMEND_STATUS_OFFLINE = 2; // 推荐下线状态
     

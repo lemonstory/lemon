@@ -66,7 +66,7 @@ class tagAlbumList extends controller
                         $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $val['cover'], 460, $val['cover_time']);
                         $albumInfo['listennum'] = 0;
                         if (!empty($albumListenNum[$val['id']])) {
-                            $albumInfo['listennum'] = $albumListenNum[$val['id']]['num'] + 0;
+                            $albumInfo['listennum'] = $albumObj->format_album_listen_num($albumListenNum[$val['id']]['num'] + 0);
                         }
                         $albumInfo['recommenddesc'] = "";
                         if (!empty($recommendDescList[$val['id']])) {

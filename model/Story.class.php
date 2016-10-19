@@ -54,7 +54,6 @@ class Story extends ModelBase
 		$sql = "INSERT INTO {$this->table}(
 					{$tmp_filed}
 				) VALUES({$tmp_value})";
-
         $st = $db->query($sql);
         unset($tmp_value, $tmp_filed);
         return $db->lastInsertId();
