@@ -1,14 +1,16 @@
 <?php
 
 include_once '../controller.php';
+
 class info extends controller
 {
-    function action() {
-    	$result  = array();
-        $album_id      = $this->getRequest("albumid", "0");
+    function action()
+    {
+        $result = array();
+        $album_id = $this->getRequest("albumid", "0");
         $iscommentpage = $this->getRequest('iscommentpage', 0);
-        $len           = $this->getRequest("len", 10);
-        $comment       = new Comment();
+        $len = $this->getRequest("len", 10);
+        $comment = new Comment();
         // 长度限制
         if ($len > 50) {
             $len = 50;
@@ -17,33 +19,33 @@ class info extends controller
         if ($iscommentpage == 1) {
             $direction = $this->getRequest("direction", "down");
             $startid = $this->getRequest("startid", 0);
-            
+
             // 评论列表
             $result['commentlist'] = $comment->get_comment_list(
-                                         "`albumid`={$album_id}",
-                                         "ORDER BY `id` DESC ",
-                                         $direction,
-                                         $startid,
-                                         $len
-                                     );
+                "`albumid`={$album_id}",
+                "ORDER BY `id` DESC ",
+                $direction,
+                $startid,
+                $len
+            );
             $this->showSuccJson($result);
         }
         // 获取专辑信息参数
-        $album            = new Album();
-        $story            = new Story();
-        $comment          = new Comment();
-        $useralbumlog     = new UserAlbumLog();
+        $album = new Album();
+        $story = new Story();
+        $comment = new Comment();
+        $useralbumlog = new UserAlbumLog();
         $useralbumlastlog = new UserAlbumLastlog();
-        $fav              = new Fav();
-        $listenobj        = new Listen();
+        $fav = new Fav();
+        $listenobj = new Listen();
 
         $uid = $this->getUid();
         // 专辑信息
-        $result['albuminfo']  = $album->get_album_info($album_id);
+        $result['albuminfo'] = $album->get_album_info($album_id);
 
-        $aliossobj = new AliOss();
+        $aliossObj = new AliOss();
         if ($result['albuminfo']['cover']) {
-            $result['albuminfo']['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $result['albuminfo']['cover'], 460, $result['albuminfo']['cover_time']);
+            $result['albuminfo']['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $result['albuminfo']['cover'], 460, $result['albuminfo']['cover_time']);
         } else {
             $result['albuminfo']['cover'] = $result['albuminfo']['s_cover'];
         }
@@ -65,12 +67,12 @@ class info extends controller
         }
         // 收听数量
         $albumlistennum = $listenobj->getAlbumListenNum($album_id);
-        if ($albumlistennum) {
+        if ($albumlistennum && intval($albumlistennum[$album_id]['num']) > 0) {
             $result['albuminfo']['listennum'] = substr($albumlistennum[$album_id]['num'], 0, 5);
         } else {
-            $result['albuminfo']['listennum'] = 0;
+            $result['albuminfo']['listennum'] = "0";
         }
-        
+
         // 专辑收藏数
         $favobj = new Fav();
         $albumfavnum = $favobj->getAlbumFavCount($album_id);
@@ -81,20 +83,29 @@ class info extends controller
         }
 
         $storylist = array();
-        $aliossobj = new AliOss();
+        $aliossObj = new AliOss();
         $storyreslist = $story->get_album_story_list($album_id);
         if (!empty($storyreslist)) {
             foreach ($storyreslist as $value) {
-                $value['playcover'] = "";
-                if (!empty($value['cover'])) {
-                    $value['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $value['cover'], 230, $value['cover_time']);
-                }
+
+                $storyInfo = array();
+                $storyInfo['id'] = $value['id'];
+                $storyInfo['album_id'] = $value['album_id'];
                 //部分英文故事辑里面会有多余的反斜杠
-                $value['title'] = stripslashes($value['title']);
-                $storylist[] = $value;
+                $storyInfo['title'] = stripslashes($value['title']);
+                //$storyInfo['intro'] = $value['intro'];
+                $storyInfo['times'] = $value['times'];
+                $storyInfo['mediapath'] = $value['mediapath'];
+                $storyInfo['view_order'] = $value['view_order'];
+                $storyInfo['playcover'] = "";
+                if (!empty($value['cover'])) {
+                    $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_STORY, $value['cover'], 230, $value['cover_time']);
+                }
+                $storyList[] = $storyInfo;
+
             }
         }
-        $result['storylist'] = $storylist;
+        $result['storylist'] = $storyList;
         // 评论数量
         $result['albuminfo']['commentnum'] = (int)$comment->get_total("`albumid`={$album_id} and `status`=1");
 
@@ -105,7 +116,7 @@ class info extends controller
         } else {
             $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ", 'up', 0, $len);
         }
-        
+
         if ($_SERVER['visitorappversion'] >= "130000") {
             // 获取专辑标签列表
             $tagnewobj = new TagNew();
@@ -113,9 +124,9 @@ class info extends controller
             $dataanalyticsobj = new DataAnalytics();
             $userimsiobj = new UserImsi();
             $taglist = array();
-            $recommendalbumlist = array();
+            $recommendAlbumList = array();
             $tagids = array();
-            
+
             // 获取当前专辑的标签
             $relationtaglist = current($tagnewobj->getAlbumTagRelationListByAlbumIds($album_id));
             if (!empty($relationtaglist)) {
@@ -131,11 +142,11 @@ class info extends controller
                 }
             }
             $result['taglist'] = $taglist;
-            
+
             $interestlist = array();
             $interesttagids = array();
             $uimid = $userimsiobj->getUimid($uid);
-            
+
             // 获取设备喜好的标签
             $interestlist = $uimidinterestobj->getUimidInterestTagListByUimid($uimid, 10);
             if (!empty($interestlist)) {
@@ -143,9 +154,9 @@ class info extends controller
                     $interesttagids[] = $interestinfo['tagid'];
                 }
             }
-            
+
             $tagrelationalbumids = array();
-            $tagrelationalbumlist = array();
+            $tagRelationAlbumList = array();
             $tagrelationlist = array();
             if (!empty($interesttagids)) {
                 // 获取喜好标签的专辑
@@ -163,34 +174,41 @@ class info extends controller
                     $tagrelationalbumids[] = $value['albumid'];
                 }
             }
-            
+
             // 获取指定长度的推荐专辑id数组
             if (!empty($tagrelationalbumids)) {
                 $tagrelationalbumids = array_unique($tagrelationalbumids);
                 // 随机推荐
                 shuffle($tagrelationalbumids);
                 $tagrelationalbumids = array_slice($tagrelationalbumids, 0, 6);
-                $tagrelationalbumlist = $album->getListByIds($tagrelationalbumids);
+                $tagRelationAlbumList = $album->getListByIds($tagrelationalbumids);
             }
-            
-            if (!empty($tagrelationalbumlist)) {
-                foreach ($tagrelationalbumlist as $value) {
+
+            if (!empty($tagRelationAlbumList)) {
+                foreach ($tagRelationAlbumList as $value) {
+
+                    $albumInfo = array();
+                    $albumIds[] = $value['id'];
+                    $albumInfo['id'] = $value['id'];
+                    $albumInfo['title'] = $value['title'];
                     if (!empty($value['cover'])) {
-                        $value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $value['cover'], 460, $value['cover_time']);
+                        $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $value['cover'], 460, $value['cover_time']);
                     }
-                    $value['listennum'] = 0;
-                    if (!empty($tagrelationlist[$value['id']])) {
-                        $value['listennum'] = $tagrelationlist[$value['id']]['albumlistennum'] + 0;
+                    $albumInfo['listennum'] = 0;
+                    if (!empty($tagRelationList[$value['id']])) {
+                        $albumInfo['listennum'] = substr($tagRelationList[$value['id']]['albumlistennum'], 0, 5);
                     }
-                    $recommendalbumlist[] = $value;
+
+                    $recommendAlbumList[] = $albumInfo;;
                 }
             }
-            
-            $result['recommendalbumlist'] = $recommendalbumlist;
+
+            $result['recommendalbumlist'] = $recommendAlbumList;
         }
 
         // 返回成功json
         $this->showSuccJson($result);
     }
 }
+
 new info();

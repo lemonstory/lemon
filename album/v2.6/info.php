@@ -69,11 +69,7 @@ class info extends controller
         $storyResList = $story->get_album_story_list($albumId);
         if (!empty($storyResList)) {
             foreach ($storyResList as $value) {
-                $value['playcover'] = "";
-                if (!empty($value['cover'])) {
-                    $value['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_STORY, $value['cover'], 230, $value['cover_time']);
-                }
-
+                
                 $storyInfo = array();
                 $storyInfo['id'] = $value['id'];
                 //部分英文故事辑里面会有多余的反斜杠
@@ -82,6 +78,10 @@ class info extends controller
                 $storyInfo['times'] = $value['times'];
                 $storyInfo['mediapath'] = $value['mediapath'];
                 $storyInfo['view_order'] = $value['view_order'];
+                $storyInfo['playcover'] = "";
+                if (!empty($value['cover'])) {
+                    $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_STORY, $value['cover'], 230, $value['cover_time']);
+                }
                 $storyList[] = $storyInfo;
             }
         }
