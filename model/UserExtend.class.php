@@ -210,7 +210,7 @@ class UserExtend extends ModelBase
 		$configVar = new ConfigVar();
 		$babyAgeGroupArr = $configVar->AGE_LEVEL_ARR;
 		$babyAgeGroup = array_shift($babyAgeGroupArr);
-		if ($age >= $configVar->MIN_AGE && $age <= $configVar->MAX_AGE) {
+		if ($age != 0 && $age >= $configVar->MIN_AGE && $age <= $configVar->MAX_AGE) {
 
 			foreach ($babyAgeGroupArr as $key => $item) {
 				if ($age >= $item['min_age'] && $age <= $item['max_age']) {

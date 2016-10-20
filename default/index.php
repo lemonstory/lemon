@@ -6,10 +6,10 @@ class index extends controller
     public function action()
     {
         $uid = $this->getUid();
-        $userinfo = array();
-        $albumids = array();
+        $userInfo = array();
+        $albumIds = array();
         $recommendObj = new Recommend();
-        $aliossobj = new AliOss();
+        $aliossObj = new AliOss();
         $configVar = new ConfigVar();
         $albumObj = new Album();
 
@@ -25,158 +25,155 @@ class index extends controller
 
         if (!empty($hotRecommendRes)) {
             foreach ($hotRecommendRes as $value) {
-                $albumids[] = $value['id'];
+                $albumIds[] = $value['id'];
             }
         }
 
-        $babyagetype = 0;
+        $babyAge = 0;
+        $userExtObj = new UserExtend();
         if (!empty($uid)) {
-            $userobj = new User();
-            $userinfo = current($userobj->getUserInfo($uid, 1));
-            if (!empty($userinfo)) {
-                $userextobj = new UserExtend();
-                $babyagetype = $userextobj->getBabyAgeType($userinfo['age']);
+            $userObj = new User();
+            $userInfo = current($userObj->getUserInfo($uid, 1));
+            if (!empty($userInfo)) {
+                $babyAge = $userInfo['age'];
             }
         }
+        $babyAgeLevel = $userExtObj->getBabyAgeGroup($babyAge);
 
         // 同龄在听
-        $sameageres = $recommendObj->getSameAgeListenList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, 1, $albumLen);
-        if (!empty($sameageres)) {
-            foreach ($sameageres as $value) {
-                $albumids[] = $value['id'];
+        $sameAgeRes = $recommendObj->getSameAgeListenList($babyAgeLevel['min_age'], $babyAgeLevel['max_age'], 0, 1, $albumLen);
+
+        if (!empty($sameAgeRes)) {
+            foreach ($sameAgeRes as $value) {
+                $albumIds[] = $value['id'];
             }
         }
 
         // 最新上架
-        $newonlineres = $recommendObj->getNewOnlineList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, 1, $albumLen);
-        if (!empty($newonlineres)) {
-            foreach ($newonlineres as $value) {
-                $albumids[] = $value['id'];
+        $newOnlineRes = $recommendObj->getNewOnlineList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, 1, $albumLen);
+        if (!empty($newOnlineRes)) {
+            foreach ($newOnlineRes as $value) {
+                $albumIds[] = $value['id'];
             }
         }
 
-        $albumlist = array();
-        $recommenddesclist = array();
-        if (!empty($albumids)) {
-            $albumids = array_unique($albumids);
+        $albumList = array();
+        $recommendDescList = array();
+        if (!empty($albumIds)) {
+            $albumIds = array_unique($albumIds);
             // 专辑信息
-            $albumobj = new Album();
-            $albumlist = $albumobj->getListByIds($albumids);
+            $albumList = $albumObj->getListByIds($albumIds);
             // 专辑收听数
-            $listenobj = new Listen();
-            $albumlistennum = $listenobj->getAlbumListenNum($albumids);
+            $listenObj = new Listen();
+            $albumListenNum = $listenObj->getAlbumListenNum($albumIds);
 
             if ($_SERVER['visitorappversion'] >= "130000") {
                 // 获取推荐语
-                $recommenddescobj = new RecommendDesc();
-                $recommenddesclist = $recommenddescobj->getAlbumRecommendDescList($albumids);
+                $recommendDescObj = new RecommendDesc();
+                $recommendDescList = $recommendDescObj->getAlbumRecommendDescList($albumIds);
             }
         }
 
         //var_dump($hotRecommendRes);
-        $hotrecommendlist = array();
-        $sameagealbumlist = array();
-        $newalbumlist = array();
+        $hotRecommendList = array();
+        $sameAgeAlbumList = array();
+        $newAlbumList = array();
         if (!empty($hotRecommendRes)) {
             foreach ($hotRecommendRes as $value) {
-                $albumid = $value['id'];
-                if (!empty($albumlist[$albumid])) {
-                    $albuminfo = $albumlist[$albumid];
-                    if (!empty($albuminfo['cover'])) {
-                        $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
-                    }
-                    $albuminfo['listennum'] = 0;
-                    if (!empty($albumlistennum[$albumid]) && intval($albumlistennum[$albumid]['num']) > 0) {
-                        $albuminfo['listennum'] = substr($albumlistennum[$albumid]['num'], 0, 5);
-                    }
-                    $albuminfo['recommenddesc'] = "";
-                    if (!empty($recommenddesclist[$albumid])) {
-                        $albuminfo['recommenddesc'] = $recommenddesclist[$albumid]['desc'];
-                    }
-                    $hotrecommendlist[] = $albuminfo;
+                $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $value['id']);
+                if (is_array($albumInfo) && !empty($albumInfo)) {
+                    $hotRecommendList[] = $albumInfo;
                 }
             }
         }
 
-        if (!empty($sameageres)) {
-            foreach ($sameageres as $value) {
-                $albumid = $value['id'];
-                if (!empty($albumlist[$albumid])) {
-                    $albuminfo = $albumlist[$albumid];
-                    if (!empty($albuminfo['cover'])) {
-                        $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
-                    }
-                    $albuminfo['listennum'] = 0;
-                    if (!empty($albumlistennum[$albumid]) && intval($albumlistennum[$albumid]['num'])) {
-                        $albuminfo['listennum'] = substr($albumlistennum[$albumid]['num'], 0, 5);
-                    }
-                    $albuminfo['recommenddesc'] = "";
-                    if (!empty($recommenddesclist[$albumid])) {
-                        $albuminfo['recommenddesc'] = $recommenddesclist[$albumid]['desc'];
-                    }
-                    $sameagealbumlist[] = $albuminfo;
+        if (!empty($sameAgeRes)) {
+            foreach ($sameAgeRes as $value) {
+                $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $value['id']);
+                if (is_array($albumInfo) && !empty($albumInfo)) {
+                    $sameAgeAlbumList[] = $albumInfo;
                 }
             }
         }
-        if (!empty($newonlineres)) {
-            foreach ($newonlineres as $value) {
-                $albumid = $value['id'];
-                if (!empty($albumlist[$albumid])) {
-                    $albuminfo = $albumlist[$albumid];
-                    if (!empty($albuminfo['cover'])) {
-                        $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
-                    }
-                    $albuminfo['listennum'] = 0;
-                    if (!empty($albumlistennum[$albumid]) && intval($albumlistennum[$albumid]['num']) > 0) {
-                        $albuminfo['listennum'] = substr($albumlistennum[$albumid]['num'], 0, 5);
-                    }
-                    $albuminfo['recommenddesc'] = "";
-                    if (!empty($recommenddesclist[$albumid])) {
-                        $albuminfo['recommenddesc'] = $recommenddesclist[$albumid]['desc'];
-                    }
-                    $newalbumlist[] = $albuminfo;
+        if (!empty($newOnlineRes)) {
+            foreach ($newOnlineRes as $value) {
+                $albumInfo = $this->getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $value['id']);
+                if (is_array($albumInfo) && !empty($albumInfo)) {
+                    $newAlbumList[] = $albumInfo;
                 }
             }
         }
 
         // 推广位
-        $focuspiclist = array();
-        $focusres = $recommendObj->getFocusList(6);
-        if (!empty($focusres)) {
-            foreach ($focusres as $value) {
-                $focusinfo['cover'] = $aliossobj->getFocusUrl($value['id'], $value['covertime'], 1);
+        $focusPicList = array();
+        $focusRes = $recommendObj->getFocusList(6);
+        if (!empty($focusRes)) {
+            foreach ($focusRes as $value) {
+                $focusinfo['cover'] = $aliossObj->getFocusUrl($value['id'], $value['covertime'], 1);
                 $focusinfo['linktype'] = $value['linktype'];
                 $focusinfo['linkurl'] = $value['linkurl'];
-                $focuspiclist[] = $focusinfo;
+                $focusPicList[] = $focusinfo;
             }
         }
 
         // 一级标签列表
-        $firsttaglist = array();
+        $firstTagList = array();
         if ($_SERVER['visitorappversion'] >= "130000") {
-            $tagnewobj = new TagNew();
-            $firsttagres = $tagnewobj->getFirstTagList(8);
-            if (!empty($firsttagres)) {
-                foreach ($firsttagres as $value) {
+            $tagNewObj = new TagNew();
+            $firstTagRes = $tagNewObj->getFirstTagList(8);
+            if (!empty($firstTagRes)) {
+                foreach ($firstTagRes as $value) {
+
+                    $tagInfo = array();
+                    $tagInfo['id'] = $value['id'];
+                    $tagInfo['pid'] = $value['pid'];
+                    $tagInfo['name'] = $value['name'];
                     if (!empty($value['cover'])) {
-                        $value['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_TAG, $value['cover'], 0, $value['covertime']);
+                        $tagInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_TAG, $value['cover'], 0, $value['covertime']);
                     }
-                    $firsttaglist[] = $value;
+                    $firstTagList[] = $tagInfo;
                 }
             }
         }
 
         // 私人订制
-
-
         $data = array(
-            "focuspic" => $focuspiclist,
-            "hotrecommend" => $hotrecommendlist,
-            "samgeage" => $sameagealbumlist,
-            "newalbum" => $newalbumlist,
-            "firsttag" => $firsttaglist
+            "focuspic" => $focusPicList,
+            "hotrecommend" => $hotRecommendList,
+            "samgeage" => $sameAgeAlbumList,
+            "newalbum" => $newAlbumList,
+            "firsttag" => $firstTagList
         );
         $this->showSuccJson($data);
+    }
+
+    public function getAlbumInfo($albumList, $albumListenNum, $recommendDescList, $albumId)
+    {
+
+        $aliossObj = new AliOss();
+        $albumObj = new Album();
+
+        $albumInfo = array();
+        if (!empty($albumList[$albumId])) {
+            $albumInfo['id'] = $albumList[$albumId]['id'];
+            $albumInfo['title'] = $albumList[$albumId]['title'];
+            $albumInfo['star_level'] = $albumList[$albumId]['star_level'];
+            //$albumInfo['intro'] = $albumList[$albumId]['intro'];
+            if (!empty($albumList[$albumId]['cover'])) {
+                $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumList[$albumId]['cover'], 460, $albumList[$albumId]['cover']);
+            }
+            $albumInfo['listennum'] = 0;
+            if (!empty($albumListenNum[$albumId])) {
+                $albumInfo['listennum'] = $albumListenNum[$albumId]['num'] + 0;
+                $albumInfo['listennum'] = substr($albumInfo['listennum'], 0, 5);
+            }
+            $albumInfo['recommenddesc'] = "";
+            if (!empty($recommendDescList[$albumId])) {
+                $albumInfo['recommenddesc'] = $recommendDescList[$albumId]['desc'];
+            }
+            //$albumSectionItem['items'][] = $albumInfo;
+        }
+        return $albumInfo;
     }
 }
 
