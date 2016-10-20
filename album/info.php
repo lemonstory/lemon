@@ -6,205 +6,212 @@ class info extends controller
 {
     function action()
     {
-        $result = array();
-        $album_id = $this->getRequest("albumid", "0");
-        $iscommentpage = $this->getRequest('iscommentpage', 0);
+        $albumId = $this->getRequest("albumid", "0");
+        $isCommentPage = $this->getRequest('iscommentpage', 0);
         $len = $this->getRequest("len", 10);
-        $comment = new Comment();
+
         // 长度限制
         if ($len > 50) {
             $len = 50;
         }
+        $result = array();
+
         // 评论分页
-        if ($iscommentpage == 1) {
+        $commentObj = new Comment();
+        if ($isCommentPage == 1) {
+
             $direction = $this->getRequest("direction", "down");
-            $startid = $this->getRequest("startid", 0);
+            $startId = $this->getRequest("startid", 0);
 
             // 评论列表
-            $result['commentlist'] = $comment->get_comment_list(
-                "`albumid`={$album_id}",
+            $result['commentlist'] = $commentObj->get_comment_list(
+                "`albumid`={$albumId}",
                 "ORDER BY `id` DESC ",
                 $direction,
-                $startid,
+                $startId,
                 $len
             );
-            $this->showSuccJson($result);
-        }
-        // 获取专辑信息参数
-        $album = new Album();
-        $story = new Story();
-        $comment = new Comment();
-        $useralbumlog = new UserAlbumLog();
-        $useralbumlastlog = new UserAlbumLastlog();
-        $fav = new Fav();
-        $listenobj = new Listen();
 
-        $uid = $this->getUid();
-        // 专辑信息
-        $result['albuminfo'] = $album->get_album_info($album_id);
-
-        $aliossObj = new AliOss();
-        if ($result['albuminfo']['cover']) {
-            $result['albuminfo']['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $result['albuminfo']['cover'], 460, $result['albuminfo']['cover_time']);
         } else {
-            $result['albuminfo']['cover'] = $result['albuminfo']['s_cover'];
-        }
 
+            // 获取专辑信息参数
+            $albumObj = new Album();
+            $storyObj = new Story();
+            $favObj = new Fav();
+            $listenObj = new Listen();
+            $uid = $this->getUid();
 
-        //简介为空的处理
-        if (empty($result['albuminfo']['intro'])) {
+            // 专辑信息
+            $albumInfo = $albumObj->get_album_info($albumId);
+            $result['albuminfo']['id'] = $albumInfo['id'];
+            $result['albuminfo']['title'] = $albumInfo['title'];
+            $result['albuminfo']['star_level'] = $albumInfo['star_level'];
+            $result['albuminfo']['story_num'] = $albumInfo['story_num'];
+            $result['albuminfo']['intro'] = $albumInfo['intro'];
 
-            $intro = sprintf("《%s》暂时没有简介(>.<)", $result['albuminfo']['title']);
-            $result['albuminfo']['intro'] = $intro;
-        }
-
-        // 是否收藏
-        $favinfo = $fav->getUserFavInfoByAlbumId($uid, $album_id);
-        if ($favinfo) {
-            $result['albuminfo']['fav'] = 1;
-        } else {
-            $result['albuminfo']['fav'] = 0;
-        }
-        // 收听数量
-        $albumlistennum = $listenobj->getAlbumListenNum($album_id);
-        if ($albumlistennum && intval($albumlistennum[$album_id]['num']) > 0) {
-            $result['albuminfo']['listennum'] = substr($albumlistennum[$album_id]['num'], 0, 5);
-        } else {
-            $result['albuminfo']['listennum'] = "0";
-        }
-
-        // 专辑收藏数
-        $favobj = new Fav();
-        $albumfavnum = $favobj->getAlbumFavCount($album_id);
-        if ($albumfavnum) {
-            $result['albuminfo']['favnum'] = (int)$albumfavnum[$album_id]['num'];
-        } else {
-            $result['albuminfo']['favnum'] = 0;
-        }
-
-        $storylist = array();
-        $aliossObj = new AliOss();
-        $storyreslist = $story->get_album_story_list($album_id);
-        if (!empty($storyreslist)) {
-            foreach ($storyreslist as $value) {
-
-                $storyInfo = array();
-                $storyInfo['id'] = $value['id'];
-                $storyInfo['album_id'] = $value['album_id'];
-                //部分英文故事辑里面会有多余的反斜杠
-                $storyInfo['title'] = stripslashes($value['title']);
-                //$storyInfo['intro'] = $value['intro'];
-                $storyInfo['times'] = $value['times'];
-                $storyInfo['mediapath'] = $value['mediapath'];
-                $storyInfo['view_order'] = $value['view_order'];
-                $storyInfo['playcover'] = "";
-                if (!empty($value['cover'])) {
-                    $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_STORY, $value['cover'], 230, $value['cover_time']);
-                }
-                $storyList[] = $storyInfo;
-
-            }
-        }
-        $result['storylist'] = $storyList;
-        // 评论数量
-        $result['albuminfo']['commentnum'] = (int)$comment->get_total("`albumid`={$album_id} and `status`=1");
-
-        // 评论列表
-        if ($_SERVER['visitorappversion'] < "120000") {
-            // 1.2版本以前的老版本，展示200条评论
-            $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ", 'up', 0, 200);
-        } else {
-            $result['commentlist'] = $comment->get_comment_list("`albumid`={$album_id}", "ORDER BY `id` DESC ", 'up', 0, $len);
-        }
-
-        if ($_SERVER['visitorappversion'] >= "130000") {
-            // 获取专辑标签列表
-            $tagnewobj = new TagNew();
-            $uimidinterestobj = new UimidInterest();
-            $dataanalyticsobj = new DataAnalytics();
-            $userimsiobj = new UserImsi();
-            $taglist = array();
-            $recommendAlbumList = array();
-            $tagids = array();
-
-            // 获取当前专辑的标签
-            $relationtaglist = current($tagnewobj->getAlbumTagRelationListByAlbumIds($album_id));
-            if (!empty($relationtaglist)) {
-                foreach ($relationtaglist as $value) {
-                    $tagids[] = $value['tagid'];
-                }
-                if (!empty($tagids)) {
-                    $tagids = array_unique($tagids);
-                    $taglist = $tagnewobj->getTagInfoByIds($tagids);
-                    if (!empty($taglist)) {
-                        $taglist = array_values($taglist);
-                    }
-                }
-            }
-            $result['taglist'] = $taglist;
-
-            $interestlist = array();
-            $interesttagids = array();
-            $uimid = $userimsiobj->getUimid($uid);
-
-            // 获取设备喜好的标签
-            $interestlist = $uimidinterestobj->getUimidInterestTagListByUimid($uimid, 10);
-            if (!empty($interestlist)) {
-                foreach ($interestlist as $interestinfo) {
-                    $interesttagids[] = $interestinfo['tagid'];
-                }
-            }
-
-            $tagrelationalbumids = array();
-            $tagRelationAlbumList = array();
-            $tagrelationlist = array();
-            if (!empty($interesttagids)) {
-                // 获取喜好标签的专辑
-                $tagrelationlist = $dataanalyticsobj->getRecommendAlbumListByTagids($interesttagids, 100);
+            $aliossObj = new AliOss();
+            if (!empty($albumInfo['cover'])) {
+                $result['albuminfo']['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
             } else {
-                // 未登录、没有喜好的新用户，默认获取本专辑标签相同的其他专辑
-                $tagrelationlist = $dataanalyticsobj->getRecommendAlbumListByTagids($tagids, 100);
-            }
-            if (!empty($tagrelationlist)) {
-                foreach ($tagrelationlist as $value) {
-                    // 过滤当前专辑
-                    if ($value['albumid'] == $album_id) {
-                        continue;
-                    }
-                    $tagrelationalbumids[] = $value['albumid'];
-                }
+                $result['albuminfo']['cover'] = $albumInfo['s_cover'];
             }
 
-            // 获取指定长度的推荐专辑id数组
-            if (!empty($tagrelationalbumids)) {
-                $tagrelationalbumids = array_unique($tagrelationalbumids);
-                // 随机推荐
-                shuffle($tagrelationalbumids);
-                $tagrelationalbumids = array_slice($tagrelationalbumids, 0, 6);
-                $tagRelationAlbumList = $album->getListByIds($tagrelationalbumids);
+
+            //简介为空的处理
+            if (empty($albumInfo['intro'])) {
+
+                $intro = sprintf("《%s》暂时没有简介(>.<)", $albumInfo['title']);
+                $result['albuminfo']['intro'] = $intro;
             }
 
-            if (!empty($tagRelationAlbumList)) {
-                foreach ($tagRelationAlbumList as $value) {
+            // 是否收藏
+            $favInfo = $favObj->getUserFavInfoByAlbumId($uid, $albumId);
+            if ($favInfo) {
+                $result['albuminfo']['fav'] = 1;
+            } else {
+                $result['albuminfo']['fav'] = 0;
+            }
 
-                    $albumInfo = array();
-                    $albumIds[] = $value['id'];
-                    $albumInfo['id'] = $value['id'];
-                    $albumInfo['title'] = $value['title'];
+            // 收听数量
+            $albumListenNum = $listenObj->getAlbumListenNum($albumId);
+            if ($albumListenNum && intval($albumListenNum[$albumId]['num']) > 0) {
+                $result['albuminfo']['listennum'] = substr($albumListenNum[$albumId]['num'], 0, 5);
+            } else {
+                $result['albuminfo']['listennum'] = "0";
+            }
+
+            // 专辑收藏数
+            $albumFavNum = $favObj->getAlbumFavCount($albumId);
+            if ($albumFavNum) {
+                $result['albuminfo']['favnum'] = (int)$albumFavNum[$albumId]['num'];
+            } else {
+                $result['albuminfo']['favnum'] = 0;
+            }
+
+            $storylist = array();
+            $aliossObj = new AliOss();
+            $storyreslist = $storyObj->get_album_story_list($albumId);
+            if (!empty($storyreslist)) {
+                foreach ($storyreslist as $value) {
+
+                    $storyInfo = array();
+                    $storyInfo['id'] = $value['id'];
+                    $storyInfo['album_id'] = $value['album_id'];
+                    //部分英文故事辑里面会有多余的反斜杠
+                    $storyInfo['title'] = stripslashes($value['title']);
+                    //$storyInfo['intro'] = $value['intro'];
+                    $storyInfo['times'] = $value['times'];
+                    $storyInfo['mediapath'] = $value['mediapath'];
+                    $storyInfo['view_order'] = $value['view_order'];
+                    $storyInfo['playcover'] = "";
                     if (!empty($value['cover'])) {
-                        $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $value['cover'], 460, $value['cover_time']);
+                        $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_STORY, $value['cover'], 230, $value['cover_time']);
                     }
-                    $albumInfo['listennum'] = 0;
-                    if (!empty($tagRelationList[$value['id']])) {
-                        $albumInfo['listennum'] = substr(intval($tagRelationList[$value['id']]['albumlistennum']), 0, 5);
-                    }
+                    $storyList[] = $storyInfo;
 
-                    $recommendAlbumList[] = $albumInfo;;
                 }
             }
+            $result['storylist'] = $storyList;
+            // 评论数量
+            $result['albuminfo']['commentnum'] = (int)$commentObj->get_total("`albumid`={$albumId} and `status`=1");
 
-            $result['recommendalbumlist'] = $recommendAlbumList;
+            // 评论列表
+            if ($_SERVER['visitorappversion'] < "120000") {
+                // 1.2版本以前的老版本，展示200条评论
+                $result['commentlist'] = $commentObj->get_comment_list("`albumid`={$albumId}", "ORDER BY `id` DESC ", 'up', 0, 200);
+            } else {
+                $result['commentlist'] = $commentObj->get_comment_list("`albumid`={$albumId}", "ORDER BY `id` DESC ", 'up', 0, $len);
+            }
+
+            if ($_SERVER['visitorappversion'] >= "130000") {
+                // 获取专辑标签列表
+                $tagnewobj = new TagNew();
+                $uimidinterestobj = new UimidInterest();
+                $dataAnalyticsObj = new DataAnalytics();
+                $userImsiObj = new UserImsi();
+                $taglist = array();
+                $recommendAlbumList = array();
+                $tagids = array();
+
+                // 获取当前专辑的标签
+                $relationtaglist = current($tagnewobj->getAlbumTagRelationListByAlbumIds($albumId));
+                if (!empty($relationtaglist)) {
+                    foreach ($relationtaglist as $value) {
+                        $tagids[] = $value['tagid'];
+                    }
+                    if (!empty($tagids)) {
+                        $tagids = array_unique($tagids);
+                        $taglist = $tagnewobj->getTagInfoByIds($tagids);
+                        if (!empty($taglist)) {
+                            $taglist = array_values($taglist);
+                        }
+                    }
+                }
+                $result['taglist'] = $taglist;
+
+                $interestList = array();
+                $interestTagIds = array();
+                $uimid = $userImsiObj->getUimid($uid);
+
+                // 获取设备喜好的标签
+                $interestList = $uimidinterestobj->getUimidInterestTagListByUimid($uimid, 10);
+                if (!empty($interestList)) {
+                    foreach ($interestList as $interestInfo) {
+                        $interestTagIds[] = $interestInfo['tagid'];
+                    }
+                }
+
+                $tagRelationAlbumIds = array();
+                $tagRelationAlbumList = array();
+                $tagRelationList = array();
+                if (!empty($interestTagIds)) {
+                    // 获取喜好标签的专辑
+                    $tagRelationList = $dataAnalyticsObj->getRecommendAlbumListByTagids($interestTagIds, 100);
+                } else {
+                    // 未登录、没有喜好的新用户，默认获取本专辑标签相同的其他专辑
+                    $tagRelationList = $dataAnalyticsObj->getRecommendAlbumListByTagids($tagids, 100);
+                }
+                if (!empty($tagRelationList)) {
+                    foreach ($tagRelationList as $value) {
+                        // 过滤当前专辑
+                        if ($value['albumid'] == $albumId) {
+                            continue;
+                        }
+                        $tagRelationAlbumIds[] = $value['albumid'];
+                    }
+                }
+
+                // 获取指定长度的推荐专辑id数组
+                if (!empty($tagRelationAlbumIds)) {
+                    $tagRelationAlbumIds = array_unique($tagRelationAlbumIds);
+                    // 随机推荐
+                    shuffle($tagRelationAlbumIds);
+                    $tagRelationAlbumIds = array_slice($tagRelationAlbumIds, 0, 6);
+                    $tagRelationAlbumList = $albumObj->getListByIds($tagRelationAlbumIds);
+                }
+
+                if (!empty($tagRelationAlbumList)) {
+                    foreach ($tagRelationAlbumList as $value) {
+
+                        $albumInfo = array();
+                        $albumIds[] = $value['id'];
+                        $albumInfo['id'] = $value['id'];
+                        $albumInfo['title'] = $value['title'];
+                        if (!empty($value['cover'])) {
+                            $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $value['cover'], 460, $value['cover_time']);
+                        }
+                        $albumInfo['listennum'] = 0;
+                        if (!empty($tagRelationList[$value['id']])) {
+                            $albumInfo['listennum'] = substr(intval($tagRelationList[$value['id']]['albumlistennum']), 0, 5);
+                        }
+
+                        $recommendAlbumList[] = $albumInfo;;
+                    }
+                }
+                $result['recommendalbumlist'] = $recommendAlbumList;
+            }
         }
+
 
         // 返回成功json
         $this->showSuccJson($result);

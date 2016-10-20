@@ -613,6 +613,8 @@ class TagNew extends ModelBase
         }
         // clear cache
         $this->clearAlbumTagRelationCacheByAlbumIds($albumid);
+        $listenObj = new Listen();
+        $listenObj->clearAlbumListenCountCache($albumid);
         if (!empty($relationids)) {
             $this->clearAlbumTagRelationCacheById($relationids);
         }
