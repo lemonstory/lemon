@@ -45,7 +45,11 @@ class info extends controller
             $albumInfo = $albumObj->get_album_info($albumId);
             $result['albuminfo']['id'] = $albumInfo['id'];
             $result['albuminfo']['title'] = $albumInfo['title'];
-            $result['albuminfo']['star_level'] = $albumInfo['star_level'];
+            $star_level = 0;
+            if (!empty($albumInfo['star_level'])) {
+                $star_level = $albumInfo['star_level'];
+            }
+            $result['albuminfo']['star_level'] = $star_level;
             $result['albuminfo']['story_num'] = $albumInfo['story_num'];
             $result['albuminfo']['intro'] = $albumInfo['intro'];
 
