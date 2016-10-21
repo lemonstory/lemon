@@ -9,7 +9,7 @@ class hotrecommendlist extends controller
         $currentfirsttagid = $this->getRequest("currentfirsttagid", 0);
         $isgettag = $this->getRequest("isgettag", 1);
         $p = $this->getRequest("p", 1);
-        $len = $this->getRequest("len", 20);
+        $len = $this->getRequest("len", 36);
         
         $userinfo = array();
         $albumids = array();
@@ -24,36 +24,24 @@ class hotrecommendlist extends controller
 
         // 热门推荐
         if ($_SERVER['visitorappversion'] < "130000") {
-            $recommendobj = new Recommend();
-            $hotrecommendres = $recommendobj->getRecommendHotList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $p, $len);
+            $hotrecommendres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 1, 0, 0, $p, $len);
         } else {
+
             if ($isgettag == 1) {
                 // 一级标签
                 $firsttaglist = $tagnewobj->getFirstTagList($first_tags_count);
             }
-
             //热门推荐->全部
-            if (empty($currentfirsttagid)) {
-
-                $recommendobj = new Recommend();
-                $hotrecommendres = $recommendobj->getRecommendHotList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $p, $len);
-
-                //无法对推荐做排序
-                //$currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
-
-            } else {
-
-                //热门推荐->子标签
-                $hotrecommendres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 1, 0, 0, $p, $len);
-            }
+            //热门推荐->子标签
+            $hotrecommendres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 1, 0, 0, $p, $len);
         }
-        
+
         if (! empty($hotrecommendres)) {
             foreach ($hotrecommendres as $value) {
-                $albumids[] = $value['id'];
+                $albumids[] = $value['albumid'];
             }
         }
-        
+
         if (! empty($albumids)) {
             $albumids = array_unique($albumids);
             // 专辑信息
@@ -70,11 +58,10 @@ class hotrecommendlist extends controller
                 $albumcommentnum = $commentobj->countAlbumComment($albumids);
             }
         }
-        
         $hotrecommendlist = array();
         if (! empty($hotrecommendres)) {
             foreach ($hotrecommendres as $value) {
-                $albumid = $value['id'];
+                $albumid = $value['albumid'];
                 if (! empty($albumlist[$albumid])) {
                     $albuminfo = $albumlist[$albumid];
                     if (!empty($albuminfo['cover'])) {
@@ -100,7 +87,7 @@ class hotrecommendlist extends controller
                 }
             }
         }
-        
+
         if ($_SERVER['visitorappversion'] < "130000") {
             $this->showSuccJson($hotrecommendlist);
         } else {
