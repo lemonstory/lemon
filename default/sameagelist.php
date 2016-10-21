@@ -1,14 +1,15 @@
 <?php
 include_once '../controller.php';
-class sameagelist extends controller 
+
+class sameagelist extends controller
 {
-    public function action() 
+    public function action()
     {
         $currentfirsttagid = $this->getRequest("currentfirsttagid", 0);
         $isgettag = $this->getRequest("isgettag", 1);
         $p = $this->getRequest("p", 1);
         $len = $this->getRequest("len", 20);
-        
+
         $uid = $this->getUid();
         $userinfo = array();
         $albumids = array();
@@ -21,21 +22,23 @@ class sameagelist extends controller
         $configVar = new ConfigVar();
         $albumObj = new Album();
         $first_tags_count = 8;
-        
         $babyagetype = 0;
-        if (! empty($uid)) {
+
+        if (!empty($uid)) {
             $userobj = new User();
             $userinfo = current($userobj->getUserInfo($uid, 1));
-            if (! empty($userinfo)) {
+            if (!empty($userinfo)) {
                 $userextobj = new UserExtend();
                 $babyagetype = $userextobj->getBabyAgeType($userinfo['age']);
             }
         }
-        
+
         // 同龄在听
         if ($_SERVER['visitorappversion'] < "130000") {
+
             $recommendobj = new Recommend();
             $sameageres = $recommendobj->getSameAgeListenList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $p, $len);
+
         } else {
             if ($isgettag == 1) {
                 // 一级标签
@@ -43,29 +46,17 @@ class sameagelist extends controller
             }
 
             //热门推荐->全部
-            if (empty($currentfirsttagid)) {
-
-                $recommendobj = new Recommend();
-                $sameageres = $recommendobj->getSameAgeListenList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $p, $len);
-
-                //无法识别年龄段及排序
-                //$currentfirsttagid = $tagnewobj->getFirstTagIds($first_tags_count);
-
-            } else {
-
-                //热门推荐->子标签
-                $sameageres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 0, 0, 1, $p, $len);
-            }
+            //热门推荐->子标签
+            $sameageres = $tagnewobj->getAlbumTagRelationListFromRecommend($currentfirsttagid, 0, 1, 0, $p, $len);
         }
-
-        if (! empty($sameageres)) {
+        if (!empty($sameageres)) {
             foreach ($sameageres as $value) {
-                $albumids[] = $value['id'];
+                $albumids[] = $value['albumid'];
             }
         }
-        
+
         $albumlist = array();
-        if (! empty($albumids)) {
+        if (!empty($albumids)) {
             $albumids = array_unique($albumids);
             // 专辑信息
             $albumobj = new Album();
@@ -82,12 +73,12 @@ class sameagelist extends controller
                 $albumcommentnum = $commentobj->countAlbumComment($albumids);
             }
         }
-        
+
         $sameagealbumlist = array();
-        if (! empty($sameageres)) {
+        if (!empty($sameageres)) {
             foreach ($sameageres as $value) {
-                $albumid = $value['id'];
-                if (! empty($albumlist[$albumid])) {
+                $albumid = $value['albumid'];
+                if (!empty($albumlist[$albumid])) {
                     $albuminfo = $albumlist[$albumid];
                     if (!empty($albuminfo['cover'])) {
                         $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
@@ -110,10 +101,11 @@ class sameagelist extends controller
                 }
             }
         }
-        
+
         if ($_SERVER['visitorappversion'] < "130000") {
             $this->showSuccJson($sameagealbumlist);
         } else {
+            $firsttaglist = array();
             $data = array(
                 "sameagelist" => $sameagealbumlist,
                 "firsttaglist" => $firsttaglist
@@ -122,4 +114,5 @@ class sameagelist extends controller
         }
     }
 }
+
 new sameagelist();

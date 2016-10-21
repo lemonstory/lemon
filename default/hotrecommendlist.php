@@ -91,7 +91,9 @@ class hotrecommendlist extends controller
         if ($_SERVER['visitorappversion'] < "130000") {
             $this->showSuccJson($hotrecommendlist);
         } else {
+            $firsttaglist = array();
             $data = array(
+
                 "hotrecommendlist" => $hotrecommendlist,
                 "firsttaglist" => $firsttaglist
             );

@@ -111,6 +111,7 @@ class newonlinelist extends controller
         if ($_SERVER['visitorappversion'] < "130000") {
             $this->showSuccJson($newalbumlist);
         } else {
+            $firsttaglist = array();
             $data = array(
                 "newonlinelist" => $newalbumlist,
                 "firsttaglist" => $firsttaglist
