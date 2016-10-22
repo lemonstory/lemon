@@ -270,6 +270,7 @@ class index extends controller
         if (!empty($albumList[$albumId])) {
             $albumInfo['id'] = $albumList[$albumId]['id'];
             $albumInfo['title'] = $albumList[$albumId]['title'];
+            $albumInfo['star_level'] = $albumList[$albumId]['star_level'];
             $albumInfo['intro'] = $albumList[$albumId]['intro'];
             if (!empty($albumList[$albumId]['cover'])) {
                 $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumList[$albumId]['cover'], 460, $albumList[$albumId]['cover']);
