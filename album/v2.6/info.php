@@ -27,11 +27,11 @@ class info extends controller
         $result['albumInfo']['age_str'] = sprintf("(%s)岁", $albumAgeLevelStr);
 
         $aliossObj = new AliOss();
-        if ($albumInfo['cover']) {
-            $result['albumInfo']['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
-        } else {
-            $result['albumInfo']['cover'] = $result['albumInfo']['s_cover'];
+        $cover = "";
+        if (!empty($albumInfo['cover'])) {
+            $cover = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
         }
+        $result['albumInfo']['cover'] = $cover;
 
         //简介为空的处理
         if (empty($result['albumInfo']['intro'])) {

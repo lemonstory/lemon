@@ -48,19 +48,18 @@ class info extends controller
             $star_level = 0;
             if (!empty($albumInfo['star_level'])) {
                 $star_level = $albumInfo['star_level'];
-            }
+            }       
             $result['albuminfo']['star_level'] = $star_level;
             $result['albuminfo']['story_num'] = $albumInfo['story_num'];
             $result['albuminfo']['intro'] = $albumInfo['intro'];
 
             $aliossObj = new AliOss();
+            $cover = "";
             if (!empty($albumInfo['cover'])) {
-                $result['albuminfo']['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
-            } else {
-                $result['albuminfo']['cover'] = $albumInfo['s_cover'];
+                $cover = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
             }
-
-
+            $result['albuminfo']['cover'] = $cover;
+            
             //简介为空的处理
             if (empty($albumInfo['intro'])) {
 
