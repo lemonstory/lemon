@@ -67,6 +67,7 @@ class info extends controller
         $storyList = array();
         $aliossObj = new AliOss();
         $storyResList = $story->get_album_story_list($albumId);
+        $storyTotal = $story->get_total(" `album_id`={$albumId} and `status`=1 ");
         if (!empty($storyResList)) {
             foreach ($storyResList as $value) {
                 
@@ -85,10 +86,19 @@ class info extends controller
                 $storyList[] = $storyInfo;
             }
         }
-        $result['storyList'] = $storyList;
+        $result['storyList']['total'] = $storyTotal;
+        $result['storyList']['items'] = $storyList;
 
         // 评论数量
         $result['albumInfo']['commentnum'] = (int)$comment->get_total("`albumid`={$albumId} and `status`=1");
+
+        //TODO:购买图书
+        $bugLinkArr = array(
+            'http://s.click.taobao.com/XHOTOQx',
+            '',
+        );
+        $key = rand(0, 1);
+        $result['albumInfo']['buy_link'] = $bugLinkArr[$key];
 
         // 获取专辑标签列表
         $tagNewObj = new TagNew();

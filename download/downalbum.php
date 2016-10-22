@@ -20,7 +20,7 @@ class downalbum extends controller
         
         // 获取专辑所有故事列表、以及音频文件地址、总下载大小
         $storyobj = new Story();
-        $storylist = $storyobj->get_album_story_list($albumid);
+        $storylist = $storyobj->get_album_story_list($albumid, 1, 10000);
         if (empty($storylist)) {
             $this->showErrorJson(ErrorConf::albumStoryListIsEmpty());
         }

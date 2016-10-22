@@ -59,7 +59,7 @@ class info extends controller
                 $cover = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
             }
             $result['albuminfo']['cover'] = $cover;
-            
+
             //简介为空的处理
             if (empty($albumInfo['intro'])) {
 
@@ -93,7 +93,7 @@ class info extends controller
 
             $storylist = array();
             $aliossObj = new AliOss();
-            $storyreslist = $storyObj->get_album_story_list($albumId);
+            $storyreslist = $storyObj->get_album_story_list($albumId, 1, 10000);
             if (!empty($storyreslist)) {
                 foreach ($storyreslist as $value) {
 

@@ -402,26 +402,29 @@ class Story extends ModelBase
 	/**
 	 * 获取专辑的故事列表
 	 */
-	public function get_album_story_list($album_id = 0)
+    public function get_album_story_list($album_id, $page = 1, $len = 50)
 	{
-		if (!$album_id) {
-			return array();
-		}
         $story_list = array();
-        // 读缓存
-        $key = RedisKey::getAlbumStoryListKey($album_id);
-        $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
-        $redisData = $redisobj->get($key);
-        if ($redisData) {
-            $story_list = json_decode($redisData, true);
-        } else {
-            $story_list = $this->get_list("`album_id`='{$album_id}' and status=1 and `mediapath` != '' ", '', '', ' ORDER BY `view_order` ASC,`id` ASC ');
-            // 缓存
-            if ($story_list) {
-                $redisobj->setex($key, 86400, json_encode($story_list));
+        $album_id = intval($album_id);
+        $page = intval($page);
+        $len = intval($len);
+        if ($album_id > 0 && $page > 0 && $len > 0) {
+            // 读缓存
+            $key = RedisKey::getAlbumStoryListKey($album_id, $page, $len);
+            $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
+            $redisData = $redisobj->get($key);
+            $offset = ($page - 1) * $len;
+            $limit = " {$offset},{$len} ";
+            if ($redisData) {
+                $story_list = json_decode($redisData, true);
+            } else {
+                $story_list = $this->get_list("`album_id`='{$album_id}' and status=1 and `mediapath` != '' ", $limit, '', ' ORDER BY `view_order` ASC,`id` ASC ');
+                // 缓存
+                if ($story_list) {
+                    $redisobj->setex($key, 86400, json_encode($story_list));
+                }
             }
-        }
-		
+		}
 		return $story_list;
 	}
 

@@ -179,9 +179,9 @@ class RedisKey
 	/**
 	 * 专辑的故事列表
 	 */
-	public static function getAlbumStoryListKey($albumId)
+	public static function getAlbumStoryListKey($albumId, $page, $len)
 	{
-		return 'album_story_list_'.$albumId;
+		return 'album_story_list_' . $albumId . '_' . $page . '_' . $len;
 	}
     
 	/**
