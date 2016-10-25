@@ -177,7 +177,6 @@ class Creator extends ModelBase
         return $arr;
     }
 
-
     public function getCreatorList($whereArr = array(), $currentPage = 1, $perPage = 50)
     {
 
@@ -195,6 +194,8 @@ class Creator extends ModelBase
             foreach ($whereArr as $key => $val) {
                 if ($key == 'nickname') {
                     $whereStr .= " and `{$key}` like :{$key}";
+                } else if ($key == 'creator_uid') {
+                    $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`uid` = :{$key}";
                 } else if ($key == 'start_uid_id') {
                     $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`uid` > :{$key}";
                 } else if ($key == 'album_num') {
@@ -263,6 +264,8 @@ class Creator extends ModelBase
             foreach ($whereArr as $key => $val) {
                 if ($key == 'nickname') {
                     $whereStr .= " and `{$key}` like :{$key}";
+                } else if ($key == 'creator_uid') {
+                    $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`uid` = :{$key}";
                 } else if ($key == 'start_uid_id') {
                     $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`uid` > :{$key}";
                 } else if ($key == 'album_num') {
@@ -279,8 +282,6 @@ class Creator extends ModelBase
         $sql = "SELECT COUNT(*)
                 from `{$this->CREATOR_TABLE_NAME}` LEFT JOIN `user_info` ON `{$this->CREATOR_TABLE_NAME}`.`uid` = `user_info`.`uid`  
                 WHERE {$whereStr}";
-        //var_dump($sql);
-
         $st = $db->prepare($sql);
         $st->execute($whereArr);
         $count = $st->fetch(PDO::FETCH_COLUMN);
