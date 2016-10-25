@@ -148,14 +148,7 @@ class Xmly extends Http
         while (true) {
             $page++;
             $album_url = "http://m.ximalaya.com/album/more_tracks?url=%2Falbum%2Fmore_tracks&aid={$album_id}&page={$page}";
-
-
-            if ($page == 1) {
-                $content = Http::ajax_get($album_url);
-            } else {
-                $content = Http::ajax_get($album_url);
-            }
-
+            $content = Http::ajax_get($album_url);
             // 内不存在直接返回空
             if (strstr($content, '您查看的内容不存在')) {
                 return array();
@@ -166,7 +159,6 @@ class Xmly extends Http
             if (isset($content['sound_ids']) && !$content['sound_ids']) {
                 break;
             }
-
             preg_match_all('/<li [\s|\S]*?<\/li>/', $content['html'], $result);
 
             if ($result[0]) {
@@ -208,20 +200,52 @@ class Xmly extends Http
 
     /**
      * @param $album_url http://m.ximalaya.com/1870065/album/4975103
+     * @return $$album_info
+     *              $album_info['cover']
+     *              $album_info['title']
+     *              $album_info['play_count']
+     *              $album_info['anchor']['name']
+     *              $album_info['anchor']['avatar']
+     *              $album_info['anchor']['intro']
      */
     public function get_album_info($album_url)
     {
-
         $album_info = array();
         $content = Http::get($album_url);
         //封面
-        $album_info['cover'] = trim(Http::sub_data($content, '<img itemprop="image" src="', '"'));
+        $image_url = trim(Http::sub_data($content, '<img itemprop="image" src="', '"'));
+        $album_info['cover'] = str_replace("_web_large", "", $image_url);
         //标题
         $album_info['title'] = trim(Http::sub_data($content, '<h2 class="album-tit elli-multi" itemprop="name">', '</h2>'));
-        //TODO:主播可能会有多个
-        $album_info['anchor'] = trim(Http::sub_data($content, 'itemprop="url">', '</a>'));
+        //主播
+        $album_info['anchor']['name'] = trim(Http::sub_data($content, 'itemprop="url">', '</a>'));
+        $album_info['anchor']['avatar'] = '';
+        $album_info['anchor']['intro'] = '';
+        //主播头像
+        $album_url_arr = @parse_url($album_url);
+        if (is_array($album_url_arr) && !empty($album_url_arr)) {
+
+            $anchor_url = $album_url_arr['scheme'] . '://' . $album_url_arr['host'] . trim(Http::sub_data($content, 'c-link nickname" href="', '"'));
+            $anchor_content = Http::get($anchor_url);
+            $image_url = Http::sub_data($anchor_content, '<img class="circle" src="', '">');
+            $image_url = str_replace("_web_large", "", $image_url);
+            $album_info['anchor']['avatar'] = $image_url;
+
+            $intro = Http::sub_data($anchor_content, '<p class="intro">', '</p>');
+            $album_info['anchor']['intro'] = $intro;
+        }
         //播放次数
-        $album_info['play_count'] = trim(Http::sub_data($content, '播放：</span>', '</p>'));
+        $count_str = trim(Http::sub_data($content, '播放：</span>', '</p>'));
+        $mult = 1;
+        $pos = strpos($count_str, "万");
+        if ($pos !== false) {
+            $mult = 10000;
+            $count_str = str_replace("万", "", $count_str);
+        }
+        $count_str = str_replace("次", "", $count_str);
+        $count_int = $count_str * $mult;
+        $album_info['play_count'] = intval($count_int);
+
         return $album_info;
     }
 }
