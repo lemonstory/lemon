@@ -12,6 +12,7 @@ class albumstorysearch extends controller
         $searchcontent = $this->getRequest("searchcontent");
         $page = $this->getRequest("page", 1);
         $len = $this->getRequest("len", 10);
+        $configVarObj = new ConfigVar();
         $len = 50;
         if (!empty($searchtype) && !in_array($searchtype, array("story", "album"))) {
             $this->showErrorJson(ErrorConf::paramError());
@@ -76,8 +77,8 @@ class albumstorysearch extends controller
                         $info['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $value['cover'], 100, $value['cover_time']);
                         $info['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $value['cover'], 230, $value['cover_time']);
                     } else {
-                        $info['cover'] = "";
-                        $info['playcover'] = "";
+                        $info['cover'] = $configVarObj->DEFAULT_STORY_COVER;
+                        $info['playcover'] = $configVarObj->DEFAULT_STORY_COVER;
                     }
                     if ($_SERVER['visitorappversion'] > $this->OnlineVerionNow) {
                         $info['title'] = $storysummarytitles[$info['id']];

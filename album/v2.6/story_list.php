@@ -21,7 +21,11 @@ class storyList extends controller
 
             $storyList = array();
             $aliossObj = new AliOss();
+            $albumObj = new Album();
             $storyObj = new Story();
+            $configVarObj = new ConfigVar();
+            // 专辑信息
+            $albumInfo = $albumObj->get_album_info($albumId);
             $storyResList = $storyObj->get_album_story_list($albumId, $page, $len);
             $storyTotal = $storyObj->get_total(" `album_id`={$albumId} and `status`=1 ");
             if (!empty($storyResList)) {
@@ -35,9 +39,11 @@ class storyList extends controller
                     $storyInfo['times'] = $value['times'];
                     $storyInfo['mediapath'] = $value['mediapath'];
                     $storyInfo['view_order'] = $value['view_order'];
-                    $storyInfo['playcover'] = "";
+                    $storyInfo['playcover'] = $configVarObj->DEFAULT_STORY_COVER;
                     if (!empty($value['cover'])) {
-                        $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_STORY, $value['cover'], 230, $value['cover_time']);
+                        $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_STORY, $value['cover'], 460, $value['cover_time']);
+                    } else if (!empty($albumInfo['cover'])) {
+                        $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
                     }
                     $storyList[] = $storyInfo;
                 }

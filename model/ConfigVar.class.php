@@ -83,4 +83,7 @@ class ConfigVar
     public $SAME_AGE_TAG_ID = "10001";
     //最新上架tag_id
     public $NEW_ONLINE_TAG_ID = "10002";
+
+    public $DEFAULT_ALBUM_COVER = "http://p.xiaoningmeng.net/album/default.png";
+    public $DEFAULT_STORY_COVER = "http://p.xiaoningmeng.net/album/default.png";
 }

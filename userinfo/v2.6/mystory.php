@@ -12,7 +12,7 @@ class myStory extends controller
         $startAlbumId = $this->getRequest("start_album_id", 0);
         $len = $this->getRequest("len", 20);
         $uid = $this->getUid();
-        $storyCoverSize = 230;
+        $storyCoverSize = 460;
         $favCount = 0;
         $listenAlbumList = array();
 
@@ -28,6 +28,7 @@ class myStory extends controller
             $listenObj = new Listen();
             $favObj = new Fav();
             $storyObj = new Story();
+            $configVarObj = new ConfigVar();
             $storyList = array();
 
             //我的收藏总数
@@ -45,6 +46,11 @@ class myStory extends controller
                 if (!empty($albumIds)) {
                     $albumIds = array_unique($albumIds);
 
+                    // 专辑列表
+                    $albumObj = new Album();
+                    $albumList = array();
+                    $albumList = $albumObj->getListByIds($albumIds);
+
                     // 专辑下最近播放的故事记录
                     $useralbumlogobj = new UserAlbumLog();
                     $playLogList = array();
@@ -60,13 +66,17 @@ class myStory extends controller
                         $albumStoryRes = $storyObj->get_list("`id` IN ({$playStoryIdstr})");
                         if (!empty($albumStoryRes)) {
                             foreach ($albumStoryRes as $item) {
+                                $albumId = $item['album_id'];
+                                $albumInfo = $albumList[$albumId];
                                 $storyInfo = array();
                                 $storyInfo['id'] = $item['id'];
                                 $storyInfo['album_id'] = $item['album_id'];
                                 $storyInfo['title'] = $item['title'];
-                                $item['playcover'] = "";
+                                $item['playcover'] = $configVarObj->DEFAULT_STORY_COVER;
                                 if (!empty($item['cover'])) {
                                     $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_STORY, $item['cover'], $storyCoverSize, $item['cover_time']);
+                                } else if (!empty($albumInfo['cover'])) {
+                                    $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], $storyCoverSize, $albumInfo['cover_time']);
                                 }
                                 $storyInfo['mediapath'] = $item['mediapath'];
                                 //$storyInfo['view_order'] = $item['view_order'];
@@ -75,10 +85,7 @@ class myStory extends controller
                         }
                     }
 
-                    // 专辑列表
-                    $albumObj = new Album();
-                    $albumList = array();
-                    $albumList = $albumObj->getListByIds($albumIds);
+
                     foreach ($listenAlbumRes as $item) {
                         $listenAlbumItem = array();
                         $albumId = $item['albumid'];

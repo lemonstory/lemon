@@ -14,6 +14,7 @@ class info extends controller
         $comment = new Comment();
         $fav = new Fav();
         $listenobj = new Listen();
+        $configVarObj = new ConfigVar();
         $uid = $this->getUid();
 
         // 专辑信息
@@ -27,7 +28,7 @@ class info extends controller
         $result['albumInfo']['age_str'] = sprintf("(%s)岁", $albumAgeLevelStr);
 
         $aliossObj = new AliOss();
-        $cover = "";
+        $cover = $configVarObj->DEFAULT_ALBUM_COVER;
         if (!empty($albumInfo['cover'])) {
             $cover = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
         }
@@ -79,9 +80,11 @@ class info extends controller
                 $storyInfo['times'] = $value['times'];
                 $storyInfo['mediapath'] = $value['mediapath'];
                 $storyInfo['view_order'] = $value['view_order'];
-                $storyInfo['playcover'] = "";
+                $storyInfo['playcover'] = $configVarObj->DEFAULT_STORY_COVER;
                 if (!empty($value['cover'])) {
-                    $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_STORY, $value['cover'], 230, $value['cover_time']);
+                    $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_STORY, $value['cover'], 460, $value['cover_time']);
+                } else if (!empty($albumInfo['cover'])) {
+                    $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
                 }
                 $storyList[] = $storyInfo;
             }

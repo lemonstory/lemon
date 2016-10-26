@@ -3,15 +3,16 @@
  * 我的故事页
  */
 include_once '../controller.php';
-class mystory extends controller 
+
+class mystory extends controller
 {
-    public function action() 
+    public function action()
     {
         $isgetcount = $this->getRequest("isgetcount", 0);
         $direction = $this->getRequest("direction", "down");
         $startalbumid = $this->getRequest("startalbumid", 0);
         $len = $this->getRequest("len", 0);
-        
+
         $uid = $this->getUid();
         if (empty($uid)) {
             // 未登录返回空数据
@@ -22,15 +23,16 @@ class mystory extends controller
         if (empty($uimid)) {
             $this->showErrorJson(ErrorConf::userImsiIdError());
         }
-        
+
         $aliossobj = new AliOss();
         $listenobj = new Listen();
         $favobj = new Fav();
         $storyobj = new Story();
-        
+        $configVarObj = new ConfigVar();
+
         $listenalbumlist = array();
         $storylist = array();
-        
+
         $listenalbumres = $listenobj->getUserAlbumListenList($uimid, $direction, $startalbumid, $len);
         if (!empty($listenalbumres)) {
             $albumids = array();
@@ -45,11 +47,11 @@ class mystory extends controller
                 // 专辑列表
                 $albumobj = new Album();
                 $albumlist = $albumobj->getListByIds($albumids);
-                
+
                 // 专辑下最近播放的故事记录
                 $useralbumlogobj = new UserAlbumLog();
                 $playloglist = $useralbumlogobj->getPlayInfoByAlbumIds($albumids);
-                
+
                 if ($_SERVER['visitorappversion'] < "130000") {
                     // 专辑收听总数
                     $albumlistennum = $listenobj->getAlbumListenNum($albumids);
@@ -58,16 +60,19 @@ class mystory extends controller
                     // 专辑评论总数
                     $commentobj = new Comment();
                     $albumcommentnum = $commentobj->countAlbumComment($albumids);
-                    
+
                     // 专辑下，uid或设备收听的故事列表
                     $albumidstr = implode(",", $albumids);
                     $albumstoryres = $storyobj->get_list("`album_id` IN ({$albumidstr})");
                     if (!empty($albumstoryres)) {
                         foreach ($albumstoryres as $storyinfo) {
                             $albumid = $storyinfo['album_id'];
-                            $storyinfo['playcover'] = "";
+                            $albuminfo = $albumlist[$albumid];
+                            $storyinfo['playcover'] = $configVarObj->DEFAULT_STORY_COVER;;
                             if (!empty($storyinfo['cover'])) {
-                                $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 230, $storyinfo['cover_time']);
+                                $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 460, $storyinfo['cover_time']);
+                            } else if (!empty($albuminfo['cover'])) {
+                                $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
                             }
                             $storylist[$albumid][] = $storyinfo;
                         }
@@ -83,9 +88,12 @@ class mystory extends controller
                         if (!empty($albumstoryres)) {
                             foreach ($albumstoryres as $storyinfo) {
                                 $albumid = $storyinfo['album_id'];
-                                $storyinfo['playcover'] = "";
+                                $albuminfo = $albumlist[$albumid];
+                                $storyinfo['playcover'] = $configVarObj->DEFAULT_STORY_COVER;
                                 if (!empty($storyinfo['cover'])) {
-                                    $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 230, $storyinfo['cover_time']);
+                                    $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 460, $storyinfo['cover_time']);
+                                } else if (!empty($albuminfo['cover'])) {
+                                    $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
                                 }
                                 $storylist[$albumid] = $storyinfo;
                             }
@@ -93,7 +101,7 @@ class mystory extends controller
                     }
                 }
             }
-            
+
             foreach ($listenalbumres as $value) {
                 $albumid = $value['albumid'];
                 if (empty($albumlist[$albumid])) {
@@ -106,12 +114,13 @@ class mystory extends controller
                     $value['playstoryid'] = $playloglist[$albumid]['storyid'] + 0;
                     $value['playtimes'] = $playloglist[$albumid]['playtimes'] + 0;
                 }
-                
+
                 $albuminfo = $albumlist[$albumid];
+                $albuminfo['cover'] = $configVarObj->DEFAULT_ALBUM_COVER;
                 if (!empty($albuminfo['cover'])) {
                     $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 100, $albuminfo['cover_time']);
                 }
-                
+
                 if ($_SERVER['visitorappversion'] < "130000") {
                     $albuminfo['listennum'] = 0;
                     if (!empty($albumlistennum[$albumid])) {
@@ -136,12 +145,12 @@ class mystory extends controller
                         $albuminfo['storyinfo'] = $storylist[$albumid];
                     }
                 }
-                
+
                 $value['albuminfo'] = $albuminfo;
                 $listenalbumlist[] = $value;
             }
         }
-        
+
         $favcount = 0;
         if ($isgetcount == 1) {
             // 我的收藏总数
@@ -149,11 +158,12 @@ class mystory extends controller
                 $favcount = $favobj->getUserFavCount($uid);
             }
             // 我的下载总数本地存储
-            
+
         }
-        
+
         $data = array('listenalbumlist' => $listenalbumlist, 'favcount' => $favcount);
         $this->showSuccJson($data);
     }
 }
+
 new mystory();
