@@ -68,12 +68,13 @@ class mystory extends controller
                         foreach ($albumstoryres as $storyinfo) {
                             $albumid = $storyinfo['album_id'];
                             $albuminfo = $albumlist[$albumid];
-                            $storyinfo['playcover'] = $configVarObj->DEFAULT_STORY_COVER;;
+                            $playcover = $configVarObj->DEFAULT_STORY_COVER;;
                             if (!empty($storyinfo['cover'])) {
-                                $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 460, $storyinfo['cover_time']);
+                                $playcover = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 460, $storyinfo['cover_time']);
                             } else if (!empty($albuminfo['cover'])) {
-                                $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
+                                $playcover = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
                             }
+                            $storyinfo['playcover'] = $playcover;
                             $storylist[$albumid][] = $storyinfo;
                         }
                     }
@@ -89,12 +90,13 @@ class mystory extends controller
                             foreach ($albumstoryres as $storyinfo) {
                                 $albumid = $storyinfo['album_id'];
                                 $albuminfo = $albumlist[$albumid];
-                                $storyinfo['playcover'] = $configVarObj->DEFAULT_STORY_COVER;
+                                $playcover = $configVarObj->DEFAULT_STORY_COVER;
                                 if (!empty($storyinfo['cover'])) {
-                                    $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 460, $storyinfo['cover_time']);
+                                    $playcover = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_STORY, $storyinfo['cover'], 460, $storyinfo['cover_time']);
                                 } else if (!empty($albuminfo['cover'])) {
-                                    $storyinfo['playcover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
+                                    $playcover = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 460, $albuminfo['cover_time']);
                                 }
+                                $storyinfo['playcover'] = $playcover;
                                 $storylist[$albumid] = $storyinfo;
                             }
                         }
@@ -116,10 +118,11 @@ class mystory extends controller
                 }
 
                 $albuminfo = $albumlist[$albumid];
-                $albuminfo['cover'] = $configVarObj->DEFAULT_ALBUM_COVER;
+                $conver = $configVarObj->DEFAULT_ALBUM_COVER;
                 if (!empty($albuminfo['cover'])) {
-                    $albuminfo['cover'] = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 100, $albuminfo['cover_time']);
+                    $conver = $aliossobj->getImageUrlNg($aliossobj->IMAGE_TYPE_ALBUM, $albuminfo['cover'], 100, $albuminfo['cover_time']);
                 }
+                $albuminfo['cover'] = $conver;
 
                 if ($_SERVER['visitorappversion'] < "130000") {
                     $albuminfo['listennum'] = 0;
