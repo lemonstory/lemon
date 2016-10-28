@@ -210,6 +210,7 @@ class info extends controller
                         if (!empty($tagRelationList[$value['id']])) {
                             $albumInfo['listennum'] = substr(intval($tagRelationList[$value['id']]['albumlistennum']), 0, 5);
                         }
+                        $albumInfo['star_level'] = $value['star_level'];
 
                         $recommendAlbumList[] = $albumInfo;;
                     }

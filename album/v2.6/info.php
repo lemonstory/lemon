@@ -192,7 +192,7 @@ class info extends controller
                 $albumIds[] = $value['id'];
                 $albumInfo['id'] = $value['id'];
                 $albumInfo['title'] = $value['title'];
-                //$albumInfo['star_level'] = $value['star_level'];
+                $albumInfo['star_level'] = $value['star_level'];
                 //$albumInfo['story_num'] = $value['story_num'];
                 //$albumInfo['intro'] = $value['intro'];
                 $albumAgeLevelStr = $albumObj->getAgeLevelStr($value['min_age'], $value['max_age']);
