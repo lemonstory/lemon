@@ -34,45 +34,31 @@ class index extends controller
             $data['focus_pic']['items'] = $focuspiclist;
         }
 
-        //年龄分组
-        $data['age_level']['total'] = 4;
-        $data['age_level']['items'][] = array(
-            "cover" => "http://lemonpic.oss-cn-hangzhou.aliyuncs.com/focus/1.png",
-            "title" => "0-2岁",
-            //"linkurl"   => "xnm://www.xiaoningmeng.net/age_level/info.php?min=0&max=2",
-        );
-        $data['age_level']['items'][] = array(
-            "cover" => "http://lemonpic.oss-cn-hangzhou.aliyuncs.com/focus/1.png",
-            "title" => "3-6岁",
-            //"linkurl"   => "xnm://www.xiaoningmeng.net/age_level/info.php?min=3&max=6",
-        );
-        $data['age_level']['items'][] = array(
-            "cover" => "http://lemonpic.oss-cn-hangzhou.aliyuncs.com/focus/1.png",
-            "title" => "7-10岁",
-            //"linkurl"   => "xnm://www.xiaoningmeng.net/age_level/info.php?min=7&max=10",
-        );
-        $data['age_level']['items'][] = array(
-            "cover" => "http://lemonpic.oss-cn-hangzhou.aliyuncs.com/focus/1.png",
-            "title" => "11-14岁",
-            //"linkurl"   => "xnm://www.xiaoningmeng.net/age_level/info.php?min=11&max=14",
-        );
-
         //内容分类
-        $data['content_category']['total'] = 3;
+        $total = 8;
+        $data['content_category']['total'] = $total;
+        $tagNewObj = new TagNew();
+        $firstTagRes = $tagNewObj->getFirstTagList($total - 1);
+        if (!empty($firstTagRes)) {
+            foreach ($firstTagRes as $value) {
+
+                $title = $value['name'];
+                if (!empty($value['cover'])) {
+                    $cover = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_TAG, $value['cover'], 0, $value['covertime']);
+                }
+                $linkurl = "xnm://www.xiaoningmeng.net/default/v2.6/tag_album_list.php?tag_id={$value['id']}";
+                $data['content_category']['items'][] = array(
+                    "title" => $title,
+                    "cover" => $cover,
+                    "linkurl" => $linkurl,
+                );
+            }
+        }
+        //全部分类
         $data['content_category']['items'][] = array(
-            "cover" => "http://p.xiaoningmeng.net/tag/2016/01/28/c81e728d9d4c2f636f067f89cc14862c.png?v=1453911544",
-            "title" => "分类",
-            //"linkurl" => "xnm://www.xiaoningmeng.net/album/tag_list.php"
-        );
-        $data['content_category']['items'][] = array(
-            "cover" => "http://p.xiaoningmeng.net/tag/2016/01/28/c81e728d9d4c2f636f067f89cc14862c.png?v=1453911544",
-            "title" => "作者",
-            //"linkurl" => "xnm://www.xiaoningmeng.net/album/author_list.php"
-        );
-        $data['content_category']['items'][] = array(
-            "cover" => "http://p.xiaoningmeng.net/tag/2016/01/28/c81e728d9d4c2f636f067f89cc14862c.png?v=1453911544",
-            "title" => "主播",
-            //"linkurl" => "xnm://www.xiaoningmeng.net/album/anchor_list.php"
+            "title" => "全部分类",
+            "cover" => "http://p.xiaoningmeng.net/tag/all_1080.png",
+            "linkurl" => "xnm://www.xiaoningmeng.net/default/v2.6/category.php"
         );
 
         $albumLen = 6;
