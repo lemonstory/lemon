@@ -29,6 +29,7 @@ class Creator extends ModelBase
         $st = $db->prepare($sql);
         $st->execute();
         $sso_uid_arr = $st->fetchAll(PDO::FETCH_ASSOC);
+
         if (is_array($sso_uid_arr) && !empty($sso_uid_arr)) {
 
             $sso_uid_str = "";
@@ -56,7 +57,7 @@ class Creator extends ModelBase
             //TODO:同名的作者处理不严谨
             if (count($uid_arr) > 1) {
                 $content = sprintf("作者名称为: [%s] 共有 %d 个\r\n", $name, count($uid_arr));
-                echo $content;
+                //echo $content;
             }
             $uid = intval($uid_arr[0]);
         }
@@ -193,7 +194,7 @@ class Creator extends ModelBase
 
             foreach ($whereArr as $key => $val) {
                 if ($key == 'nickname') {
-                    $whereStr .= " and `{$key}` like :{$key}";
+                    $whereStr .= " and `user_info`.`nickname` like :{$key}";
                 } else if ($key == 'creator_uid') {
                     $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`uid` = :{$key}";
                 } else if ($key == 'start_uid_id') {
@@ -202,12 +203,15 @@ class Creator extends ModelBase
                     $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`album_num` > :{$key}";
                 } else if ($key == 'user_info_status') {
                     $whereStr .= " and `user_info`.`status` = :{$key}";
+                } else if ($key == 'is_author') {
+                    $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`is_author` = :{$key}";
+                } else if ($key == 'online_status') {
+                    $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`online_status` = :{$key}";
                 } else {
                     $whereStr .= " and `{$key}` = :{$key}";
                 }
             }
         }
-
 
         $offset = ($currentPage - 1) * $perPage;
 
@@ -216,11 +220,13 @@ class Creator extends ModelBase
                   `{$this->CREATOR_TABLE_NAME}`.`uid` as uid,
                   `{$this->CREATOR_TABLE_NAME}`.`album_num` as album_num,
                   `{$this->CREATOR_TABLE_NAME}`.`listen_num` as listen_num,
+                  `{$this->CREATOR_TABLE_NAME}`.`add_time` as add_time,
+                  `{$this->CREATOR_TABLE_NAME}`.`view_order` as view_order,
+                  `{$this->CREATOR_TABLE_NAME}`.`online_status` as online_status,
                   `user_info`.`nickname` as nickname, 
                   `user_info`.`avatartime` as avatartime 
                 from `{$this->CREATOR_TABLE_NAME}` LEFT JOIN `user_info` ON `{$this->CREATOR_TABLE_NAME}`.`uid` = `user_info`.`uid`  
-                WHERE {$whereStr} ORDER BY `{$this->CREATOR_TABLE_NAME}`.`uid` ASC  LIMIT {$offset}, {$perPage}";
-
+                WHERE {$whereStr} ORDER BY `{$this->CREATOR_TABLE_NAME}`.`album_num` DESC LIMIT {$offset}, {$perPage}";
         $st = $db->prepare($sql);
         $st->execute($whereArr);
         $arr = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -263,7 +269,7 @@ class Creator extends ModelBase
 
             foreach ($whereArr as $key => $val) {
                 if ($key == 'nickname') {
-                    $whereStr .= " and `{$key}` like :{$key}";
+                    $whereStr .= " and `user_info`.`nickname` like :{$key}";
                 } else if ($key == 'creator_uid') {
                     $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`uid` = :{$key}";
                 } else if ($key == 'start_uid_id') {
@@ -272,16 +278,20 @@ class Creator extends ModelBase
                     $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`album_num` > :{$key}";
                 } else if ($key == 'user_info_status') {
                     $whereStr .= " and `user_info`.`status` = :{$key}";
+                } else if ($key == 'is_author') {
+                    $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`is_author` = :{$key}";
+                } else if ($key == 'online_status') {
+                    $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`online_status` = :{$key}";
                 } else {
                     $whereStr .= " and `{$key}` = :{$key}";
                 }
             }
         }
-
         $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
-        $sql = "SELECT COUNT(*)
+        $sql = "SELECT COUNT(*) as count
                 from `{$this->CREATOR_TABLE_NAME}` LEFT JOIN `user_info` ON `{$this->CREATOR_TABLE_NAME}`.`uid` = `user_info`.`uid`  
                 WHERE {$whereStr}";
+
         $st = $db->prepare($sql);
         $st->execute($whereArr);
         $count = $st->fetch(PDO::FETCH_COLUMN);
