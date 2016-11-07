@@ -25,7 +25,7 @@ class info extends controller
         $result['albumInfo']['story_num'] = $albumInfo['story_num'];
         $result['albumInfo']['intro'] = $albumInfo['intro'];
         $albumAgeLevelStr = $albumObj->getAgeLevelStr($albumInfo['min_age'], $albumInfo['max_age']);
-        $result['albumInfo']['age_str'] = sprintf("(%s)岁", $albumAgeLevelStr);
+        $result['albumInfo']['age_str'] = sprintf("适合%s岁", $albumAgeLevelStr);
 
         $aliossObj = new AliOss();
         $cover = $configVarObj->DEFAULT_ALBUM_COVER;
@@ -74,6 +74,7 @@ class info extends controller
                 
                 $storyInfo = array();
                 $storyInfo['id'] = $value['id'];
+                $storyInfo['album_id'] = $value['album_id'];
                 //部分英文故事辑里面会有多余的反斜杠
                 $storyInfo['title'] = stripslashes($value['title']);
                 //$storyInfo['intro'] = $value['intro'];
