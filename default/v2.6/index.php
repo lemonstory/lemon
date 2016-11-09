@@ -259,7 +259,7 @@ class index extends controller
             $albumInfo['star_level'] = $albumList[$albumId]['star_level'];
             $albumInfo['intro'] = $albumList[$albumId]['intro'];
             if (!empty($albumList[$albumId]['cover'])) {
-                $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumList[$albumId]['cover'], 460, $albumList[$albumId]['cover']);
+                $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumList[$albumId]['cover'], 460, $albumList[$albumId]['cover_time']);
             }
             $albumInfo['listennum'] = 0;
             if (!empty($albumListenNum[$albumId])) {
