@@ -108,9 +108,7 @@ class info extends controller
                     $storyInfo['mediapath'] = $value['mediapath'];
                     $storyInfo['view_order'] = $value['view_order'];
                     $storyInfo['playcover'] = $configVarObj->DEFAULT_STORY_COVER;
-                    if (!empty($value['cover'])) {
-                        $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_STORY, $value['cover'], 460, $value['cover_time']);
-                    } else if (!empty($albumInfo['cover'])) {
+                    if (!empty($albumInfo['cover'])) {
                         $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
                     }
                     $storyList[] = $storyInfo;
