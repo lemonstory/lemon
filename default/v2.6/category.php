@@ -25,7 +25,7 @@ class categorylist extends controller
                 $item = array();
                 $item['title'] = sprintf("%s-%s岁", $val['min_age'], $val['max_age']);
                 $item['cover'] = sprintf("http://p.xiaoningmeng.net/age_level/%s-%s.png", $val['min_age'], $val['max_age']);
-                $item['link'] = sprintf("xnm://api.xiaoningmeng.net/default/v2.6/age_level_list.php?min_age=%s&min_age=%s", $val['min_age'], $val['max_age']);
+                $item['linkurl'] = sprintf("xnm://www.xiaoningmeng.net/default/v2.6/age_level_list.php?min_age=%s&min_age=%s", $val['min_age'], $val['max_age']);
                 $data['age_level']['items'][] = $item;
             }
         }
@@ -41,7 +41,7 @@ class categorylist extends controller
             //取二级分类
             $secondList = $tagInfoObj->get_list(' pid = '.$val['id'].' and status=1','id,name','ordernum asc',100);
             foreach ($secondList as $key => $val) {
-                $secondList[$key]['link'] = sprintf("xnm://api.xiaoningmeng.net/default/v2.6/tag_album_list.php?tag_id=%s", $val['id']);
+                $secondList[$key]['linkurl'] = sprintf("xnm://www.xiaoningmeng.net/default/v2.6/tag_album_list.php?tag_id=%s", $val['id']);
             }
             $tmp['child_total'] = count($secondList);
             $tmp['child_items'] = $secondList;
