@@ -38,10 +38,18 @@ class categorylist extends controller
         foreach($firstList as $key=>$val){
             $tmp['id'] = $val['id'];
             $tmp['name'] = $val['name'];
+
             //取二级分类
-            $secondList = $tagInfoObj->get_list(' pid = '.$val['id'].' and status=1','id,name','ordernum asc',100);
+            $secondList = $tagInfoObj->get_list(' pid = ' . $val['id'] . ' and status=1', 'id,name,cover,covertime', 'ordernum asc', 100);
             foreach ($secondList as $key => $val) {
+                $secondList[$key]['id'] = $val['id'];
+                $secondList[$key]['name'] = $val['name'];
+                $secondList[$key]['cover'] = "";
+                if (!empty($value['cover'])) {
+                    $secondList[$key]['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_TAG, $val['cover'], 0, $val['covertime']);
+                }
                 $secondList[$key]['linkurl'] = sprintf("xnm://www.xiaoningmeng.net/default/v2.6/tag_album_list.php?tag_id=%s", $val['id']);
+                unset($secondList[$key]['covertime']);
             }
             $tmp['child_total'] = count($secondList);
             $tmp['child_items'] = $secondList;
