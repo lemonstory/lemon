@@ -132,6 +132,7 @@ class index extends controller
             'tag_id' => $configVar->HOT_RECOMMEND_TAG_ID,
             'title' => "今日精选",
             'total' => count($hotRecommendList),
+            'linkurl' => "xnm://www.xiaoningmeng.net/default/v2.6/recommend_list.php",
             'items' => $hotRecommendList,
         );
 
@@ -149,6 +150,7 @@ class index extends controller
             'tag_id' => $configVar->SAME_AGE_TAG_ID,
             'title' => "同龄在听",
             'total' => count($sameAgeAlbumList),
+            'linkurl' => "xnm://www.xiaoningmeng.net/default/v2.6/same_age_list.php",
             'items' => $sameAgeAlbumList,
         );
 
@@ -164,6 +166,7 @@ class index extends controller
             'tag_id' => $configVar->NEW_ONLINE_TAG_ID,
             'title' => "最新上架",
             'total' => count($newAlbumList),
+            'linkurl' => "xnm://www.xiaoningmeng.net/default/v2.6/online_list.php",
             'items' => $newAlbumList,
         );
 
@@ -213,6 +216,7 @@ class index extends controller
                 $albumSectionItem['tag_id'] = $tagItem['id'];
                 $albumSectionItem['title'] = $tagItem['name'];
                 $albumSectionItem['total'] = 0;
+                $albumSectionItem['linkurl'] = "xnm://www.xiaoningmeng.net/default/v2.6/tag_album_list.php?tag_id={$tagItem['id']}";
                 $albumSectionItem['items'] = array();
 
                 $id = $tagItem['id'];
