@@ -32,6 +32,7 @@ class categorylist extends controller
 
         $data['tag'] = array();
         $tagInfoObj = new TagInfo();
+        $aliossObj = new AliOss();
         //获取一级分类
         $firstList = $tagInfoObj->get_list(' pid = 0 and status=1','id,name','ordernum asc',100);
         $data['tag']['total'] = count($firstList);
@@ -45,7 +46,7 @@ class categorylist extends controller
                 $secondList[$key]['id'] = $val['id'];
                 $secondList[$key]['name'] = $val['name'];
                 $secondList[$key]['cover'] = "";
-                if (!empty($value['cover'])) {
+                if (!empty($val['cover'])) {
                     $secondList[$key]['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_TAG, $val['cover'], 0, $val['covertime']);
                 }
                 $secondList[$key]['linkurl'] = sprintf("xnm://www.xiaoningmeng.net/default/v2.6/tag_album_list.php?tag_id=%s", $val['id']);
