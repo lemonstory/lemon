@@ -25,7 +25,9 @@ class categorylist extends controller
                 $item = array();
                 $item['title'] = sprintf("%s-%s岁", $val['min_age'], $val['max_age']);
                 $item['cover'] = sprintf("http://p.xiaoningmeng.net/age_level/%s-%s.png", $val['min_age'], $val['max_age']);
-                $item['linkurl'] = sprintf("xnm://www.xiaoningmeng.net/default/v2.6/age_level_list.php?min_age=%s&min_age=%s", $val['min_age'], $val['max_age']);
+                //$item['linkurl'] = sprintf("xnm://www.xiaoningmeng.net/default/v2.6/age_level_list.php?min_age=%s&min_age=%s", $val['min_age'], $val['max_age']);
+                //TODO:暂时把跳转地址更改到最新上架,不过上线后这里不能更改。否则线上2.6版客户端全部分类的年龄跳转会出现错误。
+                $item['linkurl'] = sprintf("xnm://dev.xiaoningmeng.net/default/v2.6/online_list.php?&min_age=%s&max_age=%s", $val['min_age'], $val['max_age']);
                 $data['age_level']['items'][] = $item;
             }
         }
