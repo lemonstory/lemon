@@ -132,7 +132,7 @@ class index extends controller
             'tag_id' => $configVar->HOT_RECOMMEND_TAG_ID,
             'title' => "今日精选",
             'total' => count($hotRecommendList),
-            'linkurl' => "xnm://www.xiaoningmeng.net/default/v2.6/recommend_list.php",
+            'linkurl' => "xnm://api.xiaoningmeng.net/default/v2.6/recommend_list.php",
             'items' => $hotRecommendList,
         );
 
@@ -150,7 +150,7 @@ class index extends controller
             'tag_id' => $configVar->SAME_AGE_TAG_ID,
             'title' => "同龄在听",
             'total' => count($sameAgeAlbumList),
-            'linkurl' => "xnm://www.xiaoningmeng.net/default/v2.6/same_age_list.php",
+            'linkurl' => "xnm://api.xiaoningmeng.net/default/v2.6/same_age_list.php",
             'items' => $sameAgeAlbumList,
         );
 
@@ -166,7 +166,7 @@ class index extends controller
             'tag_id' => $configVar->NEW_ONLINE_TAG_ID,
             'title' => "最新上架",
             'total' => count($newAlbumList),
-            'linkurl' => "xnm://www.xiaoningmeng.net/default/v2.6/online_list.php",
+            'linkurl' => "xnm://api.xiaoningmeng.net/default/v2.6/online_list.php",
             'items' => $newAlbumList,
         );
 
@@ -234,16 +234,16 @@ class index extends controller
 
         //广告
         $data['ad'] = array(
-            "total" => 2,
+            "total" => 0,
             "items" => array(
-                array(
-                    "cover" => "https://img3.doubanio.com/view/dale-online/dale_ad/public/ae6b5444cfad075.jpg",
-                    "linkurl" => "https://www.douban.com/",
-                ),
-                array(
-                    "cover" => "https://img3.doubanio.com/view/dale-online/dale_ad/public/18a3cc696cf9561.jpg",
-                    "linkurl" => "https://www.douban.com/",
-                ),
+//                array(
+//                    "cover" => "https://img3.doubanio.com/view/dale-online/dale_ad/public/ae6b5444cfad075.jpg",
+//                    "linkurl" => "http://www.douban.com/",
+//                ),
+//                array(
+//                    "cover" => "https://img3.doubanio.com/view/dale-online/dale_ad/public/18a3cc696cf9561.jpg",
+//                    "linkurl" => "http://www.douban.com/",
+//                ),
             )
         );
         $this->showSuccJson($data);
