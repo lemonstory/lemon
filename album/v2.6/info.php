@@ -99,7 +99,7 @@ class info extends controller
             'http://s.click.taobao.com/XHOTOQx',
             '',
         );
-        $key = rand(0, 1);
+        $key = rand(1, 1);
         $result['albumInfo']['buy_link'] = $bugLinkArr[$key];
 
         // 获取专辑标签列表
