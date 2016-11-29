@@ -8,7 +8,7 @@ class cron_copyListenNumToAlbumTagRelation extends DaemonBase {
     protected $isWhile = false;
 	protected function deal() {
 	    $db = DbConnecter::connectMysql("share_main");
-	    $selectsql = "SELECT * FROM `listen_album_count`";
+	    $selectsql = "SELECT * FROM `listen_album_count` WHERE `num`>10 ORDER BY `num` DESC";
 	    $selectst = $db->prepare($selectsql);
 	    $selectst->execute();
 	    $list = $selectst->fetchAll(PDO::FETCH_ASSOC);
