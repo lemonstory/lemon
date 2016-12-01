@@ -584,9 +584,9 @@ class Album extends ModelBase
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
         $redisData = $redisobj->get($key);
         // 是否读到
-        if ($redisData) {
-            $r = json_decode($redisData, true);
-        } else {
+//        if ($redisData) {
+//            $r = json_decode($redisData, true);
+//        } else {
             $where = "`id`={$album_id}";
             $sql = "select * from {$this->table}  where {$where} limit 1";
 
@@ -596,7 +596,7 @@ class Album extends ModelBase
             $r  = $st->fetchAll();
             $r  = array_pop($r);
             $redisobj->setex($key, 604800, json_encode($r));
-        }
+//        }
         
         if ($filed) {
             if (isset($r[$filed])) {
