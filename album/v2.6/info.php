@@ -26,6 +26,7 @@ class info extends controller
         $result['albumInfo']['intro'] = $albumInfo['intro'];
         $albumAgeLevelStr = $albumObj->getAgeLevelStr($albumInfo['min_age'], $albumInfo['max_age']);
         $result['albumInfo']['age_str'] = sprintf("适合%s岁", $albumAgeLevelStr);
+        $result['albumInfo']['buy_link'] = $albumInfo['buy_link'];
 
         $aliossObj = new AliOss();
         $cover = $configVarObj->DEFAULT_ALBUM_COVER;
@@ -94,13 +95,6 @@ class info extends controller
         // 评论数量
         $result['albumInfo']['commentnum'] = (int)$comment->get_total("`albumid`={$albumId} and `status`=1");
 
-        //TODO:购买图书
-        $bugLinkArr = array(
-            'http://s.click.taobao.com/XHOTOQx',
-            '',
-        );
-        $key = rand(1, 1);
-        $result['albumInfo']['buy_link'] = $bugLinkArr[$key];
 
         // 获取专辑标签列表
         $tagNewObj = new TagNew();
