@@ -20,7 +20,7 @@ class onlineList extends controller
 
         $albumObj = new Album();
         $recommendObj = new Recommend();
-        $recommendAlbumList = $recommendObj->getNewOnlineList($minAge, $maxAge, $page, 0, $len);
+        $recommendAlbumList = $recommendObj->getNewOnlineList($minAge, $maxAge, 0, $page, $len);
 
 
         $recommendAlbumArr = array();
