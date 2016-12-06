@@ -14,7 +14,7 @@ class all extends controller
 
         $album = new Album();
 
-        $albumlist = $album->getAlbumList($direction, $startid, $len, " ORDER BY `id` DESC,`view_order` ASC ");
+        $albumlist = $album->getAlbumList($direction, $startid, $len, " ORDER BY `id` DESC,`view_order` DESC ");
 
         $aliossobj = new AliOss();
         foreach ($albumlist as $k => $v) {

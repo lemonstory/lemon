@@ -61,7 +61,7 @@ class Recommend extends ModelBase
                       FROM `{$this->RECOMMEND_HOT_TABLE_NAME}` 
                       LEFT JOIN `{$this->ALBUM_TABLE_NAME}` 
                       ON `{$this->RECOMMEND_HOT_TABLE_NAME}`.`albumid` = `{$this->ALBUM_TABLE_NAME}`.`id`
-                      WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+                      WHERE {$where} ORDER BY `ordernum` DESC , `albumid` ASC LIMIT $offset, $len";
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -133,7 +133,7 @@ class Recommend extends ModelBase
                       FROM `{$this->RECOMMEND_NEW_ONLINE_TABLE_NAME}` 
                       LEFT JOIN `{$this->ALBUM_TABLE_NAME}` 
                       ON `{$this->RECOMMEND_NEW_ONLINE_TABLE_NAME}`.`albumid` = `{$this->ALBUM_TABLE_NAME}`.`id`
-                      WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+                      WHERE {$where} ORDER BY `ordernum` DESC, `albumid` ASC LIMIT $offset, $len";
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -202,7 +202,7 @@ class Recommend extends ModelBase
                       FROM `{$this->RECOMMEND_SAME_AGE_TABLE_NAME}` 
                       LEFT JOIN `{$this->ALBUM_TABLE_NAME}` 
                       ON `{$this->RECOMMEND_SAME_AGE_TABLE_NAME}`.`albumid` = `{$this->ALBUM_TABLE_NAME}`.`id`
-                      WHERE {$where} ORDER BY `ordernum` ASC, `albumid` ASC LIMIT $offset, $len";
+                      WHERE {$where} ORDER BY `ordernum` DESC, `albumid` ASC LIMIT $offset, $len";
 
             $st = $db->prepare($sql);
             $st->execute();
@@ -236,7 +236,7 @@ class Recommend extends ModelBase
         $redisData = $cacheobj->getListCache($this->FOCUS_TABLE_NAME, $key);
         if (empty($redisData)) {
             $db = DbConnecter::connectMysql('share_manage');
-            $sql = "SELECT * FROM `{$this->FOCUS_TABLE_NAME}` WHERE `status` = '{$this->RECOMMEND_STATUS_ONLIINE}' AND `category` = '{$this->FOCUS_IMG_CATEGORY_EN_NAME}'  ORDER BY `ordernum` LIMIT $len";
+            $sql = "SELECT * FROM `{$this->FOCUS_TABLE_NAME}` WHERE `status` = '{$this->RECOMMEND_STATUS_ONLIINE}' AND `category` = '{$this->FOCUS_IMG_CATEGORY_EN_NAME}'  ORDER BY `ordernum` DESC LIMIT $len";
             $st = $db->prepare($sql);
             $st->execute();
             $dbData = $st->fetchAll(PDO::FETCH_ASSOC);
