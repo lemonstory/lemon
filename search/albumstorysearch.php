@@ -88,6 +88,7 @@ class albumstorysearch extends controller
             }
         }
 
+        $albumlistOld = array();//根据ID排序
         $albumlist = array();
         if (!empty($albumids)) {
             // 过滤掉没有音频的故事，所属的专辑
@@ -111,8 +112,13 @@ class albumstorysearch extends controller
                         if ($_SERVER['visitorappversion'] > $this->OnlineVerionNow) {
                             $info['title'] = $albumsummarytitles[$info['id']];
                         }
-                        $albumlist[] = $info;
+                        $albumlistOld[$info['id']] = $info;
                     }
+                }
+            }
+            foreach ($albumids as $albumid) {
+                if (!empty($albumlistOld[$albumid])) {
+                    $albumlist[]=$albumlistOld[$albumid];
                 }
             }
             $albumcount = count($albumlist);
