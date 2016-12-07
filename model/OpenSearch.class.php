@@ -63,6 +63,7 @@ class OpenSearch
         $search->setPair("duniqfield:albumid"); // 将totla数也去重
         $search->addSort('listen_num');
         $search->addFilter('albumstatus=1');
+        $search->addFilter('albumonlinestatus=1');
         $search->setStartHit($offset);
         $search->setHits($len);
         $search->setFormat('json');
@@ -137,6 +138,8 @@ class OpenSearch
         $search->setQueryString($query);
         $search->addSort('listen_num');//根据播放量排序
         $search->addFilter('storystatus=1');
+        $search->addFilter('albumstatus=1');
+        $search->addFilter('albumonlinestatus=1');
         $search->setStartHit($offset);
         $search->setHits($len);
         $search->setFormat('json');
