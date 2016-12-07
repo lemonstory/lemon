@@ -36,30 +36,33 @@ class OpenSearch
         $offset = ($page - 1) * $len;
         
         // 转化为分词
-        $keywordpy = Pinyin($keyword);
+        /*$keywordpy = Pinyin($keyword);
         $searchtext = "";
         for  ($i = 0; $i < strlen($keywordpy); $i++) {
             $searchtext .= $keywordpy[$i] . " ";
         }
         if ($searchtext == "") {
             $searchtext = $keyword;
-        }
+        }*/
         
         $client = $this->getClientinfo();
         $search = new CloudsearchSearch($client);
         $search->addIndex($this->OPEN_INSTANCE);
-        
-        if(preg_match("/^[\x7f-\xff]+$/",$keyword)) {
+
+        $query = "albumtitle:'{$keyword}'";
+        //使用模糊搜索，无需分词
+        /*if(preg_match("/^[\x7f-\xff]+$/",$keyword)) {
             $query = "albumtitlepy:'{$keyword}'";
         }else{
             $query = "albumtitlepy:'{$searchtext}'";
-        }
+        }*/
         $search->setQueryString($query);
         
         //$search->addAggregate("albumid", "count()");
         $search->addDistinct("albumid", 1, 1, "false"); // 每轮albumid中抽样取一个，只取一轮，实现items去重
         $search->setPair("duniqfield:albumid"); // 将totla数也去重
-        $search->addSort('albumaddtime');
+        $search->addSort('listen_num');
+        $search->addFilter('albumstatus=1');
         $search->setStartHit($offset);
         $search->setHits($len);
         $search->setFormat('json');
@@ -108,28 +111,32 @@ class OpenSearch
             $len = 100;
         }
         $offset = ($page - 1) * $len;
-    
+
+        //使用模糊搜索，无需分词
         // 转化为分词
-        $keywordpy = Pinyin($keyword);
+        /*$keywordpy = Pinyin($keyword);
         $searchtext = "";
         for  ($i = 0; $i < strlen($keywordpy); $i++) {
             $searchtext .= $keywordpy[$i] . " ";
         }
         if ($searchtext == "") {
             $searchtext = $keyword;
-        }
+        }*/
     
         $client = $this->getClientinfo();
         $search = new CloudsearchSearch($client);
         $search->addIndex($this->OPEN_INSTANCE);
-    
-        if(preg_match("/^[\x7f-\xff]+$/",$keyword)) {
+
+        $query = "storytitle:'{$keyword}'";
+        //使用模糊搜索，无需分词
+        /*if(preg_match("/^[\x7f-\xff]+$/",$keyword)) {
             $query = "storytitlepy:'{$keyword}'";
         }else{
             $query = "storytitlepy:'{$searchtext}'";
-        }
+        }*/
         $search->setQueryString($query);
-        $search->addSort('storyaddtime');
+        $search->addSort('listen_num');//根据播放量排序
+        $search->addFilter('storystatus=1');
         $search->setStartHit($offset);
         $search->setHits($len);
         $search->setFormat('json');
