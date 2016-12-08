@@ -291,7 +291,7 @@ class Story extends ModelBase
         }
         
         $db = DbConnecter::connectMysql('share_story');
-        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY `view_order` ASC, `id` DESC LIMIT {$len}";
+        $sql = "SELECT * FROM {$this->table} WHERE {$where} ORDER BY `view_order` ASC , `id` DESC LIMIT {$len}";
         $st = $db->prepare($sql);
         $st->execute();
         $res = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -465,8 +465,10 @@ class Story extends ModelBase
     public function clearAlbumStoryListCache($album_id, $page = 1, $len = 10000)
     {
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
-        $album_story_list_key = RedisKey::getAlbumStoryListKey($album_id, $page, $len);
-        $redisobj->delete($album_story_list_key);
+        $keys = $redisobj->keys('album_story_list_' . $album_id. '*');
+        foreach ($keys as $key) {
+            $redisobj->delete($key);
+        }
     }
 
     public function coverNotUploadOssCount()

@@ -28,7 +28,7 @@ class TagNew extends ModelBase
         $redisData = $cacheobj->getListCache($this->TAG_INFO_TABLE, $key);
         if (empty($redisData)) {
             $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-            $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `pid` = ? AND `status` = ? ORDER BY `ordernum` ASC, `id` ASC LIMIT {$len}";
+            $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `pid` = ? AND `status` = ? ORDER BY `ordernum` DESC, `id` ASC LIMIT {$len}";
             $selectst = $db->prepare($selectsql);
             $selectst->execute(array(0, $this->RECOMMEND_STATUS_ONLIINE));
             $dbdata = $selectst->fetchAll(PDO::FETCH_ASSOC);
@@ -80,7 +80,7 @@ class TagNew extends ModelBase
         $redisData = $cacheobj->getListCache($this->TAG_INFO_TABLE, $key);
         if (empty($redisData)) {
             $db = DbConnecter::connectMysql($this->DB_INSTANCE);
-            $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `pid` = ? AND `status` = ? ORDER BY `ordernum` ASC, `id` ASC LIMIT {$len}";
+            $selectsql = "SELECT * FROM `{$this->TAG_INFO_TABLE}` WHERE `pid` = ? AND `status` = ? ORDER BY `ordernum` DESC, `id` ASC LIMIT {$len}";
             $selectst = $db->prepare($selectsql);
             $selectst->execute(array($pid, $this->RECOMMEND_STATUS_ONLIINE));
             $dbdata = $selectst->fetchAll(PDO::FETCH_ASSOC);

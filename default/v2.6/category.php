@@ -36,14 +36,14 @@ class categorylist extends controller
         $tagInfoObj = new TagInfo();
         $aliossObj = new AliOss();
         //获取一级分类
-        $firstList = $tagInfoObj->get_list(' pid = 0 and status=1','id,name','ordernum asc',100);
+        $firstList = $tagInfoObj->get_list(' pid = 0 and status=1','id,name','ordernum desc',100);
         $data['tag']['total'] = count($firstList);
         foreach($firstList as $key=>$val){
             $tmp['id'] = $val['id'];
             $tmp['name'] = $val['name'];
 
             //取二级分类
-            $secondList = $tagInfoObj->get_list(' pid = ' . $val['id'] . ' and status=1', 'id,name,cover,covertime', 'ordernum asc', 100);
+            $secondList = $tagInfoObj->get_list(' pid = ' . $val['id'] . ' and status=1', 'id,name,cover,covertime', 'ordernum desc', 100);
             foreach ($secondList as $key => $val) {
                 $secondList[$key]['id'] = $val['id'];
                 $secondList[$key]['name'] = $val['name'];
