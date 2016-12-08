@@ -465,8 +465,10 @@ class Story extends ModelBase
     public function clearAlbumStoryListCache($album_id, $page = 1, $len = 10000)
     {
         $redisobj = AliRedisConnecter::connRedis($this->CACHE_INSTANCE);
-        $album_story_list_key = RedisKey::getAlbumStoryListKey($album_id, $page, $len);
-        $redisobj->delete($album_story_list_key);
+        $keys = $redisobj->keys('album_story_list_' . $album_id. '*');
+        foreach ($keys as $key) {
+            $redisobj->delete($key);
+        }
     }
 
     public function coverNotUploadOssCount()
