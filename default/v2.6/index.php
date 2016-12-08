@@ -238,7 +238,7 @@ class index extends controller
             "items" => array(
                 array(
                     "cover" => "http://p.xiaoningmeng.net/focus/banner.png",
-                    "linkurl" => "http://qq2-10004914.file.myqcloud.com/ch/295/huan_xiaoningmeng.apk?l=download ",
+                    "linkurl" => "http://www.mizhuan.me/ ",
                 ),
 //                array(
 //                    "cover" => "https://img3.doubanio.com/view/dale-online/dale_ad/public/18a3cc696cf9561.jpg",
