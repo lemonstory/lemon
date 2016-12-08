@@ -65,6 +65,7 @@ class Album extends ModelBase
      */
     public function update($data, $where = '')
     {
+        //echo "update is run";
         if (!$data) {
             return false;
         }
@@ -324,7 +325,7 @@ class Album extends ModelBase
      * @param $max_age
      * @return array
      */
-    public function getAuthorAlbums($author_id, $start_album_id, $min_age = 0, $max_age = 0, $limit = 20)
+    public function getAuthorAlbums($author_id, $start_album_id, $limit = 20)
     {
 
         #TODO,此处可缓存作者album_id列表
@@ -335,18 +336,12 @@ class Album extends ModelBase
         $albums = array();
         $where = " ( FIND_IN_SET({$author_id},`author_uid`) OR FIND_IN_SET({$author_id},`translator_uid`) OR FIND_IN_SET({$author_id},`illustrator_uid`) ) AND `online_status` = 1 AND `status` = 1";
 
-        //和getAgeLevelWithAlbums的年龄比较的规则相同
-        if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
-            $where .= " AND `min_age` = 0 AND `max_age` >= {$max_age}";
-        } elseif ($min_age != 0 && $max_age != 0) {
-            $where .= " AND `min_age` >= {$min_age} AND `max_age` <= {$max_age}";
-        }
         if ($start_album_id > 0) {
             $where .= " AND id < {$start_album_id} ";
         }
 
-        $filed = "`id` ,`title`,`cover`,`cover_time`,`star_level`,`story_num`,`intro`,`min_age`,`max_age`";
-        $order_by = "id desc";
+        $filed = "`id`,`title`,`cover`,`cover_time`,`min_age`,`max_age`,`intro`";
+        $order_by = "`id` desc";
         $albums = $this->get_list_new($where, $filed, $order_by, $limit);
         return $albums;
     }
@@ -585,8 +580,12 @@ class Album extends ModelBase
         $redisData = $redisobj->get($key);
         // 是否读到
 //        if ($redisData) {
+
+        //echo "cache data";
 //            $r = json_decode($redisData, true);
 //        } else {
+
+        //echo "db data";
             $where = "`id`={$album_id}";
             $sql = "select * from {$this->table}  where {$where} limit 1";
 
