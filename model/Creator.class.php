@@ -298,6 +298,16 @@ class Creator extends ModelBase
         return $count;
     }
 
+    public function getCreatorInfo($creator_uid)
+    {
+
+        $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
+        $sql = "SELECT * FROM {$this->CREATOR_TABLE_NAME}  where `uid` = {$creator_uid} LIMIT 1";
+        $st = $db->query($sql);
+        $creatorInfo = $st->fetch();
+        return $creatorInfo;
+    }
+
     /**
      * 更新
      */
