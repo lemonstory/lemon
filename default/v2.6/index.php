@@ -234,12 +234,12 @@ class index extends controller
 
         //广告
         $data['ad'] = array(
-            "total" => 1,
+            "total" => 0,
             "items" => array(
-                array(
-                    "cover" => "http://p.xiaoningmeng.net/focus/banner.png",
-                    "linkurl" => "http://www.mizhuan.me/ ",
-                ),
+//                array(
+//                    "cover" => "http://p.xiaoningmeng.net/focus/banner.png",
+//                    "linkurl" => "http://www.mizhuan.me/ ",
+//                ),
 //                array(
 //                    "cover" => "https://img3.doubanio.com/view/dale-online/dale_ad/public/18a3cc696cf9561.jpg",
 //                    "linkurl" => "http://www.douban.com/",
