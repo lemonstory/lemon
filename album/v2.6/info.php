@@ -60,8 +60,8 @@ class info extends controller
         // 专辑收藏数
         $favobj = new Fav();
         $albumfavnum = $favobj->getAlbumFavCount($albumId);
-        if ($albumfavnum) {
-            $result['albumInfo']['favnum'] = (int)$albumfavnum[$albumId]['num'];
+        if (!empty($albumfavnum) && !empty($albumfavnum[$albumId])) {
+            $result['albumInfo']['favnum'] = $albumfavnum[$albumId]['num'];
         } else {
             $result['albumInfo']['favnum'] = 0;
         }
@@ -72,7 +72,7 @@ class info extends controller
         $storyTotal = $story->get_total(" `album_id`={$albumId} and `status`=1 ");
         if (!empty($storyResList)) {
             foreach ($storyResList as $value) {
-                
+
                 $storyInfo = array();
                 $storyInfo['id'] = $value['id'];
                 $storyInfo['album_id'] = $value['album_id'];
@@ -93,8 +93,11 @@ class info extends controller
         $result['storyList']['items'] = $storyList;
 
         // 评论数量
-        $result['albumInfo']['commentnum'] = (int)$comment->get_total("`albumid`={$albumId} and `status`=1");
-
+        $result['albumInfo']['commentnum'] = "0";
+        $commentnum = $comment->get_total("`albumid`={$albumId} and `status`=1");
+        if (!empty($commentnum) && $commentnum > 0) {
+            $result['albumInfo']['commentnum'] = $commentnum;
+        }
 
         // 获取专辑标签列表
         $tagNewObj = new TagNew();
