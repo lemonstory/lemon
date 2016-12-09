@@ -70,8 +70,8 @@ class author_album_list extends controller
                 $albumInfo['id'] = $albums[$key]['id'];
                 $albumInfo['title'] = $albums[$key]['title'];
 
-                if (!empty($recommendAlbumList[$key]['cover'])) {
-                    $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $recommendAlbumList[$key]['cover'], 460, $recommendAlbumList[$key]['cover_time']);
+                if (!empty($albums[$key]['cover'])) {
+                    $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albums[$key]['cover'], 460, $albums[$key]['cover_time']);
                 }
 
                 $albumInfo['listennum'] = 0;
@@ -87,7 +87,7 @@ class author_album_list extends controller
                     $albumInfo['recommenddesc'] = $albums[$key]['intro'];
                 }
 
-                $albumAgeLevelStr = $albumObj->getAgeLevelStr($recommendAlbumList[$key]['min_age'], $recommendAlbumList[$key]['max_age']);
+                $albumAgeLevelStr = $albumObj->getAgeLevelStr($albums[$key]['min_age'], $albums[$key]['max_age']);
                 $albumInfo['age_str'] = sprintf("适合%s岁", $albumAgeLevelStr);
 
                 $ret['items'][] = $albumInfo;
