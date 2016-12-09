@@ -12,6 +12,19 @@ class Creator extends ModelBase
     public $CREATOR_TABLE_NAME = 'creator';
     public $CACHE_INSTANCE = 'cache';
 
+    public function getCreatorInfo($uid)
+    {
+        if (empty($uid)) {
+            return null;
+        }
+        $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
+        $sql = "SELECT * FROM {$this->CREATOR_TABLE_NAME} WHERE `uid` = {$uid}";
+        $st = $db->prepare($sql);
+        $st->execute();
+        $creatorInfo = $st->fetch();
+        return $creatorInfo;
+    }
+
     /**
      * 根据名称获取作者uid
      * @param $name
@@ -296,16 +309,6 @@ class Creator extends ModelBase
         $st->execute($whereArr);
         $count = $st->fetch(PDO::FETCH_COLUMN);
         return $count;
-    }
-
-    public function getCreatorInfo($creator_uid)
-    {
-
-        $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
-        $sql = "SELECT * FROM {$this->CREATOR_TABLE_NAME}  where `uid` = {$creator_uid} LIMIT 1";
-        $st = $db->query($sql);
-        $creatorInfo = $st->fetch();
-        return $creatorInfo;
     }
 
     /**
