@@ -13,24 +13,86 @@ class author_album_list extends controller
     {
         $authorId = $this->getRequest('author_id', '');
         $startAlbumId = $this->getRequest('start_album_id', '0');
-        $minAge = $this->getRequest('min_age', '0');
-        $maxAge = $this->getRequest('max_age', '0');
         $len = $this->getRequest('len', '20');
+        $avatarSize = 120;
 
         if (!empty($authorId)) {
 
             $ret = array();
-            $album = new Album();
-            $creator = new Creator();
-            $albums = $album->getAuthorAlbums($authorId, $startAlbumId, $minAge, $maxAge, $len);
-            $age_level_albums_num = $creator->getCreatorAgeLevelAlbumsNum($authorId);
-            $age_level_albums_num = $album->getAgeLevelWithAlbumsFormat($age_level_albums_num);
+            $albumObj = new Album();
+            $aliossObj = new AliOss();
 
-            $ret['age_level'] = $age_level_albums_num;
+            //作者信息
+            $userObj = new User();
+            $userInfo = current($userObj->getUserInfo($authorId, 0));
+
+            $creatorObj = new Creator();
+            $creatorInfo = $creatorObj->getCreatorInfo($authorId);
+
+            $authorInfo = array();
+            $authorInfo['avator'] = $aliossObj->getAvatarUrl($authorId, $userInfo['avatartime'], $avatarSize);
+            $authorInfo['nickname'] = $userInfo['nickname'];
+            if (empty($creatorInfo['intro'])) {
+                $creatorInfo['intro'] = "我们的工作失误,所以没有信息";
+            }
+            $authorInfo['intro'] = $creatorInfo['intro'];
             //TODO:作者百科还需完善
-            $ret['pedia'] = "http://www.xiaoningmeng.net/author/detail.php";
+            $authorInfo['wiki_url'] = "http://www.xiaoningmeng.net/author/detail.php";
+
+            $ret['info'] = $authorInfo;
+
+            //作者的专辑信息
+            $albums = $albumObj->getAuthorAlbums($authorId, $startAlbumId, $len);
             $ret['total'] = count($albums);
-            $ret['items'] = $albums;
+            if (!empty($albums)) {
+                foreach ($albums as $item) {
+                    $albumIds[] = $item['id'];
+                }
+
+                if (!empty($albumIds)) {
+
+                    $albumIds = array_unique($albumIds);
+
+                    // 专辑收听数
+                    $listenobj = new Listen();
+                    $albumListenNum = $listenobj->getAlbumListenNum($albumIds);
+
+                    // 获取推荐语
+                    $recommenddescobj = new RecommendDesc();
+                    $recommendDescList = $recommenddescobj->getAlbumRecommendDescList($albumIds);
+                }
+            }
+
+            foreach ($albums as $key => $item) {
+
+                $albumId = $item['id'];
+                $albumInfo = array();
+                $albumInfo['id'] = $albums[$key]['id'];
+                $albumInfo['title'] = $albums[$key]['title'];
+
+                if (!empty($recommendAlbumList[$key]['cover'])) {
+                    $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $recommendAlbumList[$key]['cover'], 460, $recommendAlbumList[$key]['cover_time']);
+                }
+
+                $albumInfo['listennum'] = 0;
+                if (!empty($albumListenNum[$albumId])) {
+                    $albumInfo['listennum'] = $albumObj->format_album_listen_num($albumListenNum[$albumId]['num'] + 0);
+                }
+
+                $albumInfo['recommenddesc'] = "";
+                if (!empty($recommendDescList[$albumId])) {
+                    $albumInfo['recommenddesc'] = $recommendDescList[$albumId]['desc'];
+                } else {
+                    //没有推荐语,则使用个人简介
+                    $albumInfo['recommenddesc'] = $albums[$key]['intro'];
+                }
+
+                $albumAgeLevelStr = $albumObj->getAgeLevelStr($recommendAlbumList[$key]['min_age'], $recommendAlbumList[$key]['max_age']);
+                $albumInfo['age_str'] = sprintf("适合%s岁", $albumAgeLevelStr);
+
+                $ret['items'][] = $albumInfo;
+            }
+
             $this->showSuccJson($ret);
 
         } else {
