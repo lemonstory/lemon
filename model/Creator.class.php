@@ -21,11 +21,8 @@ class Creator extends ModelBase
         $sql = "SELECT * FROM {$this->CREATOR_TABLE_NAME} WHERE `uid` = {$uid}";
         $st = $db->prepare($sql);
         $st->execute();
-        $result = $st->fetchAll(PDO::FETCH_ASSOC);
-        if (!empty($result)) {
-            return $result[0];
-        }
-        return null;
+        $creatorInfo = $st->fetch();
+        return $creatorInfo;
     }
 
     /**
@@ -312,16 +309,6 @@ class Creator extends ModelBase
         $st->execute($whereArr);
         $count = $st->fetch(PDO::FETCH_COLUMN);
         return $count;
-    }
-
-    public function getCreatorInfo($creator_uid)
-    {
-
-        $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
-        $sql = "SELECT * FROM {$this->CREATOR_TABLE_NAME}  where `uid` = {$creator_uid} LIMIT 1";
-        $st = $db->query($sql);
-        $creatorInfo = $st->fetch();
-        return $creatorInfo;
     }
 
     /**
