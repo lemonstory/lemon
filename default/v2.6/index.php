@@ -44,7 +44,8 @@ class index extends controller
 
                 $title = $value['name'];
                 if (!empty($value['cover'])) {
-                    $cover = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_TAG, $value['cover'], 0, $value['covertime']);
+                    $cover = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_TAG, $value['cover'], 0,
+                        $value['covertime']);
                 }
                 $linkurl = "xnm://www.xiaoningmeng.net/default/v2.6/tag_album_list.php?tag_id={$value['id']}";
                 $data['content_category']['items'][] = array(
@@ -64,7 +65,8 @@ class index extends controller
         $albumLen = 6;
         $currentPage = 1;
         // 热门推荐
-        $hotRecommendRes = $recommendObj->getRecommendHotList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $currentPage, $albumLen);
+        $hotRecommendRes = $recommendObj->getRecommendHotList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $currentPage,
+            $albumLen);
         if (!empty($hotRecommendRes)) {
             foreach ($hotRecommendRes as $value) {
                 $albumIds[] = $value['id'];
@@ -82,7 +84,8 @@ class index extends controller
         }
 
         // 同龄在听
-        $sameAgeRes = $recommendObj->getSameAgeListenList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $currentPage, $albumLen);
+        $sameAgeRes = $recommendObj->getSameAgeListenList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $currentPage,
+            $albumLen);
         if (!empty($sameAgeRes)) {
             foreach ($sameAgeRes as $value) {
                 $albumIds[] = $value['id'];
@@ -90,7 +93,8 @@ class index extends controller
         }
 
         // 最新上架
-        $newOnlineRes = $recommendObj->getNewOnlineList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $currentPage, $albumLen);
+        $newOnlineRes = $recommendObj->getNewOnlineList($configVar->MIN_AGE, $configVar->MAX_AGE, 0, $currentPage,
+            $albumLen);
         if (!empty($newOnlineRes)) {
             foreach ($newOnlineRes as $value) {
                 $albumIds[] = $value['id'];
@@ -246,6 +250,16 @@ class index extends controller
 //                ),
             )
         );
+
+        //热门作者
+        $authorNum = 8;
+        $creator = new Creator();
+        $hotAuthors = $creator->getHotAuthors($authorNum);
+        $data['author_section'] = array(
+            'total' => count($hotAuthors),
+            'linkUrl' => 'xnm://api.xiaoningmeng.net/default/v2.6/authors.php',
+            'items' => $hotAuthors
+        );
         $this->showSuccJson($data);
     }
 
@@ -263,7 +277,8 @@ class index extends controller
             $albumInfo['star_level'] = $albumList[$albumId]['star_level'];
             $albumInfo['intro'] = $albumList[$albumId]['intro'];
             if (!empty($albumList[$albumId]['cover'])) {
-                $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumList[$albumId]['cover'], 460, $albumList[$albumId]['cover_time']);
+                $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM,
+                    $albumList[$albumId]['cover'], 460, $albumList[$albumId]['cover_time']);
             }
             $albumInfo['listennum'] = 0;
             if (!empty($albumListenNum[$albumId])) {

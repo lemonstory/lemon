@@ -166,7 +166,38 @@ class Creator extends ModelBase
             $whereArr["start_uid_id"] = $start_author_id;
         }
 
-        $arr = $this->getCreatorList($whereArr, 1, $limit);
+        //按照View order排序
+        $order = "{$this->CREATOR_TABLE_NAME}.view_order desc";
+        //选择输出
+        $select = "`{$this->CREATOR_TABLE_NAME}`.`uid` as uid,
+                  `{$this->CREATOR_TABLE_NAME}`.`album_num` as album_num,
+                  `{$this->CREATOR_TABLE_NAME}`.`card` as card,
+                  `{$this->CREATOR_TABLE_NAME}`.`intro` as intro,
+                  `user_info`.`nickname` as nickname, 
+                  `user_info`.`avatartime` as avatartime ";
+        $arr = $this->getCreatorList($whereArr, 1, $limit, $order,$select);
+        return $arr;
+    }
+
+    /**
+     * 读取热门作者[原著]
+     * @return array
+     */
+    public function getHotAuthors($limit = 8)
+    {
+        $whereArr = array(
+            "is_author" => 1,
+            "album_num" => 0,
+            "user_info_status" => 1,
+        );
+
+        //按照View order排序
+        $order = "{$this->CREATOR_TABLE_NAME}.view_order desc";
+        //选择输出
+        $select = "`{$this->CREATOR_TABLE_NAME}`.`uid` as uid,
+                  `user_info`.`nickname` as nickname, 
+                  `user_info`.`avatartime` as avatartime ";
+        $arr = $this->getCreatorList($whereArr, 1, $limit, $order,$select);
         return $arr;
     }
 
@@ -191,7 +222,7 @@ class Creator extends ModelBase
         return $arr;
     }
 
-    public function getCreatorList($whereArr = array(), $currentPage = 1, $perPage = 50)
+    public function getCreatorList($whereArr = array(), $currentPage = 1, $perPage = 50, $order = '', $select = '')
     {
 
         if (empty($currentPage) || $currentPage <= 0) {
@@ -228,18 +259,24 @@ class Creator extends ModelBase
 
         $offset = ($currentPage - 1) * $perPage;
 
-        $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
-        $sql = "SELECT 
-                  `{$this->CREATOR_TABLE_NAME}`.`uid` as uid,
+        if ($order) {
+            $order = $order . ', ';
+        }
+        if (empty($select)) {
+            $select = "`{$this->CREATOR_TABLE_NAME}`.`uid` as uid,
                   `{$this->CREATOR_TABLE_NAME}`.`album_num` as album_num,
                   `{$this->CREATOR_TABLE_NAME}`.`listen_num` as listen_num,
                   `{$this->CREATOR_TABLE_NAME}`.`add_time` as add_time,
                   `{$this->CREATOR_TABLE_NAME}`.`view_order` as view_order,
                   `{$this->CREATOR_TABLE_NAME}`.`online_status` as online_status,
                   `user_info`.`nickname` as nickname, 
-                  `user_info`.`avatartime` as avatartime 
+                  `user_info`.`avatartime` as avatartime ";
+        }
+
+        $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
+        $sql = "SELECT {$select}
                 from `{$this->CREATOR_TABLE_NAME}` LEFT JOIN `user_info` ON `{$this->CREATOR_TABLE_NAME}`.`uid` = `user_info`.`uid`  
-                WHERE {$whereStr} ORDER BY `{$this->CREATOR_TABLE_NAME}`.`album_num` DESC LIMIT {$offset}, {$perPage}";
+                WHERE {$whereStr} ORDER BY {$order}`{$this->CREATOR_TABLE_NAME}`.`album_num` DESC LIMIT {$offset}, {$perPage}";
         $st = $db->prepare($sql);
         $st->execute($whereArr);
         $arr = $st->fetchAll(PDO::FETCH_ASSOC);
@@ -251,6 +288,8 @@ class Creator extends ModelBase
                 $avatartime = $item['avatartime'];
                 $arr[$key]['avatar'] = sprintf("http://a.xiaoningmeng.net/avatar/%s/%s/180", $uid, $avatartime);
                 unset($arr[$key]['avatartime']);
+                //增加wiki_URL
+                $arr[$key]['wiki_url'] = sprintf("http://www.xiaoningmeng.net/author/detail.php?uid=%s&author=%s", $uid, $item['nickname']);
             }
         }
 
