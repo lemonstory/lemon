@@ -87,7 +87,6 @@ class author_album_list extends controller
                     $albumInfo['recommenddesc'] = $albums[$key]['intro'];
                 }
                 $albumInfo['recommenddesc'] = trim($albumInfo['recommenddesc']);
-
                 $albumAgeLevelStr = $albumObj->getAgeLevelStr($albums[$key]['min_age'], $albums[$key]['max_age']);
                 $albumInfo['age_str'] = sprintf("适合%s岁", $albumAgeLevelStr);
 
