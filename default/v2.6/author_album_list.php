@@ -37,7 +37,7 @@ class author_album_list extends controller
             }
             $authorInfo['intro'] = $creatorInfo['intro'];
             //TODO:作者百科还需完善
-            $authorInfo['wiki_url'] = "http://www.xiaoningmeng.net/author/detail.php";
+            $authorInfo['wiki_url'] = "http://www.xiaoningmeng.net/author/detail.php?uid={$authorId}";
 
             $ret['info'] = $authorInfo;
 
