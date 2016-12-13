@@ -256,8 +256,9 @@ class index extends controller
         $creator = new Creator();
         $hotAuthors = $creator->getHotAuthors($authorNum);
         $data['author_section'] = array(
+            'title' => '热门作者',
             'total' => count($hotAuthors),
-            'linkUrl' => 'xnm://api.xiaoningmeng.net/default/v2.6/authors.php',
+            'linkurl' => 'xnm://api.xiaoningmeng.net/default/v2.6/authors.php',
             'items' => $hotAuthors
         );
         $this->showSuccJson($data);
