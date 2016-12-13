@@ -16,7 +16,7 @@ class authors extends controller
         $ret = array();
         $creator = new Creator();
         $allAuthors = $creator->getAllAuthors($startAuthorId, $len);
-        $ret['total'] = count($allAuthors);
+        $ret['total'] = $creator->getTotalCreator();
         $ret['items'] = $allAuthors;
         $this->showSuccJson($ret);
         echo json_encode($ret);
