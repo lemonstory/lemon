@@ -154,17 +154,14 @@ class Creator extends ModelBase
      * 读取系统内所有的作者[原著]
      * @return array
      */
-    public function getAllAuthors($start_author_id, $limit = 20)
+    public function getAllAuthors($page=1, $limit = 20)
     {
         $whereArr = array(
             "is_author" => 1,
             "album_num" => 0,
             "user_info_status" => 1,
+            "online_status" => 1,
         );
-
-        if ($start_author_id > 0) {
-            $whereArr["start_uid_id"] = $start_author_id;
-        }
 
         //按照View order排序
         $order = "{$this->CREATOR_TABLE_NAME}.view_order desc";
@@ -175,7 +172,7 @@ class Creator extends ModelBase
                   `{$this->CREATOR_TABLE_NAME}`.`intro` as intro,
                   `user_info`.`nickname` as nickname, 
                   `user_info`.`avatartime` as avatartime ";
-        $arr = $this->getCreatorList($whereArr, 1, $limit, $order, $select);
+        $arr = $this->getCreatorList($whereArr, $page, $limit, $order, $select);
         return $arr;
     }
 
@@ -189,6 +186,7 @@ class Creator extends ModelBase
             "is_author" => 1,
             "album_num" => 0,
             "user_info_status" => 1,
+            "online_status" => 1,
         );
 
         //按照View order排序
@@ -231,6 +229,7 @@ class Creator extends ModelBase
         $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`album_num` > 0";
         $whereStr .= " and `user_info`.`status` = 1";
         $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`is_author` = 1";
+        $whereStr .= " and `{$this->CREATOR_TABLE_NAME}`.`online_status` = 1";
 
         $db = DbConnecter::connectMysql($this->CREATOR_DB_INSTANCE);
         $sql = "SELECT COUNT(*) total
@@ -297,6 +296,7 @@ class Creator extends ModelBase
         $sql = "SELECT {$select}
                 from `{$this->CREATOR_TABLE_NAME}` LEFT JOIN `user_info` ON `{$this->CREATOR_TABLE_NAME}`.`uid` = `user_info`.`uid`  
                 WHERE {$whereStr} ORDER BY {$order}`{$this->CREATOR_TABLE_NAME}`.`album_num` DESC LIMIT {$offset}, {$perPage}";
+//        echo $sql;
         $st = $db->prepare($sql);
         $st->execute($whereArr);
         $arr = $st->fetchAll(PDO::FETCH_ASSOC);

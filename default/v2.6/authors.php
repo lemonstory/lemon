@@ -11,11 +11,12 @@ class authors extends controller
 {
     public function action()
     {
-        $startAuthorId = intval($this->getRequest('start_author_id', '0'));
-        $len = intval($this->getRequest('len', '10000'));
+        $page = intval($this->getRequest('p', '1'));
+        $page < 1 && $page = 1;
+        $len = intval($this->getRequest('len', '50'));
         $ret = array();
         $creator = new Creator();
-        $allAuthors = $creator->getAllAuthors($startAuthorId, $len);
+        $allAuthors = $creator->getAllAuthors($page, $len);
         $ret['total'] = $creator->getTotalCreator();
         $ret['items'] = $allAuthors;
         $this->showSuccJson($ret);
