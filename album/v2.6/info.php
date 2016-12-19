@@ -31,7 +31,8 @@ class info extends controller
         $aliossObj = new AliOss();
         $cover = $configVarObj->DEFAULT_ALBUM_COVER;
         if (!empty($albumInfo['cover'])) {
-            $cover = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
+            $cover = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460,
+                $albumInfo['cover_time']);
         }
         $result['albumInfo']['cover'] = $cover;
 
@@ -84,7 +85,8 @@ class info extends controller
                 $storyInfo['view_order'] = $value['view_order'];
                 $storyInfo['playcover'] = $configVarObj->DEFAULT_STORY_COVER;
                 if (!empty($albumInfo['cover'])) {
-                    $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
+                    $storyInfo['playcover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM,
+                        $albumInfo['cover'], 460, $albumInfo['cover_time']);
                 }
                 $storyList[] = $storyInfo;
             }
@@ -121,10 +123,14 @@ class info extends controller
 
                     $tagInfo = array();
                     foreach ($tagInfos as $key => $item) {
+                        if ($item['status'] != 1) {
+                            continue;
+                        }
                         $tagInfo['id'] = $item['id'];
                         $tagInfo['name'] = $item['name'];
                         if (!empty($item['cover'])) {
-                            $tagInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_TAG, $item['cover'], 0, $item['covertime']);
+                            $tagInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_TAG, $item['cover'], 0,
+                                $item['covertime']);
                         } else {
                             $tagInfo['cover'] = "";
                         }
@@ -194,7 +200,8 @@ class info extends controller
                 $albumAgeLevelStr = $albumObj->getAgeLevelStr($value['min_age'], $value['max_age']);
                 //$albumInfo['age_str'] = sprintf("(%s)岁", $albumAgeLevelStr);
                 if (!empty($value['cover'])) {
-                    $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $value['cover'], 460, $value['cover_time']);
+                    $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $value['cover'], 460,
+                        $value['cover_time']);
                 }
                 $albumInfo['listennum'] = 0;
                 if (!empty($tagRelationList[$value['id']])) {
