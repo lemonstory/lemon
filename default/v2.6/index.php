@@ -238,11 +238,19 @@ class index extends controller
 
         //广告
         $data['ad'] = array(
-            "total" => 1,
+            "total" => 3,
             "items" => array(
                 array(
                     "cover" => "http://p.xiaoningmeng.net/static/fang.jpg",
                     "linkurl" => "http://m.fang.com/zt/wap/201612/lxshiyong1.html?city=bj&m=home&source=jiajupr&utm_source=baobei",
+                ),
+                array(
+                    "cover" => "http://p.xiaoningmeng.net/static/vote.jpg",
+                    "linkurl" => "http://wechat.iuqiancheng.com/download/vote?c=xiaoningmeng",
+                ),
+                array(
+                    "cover" => "http://p.xiaoningmeng.net/static/xiaoshuo.jpg",
+                    "linkurl" => "http://jic.xiaoningmeng.net/apk/FreeBook_V41_1910_FreeShu_baomdbhl_V2.7.0_9245_118_2016-12-15-06-23-14.apk",
                 ),
 //                array(
 //                    "cover" => "https://img3.doubanio.com/view/dale-online/dale_ad/public/18a3cc696cf9561.jpg",
