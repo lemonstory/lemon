@@ -1,5 +1,5 @@
 <?php
-include_once '../controller.php';
+include_once '../../controller.php';
 
 class getTagAlbumList extends controller
 {
