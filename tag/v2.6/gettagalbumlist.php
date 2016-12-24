@@ -79,68 +79,53 @@ class getTagAlbumList extends controller
         // 获取指定二级标签下，指定长度的专辑与标签关联列表
         // 避免取到故事数量为0的故事专辑,做排查处理
         //TODO:该业务效率偏低
-        $albumRelationList = array();
-        $index = 0;
         $albumObj = new Album();
 
 
-        $albumRelationList = $tagNewObj->getAlbumTagRelationListFromTag($tagIds, $recommend, $hot, $goodComment, $direction, $startRelationId, $len);
+        $albumRelationList = $tagNewObj->getAlbumTagRelationListFromTag($tagIds, $recommend, $hot, $goodComment,
+            $direction, $startRelationId, $len);
         $albumIds = array();
         foreach ($albumRelationList as $k => $relationlist) {
             $albumIds[] = $relationlist['albumid'];
         }
 
-        //故事辑去重
-        //键名保留不变
-//        $albumIds = array_unique($albumIds);
-//
-//        $unique_album_relation_list = array();
-//        foreach ($albumIds as $key => $item) {
-//            $unique_album_relation_list[] = $albumRelationList[$key];
-//        }
-//
-//        $albumRelationList = $unique_album_relation_list;
+        // 专辑信息
         $albumInfos = $albumObj->getListByIds($albumIds);
 
+        // 获取推荐语
+        $recommendDescObj = new RecommendDesc();
+        $recommendDescList = $recommendDescObj->getAlbumRecommendDescList($albumIds);
 
-        //取出$len长度的story_num大于0的$albumRelationList
-//        if (!empty($albumRelationList) && !empty($albumInfos)) {
-//            foreach ($albumRelationList as $k => $relationInfo) {
-//                if ($index < $len) {
-//                    $albumid = $relationInfo['albumid'];
-//                    if ($albumInfos[$albumid]['story_num'] > 0 && $albumInfos[$albumid]['status'] == 1) {
-//                        $index++;
-//                    } else {
-//
-//                        //array_splice($albumRelationList, $k, 1);
-//                        unset($albumRelationList[$k]);
-//                    }
-//                } else {
-//
-//                    $albumRelationList = array_slice($albumRelationList, 0, $index);
-//                    break;
-//                }
-//            }
-//        }
 
         $albumRelationListcount = count($albumRelationList);
         if ($albumRelationListcount <= $len) {
             foreach ($albumRelationList as $relationInfo) {
                 $albumid = $relationInfo['albumid'];
-                $relationInfo['albuminfo'] = array();
                 if (!empty($albumInfos[$albumid])) {
-                    $albumInfo = $albumInfos[$albumid];
-                    if (!empty($albumInfo['cover'])) {
-                        $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $albumInfo['cover'], 460, $albumInfo['cover_time']);
+                    $albumInfo = array();
+                    $albumInfo['id'] = $albumInfos[$albumid]['id'];
+                    $albumInfo['title'] = $albumInfos[$albumid]['title'];
+                    $albumInfo['story_num'] = $albumInfos[$albumid]['story_num'];
+                    $albumInfo['intro'] = $albumInfos[$albumid]['intro'];
+                    $albumAgeLevelStr = $albumObj->getAgeLevelStr($albumInfo['min_age'], $albumInfo['max_age']);
+                    $albumInfo['age_str'] = sprintf("适合%s岁", $albumAgeLevelStr);
+                    if (!empty($albumInfos[$albumid]['cover'])) {
+                        $albumInfo['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM,
+                            $albumInfos[$albumid]['cover'], 460, $albumInfos[$albumid]['cover_time']);
+                    }
+                    $albumInfo['listennum'] = intval($relationInfo['albumlistennum']) > 0 ? substr($relationInfo['albumlistennum'],
+                        0, 5) : 0;
+
+                    $albumInfo['recommenddesc'] = "";
+                    if (!empty($recommendDescList[$albumid])) {
+                        $albumInfo['recommenddesc'] = $recommendDescList[$albumid]['desc'];
                     }
 
-
-                    $albumInfo['listennum'] = intval($relationInfo['albumlistennum']) > 0 ? substr($relationInfo['albumlistennum'], 0, 5) : 0;
+                    $albumInfo['fav'] = $albumInfos[$albumid]['fav'];
                     $albumInfo['favnum'] = $relationInfo['albumfavnum'];
                     $albumInfo['star_level'] = $relationInfo['commentstarlevel'];
-                    $relationInfo['albuminfo'] = $albumInfo;
+                    $tagAlbumList[] = $albumInfo;
                 }
-                $tagAlbumList[] = $relationInfo;
             }
         }
 
