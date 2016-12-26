@@ -1,5 +1,5 @@
 <?php
-require dirname(__FILE__).'/init.php';
+require dirname(__FILE__) . '/init.php';
 
 ## log page runtime
 define('SLOWPAGELOG', true);
@@ -10,36 +10,66 @@ register_shutdown_function(array('Runtime', 'logRunTime'));
 
 abstract class controller
 {
+
     protected $actionData = array();
-    
+    protected $debug = false;
+
+    const DEV_SITE = 'dev.xiaoningmeng.net';
+
+    const API_SITE = 'api.xiaoningmeng.net';
+
     public function __construct()
     {
+        $this->debug = isset($_GET['debug']) && $_SERVER['HTTP_HOST']== self::DEV_SITE ? true : false;
+
         $this->checkHostInfo();
         $this->checkImsiInfo();
         $this->getActionData();
         $this->checkFilters();
         $this->getAppVertion();
+        $this->debug && $this->debugStart();
         $this->action();
+        $this->debug && $this->debugEnd();
     }
-    
+
+    protected function debugStart()
+    {
+        xhprof_enable();
+    }
+
+    protected function debugEnd()
+    {
+        $debugData = xhprof_disable();
+        include_once SERVER_ROOT . "libs/xhprof/xhprof_lib/utils/xhprof_lib.php";//从源码包中拷贝xhprof_lib这个文件夹过来直接可以调用
+        include_once SERVER_ROOT . "libs/xhprof/xhprof_lib/utils/xhprof_runs.php";
+        $objXhprofRun = new XHProfRuns_Default();//数据会保存在php.ini中xhprof.output_dir设置的目录去中
+        $run_id = $objXhprofRun->save_run($debugData, "test");
+        echo "<div><hr><hr><a target='_blank' href='http://dev.xiaoningmeng.net/libs/xhprof/xhprof_html/index.php?run={$run_id}&source=test'>查看分析</a><hr><hr></div>";
+    }
+
     protected function checkHostInfo()
     {
         $host = $_SERVER['HTTP_HOST'];
-        if($host != 'api.xiaoningmeng.net' && $host != 'dev.xiaoningmeng.net') {
+        if ($host != self::API_SITE && $host != self::DEV_SITE) {
             header("HTTP/1.0 404 Not Found");
             exit;
         }
     }
-    
+
     protected function checkImsiInfo()
     {
+        $host = $_SERVER['HTTP_HOST'];
+        if ($host == self::DEV_SITE) {
+            return;
+        }
+
         $imsi = getImsi();
-        if(empty($imsi)) {
+        if (empty($imsi)) {
             header("HTTP/1.0 404 Not Found");
             exit;
         }
     }
-    
+
     protected function getAppVertion()
     {
         $userAgent = @$_SERVER['HTTP_USER_AGENT'];
@@ -55,8 +85,8 @@ abstract class controller
             $_SERVER['visitorappversion'] = $version;
         }
     }
-    
-    
+
+
     protected function getSmartyObj()
     {
         include_once SERVER_ROOT . 'libs/smarty/Smarty.class.php';
@@ -66,33 +96,33 @@ abstract class controller
         $smarty->cache_dir = SERVER_ROOT . "view/cache/";
         return $smarty;
     }
-    
+
     public function checkFilters()
     {
         if (HTTP_CACHE == true) {
             $this->checkHttpCache();
         }
     }
-    
+
     public function filters()
     {
         return array();
     }
-    
+
     private function getActionData()
     {
         $script = str_replace('.php', '', @$_SERVER['SCRIPT_NAME']);
         $scriptArr = @explode('/', trim($script, '/'));
-        if (!is_array($scriptArr)){
+        if (!is_array($scriptArr)) {
             return array();
         }
         list($module, $action) = $scriptArr;
         $data['module'] = $module;
         $data['action'] = $action;
-        
+
         $querys = $_SERVER["QUERY_STRING"];
         $params = array();
-        if (!empty($querys)){
+        if (!empty($querys)) {
             $queryParts = explode('&', $querys);
             foreach ($queryParts as $param) {
                 if ($param == "") {
@@ -103,9 +133,9 @@ abstract class controller
             }
         }
         $data['params'] = $params;
-        
+
         $this->actionData = $data;
-        
+
         return $data;
     }
 
@@ -115,61 +145,64 @@ abstract class controller
         $uid = $SsoObj->getUid();
         return $uid;
     }
-    
-    
-    abstract  function action();
-    
-    
-    protected function showErrorJson($data=array())
+
+
+    abstract function action();
+
+
+    protected function showErrorJson($data = array())
     {
-        if(empty($data))
-        {
+        $this->debug && $this->debugEnd();
+        if (empty($data)) {
             $data = ErrorConf::systemError();
         }
         echo json_encode($data);
         exit;
     }
-    protected function showSuccJson($data=array())
+
+    protected function showSuccJson($data = array())
     {
-        if(empty($data) && $data!=0)
-        {
-            echo json_encode(array('code'=>10000));
-        }else{
-            echo json_encode(array('code'=>10000,'data'=>$data));
+        $this->debug && $this->debugEnd();
+        if (empty($data) && $data != 0) {
+            echo json_encode(array('code' => 10000));
+        } else {
+            echo json_encode(array('code' => 10000, 'data' => $data));
         }
         exit;
     }
-    
-    public function getRequest($option, $default='', $method='request')
+
+    public function getRequest($option, $default = '', $method = 'request')
     {
-        if ($method == 'get'){
+        if ($method == 'get') {
             return isset($_GET[$option]) ? $_GET[$option] : $default;
-        } else if ($method == 'post'){
-            return isset($_POST[$option]) ? $_POST[$option] : $default;
-        } else{
-            return isset($_REQUEST[$option]) ? $_REQUEST[$option] : $default;
-        } 
+        } else {
+            if ($method == 'post') {
+                return isset($_POST[$option]) ? $_POST[$option] : $default;
+            } else {
+                return isset($_REQUEST[$option]) ? $_REQUEST[$option] : $default;
+            }
+        }
     }
-    
+
     protected function redirect($url, $statusCode = 302)
     {
-        if(strpos($url,'/')===0 && strpos($url,'//')!==0) {
-            if(isset($_SERVER['HTTP_HOST'])) {
-                $hostInfo = 'http://'.$_SERVER['HTTP_HOST'];
+        if (strpos($url, '/') === 0 && strpos($url, '//') !== 0) {
+            if (isset($_SERVER['HTTP_HOST'])) {
+                $hostInfo = 'http://' . $_SERVER['HTTP_HOST'];
             } else {
-                $hostInfo = 'http://'.$_SERVER['SERVER_NAME'];
+                $hostInfo = 'http://' . $_SERVER['SERVER_NAME'];
             }
             $url = $hostInfo . $url;
         }
         header('Location: ' . $url, true, $statusCode);
     }
-    
+
     public function checkHttpCache()
     {
         $httpCacheObj = new HttpCache();
         $httpCacheObj->checkHttpCache($this->actionData);
     }
-    
+
     public function commonHumanTime($time)
     {
         $dur = time() - $time;
