@@ -198,7 +198,7 @@ class UserExtend extends ModelBase
 		} elseif ($age > 6 && $age <= 10) {
 			$agetype = 3;
 		} else {
-			$agetype = 3;
+			$agetype = 4;
 		}
 		return $agetype;
 	}

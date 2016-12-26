@@ -192,17 +192,18 @@ class TagNew extends ModelBase
             return json_decode($redisData, true);
         }
     }
-    
-    
+
+
     /**
      * 标签专辑列表：获取指定标签下的专辑列表
-     * @param A $tagids        指定标签id数组
-     * @param I $isrecommend   是否为一级标签下的推荐标签
-     * @param I $ishot         是否为一级标签下的热门标签
-     * @param I $isgoodcomment 是否为一级标签下的好评榜标签
-     * @param S $direction    
-     * @param I $startrelationid   获取更多时，album_tag_relation的id
-     * @param I $len
+     * @param A $tagids 指定标签id数组
+     * @param I|int $isrecommend 是否为一级标签下的推荐标签
+     * @param I|int $ishot 是否为一级标签下的热门标签
+     * @param I|int $isgoodcomment 是否为一级标签下的好评榜标签
+     * @param S|string $direction
+     * @param I|int $startrelationid 获取更多时，album_tag_relation的id
+     * @param I|int $len
+     * @return array
      */
     public function getAlbumTagRelationListFromTag($tagids, $isrecommend = 0, $ishot = 0, $isgoodcomment = 0, $direction = "down", $startrelationid = 0, $len = 20)
     {
@@ -231,6 +232,7 @@ class TagNew extends ModelBase
         $orderby = "";
         if ($isrecommend == 1) {
             // 推荐
+
             $where .= " AND `isrecommend` = 1 AND `recommendstatus` = '{$this->RECOMMEND_STATUS_ONLIINE}'";
             if (!empty($albumtagrelationinfo)) {
                 if (!empty($albumtagrelationinfo['uptime'])) {

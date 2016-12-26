@@ -328,4 +328,10 @@ class RedisKey
 	{
 	    return "tag_tagname_" . $tagname;
 	}
+
+	//获首页缓存key
+    public static function getIndexDataKey($babyagetype)
+    {
+        return 'index_data_' . $babyagetype;
+    }
 }
