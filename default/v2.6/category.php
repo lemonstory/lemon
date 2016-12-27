@@ -36,7 +36,6 @@ class categorylist extends controller
         }
         $redisobj = AliRedisConnecter::connRedis(self::CACHE_INSTANCE);
         $categoryTagsKey = RedisKey::getCategoryTagsKey();
-        $data = array();
         $redisData = $redisobj->get($categoryTagsKey);
         if ($redisData) {
             $data['tag'] = unserialize($redisData);
