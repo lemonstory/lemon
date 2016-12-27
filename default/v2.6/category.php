@@ -8,6 +8,9 @@
 include_once '../../controller.php';
 class categorylist extends controller
 {
+    const CACHE_INSTANCE = 'cache';
+    const CACHE_EXPIRE = 3600;
+
     public function action()
     {
 
@@ -31,33 +34,45 @@ class categorylist extends controller
                 $data['age_level']['items'][] = $item;
             }
         }
+        $redisobj = AliRedisConnecter::connRedis(self::CACHE_INSTANCE);
+        $categoryTagsKey = RedisKey::getCategoryTagsKey();
+        $data = array();
+        $redisData = $redisobj->get($categoryTagsKey);
+        if ($redisData) {
+            $data['tag'] = unserialize($redisData);
+        }
+        else {
+            $data['tag'] = array();
+            $tagInfoObj = new TagInfo();
+            $aliossObj = new AliOss();
+            //获取一级分类
+            $firstList = $tagInfoObj->get_list(' pid = 0 and status=1', 'id,name', 'ordernum desc', 100);
+            $data['tag']['total'] = count($firstList);
+            foreach ($firstList as $key => $val) {
+                $tmp['id'] = $val['id'];
+                $tmp['name'] = $val['name'];
 
-        $data['tag'] = array();
-        $tagInfoObj = new TagInfo();
-        $aliossObj = new AliOss();
-        //获取一级分类
-        $firstList = $tagInfoObj->get_list(' pid = 0 and status=1','id,name','ordernum desc',100);
-        $data['tag']['total'] = count($firstList);
-        foreach($firstList as $key=>$val){
-            $tmp['id'] = $val['id'];
-            $tmp['name'] = $val['name'];
-
-            //取二级分类
-            $secondList = $tagInfoObj->get_list(' pid = ' . $val['id'] . ' and status=1', 'id,name,cover,covertime', 'ordernum desc', 100);
-            foreach ($secondList as $key => $val) {
-                $secondList[$key]['id'] = $val['id'];
-                $secondList[$key]['name'] = $val['name'];
-                $secondList[$key]['cover'] = "";
-                if (!empty($val['cover'])) {
-                    $secondList[$key]['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_TAG, $val['cover'], 0, $val['covertime']);
+                //取二级分类
+                $secondList = $tagInfoObj->get_list(' pid = ' . $val['id'] . ' and status=1', 'id,name,cover,covertime',
+                    'ordernum desc', 100);
+                foreach ($secondList as $key => $val) {
+                    $secondList[$key]['id'] = $val['id'];
+                    $secondList[$key]['name'] = $val['name'];
+                    $secondList[$key]['cover'] = "";
+                    if (!empty($val['cover'])) {
+                        $secondList[$key]['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_TAG,
+                            $val['cover'], 0, $val['covertime']);
+                    }
+                    $secondList[$key]['linkurl'] = sprintf("xnm://www.xiaoningmeng.net/default/v2.6/tag_album_list.php?tag_id=%s",
+                        $val['id']);
+                    unset($secondList[$key]['covertime']);
                 }
-                $secondList[$key]['linkurl'] = sprintf("xnm://www.xiaoningmeng.net/default/v2.6/tag_album_list.php?tag_id=%s", $val['id']);
-                unset($secondList[$key]['covertime']);
-            }
-            $tmp['child_total'] = count($secondList);
-            $tmp['child_items'] = $secondList;
+                $tmp['child_total'] = count($secondList);
+                $tmp['child_items'] = $secondList;
 
-            $data['tag']['items'][] = $tmp;
+                $data['tag']['items'][] = $tmp;
+            }
+            $redisobj->setex($categoryTagsKey, self::CACHE_EXPIRE, serialize($data['tag']));
         }
         $this->showSuccJson($data);
     }

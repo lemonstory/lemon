@@ -589,8 +589,7 @@ class Album extends ModelBase
             $db = DbConnecter::connectMysql('share_story');
             $st = $db->query( $sql );
             $st->setFetchMode(PDO::FETCH_ASSOC);
-            $r  = $st->fetchAll();
-            $r  = array_pop($r);
+            $r  = $st->fetch();
             $redisobj->setex($key, 604800, json_encode($r));
         }
         
