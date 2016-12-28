@@ -252,7 +252,7 @@ class Album extends ModelBase
                         $onedbdata['fav'] = 0;
                     }
                     $dbData[$onedbdata['id']] = $onedbdata;
-                    $onekey = RedisKey::getAlbumInfoKey($onedbdata['id']);
+                    $onekey = RedisKey::getAlbumInfoApiKey($onedbdata['id']);
                     $redisobj->setex($onekey, 86400, json_encode($onedbdata));
                 }
             }

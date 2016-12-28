@@ -150,11 +150,19 @@ class RedisKey
         return 'album_info_' . $albumId;
     }
 
+    /**
+     * 专辑信息
+     */
+    public static function getAlbumInfoApiKey($albumId)
+    {
+        return 'album_info_api_' . $albumId;
+    }
+
     public static function getAlbumInfoKeys($albumids)
     {
         $albumidarr = array();
         foreach ($albumids as $albumid) {
-            $albumidarr[] = self::getAlbumInfoKey($albumid);
+            $albumidarr[] = self::getAlbumInfoApiKey($albumid);
         }
         return $albumidarr;
     }
