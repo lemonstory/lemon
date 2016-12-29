@@ -245,6 +245,10 @@ class Sso extends ModelBase
         //test --end
         $userinfo['uc_callback'] = $match[2];
 
+        //增加用户收藏数
+        $favobj = new Fav();
+        $userinfo['favcount'] = $favobj->getUserFavCount($uid);
+
         // 登录后的处理
         $actionlogobj = new ActionLog();
         $userimsiobj = new UserImsi();
