@@ -256,6 +256,10 @@ class index extends controller
                     "cover" => "http://p.xiaoningmeng.net/static/guanjia.jpg",
                     "linkurl" => "https://at.umeng.com/DuieGv",
                 ),
+                array(
+                    "cover" => "http://p.xiaoningmeng.net/static/duobao.jpg",
+                    "linkurl" => "http://d1.eoemarket.com/partner/duobao/mfdb-g10.apk",
+                ),
             )
         );
 
