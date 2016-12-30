@@ -274,7 +274,7 @@ class index extends controller
 
             //广告
             $data['ad'] = array(
-                "total" => 3,
+                "total" => 5,
                 "items" => array(
                     array(
                         "cover" => "http://p.xiaoningmeng.net/static/fang.jpg",
