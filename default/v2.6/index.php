@@ -241,8 +241,8 @@ class index extends controller
             "total" => 5,
             "items" => array(
                 array(
-                    "cover" => "http://p.xiaoningmeng.net/static/fang.jpg",
-                    "linkurl" => "http://m.fang.com/zt/wap/201612/lxshiyong1.html?city=bj&m=home&source=jiajupr&utm_source=baobei",
+                    "cover" => "http://p.xiaoningmeng.net/static/niuniufudai.jpg",
+                    "linkurl" => "https://gw3.mouchina.com/static/H5-3.0/share.html?key=22fa13c8a0f4ef8a1323c84356f892568fe0bcfb_3&userId=1000000483",
                 ),
                 array(
                     "cover" => "http://p.xiaoningmeng.net/static/vote.jpg",
