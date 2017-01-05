@@ -246,10 +246,10 @@ class index extends controller
                     "linkurl" => "https://gw3.mouchina.com/static/H5-3.0/share.html?key=22fa13c8a0f4ef8a1323c84356f892568fe0bcfb_3&userId=1000000483",
                 ),
                 //高人汇
-                array(
-                    "cover" => "http://p.xiaoningmeng.net/static/gaorenhui.png",
-                    "linkurl" => "http://wap.gaoren.net/index.php?m=ZTM&c=Appwx&a=oneDollar&source=xiaoningmeng",
-                ),
+//                array(
+//                    "cover" => "http://p.xiaoningmeng.net/static/gaorenhui.png",
+//                    "linkurl" => "http://wap.gaoren.net/index.php?m=ZTM&c=Appwx&a=oneDollar&source=xiaoningmeng",
+//                ),
                 //掌上看家（免费手机监控器）
                 array(
                     "cover" => "http://p.xiaoningmeng.net/static/guanjia.jpg",
