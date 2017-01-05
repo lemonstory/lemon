@@ -276,25 +276,40 @@ class index extends controller
             $data['ad'] = array(
                 "total" => 5,
                 "items" => array(
+                    //牛牛福袋
                     array(
                         "cover" => "http://p.xiaoningmeng.net/static/niuniufudai.jpg",
                         "linkurl" => "https://gw3.mouchina.com/static/H5-3.0/share.html?key=22fa13c8a0f4ef8a1323c84356f892568fe0bcfb_3&userId=1000000483",
                     ),
+                    //高人汇
                     array(
-                        "cover" => "http://p.xiaoningmeng.net/static/vote.jpg",
-                        "linkurl" => "http://wechat.iuqiancheng.com/download/vote?c=xiaoningmeng",
+                        "cover" => "http://p.xiaoningmeng.net/static/gaorenhui.png",
+                        "linkurl" => "http://wap.gaoren.net/index.php?m=ZTM&c=Appwx&a=oneDollar&source=xiaoningmeng",
                     ),
-                    array(
-                        "cover" => "http://p.xiaoningmeng.net/static/xiaoshuo.jpg",
-                        "linkurl" => "http://jic.xiaoningmeng.net/apk/FreeBook_V41_1910_FreeShu_baomdbhl_V2.7.0_9245_118_2016-12-15-06-23-14.apk",
-                    ),
+                    //掌上看家（免费手机监控器）
                     array(
                         "cover" => "http://p.xiaoningmeng.net/static/guanjia.jpg",
                         "linkurl" => "https://at.umeng.com/DuieGv",
                     ),
+                    //免费夺宝（免费惊喜，就在身边）
                     array(
                         "cover" => "http://p.xiaoningmeng.net/static/duobao.jpg",
                         "linkurl" => "http://d1.eoemarket.com/partner/duobao/mfdb-g10.apk",
+                    ),
+                    //我们的餐厅
+                    array(
+                        "cover" => "http://p.xiaoningmeng.net/static/canzhuo.jpg",
+                        "linkurl" => "http://xiaoningm.flzhan.com/index.html",
+                    ),
+                    //投票大王
+                    array(
+                        "cover" => "http://p.xiaoningmeng.net/static/vote.jpg",
+                        "linkurl" => "http://wechat.iuqiancheng.com/download/vote?c=xiaoningmeng",
+                    ),
+                    //免费电子书
+                    array(
+                        "cover" => "http://p.xiaoningmeng.net/static/xiaoshuo.jpg",
+                        "linkurl" => "http://jic.xiaoningmeng.net/apk/FreeBook_V41_1910_FreeShu_baomdbhl_V2.7.0_9245_118_2016-12-15-06-23-14.apk",
                     ),
                 )
             );
