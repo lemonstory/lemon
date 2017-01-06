@@ -1,6 +1,7 @@
 <?php
 include_once '../../controller.php';
 
+
 class getTagAlbumList extends controller
 {
     public function action()
@@ -100,6 +101,12 @@ class getTagAlbumList extends controller
         $albumRelationListcount = count($albumRelationList);
         if ($albumRelationListcount <= $len) {
             foreach ($albumRelationList as $relationInfo) {
+
+                $tagAlbumItem['id'] = $relationInfo['id'];
+                $tagAlbumItem['tagid'] = $relationInfo['tagid'];
+                $tagAlbumItem['albumid'] = $relationInfo['albumid'];
+                $tagAlbumItem['id'] = $relationInfo['id'];
+
                 $albumid = $relationInfo['albumid'];
                 if (!empty($albumInfos[$albumid])) {
                     $albumInfo = array();
@@ -124,8 +131,9 @@ class getTagAlbumList extends controller
                     $albumInfo['fav'] = $albumInfos[$albumid]['fav'];
                     $albumInfo['favnum'] = $relationInfo['albumfavnum'];
                     $albumInfo['star_level'] = $relationInfo['commentstarlevel'];
-                    $tagAlbumList[] = $albumInfo;
+                    $tagAlbumItem['albuminfo'] = $albumInfo;
                 }
+                $tagAlbumList[] = $tagAlbumItem;
             }
         }
 
