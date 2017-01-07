@@ -286,20 +286,10 @@ class index extends controller
 //                        "cover" => "http://p.xiaoningmeng.net/static/gaorenhui.png",
 //                        "linkurl" => "http://wap.gaoren.net/index.php?m=ZTM&c=Appwx&a=oneDollar&source=xiaoningmeng",
 //                    ),
-                    //掌上看家（免费手机监控器）
+                    //唯彩会-彩票中奖助你中500万
                     array(
-                        "cover" => "http://p.xiaoningmeng.net/static/guanjia.jpg",
-                        "linkurl" => "https://at.umeng.com/DuieGv",
-                    ),
-                    //免费夺宝（免费惊喜，就在身边）
-                    array(
-                        "cover" => "http://p.xiaoningmeng.net/static/duobao.jpg",
-                        "linkurl" => "http://d1.eoemarket.com/partner/duobao/mfdb-g10.apk",
-                    ),
-                    //我们的餐厅
-                    array(
-                        "cover" => "http://p.xiaoningmeng.net/static/canzhuo.jpg",
-                        "linkurl" => "http://xiaoningm.flzhan.com/index.html",
+                        "cover" => "http://p.xiaoningmeng.net/static/wei_cai_hui.jpg",
+                        "linkurl" => "http://dl2.vipc.cn/Vipc-APPxnmteg.apk",
                     ),
                     //投票大王
                     array(
