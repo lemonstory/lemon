@@ -250,10 +250,15 @@ class index extends controller
 //                        "cover" => "http://p.xiaoningmeng.net/static/gaorenhui.png",
 //                        "linkurl" => "http://wap.gaoren.net/index.php?m=ZTM&c=Appwx&a=oneDollar&source=xiaoningmeng",
 //                    ),
-                //唯彩会-彩票中奖助你中500万
+                //约约-吃货扫年货
                 array(
-                    "cover" => "http://p.xiaoningmeng.net/static/wei_cai_hui.jpg",
-                    "linkurl" => "http://dl2.vipc.cn/Vipc-APPxnmteg.apk",
+                    "cover" => "http://p.xiaoningmeng.net/static/yueyue.jpg",
+                    "linkurl" => "http://t.yueus.com/qXYia3",
+                ),
+                //返利网-新用户注册只要一元
+                array(
+                    "cover" => "http://p.xiaoningmeng.net/static/fanli.jpg",
+                    "linkurl" => "http://passport.fanli.com/mark?c=4kpbcn1dqs",
                 ),
                 //投票大王
                 array(
