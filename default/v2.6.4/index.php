@@ -291,11 +291,6 @@ class index extends controller
                         "cover" => "http://p.xiaoningmeng.net/static/yueyue.jpg",
                         "linkurl" => "http://t.yueus.com/qXYia3",
                     ),
-                    //返利网-新用户注册只要一元
-                    array(
-                        "cover" => "http://p.xiaoningmeng.net/static/fanli.jpg",
-                        "linkurl" => "http://passport.fanli.com/mark?c=4kpbcn1dqs",
-                    ),
                     //投票大王
                     array(
                         "cover" => "http://p.xiaoningmeng.net/static/vote.jpg",
