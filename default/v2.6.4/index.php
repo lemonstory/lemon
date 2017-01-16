@@ -286,6 +286,7 @@ class index extends controller
 //                        "cover" => "http://p.xiaoningmeng.net/static/gaorenhui.png",
 //                        "linkurl" => "http://wap.gaoren.net/index.php?m=ZTM&c=Appwx&a=oneDollar&source=xiaoningmeng",
 //                    ),
+
                     //约约-吃货扫年货
                     array(
                         "cover" => "http://p.xiaoningmeng.net/static/yueyue.jpg",
