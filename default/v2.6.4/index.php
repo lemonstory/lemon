@@ -281,26 +281,11 @@ class index extends controller
                         "cover" => "http://p.xiaoningmeng.net/static/niuniufudai.jpg",
                         "linkurl" => "https://gw3.mouchina.com/static/H5-3.0/share.html?key=22fa13c8a0f4ef8a1323c84356f892568fe0bcfb_3&userId=1000000483",
                     ),
-                    //高人汇
-//                    array(
-//                        "cover" => "http://p.xiaoningmeng.net/static/gaorenhui.png",
-//                        "linkurl" => "http://wap.gaoren.net/index.php?m=ZTM&c=Appwx&a=oneDollar&source=xiaoningmeng",
-//                    ),
 
-                    //约约-吃货扫年货
+                    //房天下
                     array(
-                        "cover" => "http://p.xiaoningmeng.net/static/yueyue.jpg",
-                        "linkurl" => "http://t.yueus.com/qXYia3",
-                    ),
-                    //投票大王
-                    array(
-                        "cover" => "http://p.xiaoningmeng.net/static/vote.jpg",
-                        "linkurl" => "http://wechat.iuqiancheng.com/download/vote?c=xiaoningmeng",
-                    ),
-                    //免费电子书
-                    array(
-                        "cover" => "http://p.xiaoningmeng.net/static/xiaoshuo.jpg",
-                        "linkurl" => "http://jic.xiaoningmeng.net/apk/FreeBook_V41_1910_FreeShu_baomdbhl_V2.7.0_9245_118_2016-12-15-06-23-14.apk",
+                        "cover" => "http://p.xiaoningmeng.net/static/fang2.jpg",
+                        "linkurl" => "http://url.cn/43wvxQJ",
                     ),
                 )
             );
