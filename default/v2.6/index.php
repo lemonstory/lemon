@@ -238,7 +238,7 @@ class index extends controller
 
         //广告
         $data['ad'] = array(
-            "total" => 5,
+            "total" => 2,
             "items" => array(
                 //牛牛福袋
                 array(
