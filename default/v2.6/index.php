@@ -238,20 +238,13 @@ class index extends controller
 
         //广告
         $data['ad'] = array(
-            "total" => 2,
+            "total" => 0,
             "items" => array(
-                //牛牛福袋
-                array(
-                    "cover" => "http://p.xiaoningmeng.net/static/niuniufudai.jpg",
-                    "linkurl" => "https://gw3.mouchina.com/static/H5-3.0/share.html?key=22fa13c8a0f4ef8a1323c84356f892568fe0bcfb_3&userId=1000000483",
-                ),
-
-                //房天下
-                array(
-                    "cover" => "http://p.xiaoningmeng.net/static/fang2.jpg",
-                    "linkurl" => "http://url.cn/43wvxQJ",
-                ),
-            )
+//                //牛牛福袋
+//                array(
+//                    "cover" => "http://p.xiaoningmeng.net/static/niuniufudai.jpg",
+//                    "linkurl" => "https://gw3.mouchina.com/static/H5-3.0/share.html?key=22fa13c8a0f4ef8a1323c84356f892568fe0bcfb_3&userId=1000000483",
+//                ),
         );
 
         //热门作者
