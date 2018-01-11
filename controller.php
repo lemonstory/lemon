@@ -23,7 +23,7 @@ abstract class controller
         $this->debug = isset($_GET['debug']) && $_SERVER['HTTP_HOST']== self::DEV_SITE ? true : false;
 
         $this->checkHostInfo();
-        $this->checkImsiInfo();
+//        $this->checkImsiInfo();
         $this->getActionData();
         $this->checkFilters();
         $this->getAppVertion();
