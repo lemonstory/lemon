@@ -20,7 +20,7 @@ class AlbumTagRelation extends ModelBase
         $offset = ($currentPage - 1) * $perPage;
 
         $db = DbConnecter::connectMysql('share_story');
-        $select = 'a.id,a.title,a.cover,a.cover_time,a_t.albumlistennum as listen_num';
+        $select = 'a.id,a.title,a.intro,a.cover,a.cover_time,a_t.albumlistennum as listen_num';
         $sql = "SELECT {$select}
                 FROM `album_tag_relation` AS a_t LEFT JOIN `album` AS a ON a_t.albumid=a.id 
                 WHERE {$where} 
