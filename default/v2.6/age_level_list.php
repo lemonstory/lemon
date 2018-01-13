@@ -51,7 +51,7 @@ class agelevellist extends controller
                 ['id'=>183,'name'=>'奇幻探险'],
                 ['id'=>32,'name'=>'历史故事'],
                 ['id'=>49,'name'=>'传统经典'],
-                ['id'=>128,'name'=>'儿童学习'],
+//                ['id'=>128,'name'=>'儿童学习'],
             ],
             'focusPicCategory' => 'seven_ten_years_old_home',
         ],
