@@ -686,7 +686,7 @@ class Album extends ModelBase
     }
     
 
-    public function getAlbumListByAge($min_age,$max_age,$start_album_id=0,$select='a.id,a.title,a.cover,a.cover_time,a_t.albumlistennum as listen_num',$offset=0,$perPage=4){
+    public function getAlbumListByAge($min_age,$max_age,$start_album_id=0,$select='a.id,a.title,a.intro,a.cover,a.cover_time,a_t.albumlistennum as listen_num',$offset=0,$perPage=4){
         $where = ' online_status=1 ';
         //和getAgeLevelWithAlbums的年龄比较的规则相同
         if ($min_age == 0 && $max_age != 0 && $max_age != 14) {
