@@ -113,7 +113,9 @@ class agelevellist extends controller
             // 获取推荐语
             $recommendList = $recommendDescObj->getAlbumRecommendDescList($val['id']);
             $val['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $val['cover'], 460, $val['cover_time']);
-            $val['recommend_desc'] = empty($recommendList[$val['id']]['desc']) ? $val['intro']  : $recommendList[$val['id']]['desc'];
+            $recommendDesc = trim(empty($recommendList[$val['id']]['desc']) ? $val['intro']  : $recommendList[$val['id']]['desc']);
+            $val['recommend_desc'] = str_replace("　","",$recommendDesc);
+
             $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
             $val['listen_num'] = $albumObj->format_album_listen_num($val['listen_num'] + 0);
             unset($val['cover_time']);
@@ -133,12 +135,14 @@ class agelevellist extends controller
         foreach ($this->ageLevelArr[$ageKey]['tagList'] as $item) {
 
             $albumTagList = $albumTagObj->getAlbumListByTagId($item['id'],1,6);
+
             //格式化返回
             foreach ($albumTagList as $key=>$val){
                 // 获取推荐语
                 $recommendList = $recommendDescObj->getAlbumRecommendDescList($val['id']);
                 $val['cover'] = $aliossObj->getImageUrlNg($aliossObj->IMAGE_TYPE_ALBUM, $val['cover'], 460, $val['cover_time']);
-                $val['recommend_desc'] = empty($recommendList[$val['id']]['desc']) ? $val['intro']  : $recommendList[$val['id']]['desc'];
+                $recommendDesc = trim(empty($recommendList[$val['id']]['desc']) ? $val['intro']  : $recommendList[$val['id']]['desc']);
+                $val['recommend_desc'] = str_replace("　","",$recommendDesc);
                 $val['linkurl'] = 'xnm://www.xiaoningmeng.net/album/info.php?albumid='.$val['id'];
                 $val['listen_num'] = $albumObj->format_album_listen_num($val['listen_num'] + 0);
                 unset($val['tagid'],$val['cover_time']);
